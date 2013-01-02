@@ -1,13 +1,11 @@
 #
 #   Author: Hari Sekhon
 #   Date: 2011-09-15 11:30:24 +0100 (Thu, 15 Sep 2011)
-#  $LastChangedBy$
-#  $LastChangedDate$
-#  $Revision$
-#  $URL$
-#  $Id$
 #
-#  vim:ts=4:sw=4:et
+#  http://github.com/harisekhon
+#
+#  License: see accompanying LICENSE file
+#
 
 #  HARI SEKHON:
 #
