@@ -1,6 +1,6 @@
 #
-#   Author: Hari Sekhon
-#   Date: 2011-09-15 11:30:24 +0100 (Thu, 15 Sep 2011)
+#  Author: Hari Sekhon
+#  Date: 2011-09-15 11:30:24 +0100 (Thu, 15 Sep 2011)
 #
 #  http://github.com/harisekhon
 #
