@@ -47,7 +47,7 @@ use File::Basename;
 use Getopt::Long qw(:config bundling);
 #use Sys::Hostname;
 
-our $VERSION = "1.3.25";
+our $VERSION = "1.3.27";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -174,6 +174,7 @@ our @EXPORT = qw(
     validate_integer
     validate_ip
     validate_label
+    validate_node_list
     validate_password
     validate_port
     validate_process_name
@@ -282,7 +283,7 @@ our $version;
 our $warning;
 
 # universal options added automatically when using get_options()
-my %options2 = (
+our %options2 = (
     "D|debug+"     => [ \$debug,    "Debug code" ],
     "t|timeout=i"  => [ \$timeout,  "Timeout in secs (default: $default_timeout)" ],
     "v|verbose+"   => [ \$verbose,  "Verbose mode" ],
@@ -1103,11 +1104,16 @@ sub rstrip {
 
 sub set_sudo {
     local $user = $_[0] if defined($_[0]);
+    defined($user) or code_error "user arg not passed to set_sudo() and \$user not defined in outer scope";
+    # Quit if we're not the right user to ensure we don't sudo command and hang or return with a generic timeout error message
+    #quit "UNKNOWN", "not running as '$hadoop_user' user";
+    # only Mac has -n switch for non-interactive :-/
+    #$sudo = "sudo -n -u $hadoop_user ";
     if(getpwuid($>) eq $user){
         $sudo = "";
     } else {
-        vlog2("EUID doesn't match user $user, using sudo");
-        $sudo = "echo | sudo -S -u $user";
+        vlog2("EUID doesn't match user $user, using sudo\n");
+        $sudo = "echo | sudo -S -u $user ";
     }
 }
 
@@ -1402,6 +1408,20 @@ sub validate_ip {
     defined($ip) || usage "ip not specified";
     vlog_options("IP", "'$ip'");
     return (isIP($ip) || usage "invalid IP given");
+}
+
+
+sub validate_node_list {
+    my $nodes = shift;
+    my %nodes = map { $_ => 1 } split(/[,\s]+/, $nodes);
+    my @nodes = sort keys %nodes;
+    push(@nodes, @ARGV);
+    scalar @nodes or usage "node list empty";
+    foreach my $node (@nodes){
+        $node = isHost($node) || usage "Node name '$node' invalid, must be hostname/FQDN or IP address";
+    }
+    vlog_options("node list", "[ '" . join("', '", @nodes) . "' ]");
+    return @nodes;
 }
 
 
