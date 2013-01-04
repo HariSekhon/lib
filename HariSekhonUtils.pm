@@ -47,7 +47,7 @@ use File::Basename;
 use Getopt::Long qw(:config bundling);
 #use Sys::Hostname;
 
-our $VERSION = "1.3.27";
+our $VERSION = "1.3.28";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -58,7 +58,6 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(
     $critical
     $debug
-    $default_email
     $default_timeout
     $domain_regex
     $email
@@ -93,7 +92,6 @@ our @EXPORT = qw(
     %emailoptions
     %hostoptions
     %options
-    %options2
     %thresholdoptions
     %thresholds
     %useroptions
@@ -148,13 +146,13 @@ our @EXPORT = qw(
     resolve_ip
     rstrip
     rtrim
+    set_sudo
     set_timeout
     status
     strip
-    set_sudo
     trim
-    unknown
     uniq_array
+    unknown
     usage
     user_exists
     validate_database
@@ -183,8 +181,8 @@ our @EXPORT = qw(
     validate_units
     validate_url
     validate_user
-    validate_username
     validate_user_exists
+    validate_username
     verbose_mode
     version
     vlog
@@ -234,6 +232,7 @@ our %ERRORS = (
 );
 
 # Validation Regex - maybe should qr// here but it makes the vlog option output messy
+# tried reversing these to be in $regex_blah format and not auto exporting but this turned out to be less intuitive from the perspective of a module caller and it was convenient to just use the regex in pieces of code without having to import them specially. This also breaks some code such as check_hadoop_jobtracker.pl which uses $domain_regex
 my  $domain_component   = '\b(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])\b';
 # validated against http://data.iana.org/TLD/tlds-alpha-by-domain.txt which lists all possible TLDs assigned by IANA
 # this matches everything except the XN--\w{6,10} TLDs as of 8/10/2012
@@ -283,7 +282,7 @@ our $version;
 our $warning;
 
 # universal options added automatically when using get_options()
-our %options2 = (
+our %default_options = (
     "D|debug+"     => [ \$debug,    "Debug code" ],
     "t|timeout=i"  => [ \$timeout,  "Timeout in secs (default: $default_timeout)" ],
     "v|verbose+"   => [ \$verbose,  "Verbose mode" ],
@@ -387,12 +386,12 @@ sub option_present {
 sub add_options {
     my $options_hash = shift;
     isHash($options_hash, 1);
-    #@options2{keys %options} = values %options;
-    #@options2{keys %{$_[0]}} = values %{$options_hash};
+    #@default_options{keys %options} = values %options;
+    #@default_options{keys %{$_[0]}} = values %{$options_hash};
     foreach my $option (keys %{$options_hash}){
         unless(option_present($option)){
             print "want to add $option\n";
-            #$options2{$option} = ${$options_hash{$option}};
+            #$default_options{$option} = ${$options_hash{$option}};
         }
     }
 
@@ -667,17 +666,17 @@ sub expand_units {
 
 sub get_options {
     my %options3;
-    #@options2{ keys %options } = values %options;
-    foreach my $option2 (keys %options2){
+    #@default_options{ keys %options } = values %options;
+    foreach my $default_option (keys %default_options){
         # Check that the %options given don't clash with any existing or in-built options
         foreach my $option (keys %options){
             foreach my $switch (split(/\s*\|\s*/, $option)){
-                if(grep({$_ eq $switch} split(/\s*\|\s*/, $option2))){
-                    code_error("Key clash on switch '$switch' with in-built option '$option2' vs provided option '$option'");
+                if(grep({$_ eq $switch} split(/\s*\|\s*/, $default_option))){
+                    code_error("Key clash on switch '$switch' with in-built option '$default_option' vs provided option '$option'");
                 }
             }
         }
-        $options{$option2} = $options2{$option2}; #unless exists $options{$option2}; # check above is stronger
+        $options{$default_option} = $default_options{$default_option}; #unless exists $options{$default_option}; # check above is stronger
     }
     foreach(keys %options){
         unless (isArray($options{$_})){
@@ -1232,14 +1231,14 @@ sub usage {
     foreach my $option (sort keys %options){
         #debug "iterating over general options $option";
         # TODO: improve this matching for more than one long opt
-        if(grep($_ =~ /\b$option\b/, keys %options2)){
-            #debug "skipping $option cos it matched \%options2";
+        if(grep($_ =~ /\b$option\b/, keys %default_options)){
+            #debug "skipping $option cos it matched \%default_options";
             next;
         }
         print_options($option);
         #printf "%-${short_options_len}s  %-${long_options_len}s \t%s\n", $options{$option}{"short"}, $options{$option}{"long"}, $options{$option}{"desc"};
     }
-    print_options(sort { lc($a) cmp lc($b) } keys %options2);
+    print_options(sort { lc($a) cmp lc($b) } keys %default_options);
     exit $ERRORS{"UNKNOWN"};
 }
 
