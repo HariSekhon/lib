@@ -47,7 +47,7 @@ use File::Basename;
 use Getopt::Long qw(:config bundling);
 #use Sys::Hostname;
 
-our $VERSION = "1.3.28";
+our $VERSION = "1.3.29";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -58,7 +58,6 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(
     $critical
     $debug
-    $default_timeout
     $domain_regex
     $email
     $email_regex
@@ -77,6 +76,7 @@ our @EXPORT = qw(
     $status_prefix
     $sudo
     $timeout
+    $timeout_default
     $timeout_max
     $timeout_min
     $tld_regex
@@ -148,6 +148,8 @@ our @EXPORT = qw(
     rtrim
     set_sudo
     set_timeout
+    set_timeout_default
+    set_timeout_max
     status
     strip
     trim
@@ -252,7 +254,6 @@ our $url_regex          = '\b(?i:https?://' . $hostname_regex . '(?:' . $url_suf
 our $user_regex         = '\b[A-Za-z][A-Za-z0-9]+\b';
 
 our $critical;
-our $default_timeout = 10;
 our $debug = 0;
 our $email;
 our $help;
@@ -266,17 +267,18 @@ our $password;
 our $port;
 our $status = "UNKNOWN";
 our $status_prefix = "";
-our $syslog_initialized = 0;
 our $sudo = "";
-our $timeout = $default_timeout;
-our $timeout_max = 60;
-our $timeout_min = 1;
-our $usage_line  = "usage: $progname [ options ]";
+our $syslog_initialized = 0;
+our $timeout_default = 10;
+our $timeout_max     = 60;
+our $timeout_min     = 1;
+our $timeout         = $timeout_default;
+our $usage_line      = "usage: $progname [ options ]";
 our $user;
 our %thresholds;
 # Standard ordering of usage options for help. Exported and overridable inside plugin to customize usage()
 our @usage_order = qw(host port user users groups password database query field regex warning critical);
-my @valid_units = qw/% s ms us B KB MB TB c/;
+my  @valid_units = qw/% s ms us B KB MB TB c/;
 our $verbose = 0;
 our $version;
 our $warning;
@@ -284,11 +286,28 @@ our $warning;
 # universal options added automatically when using get_options()
 our %default_options = (
     "D|debug+"     => [ \$debug,    "Debug code" ],
-    "t|timeout=i"  => [ \$timeout,  "Timeout in secs (default: $default_timeout)" ],
+    "t|timeout=i"  => [ \$timeout,  "Timeout in secs (default: $timeout_default)" ],
     "v|verbose+"   => [ \$verbose,  "Verbose mode" ],
     "V|version"    => [ \$version,  "Print version and exit" ],
     "h|help"       => [ \$help,     "Print this help" ],
 );
+
+
+# These two subroutines are primarily for my other programs such as my spotify programs which have necessarily longer run times and need a good way to set this and have the %default_options auto updated for usage() to automatically stay in sync with the live options
+sub set_timeout_max {
+    $timeout_max = shift;
+    isInt($timeout_max) or code_error("must pass an integer to set_timeout_max()");
+}
+
+
+sub set_timeout_default {
+    $timeout_default = shift;
+    isInt($timeout_default) or code_error("must pass an integer to set_timeout_default()");
+    ($timeout_default > $timeout_max) and code_error("\$timeout_default ($timeout_default) may not be higher than \$timeout_max ($timeout_max)");
+    ($timeout_default < $timeout_min) and code_error("\$timeout_default ($timeout_default) may not be lower than \$timeout_min ($timeout_min)");
+    $default_options{"t|timeout=i"} = [ \$timeout, "Timeout in secs (default: $timeout_default)" ];
+}
+
 
 # Optional options
 our %hostoptions = (
