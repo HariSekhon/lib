@@ -305,6 +305,7 @@ sub set_timeout_default {
     isInt($timeout_default) or code_error("must pass an integer to set_timeout_default()");
     ($timeout_default > $timeout_max) and code_error("\$timeout_default ($timeout_default) may not be higher than \$timeout_max ($timeout_max)");
     ($timeout_default < $timeout_min) and code_error("\$timeout_default ($timeout_default) may not be lower than \$timeout_min ($timeout_min)");
+    $timeout = $timeout_default;
     $default_options{"t|timeout=i"} = [ \$timeout, "Timeout in secs (default: $timeout_default)" ];
 }
 
