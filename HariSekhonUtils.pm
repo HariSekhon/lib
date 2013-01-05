@@ -47,7 +47,7 @@ use File::Basename;
 use Getopt::Long qw(:config bundling);
 #use Sys::Hostname;
 
-our $VERSION = "1.3.29";
+our $VERSION = "1.3.30";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -116,6 +116,7 @@ our @EXPORT = qw(
     isArray
     isDigit
     isDomain
+    isEmail
     isFloat
     isFqdn
     isHash
@@ -786,6 +787,15 @@ sub isDomain {
 }
 
 
+sub isEmail {
+    my $email = shift;
+    defined($email) || return 0;
+    return 0 if(length($email) > 256);
+    $email =~ /^($email_regex)$/ || return 0;
+    return $1;
+}
+
+
 sub isFloat {
     my $number = shift;
     defined($number) or code_error("no number passed to isFloat subroutine");
@@ -1349,10 +1359,9 @@ sub validate_directory {
 
 sub validate_email {
     my $email = shift;
-    defined($email) || return 0;
-    return 0 if(length($email) > 256);
-    $email =~ /^($email_regex)$/ || return 0;
-    return $1;
+    defined($email) || usage "email not specified";
+    $email = isEmail || usage "invalid email address specified, failed regex validation";
+    return $email;
 }
 
 
