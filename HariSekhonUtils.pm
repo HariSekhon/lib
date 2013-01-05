@@ -234,7 +234,9 @@ our %ERRORS = (
     "DEPENDENT" => 4
 );
 
+# ============================================================================ #
 # Validation Regex - maybe should qr// here but it makes the vlog option output messy
+# ============================================================================ #
 # tried reversing these to be in $regex_blah format and not auto exporting but this turned out to be less intuitive from the perspective of a module caller and it was convenient to just use the regex in pieces of code without having to import them specially. This also breaks some code such as check_hadoop_jobtracker.pl which uses $domain_regex
 my  $domain_component   = '\b(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])\b';
 # validated against http://data.iana.org/TLD/tlds-alpha-by-domain.txt which lists all possible TLDs assigned by IANA
@@ -253,6 +255,7 @@ our $process_name_regex = '\b[\w\s\.\/\<\>-]+\b';
 our $url_suffix_regex   = '/[\w\.\/_\+-]+';
 our $url_regex          = '\b(?i:https?://' . $hostname_regex . '(?:' . $url_suffix_regex . ')?)\b';
 our $user_regex         = '\b[A-Za-z][A-Za-z0-9]+\b';
+# ============================================================================ #
 
 our $critical;
 our $debug = 0;
@@ -284,6 +287,9 @@ our $verbose = 0;
 our $version;
 our $warning;
 
+# ============================================================================ #
+#                                   Options
+# ============================================================================ #
 # universal options added automatically when using get_options()
 our %default_options = (
     "D|debug+"     => [ \$debug,    "Debug code" ],
@@ -330,11 +336,13 @@ our %emailoptions = (
 my $short_options_len = 0;
 my $long_options_len  = 0;
 
-############################
-# Nagios Exit Code Functions
-#
-# there is no ok func since behaviour
-# needs to be determined by plugin/scenario
+# ============================================================================ #
+#                           Nagios Exit Code Functions
+# ============================================================================ #
+
+# Set status safely - escalate only
+
+# there is no ok() since that behaviour needs to be determined by scenario
 
 sub unknown {
     if($status eq "OK"){
@@ -389,7 +397,7 @@ sub status3 {
     vlog3("status: $status");
 }
 
-############################
+# ============================================================================ #
 
 
 sub option_present {
