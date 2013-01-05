@@ -68,6 +68,19 @@ our %EXPORT_TAGS = (
                         uniq_array
                         compact_array
                     ) ],
+    'cmd'   =>  [   qw(
+                        cmd
+                        pkill
+                        set_sudo
+                        which
+                    ) ],
+    'file'  => [    qw(
+                        open_file
+                        get_path_owner
+                    ) ],
+    'io'    => [    qw(
+                        autoflush
+                    ) ],
     'is'    => [    qw(
                         isArray
                         isDigit
@@ -87,6 +100,24 @@ our %EXPORT_TAGS = (
                         isScalar
                         isUser
                         user_exists
+                    ) ],
+    'lock'  =>  [   qw(
+                        go_flock_yourself
+                        flock_off
+                    ) ],
+    'net'   =>  [   qw(
+                        resolve_ip
+                    ) ],
+    'options' => [  qw(
+                        add_options
+                        get_options
+                        check_thresholds
+                        expand_units
+                        msg_perf_thresholds
+                        plural
+                        usage
+                        validate_thresholds
+                        version
                     ) ],
     'os'    =>  [   qw(
                         isLinux
@@ -118,6 +149,15 @@ our %EXPORT_TAGS = (
                         is_unknown
                         is_ok
                         get_status_code
+                        quit
+                    ) ],
+    'string' => [   qw(
+                        lstrip
+                        ltrim
+                        rstrip
+                        rtrim
+                        strip
+                        trim
                     ) ],
     'timeout' => [  qw(
                         set_timeout
@@ -189,6 +229,7 @@ our %EXPORT_TAGS = (
                         @usage_order
                     ) ],
     'verbose' => [  qw(
+                        code_error
                         debug
                         verbose_mode
                         vlog
@@ -196,46 +237,32 @@ our %EXPORT_TAGS = (
                         vlog3
                         vlog_options
                     ) ],
+    'web'   =>  [   qw(
+                        curl
+                        wget
+                    ) ],
 );
-our @EXPORT = (
-                @{$EXPORT_TAGS{'array'}},
-                @{$EXPORT_TAGS{'is'}},
-                @{$EXPORT_TAGS{'os'}},
-                @{$EXPORT_TAGS{'status'}},
-                @{$EXPORT_TAGS{'timeout'}},
-                @{$EXPORT_TAGS{'validate'}},
-                @{$EXPORT_TAGS{'vars'}},
-                @{$EXPORT_TAGS{'verbose'}},
-    qw(
-    add_options
-    get_options
-    check_thresholds
-    autoflush
-    cmd
-    code_error
-    curl
-    expand_units
-    flock_off
-    get_path_owner
-    go_flock_yourself
-    lstrip
-    ltrim
-    msg_perf_thresholds
-    open_file
-    pkill
-    plural
-    quit
-    resolve_ip
-    rstrip
-    rtrim
-    set_sudo
-    strip
-    trim
-    usage
-    version
-    which
-), );
-our @EXPORT_OK = ( @EXPORT, @{$EXPORT_TAGS{'regex'}} );
+our @EXPORT =   (
+                    @{$EXPORT_TAGS{'array'}},
+                    @{$EXPORT_TAGS{'cmd'}},
+                    @{$EXPORT_TAGS{'io'}},
+                    @{$EXPORT_TAGS{'is'}},
+                    @{$EXPORT_TAGS{'file'}},
+                    @{$EXPORT_TAGS{'lock'}},
+                    @{$EXPORT_TAGS{'net'}},
+                    @{$EXPORT_TAGS{'options'}},
+                    @{$EXPORT_TAGS{'os'}},
+                    @{$EXPORT_TAGS{'status'}},
+                    @{$EXPORT_TAGS{'string'}},
+                    @{$EXPORT_TAGS{'timeout'}},
+                    @{$EXPORT_TAGS{'validate'}},
+                    @{$EXPORT_TAGS{'vars'}},
+                    @{$EXPORT_TAGS{'verbose'}},
+                    @{$EXPORT_TAGS{'web'}},
+                );
+our @EXPORT_OK = (  @EXPORT,
+                    @{$EXPORT_TAGS{'regex'}}
+                 );
 $EXPORT_TAGS{'all'} = [ @EXPORT_OK ];
 
 BEGIN {
