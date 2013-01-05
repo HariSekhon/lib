@@ -47,7 +47,7 @@ use File::Basename;
 use Getopt::Long qw(:config bundling);
 #use Sys::Hostname;
 
-our $VERSION = "1.3.31";
+our $VERSION = "1.3.32";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -244,7 +244,7 @@ our $domain_regex       = '(?:' . $domain_component . '\.)+' . $tld_regex;
 our $hostname_component = '\b(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]{0,61}[a-zA-Z0-9])\b';
 our $hostname_regex     = $hostname_component . '(?:\.' . $domain_regex . ')?';
 our $fqdn_regex         = $hostname_component . '\.' . $domain_regex;
-# SECURITY NOTE: I'm allowing single quote through as Irish people do have this in their email addresses. This makes the $email_regex non-safe without further validation. IE this regex validates it's a valid email address, nothing more
+# SECURITY NOTE: I'm allowing single quote through as it's found in Irish email addresses. This makes the $email_regex non-safe without further validation. This regex only tests whether it's a valid email address, nothing more. DO NOT UNTAINT EMAIL or pass to cmd to SQL without further validation!!!
 our $email_regex        = '\b[A-Za-z0-9](?:[A-Za-z0-9\._\%\'\+-]{0,62}[A-Za-z0-9\._\%\+-])?@[A-Za-z0-9\.-]{2,251}\.[A-Za-z]{2,4}\b';
 our $ip_regex           = '\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b';
 our $mac_regex          = '\b[0-9A-F-af]{1,2}([:-])(?:[0-9A-Fa-f]{1,2}\2){4}[0-9A-Fa-f]{1,2}\b';
@@ -666,6 +666,16 @@ sub debug {
     printf "${prefix_newline}debug: %s => %s\n", $sub, $debug_msg;
 }
 
+# For reference purposes at this point
+#sub escape_regex {
+#    my $regex = shift;
+#    defined($regex) or code_error "no regex arg passed to escape_regex() subroutine";
+#    #$regex =~ s/([^\w\s\r\n])/\\$1/g;
+#    # backslashes everything that isn't /[A-Za-z_0-9]/
+#    $regex = quotemeta($regex); # $regex = \Q$regex\E;
+#    return $regex;
+#}
+
 
 sub expand_units {
     my $num   = shift;
@@ -787,12 +797,14 @@ sub isDomain {
 }
 
 
+# SECURITY NOTE: this only checks if the email address is valid, it's doesn't make it safe to arbitrarily pass to commands or SQL etc!
 sub isEmail {
     my $email = shift;
     defined($email) || return 0;
     return 0 if(length($email) > 256);
-    $email =~ /^($email_regex)$/ || return 0;
-    return $1;
+    $email =~ /^$email_regex$/ || return 0;
+    # Intentionally not untainting this as it's not safe given the addition of ' to the $email_regex to support Irish email addresses
+    return $email;
 }
 
 
@@ -1357,10 +1369,12 @@ sub validate_directory {
 }
 
 
+# SECURITY NOTE: this only validates the email address is valid, it's doesn't make it safe to arbitrarily pass to commands or SQL etc!
 sub validate_email {
     my $email = shift;
     defined($email) || usage "email not specified";
-    $email = isEmail || usage "invalid email address specified, failed regex validation";
+    isEmail || usage "invalid email address specified, failed regex validation";
+    # Not passing it through regex as I don't want to untaint it
     return $email;
 }
 
