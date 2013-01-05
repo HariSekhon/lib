@@ -47,7 +47,7 @@ use File::Basename;
 use Getopt::Long qw(:config bundling);
 #use Sys::Hostname;
 
-our $VERSION = "1.3.30";
+our $VERSION = "1.3.31";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -244,8 +244,8 @@ our $domain_regex       = '(?:' . $domain_component . '\.)+' . $tld_regex;
 our $hostname_component = '\b(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]{0,61}[a-zA-Z0-9])\b';
 our $hostname_regex     = $hostname_component . '(?:\.' . $domain_regex . ')?';
 our $fqdn_regex         = $hostname_component . '\.' . $domain_regex;
-# I'm intentionally not allowing ' in email regex as although it is valid it is safer not to allow it since I have no use cases where it's come up and it's safer not to allow it
-our $email_regex        = '\b[A-Za-z0-9\._\%\+-]{1,64}@[A-Za-z0-9\.-]{2,251}\.[A-Za-z]{2,4}\b';
+# SECURITY NOTE: I'm allowing single quote through as Irish people do have this in their email addresses. This makes the $email_regex non-safe without further validation. IE this regex validates it's a valid email address, nothing more
+our $email_regex        = '\b[A-Za-z0-9](?:[A-Za-z0-9\._\%\'\+-]{0,62}[A-Za-z0-9\._\%\+-])?@[A-Za-z0-9\.-]{2,251}\.[A-Za-z]{2,4}\b';
 our $ip_regex           = '\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b';
 our $mac_regex          = '\b[0-9A-F-af]{1,2}([:-])(?:[0-9A-Fa-f]{1,2}\2){4}[0-9A-Fa-f]{1,2}\b';
 # I did a scan of registered running process names across several hundred linux servers of a diverse group of enterprise applications with 500 unique process names (58k individual processes) to determine that there are cases with spaces, slashes, dashes, underscores, chevrons (<defunct>), dots (script.p[ly], in.tftpd etc) to determine what this regex should be. Incidentally it appears that Linux truncates registered process names to 15 chars.
