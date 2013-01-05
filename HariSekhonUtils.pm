@@ -47,7 +47,7 @@ use File::Basename;
 use Getopt::Long qw(:config bundling);
 #use Sys::Hostname;
 
-our $VERSION = "1.3.32";
+our $VERSION = "1.4";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -55,90 +55,164 @@ our $VERSION = "1.3.32";
 #require Exporter;
 use Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT = qw(
-    $critical
-    $debug
-    $domain_regex
-    $email
-    $email_regex
-    $fqdn_regex
-    $host
-    $hostname_regex
-    $ip_regex
-    $msg
-    $msg_err
-    $msg_threshold
-    $password
-    $plural
-    $port
-    $progname
-    $status
-    $status_prefix
-    $sudo
-    $timeout
-    $timeout_default
-    $timeout_max
-    $timeout_min
-    $tld_regex
-    $url_regex
-    $url_suffix_regex
-    $usage_line
-    $user
-    $user_regex
-    $verbose
-    $version
-    $warning
-    %ERRORS
-    %emailoptions
-    %hostoptions
-    %options
-    %thresholdoptions
-    %thresholds
-    %useroptions
-    @ENV
-    @usage_order
+our %EXPORT_TAGS = (
+    'array' =>  [   qw(
+                        inArray
+                        uniq_array
+                        compact_array
+                    ) ],
+    'is'    => [    qw(
+                        isArray
+                        isDigit
+                        isDomain
+                        isEmail
+                        isFloat
+                        isFqdn
+                        isHash
+                        isHost
+                        isHostname
+                        isIP
+                        isInt
+                        isLinux
+                        isMac
+                        isOS
+                        isProcessName
+                        isScalar
+                        isUser
+                        user_exists
+                    ) ],
+    'os'    =>  [   qw(
+                        isLinux
+                        isMac
+                        isOS
+                        linux_mac_only
+                        linux_only
+                        mac_only
+                    ) ],
+    'regex' =>  [   qw(
+                        $domain_regex
+                        $email_regex
+                        $fqdn_regex
+                        $hostname_regex
+                        $ip_regex
+                        $tld_regex
+                        $url_regex
+                        $url_suffix_regex
+                        $user_regex
+                    ) ],
+    'status' =>  [  qw(
+                        $status
+                        status
+                        critical
+                        warning
+                        unknown
+                        is_critical
+                        is_warning
+                        is_unknown
+                        is_ok
+                        get_status_code
+                    ) ],
+    'timeout' => [  qw(
+                        set_timeout
+                        set_timeout_default
+                        set_timeout_max
+                    ) ],
+    'validate' => [ qw(
+                        validate_database
+                        validate_database_fieldname
+                        validate_database_query_select_show
+                        validate_dir
+                        validate_directory
+                        validate_domain
+                        validate_domainname
+                        validate_email
+                        validate_file
+                        validate_filename
+                        validate_fqdn
+                        validate_host
+                        validate_hostname
+                        validate_int
+                        validate_integer
+                        validate_ip
+                        validate_label
+                        validate_node_list
+                        validate_password
+                        validate_port
+                        validate_process_name
+                        validate_regex
+                        validate_thresholds
+                        validate_units
+                        validate_url
+                        validate_user
+                        validate_user_exists
+                        validate_username
+                    ) ],
+    'vars' =>   [   qw(
+                        $critical
+                        $debug
+                        $email
+                        $host
+                        $msg
+                        $msg_err
+                        $msg_threshold
+                        $password
+                        $plural
+                        $port
+                        $progname
+                        $status
+                        $status_prefix
+                        $sudo
+                        $timeout
+                        $timeout_default
+                        $timeout_max
+                        $timeout_min
+                        $usage_line
+                        $user
+                        $verbose
+                        $version
+                        $warning
+                        %ERRORS
+                        %emailoptions
+                        %hostoptions
+                        %options
+                        %thresholdoptions
+                        %thresholds
+                        %useroptions
+                        @ENV
+                        @usage_order
+                    ) ],
+    'verbose' => [  qw(
+                        debug
+                        verbose_mode
+                        vlog
+                        vlog2
+                        vlog3
+                        vlog_options
+                    ) ],
+);
+our @EXPORT = (
+                @{$EXPORT_TAGS{'array'}},
+                @{$EXPORT_TAGS{'is'}},
+                @{$EXPORT_TAGS{'os'}},
+                @{$EXPORT_TAGS{'status'}},
+                @{$EXPORT_TAGS{'timeout'}},
+                @{$EXPORT_TAGS{'validate'}},
+                @{$EXPORT_TAGS{'vars'}},
+                @{$EXPORT_TAGS{'verbose'}},
+    qw(
     add_options
-    autoflush
-    check_array
+    get_options
     check_thresholds
+    autoflush
     cmd
     code_error
-    compact_array
-    critical
     curl
-    debug
     expand_units
     flock_off
-    get_options
     get_path_owner
-    get_status_code
     go_flock_yourself
-    isArray
-    isDigit
-    isDomain
-    isEmail
-    isFloat
-    isFqdn
-    isHash
-    isHost
-    isHostname
-    isIP
-    isInt
-    isLinux
-    isMac
-    isOS
-    isProcessName
-    isScalar
-    isUser
-    is_critical
-    is_ok
-    is_unknown
-    is_warning
-    linux_mac_only
-    linux_only
     lstrip
     ltrim
-    mac_only
     msg_perf_thresholds
     open_file
     pkill
@@ -148,54 +222,14 @@ our @EXPORT = qw(
     rstrip
     rtrim
     set_sudo
-    set_timeout
-    set_timeout_default
-    set_timeout_max
-    status
     strip
     trim
-    uniq_array
-    unknown
     usage
-    user_exists
-    validate_database
-    validate_database_fieldname
-    validate_database_query_select_show
-    validate_dir
-    validate_directory
-    validate_domain
-    validate_domainname
-    validate_email
-    validate_file
-    validate_filename
-    validate_fqdn
-    validate_host
-    validate_hostname
-    validate_int
-    validate_integer
-    validate_ip
-    validate_label
-    validate_node_list
-    validate_password
-    validate_port
-    validate_process_name
-    validate_regex
-    validate_thresholds
-    validate_units
-    validate_url
-    validate_user
-    validate_user_exists
-    validate_username
-    verbose_mode
     version
-    vlog
-    vlog2
-    vlog3
-    vlog_options
-    warning
     which
-);
-our @EXPORT_OK = @EXPORT;
+), );
+our @EXPORT_OK = ( @EXPORT, @{$EXPORT_TAGS{'regex'}} );
+$EXPORT_TAGS{'all'} = [ @EXPORT_OK ];
 
 BEGIN {
     delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
@@ -470,20 +504,6 @@ sub autoflush {
     $| = 1;
     select(STDOUT);
     $| = 1;
-}
-
-
-sub check_array {
-    my $item  = shift;
-    my @array = @_;
-    my $found = 0;
-    foreach(@array){
-        #vlog("checking $item against $_");
-        if($item eq $_){
-            $found++;
-        }
-    }
-    return $found;
 }
 
 
@@ -774,6 +794,20 @@ sub flock_off {
 }
 
 
+sub inArray {
+    my $item  = shift;
+    my @array = @_;
+    my $found = 0;
+    foreach(@array){
+        #vlog("checking $item against $_");
+        if($item eq $_){
+            $found++;
+        }
+    }
+    return $found;
+}
+
+
 sub isArray {
     my $isArray = ref $_[0] eq "ARRAY";
     if($_[1]){
@@ -791,9 +825,10 @@ sub isCode {
 }
 
 
-sub isDigit {
-    isInt(@_);
-}
+#sub isDigit {
+#    isInt(@_);
+#}
+*isDigit = \&isInt;
 
 
 sub isDomain {
