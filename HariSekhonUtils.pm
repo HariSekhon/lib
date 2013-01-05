@@ -12,9 +12,16 @@
 #  Library of personal stuff I use a lot, cobbled together from bits of my own
 #  scripts over the last few years and a Nagios library I started in Python years ago
 #
-#  PLEASE DO NOT TOUCH THIS!
+#  I welcome feedback on this. Currently this lib isn't designed for purity but rather convenience
+#  and ease of maintenance.  If you have a better way of doing anything in this library that will
+#  not significantly inconvenience me then let me know!
+#
+#  PLEASE DO NOT CHANGE ANYTHING IN HERE!
 #
 #  You may use this library at your own risk. You may not change it.
+#
+#  TODO: I haven't added the tests yet and this section needs updating
+#
 #  If you import this library then at the very minimum I recommend that you add
 #  one or more regression tests to cover all usage scenarios for your code to
 #  validate when this library is updated.
