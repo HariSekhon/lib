@@ -295,7 +295,7 @@ our $progname = basename $0;
 $progname =~ /^([\w\.\/_-]+)$/ or quit("UNKNOWN", "Invalid program name - does not adhere to strict regex validation, you should name the program simply and sanely");
 $progname = $1;
 
-# Std Nagios Exit Codes. Not using weak nagios utils.pm
+# Std Nagios Exit Codes. Not using weak nagios utils.pm. Also improves portability to not rely on it being present
 our %ERRORS = (
     "OK"        => 0,
     "WARNING"   => 1,
