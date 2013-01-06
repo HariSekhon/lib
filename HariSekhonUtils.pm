@@ -235,7 +235,6 @@ our %EXPORT_TAGS = (
                         %thresholdoptions
                         %thresholds
                         %useroptions
-                        @ENV
                         @usage_order
                     ) ],
     'verbose' => [  qw(
@@ -297,7 +296,7 @@ BEGIN {
         select(STDOUT);
         $| = 1; 
     }
-    
+
     $SIG{__DIE__} = sub {
         my $str = $_[0] || "Died";
         if(substr($str, -1, 1) eq "\n"){
