@@ -249,6 +249,9 @@ our %EXPORT_TAGS = (
                         wget
                     ) ],
 );
+# same as below
+#Exporter::export_tags('foo');
+#Exporter::export_ok_tags('bar');
 # TODO: move all of this from EXPORT to EXPORT_OK while validating all dependent code still works
 our @EXPORT =   (
                     @{$EXPORT_TAGS{'array'}},
