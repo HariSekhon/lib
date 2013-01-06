@@ -64,9 +64,9 @@ use Exporter;
 our @ISA = qw(Exporter);
 our %EXPORT_TAGS = (
     'array' =>  [   qw(
+                        compact_array
                         inArray
                         uniq_array
-                        compact_array
                     ) ],
     'cmd'   =>  [   qw(
                         cmd
@@ -133,6 +133,8 @@ our %EXPORT_TAGS = (
                         $fqdn_regex
                         $hostname_regex
                         $ip_regex
+                        $mac_regex
+                        $process_name_regex
                         $tld_regex
                         $url_regex
                         $url_suffix_regex
