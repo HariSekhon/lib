@@ -105,6 +105,11 @@ our %EXPORT_TAGS = (
                         go_flock_yourself
                         flock_off
                     ) ],
+    'log'   =>  [   qw(
+                        log
+                        loginit
+                        logdie
+                    ) ],
     'net'   =>  [   qw(
                         resolve_ip
                     ) ],
@@ -263,7 +268,8 @@ our @EXPORT =   (
                     @{$EXPORT_TAGS{'web'}},
                 );
 our @EXPORT_OK = (  @EXPORT,
-                    @{$EXPORT_TAGS{'regex'}}
+                    @{$EXPORT_TAGS{'log'}},
+                    @{$EXPORT_TAGS{'regex'}},
                  );
 $EXPORT_TAGS{'all'} = [ @EXPORT_OK ];
 
