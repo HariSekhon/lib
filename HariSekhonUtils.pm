@@ -20,7 +20,7 @@
 #
 #  You may use this library at your own risk. You may not change it.
 #
-#  TODO: I haven't added the tests yet and this section needs updating
+#  TODO: I haven't added unit tests yet, this section needs updating
 #
 #  If you import this library then at the very minimum I recommend that you add
 #  one or more regression tests to cover all usage scenarios for your code to
