@@ -62,6 +62,9 @@ our $VERSION = "1.4";
 #require Exporter;
 use Exporter;
 our @ISA = qw(Exporter);
+# consider replacing the above with these two lines for compatibility with Perl 5.6 and then removing our from @EXPORT* below
+#use vars qw(@ISA @EXPORT_OK);
+#@ISA = qw(Exporter);
 our %EXPORT_TAGS = (
     'array' =>  [   qw(
                         compact_array
