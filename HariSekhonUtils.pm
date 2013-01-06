@@ -20,25 +20,31 @@
 #
 #  You may use this library at your own risk. You may not change it.
 #
-#  TODO: I haven't added unit tests yet, this section needs updating
+# ============================================================================ #
+#  Unit Tests
+#
+#  make test
+#
+#  This will call a bunch of Test::More unit tests from t/
+#
+# ============================================================================ #
+#  Functional Tests
 #
 #  If you import this library then at the very minimum I recommend that you add
-#  one or more regression tests to cover all usage scenarios for your code to
+#  one or more functional tests to cover all usage scenarios for your code to
 #  validate when this library is updated.
 #
-#  Upon library updates, I always run
+#  ./testcmd.exp path_to_tests/*.exptest
 #
-#  ./testplugins.exp tests/*.exptest
+#  One of the original purposes of this library was to be able to rapidly develop Nagios plugins.
+#  If you use this to ease your development of Nagios plugins I strongly recommend that you add
+#  functional tests and run them whenever either this library or your plugin changes
 #
-#   or
-#
-#  ./testall.sh
-#
-#  to run full suite of regression tests against all my Nagios plugins to make sure
-#  everything still works as expected before releasing to production. The latter will
+#  Running make test under nagios-plugins will run all unit and functional tests
+#  to make sure everything still works as expected before releasing to production. It will
 #  also check for plugins that are importing this library but don't have any test files
 #
-#  You don't want your Nagios screen to suddenly go all red because you haven't done QA!
+#  You don't want your Nagios screen to suddenly go all red because you haven't done your QA!
 #
 #  If you've added some code and don't have a corresponding suite of test files
 #  in the ./tests directory then they may well break when I update this library.
