@@ -338,7 +338,7 @@ my  $domain_component   = '\b(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-
 our $tld_regex          = '\b(?:[A-Za-z]{2,4}|(?i:local|museum|travel))\b';
 our $domain_regex       = '(?:' . $domain_component . '\.)+' . $tld_regex;
 our $hostname_component = '\b(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]{0,61}[a-zA-Z0-9])\b';
-our $hostname_regex     = $hostname_component . '(?:\.' . $domain_regex . ')?';
+our $hostname_regex     = "(?:$hostname_component(?:\.$domain_regex)?|$domain_regex)";
 our $fqdn_regex         = $hostname_component . '\.' . $domain_regex;
 # SECURITY NOTE: I'm allowing single quote through as it's found in Irish email addresses. This makes the $email_regex non-safe without further validation. This regex only tests whether it's a valid email address, nothing more. DO NOT UNTAINT EMAIL or pass to cmd to SQL without further validation!!!
 our $email_regex        = '\b[A-Za-z0-9](?:[A-Za-z0-9\._\%\'\+-]{0,62}[A-Za-z0-9\._\%\+-])?@[A-Za-z0-9\.-]{2,251}\.[A-Za-z]{2,4}\b';
@@ -1789,6 +1789,7 @@ sub validate_url {
     $name .= " " if $name;
     defined($url) || usage "${name}url not specified";
     $url = isUrl($url) || usage "invalid ${name}url given: '$url'";
+    vlog_options("${name}url", $url);
     return $url;
 }
 
