@@ -249,6 +249,7 @@ our %EXPORT_TAGS = (
                         wget
                     ) ],
 );
+# TODO: move all of this from EXPORT to EXPORT_OK while validating all dependent code still works
 our @EXPORT =   (
                     @{$EXPORT_TAGS{'array'}},
                     @{$EXPORT_TAGS{'cmd'}},
@@ -271,7 +272,10 @@ our @EXPORT_OK = (  @EXPORT,
                     @{$EXPORT_TAGS{'log'}},
                     @{$EXPORT_TAGS{'regex'}},
                  );
-$EXPORT_TAGS{'all'} = [ @EXPORT_OK ];
+$EXPORT_TAGS{'all'}         = [ @EXPORT_OK  ];
+$EXPORT_TAGS{'most'}        = [ @EXPORT     ];
+$EXPORT_TAGS{'EXPORT_OK'}   = [ @EXPORT_OK  ];
+$EXPORT_TAGS{'EXPORT'}      = [ @EXPORT     ];
 
 BEGIN {
     delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
