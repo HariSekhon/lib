@@ -54,7 +54,7 @@ use File::Basename;
 use Getopt::Long qw(:config bundling);
 #use Sys::Hostname;
 
-our $VERSION = "1.4";
+our $VERSION = "1.4.1";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -101,6 +101,7 @@ our %EXPORT_TAGS = (
                         isOS
                         isProcessName
                         isScalar
+                        isUrl
                         isUser
                         user_exists
                     ) ],
@@ -145,7 +146,7 @@ our %EXPORT_TAGS = (
                         $process_name_regex
                         $tld_regex
                         $url_regex
-                        $url_suffix_regex
+                        $url_path_suffix
                         $user_regex
                     ) ],
     'status' =>  [  qw(
@@ -339,8 +340,8 @@ our $ip_regex           = '\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?
 our $mac_regex          = '\b[0-9A-F-af]{1,2}([:-])(?:[0-9A-Fa-f]{1,2}\2){4}[0-9A-Fa-f]{1,2}\b';
 # I did a scan of registered running process names across several hundred linux servers of a diverse group of enterprise applications with 500 unique process names (58k individual processes) to determine that there are cases with spaces, slashes, dashes, underscores, chevrons (<defunct>), dots (script.p[ly], in.tftpd etc) to determine what this regex should be. Incidentally it appears that Linux truncates registered process names to 15 chars.
 our $process_name_regex = '\b[\w\s\.\/\<\>-]+\b';
-our $url_suffix_regex   = '/[\w\.\/_\+-]+';
-our $url_regex          = '\b(?i:https?://' . $hostname_regex . '(?:' . $url_suffix_regex . ')?)\b';
+our $url_path_suffix    = '/(?:[\w\.\/_\+-]+)?';
+our $url_regex          = '\b(?i:https?://' . $hostname_regex . '(?:' . $url_path_suffix . ')?)';
 our $user_regex         = '\b[A-Za-z][A-Za-z0-9]+\b';
 # ============================================================================ #
 
@@ -476,6 +477,7 @@ sub status {
     vlog("status: $status");
 }
 
+# status2/3 not exported/used at this time
 sub status2 {
     vlog2("status: $status");
 }
@@ -700,8 +702,9 @@ sub code_error {
 }
 
 
+# Remove blanks from array
 sub compact_array {
-    return grep { defined } @_;
+    return grep { $_ !~ /^\s*$/ } @_;
 }
 
 
@@ -715,6 +718,7 @@ sub curl {
         code_error "called curl() without declaring \"use LWP::Simple 'get'\"";
     }
     my $url = shift;
+    isUrl($url) or code_error "invalid url supplied to curl()";
     vlog2("HTTP GET $url");
     my $content = main::get $url;
     my ($result, $err) = ($?, $!);
@@ -1002,6 +1006,15 @@ sub isScalar {
 
 sub isSub {
     isCode(@_);
+}
+
+
+sub isUrl {
+    my $url = shift;
+    defined($url) or return 0;
+    #vlog3("url_regex: $url_regex");
+    $url =~ /^($url_regex)$/ or return 0;
+    return $1;
 }
 
 
@@ -1769,8 +1782,8 @@ sub validate_url {
     my $name = $_[1] || "";
     $name .= " " if $name;
     defined($url) || usage "${name}url not specified";
-    $url =~ /^($url_regex)$/ || usage "invalid ${name}url given: '$url'";
-    return $1;
+    $url = isUrl($url) || usage "invalid ${name}url given: '$url'";
+    return $url;
 }
 
 
