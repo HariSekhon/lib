@@ -275,6 +275,8 @@ our @EXPORT_OK = (  @EXPORT,
                     @{$EXPORT_TAGS{'log'}},
                     @{$EXPORT_TAGS{'regex'}},
                  );
+# could also do this:
+#{ my %seen; push @{$EXPORT_TAGS{'all'}}, grep {!$seen{$_}++} @{$EXPORT_TAGS{$_}} foreach keys %EXPORT_TAGS; }
 $EXPORT_TAGS{'all'}         = [ @EXPORT_OK  ];
 $EXPORT_TAGS{'most'}        = [ @EXPORT     ];
 $EXPORT_TAGS{'EXPORT_OK'}   = [ @EXPORT_OK  ];
