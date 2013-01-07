@@ -70,7 +70,8 @@ is(get_status_code("CRITICAL"), 2, "get_status_code(OK) eq 2");
 is(get_status_code("UNKNOWN"),  3, "get_status_code(UNKNOWN) eq 3");
 
 $verbose++;
-ok(status, "status()");
+# TODO: This only checks the sub runs and returns success, should really check it outputs the right thing but not sure how to check the stdout from this sub
+ok(status(), "status()");
 
 ok(cmd("ps"), 'cmd("ps");');
 #ok(!cmd("unknown_fake_command"), 'cmd("unknown_fake_command");');
