@@ -9,6 +9,8 @@
 #
 #  vim:ts=4:sw=4:et
 
+# Unit Tests for HariSekhonUtils
+
 use diagnostics;
 use warnings;
 use strict;
@@ -19,7 +21,7 @@ BEGIN{ use_ok('HariSekhonUtils'); }
 require_ok('HariSekhonUtils');
 
 ok($progname,   '$progname set');
-is($status,      "UNKNOWN", '$status eq UNKNOWN');
+
 is($ERRORS{"OK"},        0, '$ERRORS{OK}       eq 0');
 is($ERRORS{"WARNING"},   1, '$ERRORS{WARNING}  eq 1');
 is($ERRORS{"CRITICAL"},  2, '$ERRORS{CRITICAL} eq 2');
@@ -30,6 +32,7 @@ is($port, undef, "port is undef");
 ok(set_timeout_max(100),     "set_timeout_max(100)");
 ok(set_timeout_default(100), "set_timeout_default(100)");
 
+is($status,      "UNKNOWN", '$status eq UNKNOWN');
 $status = "OK";
 ok(is_ok,        "is_ok()");
 ok(!is_warning,  "is_warning() fail on OK");
