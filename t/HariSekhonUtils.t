@@ -29,8 +29,10 @@ is($ERRORS{"UNKNOWN"},   3, '$ERRORS{UNKNOWN}  eq 3');
 is($ERRORS{"DEPENDENT"}, 4, '$ERRORS{DEPENDEN} eq 4');
 is($port, undef, "port is undef");
 
-ok(set_timeout_max(100),     "set_timeout_max(100)");
+ok(set_timeout_max(200),     "set_timeout_max(200)");
+is($timeout_max, 200, '$timeout_max eq 200');
 ok(set_timeout_default(100), "set_timeout_default(100)");
+is($timeout_default, 100, '$timeout_default eq 100');
 
 is($status,      "UNKNOWN", '$status eq UNKNOWN');
 is(get_status_code($status), 3, 'get_status_code($status) eq UNKNOWN');
