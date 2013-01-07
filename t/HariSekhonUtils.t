@@ -69,6 +69,7 @@ ok(cmd("ps"), 'cmd("ps");');
 #ok(!cmd("unknown_fake_command"), 'cmd("unknown_fake_command");');
 
 is_deeply([compact_array(( "one", "" , "two" ))], [ "one", "two" ], 'compact_array() remove blanks');
+is_deeply([compact_array(( "one", "\t\r\n" , "two" ))], [ "one", "two" ], 'compact_array() remove ^\s*$');
 is_deeply([compact_array(( "one", 0 , "two" ))], [ "one", 0, "two" ], 'compact_array() not remove zero');
 
 # TODO: check_threshold{,s}, code_error
