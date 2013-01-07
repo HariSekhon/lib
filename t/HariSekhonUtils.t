@@ -33,6 +33,8 @@ ok(set_timeout_max(100),     "set_timeout_max(100)");
 ok(set_timeout_default(100), "set_timeout_default(100)");
 
 is($status,      "UNKNOWN", '$status eq UNKNOWN');
+is(get_status_code($status), 3, 'get_status_code($status) eq UNKNOWN');
+
 $status = "OK";
 ok(is_ok,        "is_ok()");
 ok(!is_warning,  "is_warning() fail on OK");
