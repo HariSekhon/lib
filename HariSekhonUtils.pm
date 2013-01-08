@@ -60,7 +60,7 @@ use File::Basename;
 use Getopt::Long qw(:config bundling);
 #use Sys::Hostname;
 
-our $VERSION = "1.4.1";
+our $VERSION = "1.4.2";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -342,12 +342,13 @@ our $hostname_regex     = "(?:$hostname_component(?:\.$domain_regex)?|$domain_re
 our $fqdn_regex         = $hostname_component . '\.' . $domain_regex;
 # SECURITY NOTE: I'm allowing single quote through as it's found in Irish email addresses. This makes the $email_regex non-safe without further validation. This regex only tests whether it's a valid email address, nothing more. DO NOT UNTAINT EMAIL or pass to cmd to SQL without further validation!!!
 our $email_regex        = '\b[A-Za-z0-9](?:[A-Za-z0-9\._\%\'\+-]{0,62}[A-Za-z0-9\._\%\+-])?@[A-Za-z0-9\.-]{2,251}\.[A-Za-z]{2,4}\b';
-our $ip_regex           = '\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b';
+our $ip_regex           = '\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-4]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b'; # not allowing 255 in the final octet
 our $mac_regex          = '\b[0-9A-F-af]{1,2}([:-])(?:[0-9A-Fa-f]{1,2}\2){4}[0-9A-Fa-f]{1,2}\b';
+our $host_regex         = "\\b(?:$hostname_regex|$ip_regex)\\b";
 # I did a scan of registered running process names across several hundred linux servers of a diverse group of enterprise applications with 500 unique process names (58k individual processes) to determine that there are cases with spaces, slashes, dashes, underscores, chevrons (<defunct>), dots (script.p[ly], in.tftpd etc) to determine what this regex should be. Incidentally it appears that Linux truncates registered process names to 15 chars.
 our $process_name_regex = '\b[\w\s\.\/\<\>-]+\b';
 our $url_path_suffix    = '/(?:[\w\.\/_\+-]+)?';
-our $url_regex          = '\b(?i:https?://' . $hostname_regex . '(?:' . $url_path_suffix . ')?)';
+our $url_regex          = "\\b(?i:https?://$host_regex(?:$url_path_suffix)?)";
 our $user_regex         = '\b[A-Za-z][A-Za-z0-9]+\b';
 # ============================================================================ #
 
@@ -947,7 +948,14 @@ sub isHash {
 
 sub isHost {
     my $host = shift;
-    isHostname($host) or isIP($host) or 0;
+    defined($host) or return 0;
+    if(length($host) > 255){ # Can't be a hostname
+        return isIP($host);
+    } else {
+        $host =~ /^($host_regex)$/ or return 0;
+        return $1;
+    }
+    return 0;
 }
 
 
@@ -973,7 +981,14 @@ sub isIP {
     my $ip = shift;
     defined($ip) or return 0;
     $ip =~ /^($ip_regex)$/ or return 0;
-    return $1;
+    $ip = $1;
+    my @octets = split(/\./, $ip);
+    (@octets == 4) or return 0;
+    $octets[3] eq 0 and return 0;
+    foreach(@octets){
+        $_ > 254 and return 0;
+    }
+    return $ip;
 }
 
 
