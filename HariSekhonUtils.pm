@@ -60,7 +60,7 @@ use File::Basename;
 use Getopt::Long qw(:config bundling);
 #use Sys::Hostname;
 
-our $VERSION = "1.4.2";
+our $VERSION = "1.4.3";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -192,6 +192,7 @@ our %EXPORT_TAGS = (
                         validate_email
                         validate_file
                         validate_filename
+                        validate_float
                         validate_fqdn
                         validate_host
                         validate_hostname
@@ -1533,20 +1534,30 @@ sub validate_filename {
 }
 
 
-#sub validate_int {
-#    validate_integer(@_);
-#}
-*validate_int = \&validate_integer;
-
-sub validate_integer {
+sub validate_int {
     my $integer = $_[0] if defined($_[0]);
     my $min     = $_[1] || 0;
-    my $max     = $_[2] || code_error "no max value given for validate_integer()";
-    my $name    = $_[3] || code_error "no name passed to validate_integer()";
-    defined($integer) || usage "integer not specified";
-    isInt($integer,1) or usage "invalid value given for $name, must be an integer";
-    ($integer >= $min && $integer <= $max) or usage "invalid value given for $name, must be integer between $min and $max";
+    my $max     = $_[2] || code_error "no max value given for validate_int()";
+    my $name    = $_[3] || code_error "no name passed to validate_int()";
+    defined($integer) || usage "$name integer not specified";
+    isInt($integer, 1) or usage "invalid $name given, must be an integer";
+    ($integer >= $min && $integer <= $max) or usage "invalid $name given, must be integer between $min and $max";
+    vlog_options($name, $integer);
     return $integer;
+}
+*validate_integer = \&validate_int;
+
+
+sub validate_float {
+    my $float = $_[0] if defined($_[0]);
+    my $min     = $_[1] || 0;
+    my $max     = $_[2] || code_error "no max value given for validate_float()";
+    my $name    = $_[3] || code_error "no name passed to validate_float()";
+    defined($float) || usage "$name float not specified";
+    isFloat($float,1) or usage "invalid $name given, must be an float";
+    ($float >= $min && $float <= $max) or usage "invalid $name given, must be float between $min and $max";
+    vlog_options($name, $float);
+    return $float;
 }
 
 
