@@ -98,6 +98,7 @@ our %EXPORT_TAGS = (
                         isFloat
                         isFqdn
                         isHash
+                        isHex
                         isHost
                         isHostname
                         isIP
@@ -945,6 +946,14 @@ sub isHash {
         }
     }
     return $isHash;
+}
+
+
+sub isHex {
+    my $hex = shift;
+    defined($hex) or return 0;
+    $hex =~ /^(0x[A-Fa-f\d]+)$/ or return 0;
+    return 1;
 }
 
 
