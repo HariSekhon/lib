@@ -60,7 +60,7 @@ use File::Basename;
 use Getopt::Long qw(:config bundling);
 #use Sys::Hostname;
 
-our $VERSION = "1.4.3";
+our $VERSION = "1.4.4";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -198,6 +198,7 @@ our %EXPORT_TAGS = (
                         validate_hostname
                         validate_int
                         validate_integer
+                        validate_interface
                         validate_ip
                         validate_label
                         validate_node_list
@@ -1583,6 +1584,17 @@ sub validate_hostname {
     defined($hostname) || usage "hostname not specified";
     vlog_options("host", "'$hostname'");
     return ( isHostname($hostname) or usage "invalid hostname given");
+}
+
+
+sub validate_interface {
+    my $interface = $_[0] if $_[0];
+    defined($interface) || usage "interface not specified";
+    # TODO: consider checking if the interface actually exists on the system
+    $interface =~ /^((?:eth|bond|lo)\d+)$/ or usage "invalid interface specified, must be either ethN, bondN or loN";
+    $interface = $1;
+    vlog_options("interface", $interface);
+    return $interface;
 }
 
 
