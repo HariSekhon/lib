@@ -151,8 +151,8 @@ our %EXPORT_TAGS = (
                         $mac_regex
                         $process_name_regex
                         $tld_regex
+                        $url_path_suffix_regex
                         $url_regex
-                        $url_path_suffix
                         $user_regex
                     ) ],
     'status' =>  [  qw(
@@ -349,8 +349,8 @@ our $mac_regex          = '\b[0-9A-F-af]{1,2}([:-])(?:[0-9A-Fa-f]{1,2}\2){4}[0-9
 our $host_regex         = "\\b(?:$hostname_regex|$ip_regex)\\b";
 # I did a scan of registered running process names across several hundred linux servers of a diverse group of enterprise applications with 500 unique process names (58k individual processes) to determine that there are cases with spaces, slashes, dashes, underscores, chevrons (<defunct>), dots (script.p[ly], in.tftpd etc) to determine what this regex should be. Incidentally it appears that Linux truncates registered process names to 15 chars.
 our $process_name_regex = '\b[\w\s\.\/\<\>-]+\b';
-our $url_path_suffix    = '/(?:[\w\.\/_\+-]+)?';
-our $url_regex          = "\\b(?i:https?://$host_regex(?:$url_path_suffix)?)";
+our $url_path_suffix_regex = '/(?:[\w\.\/_\+-]+)?';
+our $url_regex          = "\\b(?i:https?://$host_regex(?:$url_path_suffix_regex)?)";
 our $user_regex         = '\b[A-Za-z][A-Za-z0-9]+\b';
 # ============================================================================ #
 
