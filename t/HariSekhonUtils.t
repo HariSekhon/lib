@@ -22,6 +22,10 @@ require_ok('HariSekhonUtils');
 
 ok($progname,   '$progname set');
 
+# ============================================================================ #
+#                           Status Codes
+# ============================================================================ #
+
 is($ERRORS{"OK"},        0, '$ERRORS{OK}       eq 0');
 is($ERRORS{"WARNING"},   1, '$ERRORS{WARNING}  eq 1');
 is($ERRORS{"CRITICAL"},  2, '$ERRORS{CRITICAL} eq 2');
@@ -73,6 +77,8 @@ $verbose++;
 # TODO: This only checks the sub runs and returns success, should really check it outputs the right thing but not sure how to check the stdout from this sub
 ok(status(), "status()");
 
+# ============================================================================ #
+
 ok(cmd("ps"), 'cmd("ps");');
 #ok(!cmd("unknown_fake_command"), 'cmd("unknown_fake_command");');
 
@@ -88,5 +94,58 @@ is_deeply([compact_array(( "one", 0 , "two" ))], [ "one", 0, "two" ], 'compact_a
 #like(curl("http://www.google.com/"), qr/google.com/, 'curl("www.google.com")');
 
 #is(die(), 2, "die() returns 2");
+
+$debug = 1;
+ok(debug("debug stuff"), 'debug("debug stuff")');
+$debug = 0;
+ok(!debug("debug stuff"), '!debug("debug stuff") without \$debug set');
+
+is(expand_units("10", "KB"), 10240, 'expand_units("10", "KB") eq 10240');
+is(expand_units("10", "mB"), 10485760, 'expand_units("10", "mB") eq 10485760');
+is(expand_units("10", "Gb"), 10737418240, 'expand_units("10", "Gb") eq 10737418240');
+is(expand_units("10", "tb"), 10995116277760, 'expand_units("10", "tb") eq 10995116277760');
+is(expand_units("10", "Pb"), 11258999068426240, 'expand_units("10", "Pb") eq 11258999068426240');
+
+# TODO: get_options
+
+is(get_path_owner("/etc/passwd"), "root", 'get_path_owner("/etc/passwd") eq "root"');
+
+ok(go_flock_yourself(), "go_flock_yourself()");
+ok(flock_off(), "flock_off()");
+
+ok(inArray("one", qw/one two three/), 'inArray("one", qw/one two three/)');
+ok(!inArray("four", qw/one two three/), '!inArray("four", qw/one two three/)');
+
+ok(isArray([qw/one two/]), 'isArray([qw/one two/])');
+ok(!isArray($verbose),  '!isArray(\$verbose)');
+
+ok(HariSekhonUtils::isCode(sub{}), 'HariSekhonUtils::isCode(sub{})');
+ok(HariSekhonUtils::isSub(sub{}), 'HariSekhonUtils::isCode(sub{})');
+
+ok(!HariSekhonUtils::isCode(1), '!HariSekhonUtils::isCode(1)');
+ok(!HariSekhonUtils::isSub(1), '!HariSekhonUtils::isSub(1)');
+
+ok(isDomain("harisekhon.com"), 'isDomain("harisekhon.com")');
+ok(!isDomain("harisekhon"),    '!isDomain("harisekhon")');
+ok(!isDomain("a"x256),         '!isDomain("a"x256)');
+
+ok(isEmail('hari\'sekhon@gmail.com'), 'isEmail("hari\'sekhon@gmail.com")');
+ok(!isEmail("harisekhon"),          '!isEmail("harisekhon")');
+
+ok(isFloat(1),          'isFloat(1)');
+ok(!isFloat(-1),        '!isFloat(-1)');
+ok(isFloat(-1, 1),      'isFloat(-1, 1)');
+
+ok(isFloat(1.1),        'isFloat(1.1)');
+ok(!isFloat(-1.1),      '!isFloat(-1.1)');
+ok(isFloat(-1.1, 1),    'isFloat(-1.1, 1)');
+
+ok(!isFloat("nan"),     '!isFloat("nan")');
+ok(!isFloat("nan", 1),  '!isFloat("nan", 1)');
+
+ok(isFqdn("hari.sekhon.com"), 'isFqdn("hari.sekhon.com")');
+ok(!isFqdn("harisekhon.com"), '!isFqdn("harisekhon.com")');
+
+#ok(isHash(%{ ( "one" => 1 ) }), "isHash()");
 
 done_testing();
