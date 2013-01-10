@@ -340,12 +340,13 @@ my  $domain_component   = '\b(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-
 # this matches everything except the XN--\w{6,10} TLDs as of 8/10/2012
 our $tld_regex          = '\b(?:[A-Za-z]{2,4}|(?i:local|museum|travel))\b';
 our $domain_regex       = '(?:' . $domain_component . '\.)+' . $tld_regex;
-our $hostname_component = '\b(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]{0,61}[a-zA-Z0-9])\b';
+our $hostname_component = '\b(?:[A-Za-z][A-Za-z0-9]{0,62}|[A-Za-z][A-Za-z0-9_\-]{0,61}[a-zA-Z0-9])\b';
 our $hostname_regex     = "(?:$hostname_component(?:\.$domain_regex)?|$domain_regex)";
 our $fqdn_regex         = $hostname_component . '\.' . $domain_regex;
 # SECURITY NOTE: I'm allowing single quote through as it's found in Irish email addresses. This makes the $email_regex non-safe without further validation. This regex only tests whether it's a valid email address, nothing more. DO NOT UNTAINT EMAIL or pass to cmd to SQL without further validation!!!
 our $email_regex        = '\b[A-Za-z0-9](?:[A-Za-z0-9\._\%\'\+-]{0,62}[A-Za-z0-9\._\%\+-])?@[A-Za-z0-9\.-]{2,251}\.[A-Za-z]{2,4}\b';
-our $ip_regex           = '\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-4]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b'; # not allowing 255 in the final octet
+# TODO: review this IP regex again
+our $ip_regex           = '\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-4]|2[0-4][0-9]|[01]?[1-9][0-9]|[01]?0[1-9]|[12]00|[1-9])\b'; # not allowing 0 or 255 as the final octet
 our $mac_regex          = '\b[0-9A-F-af]{1,2}([:-])(?:[0-9A-Fa-f]{1,2}\2){4}[0-9A-Fa-f]{1,2}\b';
 our $host_regex         = "\\b(?:$hostname_regex|$ip_regex)\\b";
 # I did a scan of registered running process names across several hundred linux servers of a diverse group of enterprise applications with 500 unique process names (58k individual processes) to determine that there are cases with spaces, slashes, dashes, underscores, chevrons (<defunct>), dots (script.p[ly], in.tftpd etc) to determine what this regex should be. Incidentally it appears that Linux truncates registered process names to 15 chars.
@@ -367,6 +368,7 @@ my  @options;
 our %options;
 our $password;
 our $port;
+my  $selflock;
 our $status = "UNKNOWN";
 our $status_prefix = "";
 our $sudo = "";
@@ -746,7 +748,7 @@ sub curl {
 
 
 sub debug {
-    return unless $debug;
+    return 0 unless $debug;
     my ( $package, $filename, $line ) = caller;
     my $debug_msg = "@_" || "";
     $debug_msg =~ s/^(\n+)//;
@@ -845,7 +847,7 @@ sub go_flock_yourself {
         open  *{0} or die "Failed to open *{0} for lock: $!\n";
         flock *{0}, LOCK_EX|LOCK_NB or die "Failed to acquire global lock, related code is already running somewhere!\n";
     } else {
-        open our $selflock, $0 or die "Failed to open $0 for lock: $!\n";
+        open $selflock, $0 or die "Failed to open $0 for lock: $!\n";
         flock $selflock, LOCK_EX|LOCK_NB or die "Another instance of " . abs_path($0) . " is already running!\n";
     }
 }
@@ -855,7 +857,7 @@ sub flock_off {
         open  *{0} or die "Failed to open *{0} for lock: $!\n";
         flock *{0}, LOCK_UN;
     } else {
-        our $selflock = open $0 or die "Failed to open $0 for lock: $!\n";
+        open $selflock, $0 or die "Failed to open $0 for lock: $!\n";
         flock $selflock, LOCK_UN;
     }
 }
@@ -876,16 +878,18 @@ sub inArray {
 
 
 sub isArray {
+    defined($_[0]) or code_error "no arg passed to isArray()";
     my $isArray = ref $_[0] eq "ARRAY";
     if($_[1]){
         unless($isArray){
-            code_error "non array reference passed";
+            code_error "non array reference passed to isArray()";
         }
     }
     return $isArray;
 }
 
 
+# isSub/isCode is used by set_timeout() to determine if we were passed a valid function for the ALRM sub
 sub isCode {
     my $isCode = ref $_[0] eq "CODE";
     return $isCode;
@@ -1036,9 +1040,10 @@ sub isScalar {
 }
 
 
-sub isSub {
-    isCode(@_);
-}
+#sub isSub {
+#    isCode(@_);
+#}
+*isSub = \&isCode;
 
 
 sub isUrl {
