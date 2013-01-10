@@ -125,12 +125,12 @@ ok(HariSekhonUtils::isSub(sub{}), 'HariSekhonUtils::isCode(sub{})');
 ok(!HariSekhonUtils::isCode(1), '!HariSekhonUtils::isCode(1)');
 ok(!HariSekhonUtils::isSub(1), '!HariSekhonUtils::isSub(1)');
 
-ok(isDomain("harisekhon.com"), 'isDomain("harisekhon.com")');
-ok(!isDomain("harisekhon"),    '!isDomain("harisekhon")');
-ok(!isDomain("a"x256),         '!isDomain("a"x256)');
+is(isDomain("harisekhon.com"),  "harisekhon.com",   'isDomain("harisekhon.com") eq harisekhon.com');
+is(isDomain("harisekhon"),      0,                  '!isDomain("harisekhon") eq 0');
+is(isDomain("a"x256),           0,                  '!isDomain("a"x256) eq 0');
 
-ok(isEmail('hari\'sekhon@gmail.com'), 'isEmail("hari\'sekhon@gmail.com")');
-ok(!isEmail("harisekhon"),          '!isEmail("harisekhon")');
+is(isEmail('hari\'sekhon@gmail.com'),   'hari\'sekhon@gmail.com',   'isEmail("hari\'sekhon@gmail.com") eq hari\'sekhon@gmail.com');
+is(isEmail("harisekhon"),               0,                          '!isEmail("harisekhon") eq 0');
 
 ok(isFloat(1),          'isFloat(1)');
 ok(!isFloat(-1),        '!isFloat(-1)');
@@ -143,9 +143,43 @@ ok(isFloat(-1.1, 1),    'isFloat(-1.1, 1)');
 ok(!isFloat("nan"),     '!isFloat("nan")');
 ok(!isFloat("nan", 1),  '!isFloat("nan", 1)');
 
-ok(isFqdn("hari.sekhon.com"), 'isFqdn("hari.sekhon.com")');
-ok(!isFqdn("harisekhon.com"), '!isFqdn("harisekhon.com")');
+is(isFqdn("hari.sekhon.com"),   "hari.sekhon.com",  'isFqdn("hari.sekhon.com") eq harisekhon.com');
+is(isFqdn("harisekhon.com"),    0,                  '!isFqdn("harisekhon.com") eq 0');
 
+# TODO:
 #ok(isHash(%{ ( "one" => 1 ) }), "isHash()");
+
+ok(isHex("0xAf09b"), 'isHex');
+ok(!isHex(9),        '!isHex(9)');
+ok(!isHex("0xhari"), '!isHex("hari")');
+
+is(isHost("harisekhon.com"),    "harisekhon.com",   'isHost("harisekhon.com") eq harisekhon.com');
+ok(isHost("harisekhon"),        'isHost("harisekhon")');
+ok(isHost("10.10.10.1"),        'isHost("10.10.10.1")');
+is(isHost("10.10.10.10"),       "10.10.10.10",      'isHost("10.10.10.10") eq 10.10.10.10');
+ok(isHost("10.10.10.100"),     'isHost("10.10.10.100")');
+ok(!isHost("10.10.10.0"),       '!isHost("10.10.10.0")');
+ok(!isHost("10.10.10.255"),     '!isHost("10.10.10.255")');
+ok(!isHost("10.10.10.300"),     '!isHost("10.10.10.300")');
+ok(!isHost("a"x256),            '!isHost("a"x256)');
+
+is(isHostname("harisekhon.com"),    "harisekhon.com",   'isHostname("harisekhon.com") eq harisekon.com');
+ok(isHostname("harisekhon"),        'isHostname("harisekhon")');
+ok(!isHostname(1),                  '!isHostname(1)');
+ok(!isHostname("a"x256),            '!isHostname("a"x256)');
+
+ok(isInt(0),    'isInt(0)');
+ok(isInt(1),    'isInt(1)');
+ok(!isInt(-1),  '!isInt(-1)');
+ok(!isInt(1.1), '!isInt(1.1)');
+ok(!isInt("a"), '!isInt("a")');
+
+ok(isIP("10.10.10.1"),        'isIP("10.10.10.1")');
+is(isIP("10.10.10.10"),       "10.10.10.10",      'isIP("10.10.10.10") eq 10.10.10.10');
+ok(isIP("10.10.10.100"),      'isIP("10.10.10.100")');
+ok(!isIP("10.10.10.0"),       '!isIP("10.10.10.0")');
+ok(!isIP("10.10.10.255"),     '!isIP("10.10.10.255")');
+ok(!isIP("10.10.10.300"),     '!isIP("10.10.10.300")');
+ok(!isIP("x.x.x.x"),          '!isIP("x.x.x.x")');
 
 done_testing();
