@@ -308,7 +308,7 @@ BEGIN {
     }
 
     $SIG{__DIE__} = sub {
-        my $str = $_[0] || "Died";
+        my $str = "@_" || "Died";
         if(substr($str, -1, 1) eq "\n"){
             print STDERR $str;
         } else {
