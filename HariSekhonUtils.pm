@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.4";
+our $VERSION = "1.4.5";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -104,9 +104,12 @@ our %EXPORT_TAGS = (
                         isHostname
                         isIP
                         isInt
+                        isInterface
+                        isLabel
                         isLinux
                         isMac
                         isOS
+                        isPort
                         isProcessName
                         isScalar
                         isUrl
@@ -387,7 +390,8 @@ our $user;
 our %thresholds;
 # Standard ordering of usage options for help. Exported and overridable inside plugin to customize usage()
 our @usage_order = qw(host port user users groups password database query field regex warning critical);
-my  @valid_units = qw/% s ms us B KB MB TB c/;
+# Not sure if I can relax the case sensitivity on these according to the Nagios Developer guidelines
+my  @valid_units = qw/% s ms us B KB MB GB TB c/;
 our $verbose = 0;
 our $version;
 our $warning;
@@ -717,7 +721,11 @@ sub code_error (@) {
     use Carp;
     #quit("UNKNOWN", "Code Error - @_");
     $! = $ERRORS{"UNKNOWN"};
-    croak "UNKNOWN: Code Error - @_";
+    if($debug){
+        confess "UNKNOWN: Code Error - @_";
+    } else {
+        croak "UNKNOWN: Code Error - @_";
+    }
 }
 
 
@@ -914,7 +922,7 @@ sub isCode ($) {
 
 sub isDomain ($) {
     my $domain = shift;
-    #defined($domain) or return 0;
+    defined($domain) or return 0;
     return 0 if(length($domain) > 255);
     $domain =~ /^($domain_regex)$/ or return 0;
     return $1;
@@ -990,6 +998,15 @@ sub isHostname ($) {
 }
 
 
+sub isInterface ($) {
+    my $interface = shift;
+    defined($interface) || return 0;
+    # TODO: consider checking if the interface actually exists on the system
+    $interface =~ /^((?:eth|bond|lo)\d+|lo)$/ or return 0;
+    return $1;
+}
+
+
 sub isInt ($;$) {
     my $number = shift;
     my $signed = shift() ? "-?" : "";
@@ -1011,6 +1028,24 @@ sub isIP ($) {
         $_ > 254 and return 0;
     }
     return $ip;
+}
+
+
+# Primarily for Nagios perfdata labels
+sub isLabel ($) {
+    my $label  = shift;
+    defined($label) || return 0;
+    $label =~ /^[\%\(\)\/\*\w\s-]+$/ or return 0;
+    return $label;
+}
+
+
+sub isPort ($) {
+    my $port = shift;
+    $port  =~ /^(\d+)$/ || return 0;
+    $port = $1;
+    ($port >= 1 && $port <= 65535) || return 0;
+    return $port;
 }
 
 
@@ -1084,7 +1119,7 @@ sub isLinux () {
     isOS "linux";
 }
 
-my $supported_os_msg = "this program is only supported on %s at this time";
+our $supported_os_msg = "this program is only supported on %s at this time";
 sub mac_only () {
     isMac or quit("UNKNOWN", sprintf($supported_os_msg, "Mac/Darwin") );
 }
@@ -1375,15 +1410,15 @@ sub subtrace (@) {
 #}
 
 
-sub uniq_array {
+sub uniq_array (@) {
     my @array = @_; # or code_error "no arg passed to uniq_array";
     isArray(\@array) or code_error "uniq_array was passed a non-array";
     scalar @array or code_error "uniq_array was passed an empty array";
-    return ( keys %{{ map { $_ => 1 } @array }} );
+    return ( sort keys %{{ map { $_ => 1 } @array }} );
 }
 
 
-sub usage {
+sub usage (;@) {
     print "@_\n\n" if (@_ > 0);
     print "$usage_line\n\n";
     foreach my $key_orig (sort keys %options){
@@ -1443,9 +1478,9 @@ sub usage {
 }
 
 
-sub user_exists {
-    my $user = shift if $_[0];
-    defined($user) or code_error("no user passed to user_exists()");
+sub user_exists ($) {
+    my $user = shift; # if $_[0];
+    #defined($user) or code_error("no user passed to user_exists()");
     #$user = isUser($user) || return 0;
 
     # using id command since this should exist on most unix systems
@@ -1453,13 +1488,13 @@ sub user_exists {
     #`id "$user" >/dev/null 2>&1`;
     #return 1 if ( $? eq 0 );
     #return 0;
-    
+
     # More efficient
     return defined(getpwnam($user));
 }
 
 
-sub validate_database {
+sub validate_database ($) {
     my $database = shift;
     defined($database)      || usage "database name not specified";
     $database =~ /^(\w*)$/  || usage "invalid database name given, must be alphanumeric";
@@ -1468,7 +1503,7 @@ sub validate_database {
 }
 
 
-sub validate_database_fieldname {
+sub validate_database_fieldname ($) {
     my $field = shift;
     defined($field) || usage "field not specified";
     $field  =~ /^(\d+)$/ or $field =~/^([\w\(\)\*\,\._-]+)$/ || usage "invalid field number given, must be a positive integer, or a valid field name";
@@ -1479,42 +1514,34 @@ sub validate_database_fieldname {
 }
 
 
-sub validate_database_query_select_show {
+sub validate_database_query_select_show ($) {
     my $query = shift;
     defined($query) || usage "query not specified";
     #$query =~ /^\s*((?i:SHOW|SELECT)\s[\w\s;:,\.\?\(\)*='"-]+)$/ || usage "invalid query supplied";
-    # TODO: add subquery regex protection to ensure selects
     #debug("regex validating query: $query");
-    $query =~ /^\s*((?i:SHOW|SELECT)\s.+)$/ || usage "invalid query supplied, must be a SELECT or SHOW only for safety";
+    $query =~ /^\s*((?:SHOW|SELECT)\s+(?!.*(?:INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|TRUNCATE|;|--)).+)$/i || usage "invalid query supplied, must be a SELECT or SHOW only for safety";
     $query = $1;
+    $query =~ /insert|update|delete|create|drop|alter|truncate|;|--/i and usage "DML statement or suspect chars detected in query!";
     vlog_options("query", "$query");
     return $query;
 }
 
 
-sub validate_domain {
+sub validate_domain ($) {
     my $domain = shift;
     defined($domain) || usage "domain name not specified";
+    $domain = isDomain($domain) || usage "invalid domain name given '$domain'";
     vlog_options("domain", "'$domain'");
-    return validate_domainname($domain) || usage "invalid domain name given '$domain'";
+    return $domain;
 }
 
 
-sub validate_domainname {
-    my $domain = shift;
-    defined($domain) || return 0;
-    return 0 if(length($domain) > 253);
-    $domain =~ /^($domain_regex)$/ || return 0;
-    return $1;
-}
+#sub validate_dir ($;$) {
+#    validate_directory(@_);
+#}
 
 
-sub validate_dir {
-    validate_directory(@_);
-}
-
-
-sub validate_directory {
+sub validate_directory ($;$) {
     my $dir     = shift;
     my $noquit  = shift;
     if($noquit){
@@ -1525,10 +1552,11 @@ sub validate_directory {
     ( -d $dir) || usage "cannot find directory: '$dir'";
     return $dir;
 }
+*validate_dir = \&validate_directory;
 
 
 # SECURITY NOTE: this only validates the email address is valid, it's doesn't make it safe to arbitrarily pass to commands or SQL etc!
-sub validate_email {
+sub validate_email ($) {
     my $email = shift;
     defined($email) || usage "email not specified";
     isEmail($email) || usage "invalid email address specified, failed regex validation";
@@ -1537,7 +1565,7 @@ sub validate_email {
 }
 
 
-sub validate_file {
+sub validate_file ($;$) {
     my $filename = shift;
     my $noquit   = shift;
     $filename = validate_filename($filename, $noquit) or return 0;
@@ -1549,7 +1577,7 @@ sub validate_file {
 }
 
 
-sub validate_filename {
+sub validate_filename ($;$) {
     my $filename = shift;
     my $noquit   = shift;
     defined($filename) || usage "filename not specified";
@@ -1561,11 +1589,53 @@ sub validate_filename {
 }
 
 
-sub validate_int {
-    my $integer = $_[0] if defined($_[0]);
-    my $min     = $_[1] || 0;
-    my $max     = $_[2] || code_error "no max value given for validate_int()";
-    my $name    = $_[3] || code_error "no name passed to validate_int()";
+sub validate_float ($$$$) {
+#    my $float = $_[0] if defined($_[0]);
+#    my $min     = $_[1] || 0;
+#    my $max     = $_[2] || code_error "no max value given for validate_float()";
+#    my $name    = $_[3] || code_error "no name passed to validate_float()";
+    my ($float, $min, $max, $name) = @_;
+    defined($float) || usage "$name float not specified";
+    isFloat($float,1) or usage "invalid $name given, must be an float";
+    ($float >= $min && $float <= $max) or usage "invalid $name given, must be float between $min and $max";
+    vlog_options($name, $float);
+    return $float;
+}
+
+
+sub validate_fqdn ($) {
+    my $fqdn = shift;
+    defined($fqdn) || usage "FQDN not defined";
+    $fqdn = isFqdn($fqdn) || usage "invalidate FQDN given";
+    vlog_options("fqdn", "'$fqdn'");
+    return $fqdn
+}
+
+
+sub validate_host ($) {
+    my $host = shift;
+    defined($host) || usage "host not specified";
+    $host = isHost($host) || usage "invalid host given, not a validate hostname or IP address";
+    vlog_options("host", "'$host'");
+    return $host;
+}
+
+
+sub validate_hostname ($) {
+    my $hostname = shift;
+    defined($hostname) || usage "hostname not specified";
+    $hostname = isHostname($hostname) || usage "invalid hostname given";
+    vlog_options("hostname", "'$hostname'");
+    return $hostname;
+}
+
+
+sub validate_int ($$$$) {
+#    my $integer = $_[0] if defined($_[0]);
+#    my $min     = $_[1] || 0;
+#    my $max     = $_[2] || code_error "no max value given for validate_int()";
+#    my $name    = $_[3] || code_error "no name passed to validate_int()";
+    my ($integer, $min, $max, $name) = @_;
     defined($integer) || usage "$name integer not specified";
     isInt($integer, 1) or usage "invalid $name given, must be an integer";
     ($integer >= $min && $integer <= $max) or usage "invalid $name given, must be integer between $min and $max";
@@ -1575,69 +1645,34 @@ sub validate_int {
 *validate_integer = \&validate_int;
 
 
-sub validate_float {
-    my $float = $_[0] if defined($_[0]);
-    my $min     = $_[1] || 0;
-    my $max     = $_[2] || code_error "no max value given for validate_float()";
-    my $name    = $_[3] || code_error "no name passed to validate_float()";
-    defined($float) || usage "$name float not specified";
-    isFloat($float,1) or usage "invalid $name given, must be an float";
-    ($float >= $min && $float <= $max) or usage "invalid $name given, must be float between $min and $max";
-    vlog_options($name, $float);
-    return $float;
-}
-
-
-sub validate_fqdn {
-    my $fqdn = shift;
-    defined($fqdn) || return 0;
-    return 0 if(length($fqdn) > 255);
-    $fqdn =~ /^($fqdn_regex)$/ || return 0;
-    return $1;
-}
-
-
-sub validate_host {
-    my $host = shift;
-    defined($host) || usage "host not specified";
-    vlog_options("host", "'$host'");
-    return (isHost($host) or usage "invalid host given, not a validate hostname or IP address");
-}
-
-
-sub validate_hostname {
-    my $hostname = shift;
-    defined($hostname) || usage "hostname not specified";
-    vlog_options("host", "'$hostname'");
-    return ( isHostname($hostname) or usage "invalid hostname given");
-}
-
-
-sub validate_interface {
-    my $interface = $_[0] if $_[0];
+sub validate_interface ($) {
+    my $interface = shift;
     defined($interface) || usage "interface not specified";
-    # TODO: consider checking if the interface actually exists on the system
-    $interface =~ /^((?:eth|bond|lo)\d+)$/ or usage "invalid interface specified, must be either ethN, bondN or loN";
-    $interface = $1;
+    $interface = isInterface($interface) || usage "invalid interface specified, must be either ethN, bondN or loN";
     vlog_options("interface", $interface);
     return $interface;
 }
 
 
-sub validate_ip {
+sub validate_ip ($) {
     my $ip = shift;
     defined($ip) || usage "ip not specified";
+    $ip = isIP($ip) || usage "invalid IP given";
     vlog_options("IP", "'$ip'");
-    return (isIP($ip) || usage "invalid IP given");
+    return $ip;
 }
 
 
-sub validate_node_list {
-    my $nodes = shift;
-    my %nodes = map { $_ => 1 } split(/[,\s]+/, $nodes);
-    my @nodes = sort keys %nodes;
-    push(@nodes, @ARGV);
-    scalar @nodes or usage "node list empty";
+sub validate_node_list (@) {
+    my @nodes = @_;
+    my @nodes2;
+    foreach(@nodes){
+        push(@nodes2, split(/[,\s]+/, $_));
+    }
+    # do this validate_node_list
+    #push(@nodes, @ARGV);
+    scalar @nodes2 or usage "node list empty";
+    @nodes = uniq_array(@nodes2);
     foreach my $node (@nodes){
         $node = isHost($node) || usage "Node name '$node' invalid, must be hostname/FQDN or IP address";
     }
@@ -1646,18 +1681,16 @@ sub validate_node_list {
 }
 
 
-sub validate_port {
+sub validate_port ($) {
     my $port = shift;
     defined($port)      || usage "port not specified";
-    $port  =~ /^(\d+)$/ || usage "invalid port number given, must be a positive integer";
-    $port = $1;
-    ($port >= 1 && $port <= 65535) || usage "invalid port number given, must be between 1-65535)";
+    $port  = isPort($port) || usage "invalid port number given, must be a positive integer";
     vlog_options("port", "'$port'");
     return $port;
 }
 
 
-sub validate_process_name {
+sub validate_process_name ($) {
     my $process = shift;
     defined($process) || usage "no process name given";
     $process = isProcessName($process) || usage "invalid process name, failed regex validation";
@@ -1666,19 +1699,17 @@ sub validate_process_name {
 }
 
 
-sub validate_label {
+sub validate_label ($) {
     my $label  = shift;
-    my $noexit = shift;
     defined($label) || usage "label not specified";
-    unless($label =~ /^[\%\(\)\/\*\w\s-]+$/){
-        usage "Label must be an alphanumeric identifier" unless $noexit;
-        return 0;
-    }
+    $label = isLabel($label) || usage "Label must be an alphanumeric identifier";
     vlog_options("label", $label);
     return $label;
 }
 
-sub validate_regex {
+
+# TODO: unify with isRegex and do not allow noquit
+sub validate_regex ($;$$) {
     my $regex  = shift;
     my $noquit = shift;
     my $posix  = shift;
@@ -1720,9 +1751,9 @@ sub validate_regex {
 }
 
 
-sub validate_user {
+sub validate_user ($) {
     #subtrace(@_);
-    my $user = shift if $_[0];
+    my $user = shift;
     defined($user) || usage "username not specified";
     $user = isUser($user) || usage "invalid username given, must be alphanumeric";
     vlog_options("user", "'$user'");
@@ -1731,26 +1762,29 @@ sub validate_user {
 *validate_username = \&validate_user;
 
 
-sub validate_user_exists {
+sub validate_user_exists ($) {
     #subtrace(@_);
-    my $user = shift if $_[0];
+    my $user = shift;
     $user = validate_user($user);
     user_exists($user) || usage "invalid user given, not found on local system";
     return $user;
 }
 
 
-sub validate_password {
-    my $password = shift if $_[0];
+sub validate_password ($) {
+    my $password = shift;
     defined($password) || usage "password not specified";
     # Do not do anything stupid with this password like passing it to cmd() since we have to pass it through here as is
     $password =~ /^(.+)$/ || usage "invalid password given";
     vlog_options("password", "'$password'");
-    return $1;
+    # TODO: review what this breaks in taint mode, my mysql code I think
+    #return $1;
+    # not untainting intentionally since it can contain anything
+    return $password;
 }
 
 
-sub validate_threshold {
+sub validate_threshold ($$;$) {
     #subtrace(@_);
     my $name        = $_[0];
     my $threshold   = $_[1];
@@ -1802,12 +1836,13 @@ sub validate_threshold {
     vlog_options(sprintf("%-8s lower", $name), $thresholds{"$name"}{"lower"}) if defined($thresholds{"$name"}{"lower"});
     vlog_options(sprintf("%-8s upper", $name), $thresholds{"$name"}{"upper"}) if defined($thresholds{"$name"}{"upper"});
     vlog_options(sprintf("%-8s range inversion", $name), "on") if $thresholds{$name}{"invert_range"};
+    1;
 }
 
 
 # 1st/2nd arg determines if warning/critical are mandatory respectively
 # 3rd arg must be "upper" or "lower" to specify to only allow single threshold used as the upper or lower boundary
-sub validate_thresholds {
+sub validate_thresholds (;$$$) {
     # TODO: CRITICAL vs WARNING threshold logic is only applied to simple thresholds, not to range ones, figure out if I can reasonably do range ones later
     if($_[0]){
         defined($warning)  || usage "warning threshold not defined";
@@ -1831,10 +1866,12 @@ sub validate_thresholds {
             usage "warning threshold ($thresholds{warning}{upper}) cannot be higher than critical threshold ($thresholds{critical}{upper}) for upper limit thresholds";
         }
     }
+    1;
 }
 
 
-sub validate_units {
+# Not sure if I can relax the case sensitivity on these according to the Nagios Developer guidelines
+sub validate_units ($) {
     my $units = shift;
     $units or usage("units not defined");
     foreach(@valid_units){
@@ -1847,7 +1884,7 @@ sub validate_units {
 }
 
 
-sub validate_url {
+sub validate_url ($;$) {
     my $url  = $_[0] if $_[0];
     my $name = $_[1] || "";
     $name .= " " if $name;
@@ -1858,46 +1895,52 @@ sub validate_url {
 }
 
 
-sub verbose_mode {
+sub verbose_mode () {
     vlog2("verbose mode on\n");
 }
 
 
-sub version {
+sub version () {
     defined($main::VERSION) or $main::VERSION = "unset";
-    usage "$progname version $main::VERSION  =>  Nagios Utils Hari Sekhon version $HariSekhonUtils::VERSION";
+    usage "$progname version $main::VERSION  =>  Hari Sekhon Utils version $HariSekhonUtils::VERSION";
 }
 
 
-sub vlog {
+sub vlog (@) {
     print STDERR "@_\n" if $verbose;
 }
 
-sub vlog2 {
+sub vlog2 (@) {
     print STDERR "@_\n" if ($verbose >= 2);
 }
 
-sub vlog3 {
+sub vlog3 (@) {
     print STDERR "@_\n" if ($verbose >= 3);
 }
 
+# TODO: check this
 # $progname: prefixed
-sub vlog4{
+sub vlog4 (@){
     if($verbose){
-        foreach (split(/\n/, $_[0])){
-            print STDERR "$progname\[$$\]: $_\n";
+        foreach(@_){
+            foreach (split(/\n/, $_)){
+                print STDERR "$progname\[$$\]: $_\n";
+            }
         }
+        1;
     }
 }
 
-sub vlog_options {
-    scalar @_ eq 2 or code_error "incorrect number of args passed to vlog_options()";
+
+sub vlog_options ($$) {
+    #scalar @_ eq 2 or code_error "incorrect number of args passed to vlog_options()";
     vlog2 sprintf("%-25s %s", "$_[0]:", $_[1]);
 }
 
+
 #my %download_tries;
 #my %lock_tries;
-#sub wget {
+#sub wget ($$) {
 #    require LWP::Simple;
 #    import LWP::Simple;
 #    my $url        = shift;
@@ -1952,7 +1995,7 @@ sub vlog_options {
 #}
 
 
-sub which {
+sub which ($;$) {
     my $bin  = $_[0] || code_error "no arg supplied to which() subroutine";
     my $quit = $_[1] || 0;
     $bin = validate_filename($bin);
