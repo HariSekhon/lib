@@ -52,7 +52,7 @@
 package HariSekhonUtils;
 use warnings;
 use strict;
-use 5;
+use 5.006_001;
 use Carp;
 use Cwd 'abs_path';
 use Fcntl ':flock';
@@ -319,6 +319,9 @@ BEGIN {
     };
 }
 
+# quick prototype to allow me to use this just below
+sub quit(@);
+
 our $progname = basename $0;
 $progname =~ /^([\w\.\/_-]+)$/ or quit("UNKNOWN", "Invalid program name - does not adhere to strict regex validation, you should name the program simply and sanely");
 $progname = $1;
@@ -403,13 +406,13 @@ our %default_options = (
 
 
 # These two subroutines are primarily for my other programs such as my spotify programs which have necessarily longer run times and need a good way to set this and have the %default_options auto updated for usage() to automatically stay in sync with the live options
-sub set_timeout_max {
+sub set_timeout_max ($) {
     $timeout_max = shift;
     isInt($timeout_max) or code_error("must pass an integer to set_timeout_max()");
 }
 
 
-sub set_timeout_default {
+sub set_timeout_default ($) {
     $timeout_default = shift;
     isInt($timeout_default) or code_error("must pass an integer to set_timeout_default()");
     ($timeout_default > $timeout_max) and code_error("\$timeout_default ($timeout_default) may not be higher than \$timeout_max ($timeout_max)");
@@ -446,64 +449,66 @@ my $long_options_len  = 0;
 
 # there is no ok() since that behaviour needs to be determined by scenario
 
-sub unknown {
+sub unknown () {
     if($status eq "OK"){
         $status = "UNKNOWN";
     }
 }
 
-sub warning {
+sub warning () {
     if($status ne "CRITICAL"){
         $status = "WARNING";
     }
 }
 
-sub critical {
+sub critical () {
     $status = "CRITICAL";
 }
 
 ############################
-sub is_ok {
+sub is_ok () {
     ($status eq "OK");
 }
 
-sub is_warning {
+sub is_warning () {
     ($status eq "WARNING");
 }
 
-sub is_critical {
+sub is_critical () {
     ($status eq "CRITICAL");
 }
 
-sub is_unknown {
+sub is_unknown () {
     ($status eq "UNKNOWN");
 }
 
-sub get_status_code {
+sub get_status_code (;$) {
     if($_[0]){
+        defined($ERRORS{$_[0]}) || code_error("invalid status '$_[0]' passed to get_status_code()");
         return $ERRORS{$_[0]};
     } else {
+        defined($ERRORS{$status}) || code_error("invalid status '$status' found in \$status variable used by get_status_code()");
         return $ERRORS{$status};
     }
 }
 
-sub status {
+sub status () {
     vlog("status: $status");
 }
 
 # status2/3 not exported/used at this time
-sub status2 {
+sub status2 () {
     vlog2("status: $status");
 }
 
-sub status3 {
+sub status3 () {
     vlog3("status: $status");
 }
 
 # ============================================================================ #
 
 
-sub option_present {
+sub option_present ($) {
     my $new_option = shift;
     grep {
         my @option_switches = split("|", $_);
@@ -515,7 +520,7 @@ sub option_present {
 # TODO: consider calling this from get_options and passing hashes we want options for straight to that sub
 
 # TODO: fix this to use option_present
-sub add_options {
+sub add_options ($) {
     my $options_hash = shift;
     isHash($options_hash, 1);
     #@default_options{keys %options} = values %options;
@@ -568,7 +573,7 @@ sub add_options {
 #}
 
 
-sub autoflush {
+sub autoflush () {
     select(STDERR);
     $| = 1;
     select(STDOUT);
@@ -576,7 +581,7 @@ sub autoflush {
 }
 
 
-sub check_threshold {
+sub check_threshold ($$) {
     #subtrace(@_);
     my $threshold = shift;
     my $result    = shift;
@@ -627,7 +632,7 @@ sub check_threshold {
 }
 
 
-sub check_thresholds {
+sub check_thresholds ($) {
     #subtrace(@_);
     check_threshold("critical", $_[0]) and
     check_threshold("warning",  $_[0]);
@@ -635,7 +640,7 @@ sub check_thresholds {
 }
 
 
-#sub checksum {
+#sub checksum ($;$) {
 #    my $file = shift;
 #    my $algo = shift;
 #    $algo or $algo = "md5";
@@ -665,7 +670,7 @@ sub check_thresholds {
 #}
 
 
-sub cmd {
+sub cmd ($;$$) {
     my $cmd       = shift;
     my $errchk    = shift;
     my $inbuilt   = shift;
@@ -708,7 +713,7 @@ sub cmd {
 }
 
 
-sub code_error {
+sub code_error (@) {
     use Carp;
     #quit("UNKNOWN", "Code Error - @_");
     $! = $ERRORS{"UNKNOWN"};
@@ -717,12 +722,12 @@ sub code_error {
 
 
 # Remove blanks from array
-sub compact_array {
+sub compact_array (@) {
     return grep { $_ !~ /^\s*$/ } @_;
 }
 
 
-sub curl {
+sub curl ($) {
     unless(defined(&main::get)){
         # inefficient, it'll import for each curl call, instead force top level author to 
         # use LWP::Simple 'get'
@@ -749,12 +754,12 @@ sub curl {
 }
 
 
-sub debug {
+sub debug (@) {
     return 0 unless $debug;
     my ( $package, $filename, $line ) = caller;
-    my $debug_msg = "@_" || "";
+    my $debug_msg = "@_";
     $debug_msg =~ s/^(\n+)//;
-    my $prefix_newline = $1 || "";
+    #my $prefix_newline = $1 || "";
     my $sub = (caller(1))[3];
     if($sub){
         $sub .= "()";
@@ -762,11 +767,13 @@ sub debug {
         $filename = basename $filename;
         $sub = "global $filename line $line";
     }
-    printf "${prefix_newline}debug: %s => %s\n", $sub, $debug_msg;
+    #printf "${prefix_newline}debug: %s => %s\n", $sub, $debug_msg;
+    printf "debug: %s => %s\n", $sub, $debug_msg;
 }
 
+
 # For reference purposes at this point
-#sub escape_regex {
+#sub escape_regex ($) {
 #    my $regex = shift;
 #    defined($regex) or code_error "no regex arg passed to escape_regex() subroutine";
 #    #$regex =~ s/([^\w\s\r\n])/\\$1/g;
@@ -776,14 +783,14 @@ sub debug {
 #}
 
 
-sub expand_units {
+sub expand_units ($$;$) {
     my $num   = shift;
     my $units = shift;
     my $name  = shift;
     my $power;
-    defined($num)   || code_error "no num passed to expand_units()";
+    #defined($num)   || code_error "no num passed to expand_units()";
     isFloat($num)   || code_error "non-float arg 1 passed to expand_units()";
-    defined($units) || code_error "no units passed to expand_units()";
+    #defined($units) || code_error "no units passed to expand_units()";
     if   ($units =~ /^KB$/i){ $power = 1; }
     elsif($units =~ /^MB$/i){ $power = 2; }
     elsif($units =~ /^GB$/i){ $power = 3; }
@@ -832,8 +839,9 @@ sub get_options {
 }
 
 
-sub get_path_owner {
-    my $path = shift if defined($_[0]) || code_error "no path passed to get_path_owner()";
+sub get_path_owner ($) {
+    # defined($_[0]) || code_error "no path passed to get_path_owner()";
+    my $path = shift;
     open my $fh, $path || return 0;
     my @stats = stat($fh);
     close $fh;
@@ -843,7 +851,7 @@ sub get_path_owner {
 
 
 # go flock ur $self ;)
-sub go_flock_yourself {
+sub go_flock_yourself (;$) {
     my $there_can_be_only_one = shift;
     if($there_can_be_only_one){
         open  *{0} or die "Failed to open *{0} for lock: $!\n";
@@ -853,7 +861,7 @@ sub go_flock_yourself {
         flock $selflock, LOCK_EX|LOCK_NB or die "Another instance of " . abs_path($0) . " is already running!\n";
     }
 }
-sub flock_off {
+sub flock_off (;$) {
     my $there_can_be_only_one = shift;
     if($there_can_be_only_one){
         open  *{0} or die "Failed to open *{0} for lock: $!\n";
@@ -865,7 +873,7 @@ sub flock_off {
 }
 
 
-sub inArray {
+sub inArray ($@) {
     my $item  = shift;
     my @array = @_;
     my $found = 0;
@@ -879,8 +887,8 @@ sub inArray {
 }
 
 
-sub isArray {
-    defined($_[0]) or code_error "no arg passed to isArray()";
+sub isArray ($) {
+    #defined($_[0]) or code_error "no arg passed to isArray()";
     my $isArray = ref $_[0] eq "ARRAY";
     if($_[1]){
         unless($isArray){
@@ -892,7 +900,7 @@ sub isArray {
 
 
 # isSub/isCode is used by set_timeout() to determine if we were passed a valid function for the ALRM sub
-sub isCode {
+sub isCode ($) {
     my $isCode = ref $_[0] eq "CODE";
     return $isCode;
 }
@@ -904,9 +912,9 @@ sub isCode {
 *isDigit = \&isInt;
 
 
-sub isDomain {
+sub isDomain ($) {
     my $domain = shift;
-    defined($domain) or return 0;
+    #defined($domain) or return 0;
     return 0 if(length($domain) > 255);
     $domain =~ /^($domain_regex)$/ or return 0;
     return $1;
@@ -914,9 +922,9 @@ sub isDomain {
 
 
 # SECURITY NOTE: this only checks if the email address is valid, it's doesn't make it safe to arbitrarily pass to commands or SQL etc!
-sub isEmail {
+sub isEmail ($) {
     my $email = shift;
-    defined($email) || return 0;
+    #defined($email) || return 0;
     return 0 if(length($email) > 256);
     $email =~ /^$email_regex$/ || return 0;
     # Intentionally not untainting this as it's not safe given the addition of ' to the $email_regex to support Irish email addresses
@@ -924,27 +932,24 @@ sub isEmail {
 }
 
 
-sub isFloat {
+sub isFloat ($;$) {
     my $number = shift;
-    defined($number) or code_error("no number passed to isFloat subroutine");
-    #my $allow_negative = shift;
-    my $negative = "";
-    #$negative = "-?" if $allow_negative;
-    $negative = "-?" if shift;
+    my $negative = shift() ? "-?" : "";
+    #defined($number) or code_error("no number passed to isFloat subroutine");
     $number =~ /^$negative\d+(?:\.\d+)?$/;
 }
 
 
-sub isFqdn {
+sub isFqdn ($) {
     my $fqdn = shift;
-    defined($fqdn) or return 0;
+    #defined($fqdn) or return 0;
     return 0 if(length($fqdn) > 255);
     $fqdn =~ /^($fqdn_regex)$/ or return 0;
     return $1;
 }
 
 
-sub isHash {
+sub isHash ($) {
     my $isHash = ref $_[0] eq "HASH";
     if($_[1]){
         unless($isHash){
@@ -955,17 +960,17 @@ sub isHash {
 }
 
 
-sub isHex {
+sub isHex ($) {
     my $hex = shift;
-    defined($hex) or return 0;
+    #defined($hex) or return 0;
     $hex =~ /^(0x[A-Fa-f\d]+)$/ or return 0;
     return 1;
 }
 
 
-sub isHost {
+sub isHost ($) {
     my $host = shift;
-    defined($host) or return 0;
+    #defined($host) or return 0;
     if(length($host) > 255){ # Can't be a hostname
         return isIP($host);
     } else {
@@ -976,16 +981,16 @@ sub isHost {
 }
 
 
-sub isHostname {
+sub isHostname ($) {
     my $hostname = shift;
-    defined($hostname) or return 0;
+    #defined($hostname) or return 0;
     return 0 if(length($hostname) > 255);
     $hostname =~ /^($hostname_regex)$/ or return 0;
     return $1;
 }
 
 
-sub isInt {
+sub isInt ($;$) {
     my $number = shift;
     my $signed = shift() ? "-?" : "";
     defined($number) or code_error("no number passed to isInt()");
@@ -994,9 +999,9 @@ sub isInt {
 }
 
 
-sub isIP {
+sub isIP ($) {
     my $ip = shift;
-    defined($ip) or return 0;
+    #defined($ip) or return 0;
     $ip =~ /^($ip_regex)$/ or return 0;
     $ip = $1;
     my @octets = split(/\./, $ip);
@@ -1009,16 +1014,16 @@ sub isIP {
 }
 
 
-sub isProcessName {
+sub isProcessName ($) {
     my $process = shift;
-    defined($process) or return 0;
+    #defined($process) or return 0;
     $process =~ /^($process_name_regex)$/ or return 0;
     return $1;
 }
 
 
 # TODO FIXME: doesn't catch error before Perl errors out right now, not using it yet
-#sub isRegex {
+#sub isRegex ($) {
 #    my $regex = shift;
 #    defined($regex) || code_error "no regex arg passed to isRegex()";
 #    #defined($regex) || return 0;
@@ -1031,7 +1036,7 @@ sub isProcessName {
 #}
 
 
-sub isScalar {
+sub isScalar ($;$) {
     my $isScalar = ref $_[0] eq "SCALAR";
     if($_[1]){
         unless($isScalar){
@@ -1048,53 +1053,53 @@ sub isScalar {
 *isSub = \&isCode;
 
 
-sub isUrl {
+sub isUrl ($) {
     my $url = shift;
-    defined($url) or return 0;
+    #defined($url) or return 0;
     #vlog3("url_regex: $url_regex");
     $url =~ /^($url_regex)$/ or return 0;
     return $1;
 }
 
 
-sub isUser {
+sub isUser ($) {
     #subtrace(@_);
     my $user = shift if $_[0];
-    defined($user) || code_error "user arg not passed to isUser()";
+    #defined($user) || code_error "user arg not passed to isUser()";
     $user =~ /^($user_regex)$/ || return 0;
     return $1;
 }
 
 
 # =============================== OS CHECKS ================================== #
-sub isOS {
+sub isOS ($) {
     $^O eq shift;
 }
 
-sub isMac {
+sub isMac () {
     isOS "darwin";
 }
 
-sub isLinux {
+sub isLinux () {
     isOS "linux";
 }
 
 my $supported_os_msg = "this program is only supported on %s at this time";
-sub mac_only {
+sub mac_only () {
     isMac or quit("UNKNOWN", sprintf($supported_os_msg, "Mac/Darwin") );
 }
 
-sub linux_only {
+sub linux_only () {
     isLinux or quit("UNKNOWN", sprintf($supported_os_msg, "Linux") );
 }
 
-sub linux_mac_only {
+sub linux_mac_only () {
     isLinux or isMac or quit("UNKNOWN", sprintf($supported_os_msg, "Linux or Mac/Darwin") );
 }
 # ============================================================================ #
 
 
-sub loginit {
+sub loginit () {
     # This can cause plugins to fail if there is no connection to syslog available at plugin INIT
     # Let's only use this for something that really needs it
     #INIT {
@@ -1110,7 +1115,7 @@ sub loginit {
 }
 
 
-sub log {
+sub log (@) {
     loginit() unless $syslog_initialized;
     # For some reason perror doesn't seem to print so do it manually here
     print strftime("%F %T", localtime) . "  $progname\[$$\]: @_\n";
@@ -1118,15 +1123,15 @@ sub log {
 }
 
 
-sub logdie {
+sub logdie (@) {
     &log("ERROR: @_");
     exit get_status_code("CRITICAL");
 }
 
 
-sub lstrip {
+sub lstrip ($) {
     my $string = shift;
-    defined($string) or code_error "no arg passed to lstrip()";
+    #defined($string) or code_error "no arg passed to lstrip()";
     $string =~ s/^\s+//o;
     return $string;
 }
@@ -1134,7 +1139,7 @@ sub lstrip {
 *ltrim = \&lstrip;
 
 
-sub msg_perf_thresholds {
+sub msg_perf_thresholds () {
     $msg .= ";";
     $msg .= $warning if $warning;
     $msg .= ";";
@@ -1143,7 +1148,7 @@ sub msg_perf_thresholds {
 }
 
 
-sub msg_thresholds {
+sub msg_thresholds () {
     my $msg2 = "";
     if ($thresholds{"critical"}{"error"} or
         $thresholds{"warning"}{"error"}  or
@@ -1170,10 +1175,10 @@ sub msg_thresholds {
 }
 
 
-sub open_file{
+sub open_file ($;$) {
     my $filename = shift;
     my $lock = shift;
-    my $mode = shift;
+    #my $mode = shift;
     my $tmpfh;
     ( -e $filename ) or quit("CRITICAL", "file not found: '$filename'");
     ( -f $filename ) or quit("CRITICAL", "not a valid file: '$filename'");
@@ -1189,14 +1194,14 @@ sub open_file{
 
 # parsing ps aux is more portable than pkill -f command. Useful for alarm sub
 # Be careful to validate and make sure you use taint mode before calling this sub
-sub pkill {
+sub pkill ($;$) {
     my $search    = $_[0] || code_error "No search arg specified for pkill sub";
     my $kill_args = $_[1] || "";
     return `ps aux | awk '/$search/ {print \$2}' | while read pid; do kill $kill_args \$pid >/dev/null 2>&1; done`;
 }
 
 
-sub plural {
+sub plural ($) {
     our $plural;
     my $var = $_[0];
     #print "var = $var\n";
@@ -1214,7 +1219,7 @@ sub plural {
 }
 
 
-sub print_options {
+sub print_options (@) {
     #subtrace(@_);
     foreach my $option (@_){
         my $option_regex = $option;
@@ -1241,7 +1246,8 @@ sub print_options {
 }
 
 
-sub quit {
+# Also prototyped at top to allow me to call it earlier
+sub quit (@) {
     if($status_prefix ne ""){
         $status_prefix .= " ";
     }
@@ -1272,19 +1278,19 @@ sub quit {
     } else {
         #print "UNKNOWN: Code Error - Invalid number of arguments passed to quit function (" . scalar(@_). ", should be 0 - 2)\n";
         #exit $ERRORS{"UNKNOWN"};
-        code_error "invalid number of arguments passed to quit function";
+        code_error("invalid number of arguments passed to quit function (" . scalar(@_) . ", should be 0 - 2)");
     }
 }
 
 
-sub resolve_ip {
+sub resolve_ip ($) {
     require Socket;
     import Socket;
     return inet_ntoa(inet_aton($_[0]));
 }
 
 
-sub rstrip {
+sub rstrip ($) {
     my $string = shift;
     defined($string) or code_error "no arg passed to rstrip()";
     $string =~ s/\s+$//;
@@ -1294,7 +1300,7 @@ sub rstrip {
 *rtrim = \&rstrip;
 
 
-sub set_sudo {
+sub set_sudo (;$) {
     local $user = $_[0] if defined($_[0]);
     defined($user) or code_error "user arg not passed to set_sudo() and \$user not defined in outer scope";
     # Quit if we're not the right user to ensure we don't sudo command and hang or return with a generic timeout error message
@@ -1310,7 +1316,7 @@ sub set_sudo {
 }
 
 
-sub set_timeout {
+sub set_timeout ($;$) {
     $timeout = $_[0] if $_[0];
     my $sub_ref = $_[1] if $_[1];
     $timeout =~ /^\d+$/ || usage("timeout value must be a positive integer\n");
@@ -1335,7 +1341,7 @@ sub set_timeout {
 #}
 
 
-sub strip {
+sub strip ($) {
     my $string = shift;
     defined($string) or code_error "no arg passed to strip()";
     $string =~ s/^\s+//o;
@@ -1345,8 +1351,8 @@ sub strip {
 *trim = \&strip;
 
 
-sub subtrace {
-    @_ || code_error("\@_ not passed to subtrace");
+sub subtrace (@) {
+    #@_ || code_error("\@_ not passed to subtrace");
     return unless ($debug >= 2);
     my ( $package, $filename, $line ) = caller;
     my $debug_msg = "entering with args: @_";
@@ -1525,8 +1531,8 @@ sub validate_directory {
 sub validate_email {
     my $email = shift;
     defined($email) || usage "email not specified";
-    isEmail || usage "invalid email address specified, failed regex validation";
-    # Not passing it through regex as I don't want to untaint it
+    isEmail($email) || usage "invalid email address specified, failed regex validation";
+    # Not passing it through regex as I don't want to untaint it due to the addition of the valid ' char in email addresses
     return $email;
 }
 
