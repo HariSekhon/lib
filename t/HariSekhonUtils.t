@@ -181,6 +181,11 @@ ok(!isInt(-1),  '!isInt(-1)');
 ok(!isInt(1.1), '!isInt(1.1)');
 ok(!isInt("a"), '!isInt("a")');
 
+is(isInterface("eth0"),     "eth0",     'isInterface("eth0")');
+is(isInterface("bond3"),    "bond3",    'isInterface("bond3")');
+is(isInterface("lo"),       "lo",       'isInterface("lo")');
+ok(!isInterface('b@interface'),         '!isInterface(\'b@dinterface\'');
+
 ok(isIP("10.10.10.1"),        'isIP("10.10.10.1")');
 is(isIP("10.10.10.10"),       "10.10.10.10",      'isIP("10.10.10.10") eq 10.10.10.10');
 ok(isIP("10.10.10.100"),      'isIP("10.10.10.100")');
@@ -189,6 +194,13 @@ ok(!isIP("10.10.10.0"),       '!isIP("10.10.10.0")');
 ok(!isIP("10.10.10.255"),     '!isIP("10.10.10.255")');
 ok(!isIP("10.10.10.300"),     '!isIP("10.10.10.300")');
 ok(!isIP("x.x.x.x"),          '!isIP("x.x.x.x")');
+
+is(isPort(80),          80,     'isPort(80)');
+ok(!isPort(65536),              '!isPort(65536)');
+ok(!isPort("a"),                'isPort("a")');
+
+is(isLabel("st4ts_used(%)"),    "st4ts_used(%)",    'isLabel("st4ts_used(%)")');
+ok(!isLabel('b@dlabel'),                            'isLabel(\'b@dlabel\')');
 
 is(isProcessName("../my_program"),      "../my_program",        'isProcessName("../my_program")');
 is(isProcessName("ec2-run-instances"),  "ec2-run-instances",    'isProcessName("ec2-run-instances")');
@@ -265,5 +277,160 @@ is(trim(" \t \n ha ri \t \n"),      "ha ri",   'trim()');
 
 # TODO:
 #ok(subtrace("test"), 'subtrace("test")');
+
+is_deeply([uniq_array(("one", "two", "three", "", "one"))],     [ "", "one", "three", "two" ],    'uniq_array()');
+
+# TODO:
+# usage
+
+ok(user_exists("root"),                 'user_exists("root")');
+ok(!user_exists("nonexistentuser"),     '!user_exists("nonexistentuser")');
+
+# TODO: can't actually test failure of these validation functions as they will error out
+is(validate_database("mysql"),                  "mysql",        'validate_database("mysql")');
+is(validate_database_fieldname(10),             10,             'validate_database_fieldname(10)');
+is(validate_database_fieldname("count(*)"),     "count(*)",     'validate_database_fieldname("count(*)")');
+
+is(validate_database_query_select_show("SELECT count(*) from database.field"),  "SELECT count(*) from database.field", 'validate_database_query_select_show("SELECT count(*) from database.field")');
+# This should error out with invalid query msg. if it shows DML statement detected then it's fallen through to DML keyword match
+#ok(!validate_database_query_select_show("SELECT count(*) from (DELETE FROM database.field)"),  'validate_database_query_select_show("SELECT count(*) from (DELETE FROM database.field)")');
+
+is(validate_domain("harisekhon.com"),  "harisekhon.com",    'validate_domain("harisekhon.com") eq harisekhon.com');
+
+is(validate_directory("/etc/"),     "/etc/",    'validate_directory("/etc/")');
+is(validate_dir("/etc/"),           "/etc/",    'validate_dir("/etc/")');
+is(validate_directory("/nonexistentdir", 1),    "/nonexistentdir",  'validate_directory("/nonexistentdir", 1)');
+ok(!validate_directory('b@ddir', 1),            '!validate_directory(\'b@ddir\')');
+# TODO: cannot validate dir not existing here as it terminates program
+
+is(validate_email('harisekhon@gmail.com'),      'harisekhon@gmail.com',     'validate_email(\'harisekhon@gmail.com\')');
+
+is(validate_file("/etc/passwd"),    "/etc/passwd",  'validate_file("/etc/passwd")');
+is(validate_file("/etc/nonexistentfile", 1),   0,   'validate_file("/etc/nonexistentfile", 1) eq 0');
+
+is(validate_filename("/etc/passwd"),                "/etc/passwd",              'validate_filename("/etc/passwd")');
+is(validate_filename("/etc/nonexistentfile", 1),    "/etc/nonexistentfile",     'validate_filename("/etc/nonexistentfile", 1)');
+
+is(validate_float(2,0,10,"two"),            2,      'validate_float(2,0,10,"two")');
+is(validate_float(-2,-10,10,"minus-two"),   -2,     'validate_float(-2,-10,10,"minus-two")');
+is(validate_float(2.1,0,10,"two-float"),    2.1,    'validate_float(2.1,0,10,"two-float")');
+is(validate_float(6.8,5,10,"six-float"),    6.8,    'validate_float(6.8,5,10,"six")');
+is(validate_float(-6,-6,0,"minus-six"),     -6,     'validate_float(-6,-6,0,"minus-six")');
+# should error out
+#is(validate_float(3,4,10,"three"),  0,  'validate_float(3,4,10,"three")');
+
+is(validate_fqdn("www.harisekhon.com"),     "www.harisekhon.com",      'validate_fqdn("www.harisekhon.com")');
+# should error out
+#is(validate_fqdn("harisekhon.com"),     0,      'validate_fqdn("harisekhon.com")');
+
+
+is(validate_int(2,0,10,"two"),    2,  'validate_int(2,0,10,"two")');
+is(validate_int(-2,-10,10,"minus-two"),    -2,  'validate_int(-2,-10,10,"minus-two")');
+# should error out
+#is(validate_int(2.1,0,10,"two-float"),  0,  'validate_int(2.0,0,10,"two-float")');
+is(validate_int(6,5,10,"six"),    6,  'validate_int(6,5,10,"six")');
+is(validate_int(-6,-6,0,"minus-six"),    -6,  'validate_int(-6,-6,0,"minus-six")');
+is(validate_integer(2,0,10,"two"),    2,  'validate_integer(2,0,10,"two")');
+is(validate_integer(6,5,7,"six"),    6,  'validate_integer(6,5,7,"six")');
+# should error out
+#is(validate_int(3,4,10,"three"),  0,  'validate_int(3,4,10,"three")');
+
+is(validate_interface("eth0"),     "eth0",     'validate_interface("eth0")');
+is(validate_interface("bond3"),    "bond3",    'validate_interface("bond3")');
+is(validate_interface("lo"),       "lo",       'validate_interface("lo")');
+
+ok(validate_ip("10.10.10.1"),        'validate_ip("10.10.10.1")');
+is(validate_ip("10.10.10.10"),       "10.10.10.10",      'validate_ip("10.10.10.10") eq 10.10.10.10');
+ok(validate_ip("10.10.10.100"),      'validate_ip("10.10.10.100")');
+ok(validate_ip("254.0.0.254"),       'validate_ip("254.0.0.254")');
+
+is_deeply([validate_node_list("node1, node2 ,node3 , node4,,\t\nnode5")], [qw/node1 node2 node3 node4 node5/],    'validate_node_list($)');
+# The , in node4, inside the qw array should be split out to just node4 and blank, blank shouldn't make it in to the array
+is_deeply([validate_node_list("node1", qw/node2 node3 node4, node5/)], [qw/node1 node2 node3 node4 node5/],    'validate_node_list($@)');
+# should error out with "node list empty"
+#is(!validate_node_list(""), '!validate_node_list("")');
+
+is(validate_port(80),          80,     'validate_port(80)');
+is(validate_port(65535),       65535,  'validate_port(65535)');
+
+is(validate_process_name("../my_program"),      "../my_program",        'validate_process_name("../my_program")');
+is(validate_process_name("ec2-run-instances"),  "ec2-run-instances",    'validate_process_name("ec2-run-instances")');
+ok(validate_process_name("sh <defunct>"),       'validate_process_name("sh <defunct>")');
+
+is(validate_label("st4ts_used(%)"),    "st4ts_used(%)",    'validate_label("st4ts_used(%)")');
+
+is(validate_regex("some[Rr]egex.*(capture)"),   "(?-xism:some[Rr]egex.*(capture))",  'validate_regex("some[Rr]egex.*(capture)")');
+# Errors out still, should detect and fail gracefully
+#is(validate_regex("some[Rr]egex.*(capture broken", 1),   0,  'validate_regex("some[Rr]egex.*(capture broken", 1)');
+is(validate_regex("somePosix[Rr]egex.*(capture)", 0, 1),   "somePosix[Rr]egex.*(capture)",      'validate_regex("somePosix[Rr]egex.*(capture)", 0, 1)');
+is(validate_regex("somePosix[Rr]egex.*(capture broken", 1, 1),   0,       'validate_regex("somePosix[Rr]egex.*(capture broken", 1, 1) eq 0');
+
+is(validate_user("hadoop"),    "hadoop",   'validate_user("hadoop")');
+is(validate_user("hari1983"),  "hari1983", 'validate_user("hari1983")');
+
+is(validate_user_exists("root"),  "root", 'validate_user_exists("root")');
+
+is(validate_password('wh@tev3r'),   'wh@tev3r',     'validate_password(\'wh@tev3r\')');
+
+# This could do with a lot more unit testing
+ok(HariSekhonUtils::validate_threshold("warning", 75), 'validate_threshold("warning", 75)');
+ok(HariSekhonUtils::validate_threshold("critical", 90), 'validate_threshold("critical", 90)');
+ok(validate_thresholds(), 'validate_thresholds()');
+
+# Not sure if I can relax the case sensitivity on these according to the Nagios Developer guidelines
+is(validate_units("s"),     "s",    'validate_units("s")');
+is(validate_units("ms"),    "ms",   'validate_units("ms")');
+is(validate_units("us"),    "us",   'validate_units("us")');
+is(validate_units("B"),     "B",    'validate_units("B")');
+is(validate_units("KB"),    "KB",   'validate_units("KB")');
+is(validate_units("GB"),    "GB",   'validate_units("GB")');
+is(validate_units("KB"),    "KB",   'validate_units("KB")');
+is(validate_units("c"),     "c",    'validate_units("c")');
+# should error out
+#is(validate_units("a"),     "c",    'validate_units("c")');
+
+is(validate_url("http://www.google.com"),  "http://www.google.com",    'validate_url("http://www.google.com")');
+is(validate_url("https://gmail.com"),      "https://gmail.com",        'validate_url("https://gmail.com")');
+
+ok(!verbose_mode(),  '!verbose_mode()');
+$verbose = 2;
+ok(verbose_mode(),  'verbose_mode()');
+
+# TODO: errors out
+#ok(version(),       'version()');
+
+print "\n";
+$verbose = 0;
+ok(!vlog("testing vlog in \$verbose $verbose"),       "!vlog(\"testing vlog in \$verbose $verbose\")");
+ok(!vlog2("testing vlog2 in \$verbose $verbose"),     "!vlog2(\"testing vlog2 in \$verbose $verbose\")");
+ok(!vlog2("testing vlog3 in \$verbose $verbose"),     "!vlog3(\"testing vlog3 in \$verbose $verbose\")");
+print "\n";
+$verbose = 1;
+ok(vlog("testing vlog in \$verbose $verbose"),        "vlog(\"testing vlog in \$verbose $verbose\")");
+ok(!vlog2("testing vlog2 in \$verbose $verbose"),     "!vlog2(\"testing vlog2 in \$verbose $verbose\")");
+ok(!vlog2("testing vlog3 in \$verbose $verbose"),     "!vlog3(\"testing vlog3 in \$verbose $verbose\")");
+print "\n";
+$verbose = 2;
+ok(vlog("testing vlog in \$verbose $verbose"),        "vlog(\"testing vlog in \$verbose $verbose\")");
+ok(vlog2("testing vlog2 in \$verbose $verbose"),      "vlog(\"testing vlog2 in \$verbose $verbose\")");
+ok(!vlog3("testing vlog3 in \$verbose $verbose"),     "!vlog(\"testing vlog3 in \$verbose $verbose\")");
+print "\n";
+$verbose = 3;
+ok(vlog("testing vlog in \$verbose $verbose"),        "vlog(\"testing vlog in \$verbose $verbose\")");
+ok(vlog2("testing vlog2 in \$verbose $verbose"),      "vlog(\"testing vlog2 in \$verbose $verbose\")");
+ok(vlog3("testing vlog3 in \$verbose $verbose"),      "vlog(\"testing vlog3 in \$verbose $verbose\")");
+
+$verbose = 1;
+ok(HariSekhonUtils::vlog4("test1\ntest2"),   'vlog4("test1\ntest2")');
+
+$verbose = 1;
+ok(!vlog_options("option", "value"),         '!vlog_options("option", "value") in $verbose 1');
+$verbose = 2;
+ok(vlog_options("option", "value"),         'vlog_options("option", "value") in $verbose 2');
+
+is(which("sh"),   "/bin/sh",        'which("sh") eq sh');
+# TODO: not testing which("/explicit/path", 1) since it would error out
+is(which("/explicit/path"),   "/explicit/path",        'which("/explicit/path") eq /explicit/path');
+is(which("nonexistentprogram"),   0,        'which("nonexistentprogram") eq 0');
 
 done_testing();
