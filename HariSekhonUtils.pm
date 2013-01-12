@@ -58,6 +58,7 @@ use Cwd 'abs_path';
 use Fcntl ':flock';
 use File::Basename;
 use Getopt::Long qw(:config bundling);
+use POSIX;
 #use Sys::Hostname;
 
 our $VERSION = "1.4.4";
@@ -350,7 +351,8 @@ our $ip_regex           = '\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?
 our $mac_regex          = '\b[0-9A-F-af]{1,2}([:-])(?:[0-9A-Fa-f]{1,2}\2){4}[0-9A-Fa-f]{1,2}\b';
 our $host_regex         = "\\b(?:$hostname_regex|$ip_regex)\\b";
 # I did a scan of registered running process names across several hundred linux servers of a diverse group of enterprise applications with 500 unique process names (58k individual processes) to determine that there are cases with spaces, slashes, dashes, underscores, chevrons (<defunct>), dots (script.p[ly], in.tftpd etc) to determine what this regex should be. Incidentally it appears that Linux truncates registered process names to 15 chars.
-our $process_name_regex = '\b[\w\s\.\/\<\>-]+\b';
+# This is not from ps -ef etc it is the actual process registered name, hence init not [init] as it appears in ps output
+our $process_name_regex = '[\w\s_\.\/\<\>-]+';
 our $url_path_suffix_regex = '/(?:[\w\.\/_\+-]+)?';
 our $url_regex          = "\\b(?i:https?://$host_regex(?:$url_path_suffix_regex)?)";
 our $user_regex         = '\b[A-Za-z][A-Za-z0-9]+\b';
@@ -1010,7 +1012,7 @@ sub isIP {
 sub isProcessName {
     my $process = shift;
     defined($process) or return 0;
-    $process =~ /%($process_name_regex)$/ or return 0;
+    $process =~ /^($process_name_regex)$/ or return 0;
     return $1;
 }
 
@@ -1100,7 +1102,9 @@ sub loginit {
         #import Sys::Syslog qw(:standard :macros);
         # Can't actually require/import optimize here because barewards aren't recognized early enough which breaks strict
         use Sys::Syslog qw(:standard :macros);
-        openlog $progname, "ndelay,nofatal,nowait,perror,pid", LOG_LOCAL0;
+        # nofatal doesn't appear in earlier 5.x versions
+        #openlog $progname, "ndelay,nofatal,nowait,perror,pid", LOG_LOCAL0;
+        openlog $progname, "ndelay,nowait,perror,pid", LOG_LOCAL0;
         $syslog_initialized = 1;
     #}
 }
@@ -1127,7 +1131,7 @@ sub lstrip {
     return $string;
 }
 #sub ltrim { lstrip(@_) }
-*ltrim = \&ltrim;
+*ltrim = \&lstrip;
 
 
 sub msg_perf_thresholds {
@@ -1205,6 +1209,7 @@ sub plural {
     #} elsif (not isFloat($var)) {
     #    code_error "non-scalar, non-array ref and non-hash ref passed to plural()";
     }
+    isInt($var) or code_error("arg passed to plural() is not an integer");
     ( $var == 1 ) ? ( $plural = "" ) : ( $plural = "s" );
 }
 
@@ -1282,7 +1287,7 @@ sub resolve_ip {
 sub rstrip {
     my $string = shift;
     defined($string) or code_error "no arg passed to rstrip()";
-    $string =~ s/\s+$//o;
+    $string =~ s/\s+$//;
     return $string;
 }
 #sub rtrim { rstrip(@_) }
@@ -1320,7 +1325,8 @@ sub set_timeout {
     };
     #verbose_mode() unless $_[1];
     vlog2("setting timeout to $timeout secs\n");
-    alarm($timeout);
+    # alarm returns the time of the last timer, on first run this is zero so cannot die here
+    alarm($timeout) ;#or die "Failed to set time to $timeout";
 }
 
 
@@ -1649,7 +1655,7 @@ sub validate_process_name {
     my $process = shift;
     defined($process) || usage "no process name given";
     $process = isProcessName($process) || usage "invalid process name, failed regex validation";
-    vlog_options("process name", '$process');
+    vlog_options("process name", $process);
     return $process;
 }
 
