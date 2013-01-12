@@ -26,11 +26,11 @@ ok($progname,   '$progname set');
 #                           Status Codes
 # ============================================================================ #
 
-is($ERRORS{"OK"},        0, '$ERRORS{OK}       eq 0');
-is($ERRORS{"WARNING"},   1, '$ERRORS{WARNING}  eq 1');
-is($ERRORS{"CRITICAL"},  2, '$ERRORS{CRITICAL} eq 2');
-is($ERRORS{"UNKNOWN"},   3, '$ERRORS{UNKNOWN}  eq 3');
-is($ERRORS{"DEPENDENT"}, 4, '$ERRORS{DEPENDEN} eq 4');
+is($ERRORS{"OK"},        0, '$ERRORS{OK}        eq 0');
+is($ERRORS{"WARNING"},   1, '$ERRORS{WARNING}   eq 1');
+is($ERRORS{"CRITICAL"},  2, '$ERRORS{CRITICAL}  eq 2');
+is($ERRORS{"UNKNOWN"},   3, '$ERRORS{UNKNOWN}   eq 3');
+is($ERRORS{"DEPENDENT"}, 4, '$ERRORS{DEPENDENT} eq 4');
 is($port, undef, "port is undef");
 
 ok(set_timeout_max(200),     "set_timeout_max(200)");
@@ -157,7 +157,7 @@ is(isHost("harisekhon.com"),    "harisekhon.com",   'isHost("harisekhon.com") eq
 ok(isHost("harisekhon"),        'isHost("harisekhon")');
 ok(isHost("10.10.10.1"),        'isHost("10.10.10.1")');
 is(isHost("10.10.10.10"),       "10.10.10.10",      'isHost("10.10.10.10") eq 10.10.10.10');
-ok(isHost("10.10.10.100"),     'isHost("10.10.10.100")');
+ok(isHost("10.10.10.100"),      'isHost("10.10.10.100")');
 ok(!isHost("10.10.10.0"),       '!isHost("10.10.10.0")');
 ok(!isHost("10.10.10.255"),     '!isHost("10.10.10.255")');
 ok(!isHost("10.10.10.300"),     '!isHost("10.10.10.300")');
@@ -177,10 +177,85 @@ ok(!isInt("a"), '!isInt("a")');
 ok(isIP("10.10.10.1"),        'isIP("10.10.10.1")');
 is(isIP("10.10.10.10"),       "10.10.10.10",      'isIP("10.10.10.10") eq 10.10.10.10');
 ok(isIP("10.10.10.100"),      'isIP("10.10.10.100")');
-ok(isIP("254.0.0.254"),      'isIP("254.0.0.254")');
+ok(isIP("254.0.0.254"),       'isIP("254.0.0.254")');
 ok(!isIP("10.10.10.0"),       '!isIP("10.10.10.0")');
 ok(!isIP("10.10.10.255"),     '!isIP("10.10.10.255")');
 ok(!isIP("10.10.10.300"),     '!isIP("10.10.10.300")');
 ok(!isIP("x.x.x.x"),          '!isIP("x.x.x.x")');
+
+is(isProcessName("../my_program"),      "../my_program",        'isProcessName("../my_program")');
+is(isProcessName("ec2-run-instances"),  "ec2-run-instances",    'isProcessName("ec2-run-instances")');
+ok(isProcessName("sh <defunct>"),   'isProcessName("sh <defunct>")');
+ok(!isProcessName("./b\@dfile"),    '!isProcessName("./b@dfile")');
+ok(!isProcessName("[init] 3"),      '!isProcessName("[init] 3")');
+
+ok(isScalar(\$status),          'isScalar(\$status)');
+ok(!isScalar(\@usage_order),    '!isScalar(\@usage_order)');
+ok(!isScalar(\%ERRORS),         '!isScalar(\%ERRORS)');
+ok(!isScalar(1),                '!isScalar(1)');
+
+is(isUrl("http://www.google.com"),  "http://www.google.com",    'isUrl("http://www.google.com")');
+is(isUrl("https://gmail.com"),      "https://gmail.com",        'isUrl("https://gmail.com")');
+ok(!isUrl("www.google.com"),                                    '!isUrl("www.google.com")');
+ok(!isUrl(1),                                                   '!isUrl(1)');
+
+is(isUser("hadoop"),    "hadoop",   'isUser("hadoop")');
+is(isUser("hari1983"),  "hari1983", 'isUser("hari1983")');
+ok(!isUser("-hari"),                '!isUser("-hari")');
+ok(!isUser("1983hari"),             '!isUser("1983hari")');
+
+ok(isOS($^O),    'isOS($^O)');
+
+ok(HariSekhonUtils::loginit(),   'HariSekhonUtils::loginit()');
+ok(HariSekhonUtils::loginit(),   'HariSekhonUtils::loginit() again since it should be initialized by first one');
+ok(&HariSekhonUtils::log("hari testing"), '&HariSekhonUtils::log("hari testing")');
+
+# TODO
+# logdie
+
+is(lstrip(" \t \n ha ri \t \n"),     "ha ri \t \n",   'lstrip()');
+is(ltrim(" \t \n ha ri \t \n"),      "ha ri \t \n",   'ltrim()');
+
+ok(msg_perf_thresholds(),   "msg_perf_thresholds()");
+
+# TODO
+#ok(HariSekhonUtils::msg_thresholds(),        "msg_thresholds()");
+
+ok(open_file("/etc/hosts",1),           'open_file("/etc/hosts",1)');
+ok(open_file("/etc/hosts",1,">>"),      'open_file("/etc/hosts",1,">>")');
+
+ok(!pkill("nonexistentprogram"),         '!pkill("nonexistentprogram")');
+
+is(plural(1),                       "",     'plural(1)');
+is(plural(2),                       "s",    'plural(2)');
+# code_error's out
+#is(plural("string"),                "",     'plural("string")');
+is(plural([qw/one/]),               "",     'plural(qw/one/)');
+is(plural([qw/one two three/]),     "s",    'plural(qw/one two three/)');
+
+# TODO
+#ok(HariSekhonUtils::print_options(),       'print_options()');
+
+# TODO
+# quit
+
+is(resolve_ip("a.resolvers.level3.net"),    "4.2.2.1",      'resolve_ip("a.resolvers.level3.net") returns 4.2.2.1');
+is(resolve_ip("4.2.2.2"),                   "4.2.2.2",             'resolve_ip("4.2.2.2") returns 4.2.2.2');
+
+is(rstrip(" \t \n ha ri \t \n"),     " \t \n ha ri",   'rstrip()');
+is(rtrim(" \t \n ha ri \t \n"),      " \t \n ha ri",   'rtrim()');
+
+is(set_sudo("hadoop"),      "echo | sudo -S -u hadoop ",    'set_sudo("hadoop")');
+is(set_sudo(getpwuid($>)),  "",                             'set_sudo(getpwuid($>))');
+
+# This is because the previous timer remaining time was 0
+is(set_timeout(10),     0,      "set_timeout(10) eq 0");
+is(set_timeout(10),     10,     "set_timeout(10) eq 10");
+
+is(strip(" \t \n ha ri \t \n"),     "ha ri",   'strip()');
+is(trim(" \t \n ha ri \t \n"),      "ha ri",   'trim()');
+
+# TODO:
+#ok(subtrace("test"), 'subtrace("test")');
 
 done_testing();
