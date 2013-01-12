@@ -40,6 +40,7 @@ is($timeout_default, 100, '$timeout_default eq 100');
 
 is($status,      "UNKNOWN", '$status eq UNKNOWN');
 is(get_status_code($status), 3, 'get_status_code($status) eq UNKNOWN');
+is(get_status_code(),        3, 'get_status_code() eq UNKNOWN');
 
 $status = "OK";
 ok(is_ok,        "is_ok()");
@@ -51,8 +52,8 @@ is(unknown, "UNKNOWN", "unknown()");
 ok(is_unknown,   "is_unknown()");
 ok(!is_ok,       "is_ok() fail on UNKNOWN");
 ok(!is_warning,  "is_warning() fail on UNKNOWN");
-
 ok(!is_critical, "is_critical() fail on UNKNOWN");
+
 is(warning, "WARNING", "warning()");
 is(unknown, "",  "unknown() doesn't set \$status when WARNING");
 ok(is_warning,   "is_warning()");
@@ -72,6 +73,12 @@ is(get_status_code("OK"),       0, "get_status_code(OK) eq 0");
 is(get_status_code("WARNING"),  1, "get_status_code(WARNING) eq 1");
 is(get_status_code("CRITICAL"), 2, "get_status_code(OK) eq 2");
 is(get_status_code("UNKNOWN"),  3, "get_status_code(UNKNOWN) eq 3");
+is(get_status_code("DEPENDENT"),  4, "get_status_code(DEPENDENT) eq 4");
+# This code errors out now
+#is(get_status_code("NONEXISTENT"),  undef, "get_status_code(NONEXISTENT) eq undef");
+
+# This should cause compilation failure
+#ok(critical("blah"), 'critical("blah")');
 
 $verbose++;
 # TODO: This only checks the sub runs and returns success, should really check it outputs the right thing but not sure how to check the stdout from this sub
@@ -222,7 +229,8 @@ ok(msg_perf_thresholds(),   "msg_perf_thresholds()");
 #ok(HariSekhonUtils::msg_thresholds(),        "msg_thresholds()");
 
 ok(open_file("/etc/hosts",1),           'open_file("/etc/hosts",1)');
-ok(open_file("/etc/hosts",1,">>"),      'open_file("/etc/hosts",1,">>")');
+# Not supporting mode right now
+#ok(open_file("/etc/hosts",1,">>"),      'open_file("/etc/hosts",1,">>")');
 
 ok(!pkill("nonexistentprogram"),         '!pkill("nonexistentprogram")');
 
