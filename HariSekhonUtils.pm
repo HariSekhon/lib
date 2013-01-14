@@ -150,6 +150,7 @@ our %EXPORT_TAGS = (
     'regex' =>  [   qw(
                         $domain_regex
                         $email_regex
+                        $filename_regex
                         $fqdn_regex
                         $hostname_regex
                         $ip_regex
@@ -349,6 +350,7 @@ our $tld_regex          = '\b(?:[A-Za-z]{2,4}|(?i:local|museum|travel))\b';
 our $domain_regex       = '(?:' . $domain_component . '\.)+' . $tld_regex;
 our $hostname_component = '\b(?:[A-Za-z][A-Za-z0-9]{0,62}|[A-Za-z][A-Za-z0-9_\-]{0,61}[a-zA-Z0-9])\b';
 our $hostname_regex     = "(?:$hostname_component(?:\.$domain_regex)?|$domain_regex)";
+our $filename_regex     = '[\/\w\s_\.\*\=\%\?\+-]+';
 our $fqdn_regex         = $hostname_component . '\.' . $domain_regex;
 # SECURITY NOTE: I'm allowing single quote through as it's found in Irish email addresses. This makes the $email_regex non-safe without further validation. This regex only tests whether it's a valid email address, nothing more. DO NOT UNTAINT EMAIL or pass to cmd to SQL without further validation!!!
 our $email_regex        = '\b[A-Za-z0-9](?:[A-Za-z0-9\._\%\'\+-]{0,62}[A-Za-z0-9\._\%\+-])?@[A-Za-z0-9\.-]{2,251}\.[A-Za-z]{2,4}\b';
@@ -695,6 +697,13 @@ sub cmd ($;$$) {
     #    $prog = (split(/\s+/, $cmd))[1];
     #    which($prog, 1);
     #}
+    if($cmd =~ s/\|\s*$//){
+        # return reference to filehandle for more efficient processing
+        vlog2("opening cmd pipe");
+        vlog3("cmd: $cmd");
+        open my $fh, "$cmd |";
+        return $fh;
+    }
     vlog3("cmd: $cmd");
     my $return_output   = `$cmd 2>&1`;
     my $returncode      = $?;
@@ -1351,7 +1360,7 @@ sub set_sudo (;$) {
 }
 
 
-sub set_timeout ($;$) {
+sub set_timeout (;$$) {
     $timeout = $_[0] if $_[0];
     my $sub_ref = $_[1] if $_[1];
     $timeout =~ /^\d+$/ || usage("timeout value must be a positive integer\n");
@@ -1581,7 +1590,7 @@ sub validate_filename ($;$) {
     my $filename = shift;
     my $noquit   = shift;
     defined($filename) || usage "filename not specified";
-    unless($filename =~ /^([\/\w\s_\.\*\+-]+)$/){
+    unless($filename =~ /^($filename_regex)$/){
         usage "invalid filename given (does not match regex critera): '$filename'" unless $noquit;
         return 0;
     }
@@ -1595,7 +1604,7 @@ sub validate_float ($$$$) {
 #    my $max     = $_[2] || code_error "no max value given for validate_float()";
 #    my $name    = $_[3] || code_error "no name passed to validate_float()";
     my ($float, $min, $max, $name) = @_;
-    defined($float) || usage "$name float not specified";
+    defined($float) || usage "$name not specified";
     isFloat($float,1) or usage "invalid $name given, must be an float";
     ($float >= $min && $float <= $max) or usage "invalid $name given, must be float between $min and $max";
     vlog_options($name, $float);
@@ -1636,7 +1645,7 @@ sub validate_int ($$$$) {
 #    my $max     = $_[2] || code_error "no max value given for validate_int()";
 #    my $name    = $_[3] || code_error "no name passed to validate_int()";
     my ($integer, $min, $max, $name) = @_;
-    defined($integer) || usage "$name integer not specified";
+    defined($integer) || usage "$name not specified";
     isInt($integer, 1) or usage "invalid $name given, must be an integer";
     ($integer >= $min && $integer <= $max) or usage "invalid $name given, must be integer between $min and $max";
     vlog_options($name, $integer);
