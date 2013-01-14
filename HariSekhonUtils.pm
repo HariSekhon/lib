@@ -1605,8 +1605,8 @@ sub validate_float ($$$$) {
 #    my $name    = $_[3] || code_error "no name passed to validate_float()";
     my ($float, $min, $max, $name) = @_;
     defined($float) || usage "$name not specified";
-    isFloat($float,1) or usage "invalid $name given, must be an float";
-    ($float >= $min && $float <= $max) or usage "invalid $name given, must be float between $min and $max";
+    isFloat($float,1) or usage "invalid $name given, must be a real number";
+    ($float >= $min && $float <= $max) or usage "invalid $name given, must be real number between $min and $max";
     vlog_options($name, $float);
     return $float;
 }
