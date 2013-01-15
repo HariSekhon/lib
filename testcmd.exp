@@ -1,0 +1,233 @@
+#!/usr/bin/env expect
+#
+#   Author: Hari Sekhon
+#   Date: 2012-01-16 16:14:37 +0000 (Mon, 16 Jan 2012)
+#  $LastChangedBy$
+#  $LastChangedDate$
+#  $Revision$
+#  $URL$
+#  $Id$
+#
+
+# TODO: add regex test for expected exit code line to check the test file was written correctly
+
+# Format for the test files is:
+# 
+# # hash prefixed or blank lines are ignored up to the first non-blank/comment line (subsequent blank lines may be a valid part of expected output)
+#
+# ./command --with --all --args
+# expected exit code    - 0, 1, 2 or 3 etc. Can be a regex ie. 0|1
+# regex_boolean         - 0 or 1 to determine if the expected output is a multi-line regex or string literal
+# expected output       - regex or string. Is multi-line from here to end of file including all whitespace
+
+set version "0.9.13"
+
+set timeout 10
+
+set debug 0
+set failed 0
+set exitcode -1
+
+match_max 10000
+
+set force_conservative 0
+if {$force_conservative} {
+    set send_slow {1 .1}
+    proc send {ignore arg} {
+        sleep .1
+        exp_send -s -- $arg
+    }
+}
+
+proc check_code { filename } {
+    if { ! [regexp -nocase {.*\.exptest$} $filename] } {
+        puts "$filename does not match *.exptest"
+        exit 1
+    }
+    puts "Test File:        $filename"
+    set fh [open $filename]
+    set cmd [gets $fh]
+    while { [regexp {^(\s*#.*|\s*)$} $cmd] } {
+        if {[eof $fh]} {
+            close $fh
+            puts "Hit end of file, test incomplete, skipping..."
+            return
+        }
+        set cmd [gets $fh]
+    }
+    set expected_exitcode [gets $fh]
+    if {[eof $fh]} {
+        close $fh
+        puts "Hit end of file, test incomplete, skipping..."
+        return
+    }
+    set regex [gets $fh]
+    if {[eof $fh]} {
+        close $fh
+        puts "Hit end of file, test incomplete, skipping..."
+        return
+    }
+    set expected_output [read $fh]
+    puts -nonewline "Command:          $cmd\nExpected output:  "
+    #if {$regex == 1} {
+        puts -nonewline "$expected_output"
+    #    #regsub -all {\\} $expected_output "\\" expected_output2
+    #} else {
+    #    puts "$expected_output"
+    #}
+    puts -nonewline "  Actual output:  "
+    flush stdout
+    flush stderr
+	# not working on stopping \n => \r\n
+    #stty raw
+    regsub -all {\n} $expected_output "NEWLINE" expected_output
+    if {$regex == 0} {
+        #regsub -all {\n} $expected_output "\r\n" expected_output
+        regsub -all {([^\s\d\w\r\n])} $expected_output {\\\1} expected_output
+        regsub -all {\s+} $expected_output {\\s+} expected_output
+        #regsub -all {\(} $expected_output "\\\(" expected_output
+        #regsub -all {\)} $expected_output "\\\)" expected_output
+        #regsub -all {\[} $expected_output "\\\[" expected_output
+        #regsub -all {\.} $expected_output "\\\." expected_output
+    }
+    regsub -all {NEWLINE} $expected_output "\r\n" expected_output
+    #puts "expected regex: $expected_output"
+    eval spawn -noecho $cmd
+    #wait2
+    #if {$regex == 0} {
+    #    expect {
+    #        # TODO: fix end anchoring $
+    #        #-re "^$expected_output\r\n" {}
+    #        -exact "$expected_output" {}
+    #        timeout failtimeout
+    #        default failoutput
+    #    }
+    #} else {
+
+    # For line by line debugging
+    if { 1 } {
+        if { $::debug == 1 } { puts "" }
+        set expected_lines [split $expected_output "\n"]
+        #set expected_lines [lrange $expected_lines 0 end-1]
+        set expected_lines [lreplace $expected_lines end end]
+        foreach expected_line $expected_lines {
+            regsub -all {\r} $expected_line {} expected_line
+            #regsub -all {\s+} $expected_line {\\s+} expected_line
+            # prioritizing multi line matching debugging
+            if { $::debug == 1 } { puts "expected line: '$expected_line'" }
+            expect {
+                # TODO: fix end anchoring $
+                #-re "^$expected_output\r\n" {}
+                -re "^$expected_line\r*\n" {}
+                -re "\r?\n" { failoutput2 "$expected_line\r?\n" "$expect_out(buffer)" }
+                timeout failtimeout
+                default { failoutput2 "$expected_line\r?\n" "$expect_out(buffer)(hit default/end)" }
+            }
+            exit_if_failed
+        }
+    } else {
+        expect {
+            # TODO: fix end anchoring $
+            #-re "^$expected_output\r\n" {}
+            -re "^$expected_output" {}
+            timeout failtimeout
+            default failoutput
+        }
+    }
+    #}
+    #catch wait result
+    #set ::exitcode [lindex $result 3]
+    set ::exitcode [lindex [wait] 3]
+    check_exitcode $expected_exitcode
+    exit_if_failed
+}
+
+# wait from supbproc doesn't catch the exit code
+proc wait2 {} {
+    #global exitcode
+    #set ::exitcode [lindex [wait] 3]
+    #puts $::exitcode
+}
+
+proc check_exitcode { expected_exitcode } {
+    #global exitcode
+    puts "Expected Exit Code: $expected_exitcode"
+    puts "  Actual Exit Code: $::exitcode"
+    if { ! [ regexp $expected_exitcode $::exitcode ] } {
+        puts "*** FAIL: Exit Code did not match $expected_exitcode!"
+        failed
+    }
+}
+
+proc failoutput {} {
+    puts "*** FAIL: Output does not match expected result"
+    failed
+}
+
+proc failoutput2 { {expected_line ""} {actual_output ""} } {
+    regsub -all {\r} $actual_output {\\r} actual_output
+    regsub -all {\r} $expected_line {\\r} expected_line
+    regsub -all {\n} $actual_output {\\n} actual_output
+    regsub -all {\n} $expected_line {\\n} expected_line
+    puts "*** FAIL: Output does not match expected result\nexpected: '$expected_line'\ngot:      '$actual_output')"
+    failed
+}
+
+proc failtimeout {} {
+    puts "*** FAIL: Timeout after $::timeout secs"
+    failed
+}
+
+proc failed {} {
+    incr ::failed
+}
+
+proc exit_if_failed {} {
+    if { $::failed != 0 } {
+        hr
+        puts "Tests FAILED"
+        hr
+        exit $::failed
+    }
+}
+
+proc hr {} {
+    puts "================================================================================"
+}
+hr
+puts "Hari Sekhon Nagios Utils and Plugins\n\nTest Suite version $version\n"
+puts "Starting run: [timestamp -gmt -format "%Y-%m-%d %H:%M:%S"]"
+hr
+
+proc skip_file { filename } {
+    if { $filename == "-D" } {
+        set ::debug 1
+        return 1
+    }
+    if { [file isdirectory $filename] } { return 1 }
+    return 0
+}
+
+foreach filename $argv {
+    if { [skip_file $filename] } { continue }
+    if { ! [regexp -nocase {.*\.exptest$} $filename] } {
+        puts "$filename does not match *.exptest"
+        exit 1
+    }
+}
+foreach filename $argv {
+    if { [skip_file $filename] } { continue }
+    check_code $filename
+    hr
+}
+# Nagios Tests
+###check_code "./check_mysql_query.pl -H slave-mdb301-dc3 --user nagios --password sh158ark -d mysql -q \"select count(*) from user\" -f 1;" "OK: query returned '46'" 0
+##
+
+if { $failed == 0 } {
+    puts "Tests Passed"
+} else {
+    puts "Tests FAILED"
+}
+hr
+exit $failed
