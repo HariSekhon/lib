@@ -2,11 +2,10 @@
 #
 #   Author: Hari Sekhon
 #   Date: 2012-01-16 16:14:37 +0000 (Mon, 16 Jan 2012)
-#  $LastChangedBy$
-#  $LastChangedDate$
-#  $Revision$
-#  $URL$
-#  $Id$
+#
+#  http://github.com/harisekhon
+#
+#  License: see accompanying LICENSE file
 #
 
 # TODO: add regex test for expected exit code line to check the test file was written correctly
