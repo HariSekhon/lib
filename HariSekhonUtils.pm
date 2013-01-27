@@ -1330,7 +1330,8 @@ sub quit (@) {
 sub resolve_ip ($) {
     require Socket;
     import Socket;
-    return inet_ntoa(inet_aton($_[0]));
+    my $tmp = inet_aton($_[0]) || return 0;
+    return inet_ntoa($tmp);
 }
 
 
