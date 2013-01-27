@@ -365,9 +365,11 @@ is(validate_regex("some[Rr]egex.*(capture)"),   "(?-xism:some[Rr]egex.*(capture)
 # Errors out still, should detect and fail gracefully
 #is(validate_regex("some[Rr]egex.*(capture broken", 1),   0,  'validate_regex("some[Rr]egex.*(capture broken", 1)');
 is(validate_regex("somePosix[Rr]egex.*(capture)", 0, 1),   "somePosix[Rr]egex.*(capture)",      'validate_regex("somePosix[Rr]egex.*(capture)", 0, 1)');
-is(validate_regex("somePosix[Rr]egex.*(capture broken", 1, 1),   0,       'validate_regex("somePosix[Rr]egex.*(capture broken", 1, 1) eq 0');
-is(validate_regex('somePosix[Rr]egex.*$(evilcmd)', 1, 1),  0,       'validate_regex("somePosix[Rr]egex.*$(evilcmd)", 1, 1) eq 0');
-is(validate_regex('somePosix[Rr]egex.*`evilcmd`', 1, 1),   0,       'validate_regex("somePosix[Rr]egex.*`evilcmd`", 1, 1) eq 0');
+is(validate_regex("somePosix[Rr]egex.*(capture broken", 1, 1),  0,       'validate_regex("somePosix[Rr]egex.*(capture broken", 1, 1) eq 0');
+is(validate_regex('somePosix[Rr]egex.*$(evilcmd)', 1, 1),       0,       'validate_regex("somePosix[Rr]egex.*$(evilcmd)", 1, 1) eq 0');
+is(validate_regex('somePosix[Rr]egex.*$(evilcmd', 1, 1),        0,       'validate_regex("somePosix[Rr]egex.*$(evilcmd", 1, 1) eq 0');
+is(validate_regex('somePosix[Rr]egex.*`evilcmd`', 1, 1),        0,       'validate_regex("somePosix[Rr]egex.*`evilcmd`", 1, 1) eq 0');
+is(validate_regex('somePosix[Rr]egex.*`evilcmd', 1, 1),         0,       'validate_regex("somePosix[Rr]egex.*`evilcmd", 1, 1) eq 0');
 
 is(validate_user("hadoop"),    "hadoop",   'validate_user("hadoop")');
 is(validate_user("hari1983"),  "hari1983", 'validate_user("hari1983")');
