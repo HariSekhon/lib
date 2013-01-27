@@ -11,13 +11,15 @@
 
 # Unit Tests for HariSekhonUtils
 
-use diagnostics;
+#use diagnostics;
 use warnings;
 use strict;
 use Test::More;
-use lib ".";
-
-BEGIN{ use_ok('HariSekhonUtils'); }
+use File::Basename;
+BEGIN {
+    use lib dirname(__FILE__) . "/..";
+    use_ok('HariSekhonUtils');
+}
 require_ok('HariSekhonUtils');
 
 ok($progname,   '$progname set');
@@ -260,7 +262,7 @@ is(plural([qw/one two three/]),     "s",    'plural(qw/one two three/)');
 # quit
 
 is(resolve_ip("a.resolvers.level3.net"),    "4.2.2.1",      'resolve_ip("a.resolvers.level3.net") returns 4.2.2.1');
-is(resolve_ip("4.2.2.2"),                   "4.2.2.2",             'resolve_ip("4.2.2.2") returns 4.2.2.2');
+is(resolve_ip("4.2.2.2"),                   "4.2.2.2",      'resolve_ip("4.2.2.2") returns 4.2.2.2');
 
 is(rstrip(" \t \n ha ri \t \n"),     " \t \n ha ri",   'rstrip()');
 is(rtrim(" \t \n ha ri \t \n"),      " \t \n ha ri",   'rtrim()');
@@ -364,6 +366,8 @@ is(validate_regex("some[Rr]egex.*(capture)"),   "(?-xism:some[Rr]egex.*(capture)
 #is(validate_regex("some[Rr]egex.*(capture broken", 1),   0,  'validate_regex("some[Rr]egex.*(capture broken", 1)');
 is(validate_regex("somePosix[Rr]egex.*(capture)", 0, 1),   "somePosix[Rr]egex.*(capture)",      'validate_regex("somePosix[Rr]egex.*(capture)", 0, 1)');
 is(validate_regex("somePosix[Rr]egex.*(capture broken", 1, 1),   0,       'validate_regex("somePosix[Rr]egex.*(capture broken", 1, 1) eq 0');
+is(validate_regex('somePosix[Rr]egex.*$(evilcmd)', 1, 1),  0,       'validate_regex("somePosix[Rr]egex.*$(evilcmd)", 1, 1) eq 0');
+is(validate_regex('somePosix[Rr]egex.*`evilcmd`', 1, 1),   0,       'validate_regex("somePosix[Rr]egex.*`evilcmd`", 1, 1) eq 0');
 
 is(validate_user("hadoop"),    "hadoop",   'validate_user("hadoop")');
 is(validate_user("hari1983"),  "hari1983", 'validate_user("hari1983")');
