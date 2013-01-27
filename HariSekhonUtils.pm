@@ -1735,8 +1735,10 @@ sub validate_regex ($;$$) {
             return 0;
         } else {
             my @output = cmd("egrep '$regex' < /dev/null");
-            if(grep({$_ =~ "Unmatched"} @output)){
-                quit "UNKNOWN", "invalid posix regex supplied: contains unbalanced () or []" unless $noquit;
+            #if(grep({$_ =~ "Unmatched"} @output)){
+            if(@output){
+                #quit "UNKNOWN", "invalid posix regex supplied: contains unbalanced () or []" unless $noquit;
+                quit "UNKNOWN", "invalid posix regex supplied: @output" unless $noquit;
                 return 0;
             }
         }
