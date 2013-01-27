@@ -1,13 +1,11 @@
 #
-#   Author: Hari Sekhon
-#   Date: 2013-01-06 01:25:55 +0000 (Sun, 06 Jan 2013)
-#  $LastChangedBy$
-#  $LastChangedDate$
-#  $Revision$
-#  $URL$
-#  $Id$
+#  Author: Hari Sekhon
+#  Date: 2013-01-06 01:25:55 +0000 (Sun, 06 Jan 2013)
 #
-#  vim:ts=4:sw=4:et
+#  http://github.com/harisekhon
+#
+#  License: see accompanying LICENSE file
+#
 
 # Unit Tests for HariSekhonUtils
 
