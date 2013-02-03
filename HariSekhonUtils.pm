@@ -1595,6 +1595,7 @@ sub validate_filename ($;$) {
         usage "invalid filename given (does not match regex critera): '$filename'" unless $noquit;
         return 0;
     }
+    vlog_options("filename", $1);
     return $1;
 }
 
