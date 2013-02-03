@@ -3,5 +3,6 @@
 #  Date: 2013-01-06 15:45:00 +0000 (Sun, 06 Jan 2013)
 #
 
+.PHONY: test
 test:
 	prove t --timer -v	
