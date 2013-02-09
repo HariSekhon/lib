@@ -1430,6 +1430,7 @@ sub uniq_array (@) {
 
 sub usage (;@) {
     print "@_\n\n" if (@_ > 0);
+    print "$main::DESCRIPTION\n\n" if $main::DESCRIPTION;
     print "$usage_line\n\n";
     foreach my $key_orig (sort keys %options){
         my $key = $key_orig;
