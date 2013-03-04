@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.5";
+our $VERSION = "1.4.6";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1281,7 +1281,7 @@ sub print_options (@) {
             #debug $options{$_};
             #debug "options long value is $options{$_}{desc}";
             if($options{$_}{"long"} =~ /^.*--(?:$option_regex)\s*$/){
-                printf "%-${short_options_len}s  %-${long_options_len}s \t%s\n", $options{$_}{"short"}, $options{$_}{"long"}, $options{$_}{"desc"};
+                printf STDERR "%-${short_options_len}s  %-${long_options_len}s \t%s\n", $options{$_}{"short"}, $options{$_}{"long"}, $options{$_}{"desc"};
                 delete $options{$_};
                 last;
             }
@@ -1429,9 +1429,9 @@ sub uniq_array (@) {
 
 
 sub usage (;@) {
-    print "@_\n\n" if (@_ > 0);
-    print "$main::DESCRIPTION\n\n" if $main::DESCRIPTION;
-    print "$usage_line\n\n";
+    print STDERR "@_\n\n" if (@_ > 0);
+    print STDERR "$main::DESCRIPTION\n\n" if $main::DESCRIPTION;
+    print STDERR "$usage_line\n\n";
     foreach my $key_orig (sort keys %options){
         my $key = $key_orig;
         $key =~ s/=.*$//;
