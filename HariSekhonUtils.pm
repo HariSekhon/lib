@@ -868,14 +868,22 @@ sub get_path_owner ($) {
 
 
 # go flock ur $self ;)
-sub go_flock_yourself (;$) {
+sub go_flock_yourself (;$$) {
     my $there_can_be_only_one = shift;
+    my $wait = shift;
+    my $locking_options;
+    if($wait){
+        vlog2("waiting to go flock myself");
+        $locking_options = LOCK_EX;
+    } else {
+        $locking_options = LOCK_EX|LOCK_NB;
+    }
     if($there_can_be_only_one){
         open  *{0} or die "Failed to open *{0} for lock: $!\n";
-        flock *{0}, LOCK_EX|LOCK_NB or die "Failed to acquire global lock, related code is already running somewhere!\n";
+        flock *{0}, $locking_options or die "Failed to acquire global lock, related code is already running somewhere!\n";
     } else {
         open $selflock, $0 or die "Failed to open $0 for lock: $!\n";
-        flock $selflock, LOCK_EX|LOCK_NB or die "Another instance of " . abs_path($0) . " is already running!\n";
+        flock $selflock, $locking_options or die "Another instance of " . abs_path($0) . " is already running!\n";
     }
 }
 sub flock_off (;$) {
