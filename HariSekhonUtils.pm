@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.7";
+our $VERSION = "1.4.8";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -96,6 +96,7 @@ our %EXPORT_TAGS = (
                         isDigit
                         isDomain
                         isEmail
+                        isFilename
                         isFloat
                         isFqdn
                         isHash
@@ -957,6 +958,14 @@ sub isEmail ($) {
 }
 
 
+sub isFilename($){
+    my $filename = shift;
+    return undef unless defined($filename);
+    return undef unless($filename =~ /^($filename_regex)$/);
+    return $1;
+}
+
+
 sub isFloat ($;$) {
     my $number = shift;
     my $negative = shift() ? "-?" : "";
@@ -1596,16 +1605,17 @@ sub validate_file ($;$) {
 }
 
 
-sub validate_filename ($;$) {
+sub validate_filename ($;$$) {
     my $filename = shift;
     my $noquit   = shift;
+    my $name     = shift || "filename";
     defined($filename) || usage "filename not specified";
-    unless($filename =~ /^($filename_regex)$/){
+    unless($filename = isFilename($filename)){
         usage "invalid filename given (does not match regex critera): '$filename'" unless $noquit;
         return 0;
     }
-    vlog_options("filename", $1);
-    return $1;
+    vlog_options("$name", $filename);
+    return $filename;
 }
 
 
@@ -2020,7 +2030,7 @@ sub vlog_options ($$) {
 sub which ($;$) {
     my $bin  = $_[0] || code_error "no arg supplied to which() subroutine";
     my $quit = $_[1] || 0;
-    $bin = validate_filename($bin);
+    $bin = isFilename($bin) || quit "UNKNOWN", "invalid filename '$bin' supplied";
     if($bin =~ /^[\.\/]/){
         (-f $bin) or quit "UNKNOWN", "couldn't find executable '$bin': $!" if $quit;
         (-x $bin) or quit "UNKNOWN", "'$bin' is not executable" if $quit;
