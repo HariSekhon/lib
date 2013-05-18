@@ -139,6 +139,9 @@ is(isDomain("a"x256),           0,                  '!isDomain("a"x256) eq 0');
 is(isEmail('hari\'sekhon@gmail.com'),   'hari\'sekhon@gmail.com',   'isEmail("hari\'sekhon@gmail.com") eq hari\'sekhon@gmail.com');
 is(isEmail("harisekhon"),               0,                          '!isEmail("harisekhon") eq 0');
 
+is(isFilename("/tmp/test"), "/tmp/test", "isFilename(/tmp/test");
+is(isFilename("\@me"),      undef,       "isFilename(\@me)");
+
 ok(isFloat(1),          'isFloat(1)');
 ok(!isFloat(-1),        '!isFloat(-1)');
 ok(isFloat(-1, 1),      'isFloat(-1, 1)');
