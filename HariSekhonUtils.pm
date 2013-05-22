@@ -876,6 +876,7 @@ sub go_flock_yourself (;$$) {
     if($wait){
         vlog2("waiting to go flock myself");
         $locking_options = LOCK_EX;
+        vlog2("truly flocked now");
     } else {
         $locking_options = LOCK_EX|LOCK_NB;
     }
