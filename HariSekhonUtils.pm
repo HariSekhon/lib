@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.8";
+our $VERSION = "1.4.9";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -93,6 +93,9 @@ our %EXPORT_TAGS = (
                     ) ],
     'is'    => [    qw(
                         isArray
+                        isDatabaseColumnName
+                        isDatabaseFieldName
+                        isDatabaseTableName
                         isDigit
                         isDomain
                         isEmail
@@ -157,6 +160,7 @@ our %EXPORT_TAGS = (
                         $ip_regex
                         $mac_regex
                         $process_name_regex
+                        $rwxt_regex
                         $tld_regex
                         $url_path_suffix_regex
                         $url_regex
@@ -190,8 +194,10 @@ our %EXPORT_TAGS = (
                     ) ],
     'validate' => [ qw(
                         validate_database
+                        validate_database_columnname
                         validate_database_fieldname
                         validate_database_query_select_show
+                        validate_database_tablename
                         validate_dir
                         validate_directory
                         validate_domain
@@ -352,6 +358,7 @@ our $domain_regex       = '(?:' . $domain_component . '\.)+' . $tld_regex;
 our $hostname_component = '\b(?:[A-Za-z][A-Za-z0-9]{0,62}|[A-Za-z][A-Za-z0-9_\-]{0,61}[a-zA-Z0-9])\b';
 our $hostname_regex     = "(?:$hostname_component(?:\.$domain_regex)?|$domain_regex)";
 our $filename_regex     = '[\/\w\s_\.\*\=\%\?\+-]+';
+our $rwxt_regex         = '[r-][w-][x-][r-][w-][x-][r-][w-][xt-]';
 our $fqdn_regex         = $hostname_component . '\.' . $domain_regex;
 # SECURITY NOTE: I'm allowing single quote through as it's found in Irish email addresses. This makes the $email_regex non-safe without further validation. This regex only tests whether it's a valid email address, nothing more. DO NOT UNTAINT EMAIL or pass to cmd to SQL without further validation!!!
 our $email_regex        = '\b[A-Za-z0-9](?:[A-Za-z0-9\._\%\'\+-]{0,62}[A-Za-z0-9\._\%\+-])?@[A-Za-z0-9\.-]{2,251}\.[A-Za-z]{2,4}\b';
@@ -947,6 +954,29 @@ sub isDomain ($) {
     return $1;
 }
 
+sub isDatabaseColumnName ($) {
+    my $column = shift;
+    defined($column) || return undef;
+    $column =~ /^(\w+)$/ or return undef;
+    return $1;
+}
+
+
+sub isDatabaseFieldName ($) {
+    my $field = shift;
+    defined($field) || return undef;
+    ( $field  =~ /^(\d+)$/ or $field =~/^([\w\(\)\*\,\._-]+)$/ ) or return undef;
+    return $1;
+}
+
+
+sub isDatabaseTableName ($) {
+    my $table = shift;
+    defined($table) || return undef;
+    $table =~ /^(\w+)$/ or return undef;
+    return $1;
+}
+
 
 # SECURITY NOTE: this only checks if the email address is valid, it's doesn't make it safe to arbitrarily pass to commands or SQL etc!
 sub isEmail ($) {
@@ -1532,11 +1562,28 @@ sub validate_database ($) {
 }
 
 
+sub validate_database_tablename ($) {
+    my $table = shift;
+    defined($table) || usage "table not specified";
+    $table = isDatabaseTableName($table) || usage "invalid table name, must be alphanumeric";
+    vlog_options("table", "$table");
+    return $table;
+}
+
+
+sub validate_database_columnname ($) {
+    my $column = shift;
+    defined($column) || usage "column not specified";
+    $column = isDatabaseColumnName($column) || usage "invalid column name, must be alphanumeric";
+    vlog_options("column", "$column");
+    return $column;
+}
+
+
 sub validate_database_fieldname ($) {
     my $field = shift;
     defined($field) || usage "field not specified";
-    $field  =~ /^(\d+)$/ or $field =~/^([\w\(\)\*\,\._-]+)$/ || usage "invalid field number given, must be a positive integer, or a valid field name";
-    $field = $1;
+    $field = isDatabaseFieldName($field) || usage "invalid field number given, must be a positive integer, or a valid field name";
     ($field eq "0") && usage "field cannot be zero";
     vlog_options("field", "$field");
     return $field;
