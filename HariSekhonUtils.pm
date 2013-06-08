@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.11";
+our $VERSION = "1.4.12";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -946,14 +946,6 @@ sub isCode ($) {
 *isDigit = \&isInt;
 
 
-sub isDomain ($) {
-    my $domain = shift;
-    defined($domain) or return 0;
-    return 0 if(length($domain) > 255);
-    $domain =~ /^($domain_regex)$/ or return 0;
-    return $1;
-}
-
 sub isDatabaseColumnName ($) {
     my $column = shift;
     defined($column) || return undef;
@@ -975,10 +967,21 @@ sub isDatabaseTableName ($;$) {
     my $allow_qualified = shift;
     defined($table) || return undef;
     if($allow_qualified){
-        $table =~ /^((?:\w+\.)?\w+)$/ or return undef;
+        $table =~ /^((?:\w+\.)?\w+)$/i or return undef;
+        return $1;
     } else {
-        $table =~ /^(\w+)$/ or return undef;
+        $table =~ /^(\w+)$/i or return undef;
+        return $1;
     }
+    return undef;
+}
+
+
+sub isDomain ($) {
+    my $domain = shift;
+    defined($domain) or return 0;
+    return 0 if(length($domain) > 255);
+    $domain =~ /^($domain_regex)$/ or return 0;
     return $1;
 }
 
