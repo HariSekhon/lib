@@ -1272,6 +1272,7 @@ sub open_file ($;$) {
     my $lock = shift;
     #my $mode = shift;
     my $tmpfh;
+    defined($filename) or code_error "no filename given to open_file()";
     ( -e $filename ) or quit("CRITICAL", "file not found: '$filename'");
     ( -f $filename ) or quit("CRITICAL", "not a valid file: '$filename'");
     ( -r $filename ) or quit("CRITICAL", "file not readable: '$filename'");
@@ -1309,7 +1310,6 @@ sub parse_file_option($;$){
     }
     if($file or ($file_args and @ARGV)){
         if(not @files){
-            print "step 2\n";
             die "Error: no files found\n";
         }
     }
