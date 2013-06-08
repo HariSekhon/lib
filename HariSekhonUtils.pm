@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.9";
+our $VERSION = "1.4.10";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -138,6 +138,7 @@ our %EXPORT_TAGS = (
                         check_thresholds
                         expand_units
                         msg_perf_thresholds
+                        parse_file_option
                         plural
                         usage
                         validate_thresholds
@@ -417,7 +418,6 @@ our %default_options = (
     "V|version"    => [ \$version,  "Print version and exit" ],
     "h|help"       => [ \$help,     "Print this help" ],
 );
-
 
 # These two subroutines are primarily for my other programs such as my spotify programs which have necessarily longer run times and need a good way to set this and have the %default_options auto updated for usage() to automatically stay in sync with the live options
 sub set_timeout_max ($) {
@@ -1281,6 +1281,42 @@ sub open_file ($;$) {
         flock($tmpfh, LOCK_EX | LOCK_NB) or quit("UNKNOWN", "Failed to aquire a lock on file '$filename', another instance of this code may be running?");
     }
     return $tmpfh;
+}
+
+
+sub parse_file_option($;$){
+    my $file      = shift;
+    my $file_args = shift;
+    my @files;
+    my @tmp;
+    if($file){
+        my @tmp = split(/\s*[\s,]\s*/, $file);
+        push(@files, @tmp);
+    }
+
+    if($file_args){
+        # @ARGV should only be used after get_options()
+        foreach(@ARGV){
+            push(@files, $_);
+        }
+    }
+
+    foreach my $f (@files){
+        if(not -f $f ){
+            print STDERR "File not found: '$f'\n";
+            @files = grep { $_ ne $f } @files;
+        }
+    }
+    if($file or ($file_args and @ARGV)){
+        if(not @files){
+            print "step 2\n";
+            die "Error: no files found\n";
+        }
+    }
+
+    vlog_options("files", "[ '" . join("', '", @files) . "' ]");
+
+    return @files;
 }
 
 
