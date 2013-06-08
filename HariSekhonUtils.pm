@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.10";
+our $VERSION = "1.4.11";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -970,10 +970,15 @@ sub isDatabaseFieldName ($) {
 }
 
 
-sub isDatabaseTableName ($) {
-    my $table = shift;
+sub isDatabaseTableName ($;$) {
+    my $table           = shift;
+    my $allow_qualified = shift;
     defined($table) || return undef;
-    $table =~ /^(\w+)$/ or return undef;
+    if($allow_qualified){
+        $table =~ /^((?:\w+\.)?\w+)$/ or return undef;
+    } else {
+        $table =~ /^(\w+)$/ or return undef;
+    }
     return $1;
 }
 
@@ -1598,10 +1603,11 @@ sub validate_database ($) {
 }
 
 
-sub validate_database_tablename ($) {
-    my $table = shift;
+sub validate_database_tablename ($;$) {
+    my $table           = shift;
+    my $allow_qualified = shift;
     defined($table) || usage "table not specified";
-    $table = isDatabaseTableName($table) || usage "invalid table name, must be alphanumeric";
+    $table = isDatabaseTableName($table, $allow_qualified) || usage "invalid table name, must be alphanumeric";
     vlog_options("table", "$table");
     return $table;
 }
