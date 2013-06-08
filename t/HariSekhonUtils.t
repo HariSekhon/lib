@@ -14,6 +14,7 @@ use warnings;
 use strict;
 use Test::More;
 use File::Basename;
+note("Testing on perl $]");
 BEGIN {
     use lib dirname(__FILE__) . "/..";
     use_ok('HariSekhonUtils');
@@ -131,6 +132,18 @@ ok(HariSekhonUtils::isSub(sub{}), 'HariSekhonUtils::isCode(sub{})');
 
 ok(!HariSekhonUtils::isCode(1), '!HariSekhonUtils::isCode(1)');
 ok(!HariSekhonUtils::isSub(1), '!HariSekhonUtils::isSub(1)');
+
+is(isDatabaseColumnName("myColumn_1"),  "myColumn_1",   'isDatabaseColumnName("myColumn_1")');
+is(isDatabaseColumnName("'column'"),    undef,          'isDatabaseColumnName("\'column\'")');
+
+is(isDatabaseFieldName("count(*)"),     "count(*)",     'isDatabaseFieldName("count(*)")');
+is(isDatabaseFieldName("\@something"),  undef,          'isDatabaseFieldName("@something")');
+
+is(isDatabaseTableName("myTable_1"),                "myTable_1",            'isDatabaseTableName("myTable_1") eq myTable_1');
+is(isDatabaseTableName("'table'"),                  undef,                  'isDatabaseTableName("\'table\'") eq undef');
+is(isDatabaseTableName("default.myTable_1", 1),     "default.myTable_1",    'isDatabaseTableName("default.myTable_1", 1) eq default.myTable_1');
+is(isDatabaseTableName("default.myTable_1", 0),     undef,                  'isDatabaseTableName("default.myTable_1", 0) eq undef');
+is(isDatabaseTableName("default.myTable_1"),        undef,                  'isDatabaseTableName("default.myTable_1")    eq undef');
 
 is(isDomain("harisekhon.com"),  "harisekhon.com",   'isDomain("harisekhon.com") eq harisekhon.com');
 is(isDomain("harisekhon"),      0,                  '!isDomain("harisekhon") eq 0');
