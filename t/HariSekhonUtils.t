@@ -247,6 +247,11 @@ ok(open_file("/etc/hosts",1),           'open_file("/etc/hosts",1)');
 # Not supporting mode right now
 #ok(open_file("/etc/hosts",1,">>"),      'open_file("/etc/hosts",1,">>")');
 
+is(parse_file_option("/bin/sh"),      @{["/bin/sh"]},  'parse_file_options("/bin/sh")');
+is(parse_file_option("/bin/sh", "args are files"),   @{["/bin/sh"]},  'parse_file_options("/bin/sh", "args are files")');
+is(parse_file_option("/bin/sh, /bin/sh", "args are files"),   @{["/bin/sh","/bin/sh"]},  'parse_file_options("/bin/sh, /bin/sh", "args are files")');
+is(parse_file_option("/bin/sh  /bin/sh", "args are files"),   @{["/bin/sh","/bin/sh"]},  'parse_file_options("/bin/sh  /bin/sh", "args are files")');
+
 ok(!pkill("nonexistentprogram"),         '!pkill("nonexistentprogram")');
 
 is(plural(1),                       "",     'plural(1)');
