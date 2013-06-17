@@ -17,7 +17,7 @@ use File::Basename;
 note("Testing on perl $]");
 BEGIN {
     use lib dirname(__FILE__) . "/..";
-    use_ok('HariSekhonUtils');
+    use_ok('HariSekhonUtils', qw/:DEFAULT :time/);
 }
 require_ok('HariSekhonUtils');
 
@@ -132,6 +132,9 @@ ok(HariSekhonUtils::isSub(sub{}), 'HariSekhonUtils::isCode(sub{})');
 
 ok(!HariSekhonUtils::isCode(1), '!HariSekhonUtils::isCode(1)');
 ok(!HariSekhonUtils::isSub(1), '!HariSekhonUtils::isSub(1)');
+
+is(isAlNum("ABC123efg"),    "ABC123efg",    'isAlNum("ABC123efg") eq "ABC123efg"');
+is(isAlNum("1.2"),          undef,          'isAlNum("1.2") eq undef');
 
 is(isDatabaseColumnName("myColumn_1"),  "myColumn_1",   'isDatabaseColumnName("myColumn_1")');
 is(isDatabaseColumnName("'column'"),    undef,          'isDatabaseColumnName("\'column\'")');
@@ -285,6 +288,10 @@ is(resolve_ip("4.2.2.2"),                   "4.2.2.2",      'resolve_ip("4.2.2.2
 
 is(rstrip(" \t \n ha ri \t \n"),     " \t \n ha ri",   'rstrip()');
 is(rtrim(" \t \n ha ri \t \n"),      " \t \n ha ri",   'rtrim()');
+
+is(sec2min(65),     "1:05",     'sec2min(65) eq "1:05"');
+is(sec2min(30),     "0:30",     'sec2min(30) eq "0:30"');
+is(sec2min(3601),   "60:01",    'sec2min(3601) eq "60:01"');
 
 is(set_sudo("hadoop"),      "echo | sudo -S -u hadoop ",    'set_sudo("hadoop")');
 is(set_sudo(getpwuid($>)),  "",                             'set_sudo(getpwuid($>))');
