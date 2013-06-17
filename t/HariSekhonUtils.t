@@ -146,11 +146,11 @@ is(isDatabaseTableName("default.myTable_1", 0),     undef,                  'isD
 is(isDatabaseTableName("default.myTable_1"),        undef,                  'isDatabaseTableName("default.myTable_1")    eq undef');
 
 is(isDomain("harisekhon.com"),  "harisekhon.com",   'isDomain("harisekhon.com") eq harisekhon.com');
-is(isDomain("harisekhon"),      0,                  '!isDomain("harisekhon") eq 0');
-is(isDomain("a"x256),           0,                  '!isDomain("a"x256) eq 0');
+is(isDomain("harisekhon"),      undef,              '!isDomain("harisekhon") eq undef');
+is(isDomain("a"x256),           undef,              '!isDomain("a"x256) eq undef');
 
 is(isEmail('hari\'sekhon@gmail.com'),   'hari\'sekhon@gmail.com',   'isEmail("hari\'sekhon@gmail.com") eq hari\'sekhon@gmail.com');
-is(isEmail("harisekhon"),               0,                          '!isEmail("harisekhon") eq 0');
+is(isEmail("harisekhon"),               undef,                      '!isEmail("harisekhon") eq undef');
 
 is(isFilename("/tmp/test"), "/tmp/test", "isFilename(/tmp/test");
 is(isFilename("\@me"),      undef,       "isFilename(\@me)");
@@ -167,7 +167,7 @@ ok(!isFloat("nan"),     '!isFloat("nan")');
 ok(!isFloat("nan", 1),  '!isFloat("nan", 1)');
 
 is(isFqdn("hari.sekhon.com"),   "hari.sekhon.com",  'isFqdn("hari.sekhon.com") eq harisekhon.com');
-is(isFqdn("harisekhon.com"),    0,                  '!isFqdn("harisekhon.com") eq 0');
+is(isFqdn("harisekhon.com"),    undef,              '!isFqdn("harisekhon.com") eq undef');
 
 # TODO:
 #ok(isHash(%{ ( "one" => 1 ) }), "isHash()");
@@ -326,8 +326,8 @@ ok(!validate_directory('b@ddir', 1),            '!validate_directory(\'b@ddir\')
 
 is(validate_email('harisekhon@gmail.com'),      'harisekhon@gmail.com',     'validate_email(\'harisekhon@gmail.com\')');
 
-is(validate_file("/etc/passwd"),    "/etc/passwd",  'validate_file("/etc/passwd")');
-is(validate_file("/etc/nonexistentfile", 1),   0,   'validate_file("/etc/nonexistentfile", 1) eq 0');
+is(validate_file("/etc/passwd"),                "/etc/passwd",  'validate_file("/etc/passwd")');
+is(validate_file("/etc/nonexistentfile", 1),    undef,          'validate_file("/etc/nonexistentfile", 1) eq undef');
 
 is(validate_filename("/etc/passwd"),                "/etc/passwd",              'validate_filename("/etc/passwd")');
 is(validate_filename("/etc/nonexistentfile", 1),    "/etc/nonexistentfile",     'validate_filename("/etc/nonexistentfile", 1)');
@@ -382,13 +382,13 @@ is(validate_label("st4ts_used(%)"),    "st4ts_used(%)",    'validate_label("st4t
 
 is(validate_regex("some[Rr]egex.*(capture)"),   "(?-xism:some[Rr]egex.*(capture))",  'validate_regex("some[Rr]egex.*(capture)")');
 # Errors out still, should detect and fail gracefully
-#is(validate_regex("some[Rr]egex.*(capture broken", 1),   0,  'validate_regex("some[Rr]egex.*(capture broken", 1)');
+#is(validate_regex("some[Rr]egex.*(capture broken", 1),   undef,  'validate_regex("some[Rr]egex.*(capture broken", 1)');
 is(validate_regex("somePosix[Rr]egex.*(capture)", 0, 1),   "somePosix[Rr]egex.*(capture)",      'validate_regex("somePosix[Rr]egex.*(capture)", 0, 1)');
-is(validate_regex("somePosix[Rr]egex.*(capture broken", 1, 1),  0,       'validate_regex("somePosix[Rr]egex.*(capture broken", 1, 1) eq 0');
-is(validate_regex('somePosix[Rr]egex.*$(evilcmd)', 1, 1),       0,       'validate_regex("somePosix[Rr]egex.*$(evilcmd)", 1, 1) eq 0');
-is(validate_regex('somePosix[Rr]egex.*$(evilcmd', 1, 1),        0,       'validate_regex("somePosix[Rr]egex.*$(evilcmd", 1, 1) eq 0');
-is(validate_regex('somePosix[Rr]egex.*`evilcmd`', 1, 1),        0,       'validate_regex("somePosix[Rr]egex.*`evilcmd`", 1, 1) eq 0');
-is(validate_regex('somePosix[Rr]egex.*`evilcmd', 1, 1),         0,       'validate_regex("somePosix[Rr]egex.*`evilcmd", 1, 1) eq 0');
+is(validate_regex("somePosix[Rr]egex.*(capture broken", 1, 1),  undef,       'validate_regex("somePosix[Rr]egex.*(capture broken", 1, 1) eq undef');
+is(validate_regex('somePosix[Rr]egex.*$(evilcmd)', 1, 1),       undef,       'validate_regex("somePosix[Rr]egex.*$(evilcmd)", 1, 1) eq undef');
+is(validate_regex('somePosix[Rr]egex.*$(evilcmd', 1, 1),        undef,       'validate_regex("somePosix[Rr]egex.*$(evilcmd", 1, 1) eq undef');
+is(validate_regex('somePosix[Rr]egex.*`evilcmd`', 1, 1),        undef,       'validate_regex("somePosix[Rr]egex.*`evilcmd`", 1, 1) eq undef');
+is(validate_regex('somePosix[Rr]egex.*`evilcmd', 1, 1),         undef,       'validate_regex("somePosix[Rr]egex.*`evilcmd", 1, 1) eq undef');
 
 is(validate_user("hadoop"),    "hadoop",   'validate_user("hadoop")');
 is(validate_user("hari1983"),  "hari1983", 'validate_user("hari1983")');
@@ -455,7 +455,7 @@ ok(vlog_options("option", "value"),         'vlog_options("option", "value") in 
 
 is(which("sh"),   "/bin/sh",        'which("sh") eq sh');
 # TODO: not testing which("/explicit/path", 1) since it would error out
-is(which("/explicit/path"),   "/explicit/path",        'which("/explicit/path") eq /explicit/path');
-is(which("nonexistentprogram"),   0,        'which("nonexistentprogram") eq 0');
+is(which("/explicit/path"),         "/explicit/path",       'which("/explicit/path") eq /explicit/path');
+is(which("nonexistentprogram"),     undef,                  'which("nonexistentprogram") eq undef');
 
 done_testing();
