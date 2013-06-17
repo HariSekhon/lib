@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.12";
+our $VERSION = "1.4.13";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -93,6 +93,7 @@ our %EXPORT_TAGS = (
                     ) ],
     'is'    => [    qw(
                         isArray
+                        isAlNum
                         isDatabaseColumnName
                         isDatabaseFieldName
                         isDatabaseTableName
@@ -640,7 +641,7 @@ sub check_threshold ($$) {
         $thresholds{$threshold}{"error"} = $error;
         vlog2("result outside of $threshold thresholds: $error\n");
         eval $threshold;
-        return 0;
+        return undef;
     }
     return 1;
 }
@@ -661,7 +662,7 @@ sub check_thresholds ($) {
 #    my $fh;
 #    unless(open($fh, $file)){
 #        vlog "Failed to read file '$file': $!\n";
-#        return 0;
+#        return undef;
 #    }
 #    binmode($fh);
 #    my $checksum;
@@ -780,7 +781,7 @@ sub curl ($) {
 
 
 sub debug (@) {
-    return 0 unless $debug;
+    return undef unless $debug;
     my ( $package, $filename, $line ) = caller;
     my $debug_msg = "@_";
     $debug_msg =~ s/^(\n+)//;
@@ -867,10 +868,10 @@ sub get_options {
 sub get_path_owner ($) {
     # defined($_[0]) || code_error "no path passed to get_path_owner()";
     my $path = shift;
-    open my $fh, $path || return 0;
+    open my $fh, $path || return undef;
     my @stats = stat($fh);
     close $fh;
-    defined($stats[4]) || return 0;
+    defined($stats[4]) || return undef;
     return getpwuid($stats[4]) || 0;
 }
 
@@ -918,6 +919,14 @@ sub inArray ($@) {
         }
     }
     return $found;
+}
+
+
+sub isAlNum ($) {
+    my $arg = shift;
+    defined($arg) or code_error("no arg passed to isAlNum()");
+    $arg =~ /^([A-Za-z0-9]+)$/ or return undef;
+    return $1;
 }
 
 
@@ -979,9 +988,9 @@ sub isDatabaseTableName ($;$) {
 
 sub isDomain ($) {
     my $domain = shift;
-    defined($domain) or return 0;
-    return 0 if(length($domain) > 255);
-    $domain =~ /^($domain_regex)$/ or return 0;
+    defined($domain) or return undef;
+    return undef if(length($domain) > 255);
+    $domain =~ /^($domain_regex)$/ or return undef;
     return $1;
 }
 
@@ -989,9 +998,9 @@ sub isDomain ($) {
 # SECURITY NOTE: this only checks if the email address is valid, it's doesn't make it safe to arbitrarily pass to commands or SQL etc!
 sub isEmail ($) {
     my $email = shift;
-    #defined($email) || return 0;
-    return 0 if(length($email) > 256);
-    $email =~ /^$email_regex$/ || return 0;
+    #defined($email) || return undef;
+    return undef if(length($email) > 256);
+    $email =~ /^$email_regex$/ || return undef;
     # Intentionally not untainting this as it's not safe given the addition of ' to the $email_regex to support Irish email addresses
     return $email;
 }
@@ -1015,9 +1024,9 @@ sub isFloat ($;$) {
 
 sub isFqdn ($) {
     my $fqdn = shift;
-    #defined($fqdn) or return 0;
-    return 0 if(length($fqdn) > 255);
-    $fqdn =~ /^($fqdn_regex)$/ or return 0;
+    #defined($fqdn) or return undef;
+    return undef if(length($fqdn) > 255);
+    $fqdn =~ /^($fqdn_regex)$/ or return undef;
     return $1;
 }
 
@@ -1035,39 +1044,39 @@ sub isHash ($) {
 
 sub isHex ($) {
     my $hex = shift;
-    #defined($hex) or return 0;
-    $hex =~ /^(0x[A-Fa-f\d]+)$/ or return 0;
+    #defined($hex) or return undef;
+    $hex =~ /^(0x[A-Fa-f\d]+)$/ or return undef;
     return 1;
 }
 
 
 sub isHost ($) {
     my $host = shift;
-    #defined($host) or return 0;
+    #defined($host) or return undef;
     if(length($host) > 255){ # Can't be a hostname
         return isIP($host);
     } else {
-        $host =~ /^($host_regex)$/ or return 0;
+        $host =~ /^($host_regex)$/ or return undef;
         return $1;
     }
-    return 0;
+    return undef;
 }
 
 
 sub isHostname ($) {
     my $hostname = shift;
-    #defined($hostname) or return 0;
-    return 0 if(length($hostname) > 255);
-    $hostname =~ /^($hostname_regex)$/ or return 0;
+    #defined($hostname) or return undef;
+    return undef if(length($hostname) > 255);
+    $hostname =~ /^($hostname_regex)$/ or return undef;
     return $1;
 }
 
 
 sub isInterface ($) {
     my $interface = shift;
-    defined($interface) || return 0;
+    defined($interface) || return undef;
     # TODO: consider checking if the interface actually exists on the system
-    $interface =~ /^((?:eth|bond|lo)\d+|lo)$/ or return 0;
+    $interface =~ /^((?:eth|bond|lo)\d+|lo)$/ or return undef;
     return $1;
 }
 
@@ -1076,21 +1085,22 @@ sub isInt ($;$) {
     my $number = shift;
     my $signed = shift() ? "-?" : "";
     defined($number) or code_error("no number passed to isInt()");
-    $number =~ /^$signed\d+$/ or return 0;
+    $number =~ /^($signed\d+)$/ or return undef;
+    # can't return zero here as it would fail boolean tests for 0 which may be a valid int for purpose
     return 1;
 }
 
 
 sub isIP ($) {
     my $ip = shift;
-    #defined($ip) or return 0;
-    $ip =~ /^($ip_regex)$/ or return 0;
+    #defined($ip) or return undef;
+    $ip =~ /^($ip_regex)$/ or return undef;
     $ip = $1;
     my @octets = split(/\./, $ip);
-    (@octets == 4) or return 0;
-    $octets[3] eq 0 and return 0;
+    (@octets == 4) or return undef;
+    $octets[3] eq 0 and return undef;
     foreach(@octets){
-        $_ > 254 and return 0;
+        $_ > 254 and return undef;
     }
     return $ip;
 }
@@ -1099,25 +1109,25 @@ sub isIP ($) {
 # Primarily for Nagios perfdata labels
 sub isLabel ($) {
     my $label  = shift;
-    defined($label) || return 0;
-    $label =~ /^[\%\(\)\/\*\w\s-]+$/ or return 0;
+    defined($label) || return undef;
+    $label =~ /^[\%\(\)\/\*\w\s-]+$/ or return undef;
     return $label;
 }
 
 
 sub isPort ($) {
     my $port = shift;
-    $port  =~ /^(\d+)$/ || return 0;
+    $port  =~ /^(\d+)$/ || return undef;
     $port = $1;
-    ($port >= 1 && $port <= 65535) || return 0;
+    ($port >= 1 && $port <= 65535) || return undef;
     return $port;
 }
 
 
 sub isProcessName ($) {
     my $process = shift;
-    #defined($process) or return 0;
-    $process =~ /^($process_name_regex)$/ or return 0;
+    #defined($process) or return undef;
+    $process =~ /^($process_name_regex)$/ or return undef;
     return $1;
 }
 
@@ -1126,12 +1136,12 @@ sub isProcessName ($) {
 #sub isRegex ($) {
 #    my $regex = shift;
 #    defined($regex) || code_error "no regex arg passed to isRegex()";
-#    #defined($regex) || return 0;
+#    #defined($regex) || return undef;
 #    vlog3("testing regex '$regex'");
 #    if(eval { qr/$regex/ }){
 #        return $regex;
 #    } else {
-#        return 0;
+#        return undef;
 #    }
 #}
 
@@ -1155,9 +1165,9 @@ sub isScalar ($;$) {
 
 sub isUrl ($) {
     my $url = shift;
-    #defined($url) or return 0;
+    #defined($url) or return undef;
     #vlog3("url_regex: $url_regex");
-    $url =~ /^($url_regex)$/ or return 0;
+    $url =~ /^($url_regex)$/ or return undef;
     return $1;
 }
 
@@ -1166,7 +1176,7 @@ sub isUser ($) {
     #subtrace(@_);
     my $user = shift if $_[0];
     #defined($user) || code_error "user arg not passed to isUser()";
-    $user =~ /^($user_regex)$/ || return 0;
+    $user =~ /^($user_regex)$/ || return undef;
     return $1;
 }
 
@@ -1422,7 +1432,7 @@ sub quit (@) {
 sub resolve_ip ($) {
     require Socket;
     import Socket;
-    my $tmp = inet_aton($_[0]) || return 0;
+    my $tmp = inet_aton($_[0]) || return undef;
     return inet_ntoa($tmp);
 }
 
@@ -1508,7 +1518,7 @@ sub subtrace (@) {
 #   `type $builtin`;
 #    return 1 if($? == 0);
 #    quit "UNKNOWN", "$builtin is not a shell built-in" if $quit;
-#    return 0;
+#    return undef;
 #}
 
 
@@ -1584,13 +1594,13 @@ sub usage (;@) {
 sub user_exists ($) {
     my $user = shift; # if $_[0];
     #defined($user) or code_error("no user passed to user_exists()");
-    #$user = isUser($user) || return 0;
+    #$user = isUser($user) || return undef;
 
     # using id command since this should exist on most unix systems
     #which("id", 1);
     #`id "$user" >/dev/null 2>&1`;
     #return 1 if ( $? eq 0 );
-    #return 0;
+    #return undef;
 
     # More efficient
     return defined(getpwnam($user));
@@ -1689,10 +1699,10 @@ sub validate_email ($) {
 sub validate_file ($;$) {
     my $filename = shift;
     my $noquit   = shift;
-    $filename = validate_filename($filename, $noquit) or return 0;
+    $filename = validate_filename($filename, $noquit) or return undef;
     unless( -f $filename ){
         usage "file not found: '$filename' ($!)" unless $noquit;
-        return 0
+        return undef
     }
     return $filename;
 }
@@ -1705,7 +1715,7 @@ sub validate_filename ($;$$) {
     defined($filename) || usage "filename not specified";
     unless($filename = isFilename($filename)){
         usage "invalid filename given (does not match regex critera): '$filename'" unless $noquit;
-        return 0;
+        return undef;
     }
     vlog_options("$name", $filename);
     return $filename;
@@ -1838,21 +1848,21 @@ sub validate_regex ($;$$) {
     my $posix  = shift;
     my $regex2;
     if($noquit){
-        defined($regex) || return 0;
+        defined($regex) || return undef;
     } else {
         defined($regex) || usage "regex not specified";
     }
     if($posix){
         if($regex =~ /\$\(|\`/){
             quit "UNKNOWN", "invalid posix regex supplied: contains sub shell metachars ( \$( / ` ) that would be dangerous to pass to shell" unless $noquit;
-            return 0;
+            return undef;
         } else {
             my @output = cmd("egrep '$regex' < /dev/null");
             #if(grep({$_ =~ "Unmatched"} @output)){
             if(@output){
                 #quit "UNKNOWN", "invalid posix regex supplied: contains unbalanced () or []" unless $noquit;
                 quit "UNKNOWN", "invalid posix regex supplied: @output" unless $noquit;
-                return 0;
+                return undef;
             }
         }
     } else {
@@ -1863,7 +1873,7 @@ sub validate_regex ($;$$) {
             $errstr =~ s/;.*?$//;
             $errstr =~ s/in regex m\/.*?$/in regex/;
             quit "UNKNOWN", "invalid regex supplied: $errstr" unless $noquit;
-            return 0;
+            return undef;
         }
     }
     if($regex2){
@@ -2077,7 +2087,7 @@ sub vlog_options ($$) {
 #        $lock_tries{$url}++;
 #        if($lock_tries{$url} > $LOCK_TRY_ATTEMPTS){
 #            vlog "Hit max lock attempts on url '$url' ($LOCK_TRY_ATTEMPTS attempts, $LOCK_TRY_INTERVAL secs apart) while waiting for download lock, aborting download...\n";
-#            return 0;
+#            return undef;
 #        }
 #        vlog "sleeping for $LOCK_TRY_INTERVAL secs before retrying download lock for url '$url'";
 #        sleep $LOCK_TRY_INTERVAL;
@@ -2095,13 +2105,13 @@ sub vlog_options ($$) {
 #        flock_off;
 #        if($download_tries{$url} >= $DOWNLOAD_TRIES){
 #            vlog "failed to download url '$url' $DOWNLOAD_TRIES times";
-#            return 0;
+#            return undef;
 #        }
 #        vlog "sleeping for $DOWNLOAD_RETRY_INTERVAL secs before trying again";
 #        sleep $DOWNLOAD_RETRY_INTERVAL;
 #        return wget($url, $local_file);
 #    }
-#    return 0;
+#    return undef;
 #    #vlog "fetching $url.md5...";
 #    #getstore("$url.md5", "$local_file.md5");
 ##    if(open(my $fh, "$local_file.md5")){
@@ -2134,7 +2144,7 @@ sub which ($;$) {
         }
         quit "UNKNOWN", "couldn't find '$bin' in \$PATH ($ENV{PATH})" if $quit;
     }
-    return 0;
+    return undef;
 }
 
 
