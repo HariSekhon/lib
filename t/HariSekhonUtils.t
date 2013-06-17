@@ -292,6 +292,9 @@ is(rtrim(" \t \n ha ri \t \n"),      " \t \n ha ri",   'rtrim()');
 is(sec2min(65),     "1:05",     'sec2min(65) eq "1:05"');
 is(sec2min(30),     "0:30",     'sec2min(30) eq "0:30"');
 is(sec2min(3601),   "60:01",    'sec2min(3601) eq "60:01"');
+is(sec2min(-1),     undef,      'sec2min(-1) eq undef');
+is(sec2min("aa"),   undef,      'sec2min("aa") eq undef');
+is(sec2min(0),      "0:00",     'sec2min(0) eq 0:00');
 
 is(set_sudo("hadoop"),      "echo | sudo -S -u hadoop ",    'set_sudo("hadoop")');
 is(set_sudo(getpwuid($>)),  "",                             'set_sudo(getpwuid($>))');
