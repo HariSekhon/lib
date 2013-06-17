@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.13";
+our $VERSION = "1.4.14";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -189,6 +189,9 @@ our %EXPORT_TAGS = (
                         strip
                         trim
                     ) ],
+    'time'    => [  qw(
+                        sec2min
+                    ) ],
     'timeout' => [  qw(
                         set_timeout
                         set_timeout_default
@@ -300,6 +303,7 @@ our @EXPORT =   (
 our @EXPORT_OK = (  @EXPORT,
                     @{$EXPORT_TAGS{'log'}},
                     @{$EXPORT_TAGS{'regex'}},
+                    @{$EXPORT_TAGS{'time'}},
                  );
 # could also do this:
 #{ my %seen; push @{$EXPORT_TAGS{'all'}}, grep {!$seen{$_}++} @{$EXPORT_TAGS{$_}} foreach keys %EXPORT_TAGS; }
@@ -1445,6 +1449,13 @@ sub rstrip ($) {
 }
 #sub rtrim { rstrip(@_) }
 *rtrim = \&rstrip;
+
+
+sub sec2min ($){
+    my $secs = shift;
+    isFloat($secs) or return undef;
+    return sprintf("%d:%.2d", int($secs / 60), $secs % 60);
+}
 
 
 sub set_sudo (;$) {
