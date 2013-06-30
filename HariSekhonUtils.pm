@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.14";
+our $VERSION = "1.4.15";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -113,6 +113,7 @@ our %EXPORT_TAGS = (
                         isLabel
                         isLinux
                         isMac
+                        isNagiosUnit
                         isOS
                         isPort
                         isProcessName
@@ -1119,6 +1120,17 @@ sub isLabel ($) {
 }
 
 
+sub isNagiosUnit ($) {
+    my $units = shift;
+    foreach(@valid_units){
+        if(lc $units eq lc $_){
+            return $_;
+        }
+    }
+    return undef;
+}
+
+
 sub isPort ($) {
     my $port = shift;
     $port  =~ /^(\d+)$/ || return undef;
@@ -2020,13 +2032,9 @@ sub validate_thresholds (;$$$) {
 sub validate_units ($) {
     my $units = shift;
     $units or usage("units not defined");
-    foreach(@valid_units){
-        if($units eq $_){
-            vlog_options("units", $units);
-            return $_;
-        }
-    }
-    usage("invalid unit specified, must be one of: " . join(" ", @valid_units));
+    $units = isNagiosUnit($units) || usage("invalid unit specified, must be one of: " . join(" ", @valid_units));
+    vlog_options("units", $units);
+    return $units;
 }
 
 

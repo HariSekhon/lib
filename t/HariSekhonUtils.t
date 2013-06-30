@@ -214,6 +214,12 @@ ok(!isIP("10.10.10.255"),     '!isIP("10.10.10.255")');
 ok(!isIP("10.10.10.300"),     '!isIP("10.10.10.300")');
 ok(!isIP("x.x.x.x"),          '!isIP("x.x.x.x")');
 
+is(isNagiosUnit("s"),   "s",    'isNagiosUnit(s) eq s');
+is(isNagiosUnit("ms"),  "ms",   'isNagiosUnit(s) eq ms');
+is(isNagiosUnit("%"),   "%",    'isNagiosUnit(%) eq %');
+is(isNagiosUnit("Kb"),  "KB",   'isNagiosUnit(Kb) eq KB');
+is(isNagiosUnit("Kbps"), undef, 'isNagiosUnit(Kbps) eq undef');
+
 is(isPort(80),          80,     'isPort(80)');
 ok(!isPort(65536),              '!isPort(65536)');
 ok(!isPort("a"),                'isPort("a")');
