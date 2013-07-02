@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.15";
+our $VERSION = "1.4.16";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1695,14 +1695,16 @@ sub validate_domain ($) {
 #}
 
 
-sub validate_directory ($;$) {
+sub validate_directory ($;$$$) {
     my $dir     = shift;
     my $noquit  = shift;
+    my $name    = shift || "directory";
+    my $no_vlog = shift;
     if($noquit){
         return validate_filename($dir, 1);
     }
     defined($dir) || usage "directory not specified";
-    $dir = validate_filename($dir, 1) || usage "Invalid directory given (does not match regex criteria): '$dir'";
+    $dir = validate_filename($dir, "noquit", $name, $no_vlog) || usage "Invalid directory given (does not match regex criteria): '$dir'";
     ( -d $dir) || usage "cannot find directory: '$dir'";
     return $dir;
 }
@@ -1719,10 +1721,12 @@ sub validate_email ($) {
 }
 
 
-sub validate_file ($;$) {
+sub validate_file ($;$$$) {
     my $filename = shift;
     my $noquit   = shift;
-    $filename = validate_filename($filename, $noquit) or return undef;
+    my $name     = shift;
+    my $no_vlog  = shift;
+    $filename = validate_filename($filename, $noquit, $name, $no_vlog) or return undef;
     unless( -f $filename ){
         usage "file not found: '$filename' ($!)" unless $noquit;
         return undef
@@ -1731,16 +1735,17 @@ sub validate_file ($;$) {
 }
 
 
-sub validate_filename ($;$$) {
+sub validate_filename ($;$$$) {
     my $filename = shift;
     my $noquit   = shift;
     my $name     = shift || "filename";
-    defined($filename) || usage "filename not specified";
+    my $no_vlog  = shift;
+    defined($filename) || usage "$name not specified";
     unless($filename = isFilename($filename)){
-        usage "invalid filename given (does not match regex critera): '$filename'" unless $noquit;
+        usage "invalid $name given (does not match regex critera): '$filename'" unless $noquit;
         return undef;
     }
-    vlog_options("$name", $filename);
+    vlog_options($name, $filename) unless $no_vlog;
     return $filename;
 }
 
