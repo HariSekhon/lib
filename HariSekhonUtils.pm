@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.16";
+our $VERSION = "1.4.17";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -422,7 +422,7 @@ our %default_options = (
     "t|timeout=i"  => [ \$timeout,  "Timeout in secs (default: $timeout_default)" ],
     "v|verbose+"   => [ \$verbose,  "Verbose mode" ],
     "V|version"    => [ \$version,  "Print version and exit" ],
-    "h|help"       => [ \$help,     "Print this help" ],
+    "h|help"       => [ \$help,     "Print description and usage options" ],
 );
 
 # These two subroutines are primarily for my other programs such as my spotify programs which have necessarily longer run times and need a good way to set this and have the %default_options auto updated for usage() to automatically stay in sync with the live options
@@ -1554,8 +1554,8 @@ sub uniq_array (@) {
 
 
 sub usage (;@) {
-    print STDERR "@_\n\n" if (@_ > 0);
-    print STDERR "$main::DESCRIPTION\n\n" if $main::DESCRIPTION;
+    print STDERR "@_\n\n" if (@_);
+    print STDERR "$main::DESCRIPTION\n\n" if(not @_ and $main::DESCRIPTION);
     print STDERR "$usage_line\n\n";
     foreach my $key_orig (sort keys %options){
         my $key = $key_orig;
