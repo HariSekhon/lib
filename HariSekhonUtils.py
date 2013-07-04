@@ -87,7 +87,7 @@ def print_jython_exception():
 
     printerr("Error: %s" % sys.exc_info()[1].toString())
     if sys.exc_info()[1].toString() == java_oom:
-        print >> sys.stderr, java_oom_fix
+        printerr(java_oom_fix)
     #import traceback; traceback.print_exc()
 
 
