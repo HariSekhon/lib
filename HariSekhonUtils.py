@@ -28,10 +28,10 @@ ERRORS = {
     "DEPENDENT" : 4
 }
 
-def printerr(msg, *differentiate):
+def printerr(msg, *indent):
     """ Print error message to stdout """
 
-    if differentiate:
+    if indent:
         print >> sys.stderr, ">>> ",
     print >> sys.stderr, "%s" % msg
 
