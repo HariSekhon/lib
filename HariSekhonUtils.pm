@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.17";
+our $VERSION = "1.4.18";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2159,9 +2159,15 @@ sub which ($;$) {
     my $quit = $_[1] || 0;
     $bin = isFilename($bin) || quit "UNKNOWN", "invalid filename '$bin' supplied";
     if($bin =~ /^[\.\/]/){
-        (-f $bin) or quit "UNKNOWN", "couldn't find executable '$bin': $!" if $quit;
-        (-x $bin) or quit "UNKNOWN", "'$bin' is not executable" if $quit;
-        return $bin;
+        if(-f $bin){
+            if(-x $bin){
+                return $bin;
+            } else {
+                quit "UNKNOWN", "'$bin' is not executable" if $quit;
+            }
+        } else {
+            quit "UNKNOWN", "couldn't find executable '$bin': $!" if $quit;
+        }
     } else {
         foreach(split(":", $ENV{"PATH"})){
             (-x "$_/$bin") && return "$_/$bin";

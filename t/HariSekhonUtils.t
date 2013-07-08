@@ -469,9 +469,10 @@ ok(!vlog_options("option", "value"),         '!vlog_options("option", "value") i
 $verbose = 2;
 ok(vlog_options("option", "value"),         'vlog_options("option", "value") in $verbose 2');
 
-is(which("sh"),   "/bin/sh",        'which("sh") eq sh');
-# TODO: not testing which("/explicit/path", 1) since it would error out
-is(which("/explicit/path"),         "/explicit/path",       'which("/explicit/path") eq /explicit/path');
-is(which("nonexistentprogram"),     undef,                  'which("nonexistentprogram") eq undef');
+# XXX: not testing which("/explicit/nonexistent/path", 1) since it would error out
+is(which("sh"),                             "/bin/sh",      'which("sh") eq /bin/sh');
+is(which("/bin/bash"),                      "/bin/bash",    'which("bash") eq /bin/bash');
+is(which("/explicit/nonexistent/path"),     undef,          'which("/explicit/nonexistent/path") eq undef');
+is(which("nonexistentprogram"),             undef,          'which("nonexistentprogram") eq undef');
 
 done_testing();
