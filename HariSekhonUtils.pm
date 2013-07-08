@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.19";
+our $VERSION = "1.4.18";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2155,7 +2155,7 @@ sub vlog_options ($$) {
 
 
 sub which ($;$) {
-    my $bin  = $_[0];
+    my $bin  = $_[0] || code_error "no arg supplied to which() subroutine";
     my $quit = $_[1] || 0;
     $bin = isFilename($bin) || quit "UNKNOWN", "invalid filename '$bin' supplied";
     if($bin =~ /^[\.\/]/){
