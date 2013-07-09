@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.18";
+our $VERSION = "1.4.20";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1955,7 +1955,7 @@ sub validate_threshold ($$;$) {
     isHash($options_ref) or code_error "3rd arg to validate_threshold() must be a hash ref of options";
     $options_ref->{"positive"} = 1 unless defined($options_ref->{"positive"});
     $options_ref->{"simple"} = "upper" unless $options_ref->{"simple"};
-    my @valid_options = qw/simple positive integer/;
+    my @valid_options = qw/simple positive integer min max/;
     foreach my $option (sort keys %$options_ref){
         grep(/^$option$/, @valid_options) or code_error "invalid option '$option' passed to validate_threshold(), must be one of " . join("/", @valid_options);
     }
@@ -1993,6 +1993,12 @@ sub validate_threshold ($$;$) {
         }
         if($options_ref->{"integer"} and defined($thresholds{$name}{$_}) and not isInt($thresholds{$name}{$_})){
             usage "$name threshold must be an integer";
+        }
+        if($options_ref->{"min"} and defined($thresholds{$name}{$_}) and $thresholds{$name}{$_} < $options_ref->{"min"}){
+            usage "$name threshold cannot be less than $options_ref->{min}";
+        }
+        if($options_ref->{"max"} and defined($thresholds{$name}{$_}) and $thresholds{$name}{$_} > $options_ref->{"max"}){
+            usage "$name threshold cannot be greater than $options_ref->{max}";
         }
     }
     $thresholds{"defined"} = 1 if (defined($thresholds{$name}{"upper"}) or defined($thresholds{$name}{"lower"}));
