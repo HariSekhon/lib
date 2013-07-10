@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.20";
+our $VERSION = "1.4.21";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -376,8 +376,8 @@ our $host_regex         = "\\b(?:$hostname_regex|$ip_regex)\\b";
 # I did a scan of registered running process names across several hundred linux servers of a diverse group of enterprise applications with 500 unique process names (58k individual processes) to determine that there are cases with spaces, slashes, dashes, underscores, chevrons (<defunct>), dots (script.p[ly], in.tftpd etc) to determine what this regex should be. Incidentally it appears that Linux truncates registered process names to 15 chars.
 # This is not from ps -ef etc it is the actual process registered name, hence init not [init] as it appears in ps output
 our $process_name_regex = '[\w\s_\.\/\<\>-]+';
-our $url_path_suffix_regex = '/(?:[\w\.\/_\+-]+)?';
-our $url_regex          = "\\b(?i:https?://$host_regex(?:$url_path_suffix_regex)?)";
+our $url_path_suffix_regex = '/(?:[\w\.\/\%\?\=\+-]+)?';
+our $url_regex          = '\b(?i:https?://' . $host_regex . '(?::\d{1,5})?(?:' . $url_path_suffix_regex . ')?)';
 our $user_regex         = '\b[A-Za-z][A-Za-z0-9]+\b';
 # ============================================================================ #
 
@@ -768,6 +768,7 @@ sub curl ($) {
         code_error "called curl() without declaring \"use LWP::Simple 'get'\"";
     }
     my $url = shift;
+    #debug("url passed to curl: $url");
     isUrl($url) or code_error "invalid url supplied to curl()";
     vlog2("HTTP GET $url");
     my $content = main::get $url;
@@ -1182,7 +1183,7 @@ sub isScalar ($;$) {
 sub isUrl ($) {
     my $url = shift;
     #defined($url) or return undef;
-    #vlog3("url_regex: $url_regex");
+    #debug("url_regex: $url_regex");
     $url =~ /^($url_regex)$/ or return undef;
     return $1;
 }
