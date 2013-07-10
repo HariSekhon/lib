@@ -240,8 +240,9 @@ ok(!isScalar(1),                '!isScalar(1)');
 
 is(isUrl("http://www.google.com"),  "http://www.google.com",    'isUrl("http://www.google.com")');
 is(isUrl("https://gmail.com"),      "https://gmail.com",        'isUrl("https://gmail.com")');
-ok(!isUrl("www.google.com"),                                    '!isUrl("www.google.com")');
-ok(!isUrl(1),                                                   '!isUrl(1)');
+is(isUrl("www.google.com"),         undef,                      'isUrl("www.google.com") eq undef');
+is(isUrl(1),                        undef,                      'isUrl(1) eq undef');
+is(isUrl("http://cdh43:50070/dfsnodelist.jsp?whatNodes=LIVE"),  'http://cdh43:50070/dfsnodelist.jsp?whatNodes=LIVE', 'isUrl(http://cdh43:50070/dfsnodelist.jsp?whatNodes=LIVE)');
 
 is(isUser("hadoop"),    "hadoop",   'isUser("hadoop")');
 is(isUser("hari1983"),  "hari1983", 'isUser("hari1983")');
