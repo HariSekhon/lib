@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.21";
+our $VERSION = "1.4.22";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -142,6 +142,7 @@ our %EXPORT_TAGS = (
                         msg_perf_thresholds
                         parse_file_option
                         plural
+                        remove_timeout
                         usage
                         validate_thresholds
                         version
@@ -890,7 +891,6 @@ sub go_flock_yourself (;$$) {
     if($wait){
         vlog2("waiting to go flock myself");
         $locking_options = LOCK_EX;
-        vlog2("truly flocked now");
     } else {
         $locking_options = LOCK_EX|LOCK_NB;
     }
@@ -901,6 +901,7 @@ sub go_flock_yourself (;$$) {
         open $selflock, $0 or die "Failed to open $0 for lock: $!\n";
         flock $selflock, $locking_options or die "Another instance of " . abs_path($0) . " is already running!\n";
     }
+    vlog2("truly flocked now");
 }
 sub flock_off (;$) {
     my $there_can_be_only_one = shift;
@@ -1443,6 +1444,11 @@ sub quit (@) {
         #exit $ERRORS{"UNKNOWN"};
         code_error("invalid number of arguments passed to quit function (" . scalar(@_) . ", should be 0 - 2)");
     }
+}
+
+
+sub remove_timeout(){
+    delete $HariSekhonUtils::default_options{"t|timeout=i"};
 }
 
 
