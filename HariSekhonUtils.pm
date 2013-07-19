@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.25";
+our $VERSION = "1.4.26";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1116,13 +1116,26 @@ sub isIP ($) {
 }
 
 
+# wish there was a better way of validating the JSON returned but Test::JSON is_valid_json() also errored out badly from underlying JSON::Any module, similar to JSON's decode_json
 sub isJson($){
     my $string = shift;
-    # wish there was a better way of validating the JSON returned but Test::JSON is_valid_json() also errored out badly from underlying JSON::Any module, similar to JSON's decode_json
-    if($string =~ /^[^A-Za-z]*$/ and $string !~ /{/){
-        return 0;        
+    # slightly modified from http://stackoverflow.com/questions/2583472/regex-to-validate-json
+    my $json_regex = qr/
+      (?(DEFINE)
+         (?<number>   -? (?= [1-9]|0(?!\d) ) \d+ (\.\d+)? ([eE] [+-]? \d+)? )
+         (?<boolean>   true | false | null )
+         (?<string>    " ([^"\\\\]* | \\\\ ["\\\\bfnrt\/] | \\\\ u [0-9a-f]{4} )* " )
+         (?<array>     \[  (?: (?&json)  (?: , (?&json)  )*  )?  \s* \] )
+         (?<pair>      \s* (?&string) \s* : (?&json)  )
+         (?<object>    \{  (?: (?&pair)  (?: , (?&pair)  )*  )?  \s* \} )
+         (?<json>      \s* (?: (?&number) | (?&boolean) | (?&string) | (?&array) | (?&object) ) \s* )
+      )
+      \A (?&json) \Z
+      /six;
+    if($string =~ $json_regex){
+        return 1;        
     }
-    return 1;
+    return 0;
 }
 
 
