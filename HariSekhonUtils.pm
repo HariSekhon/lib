@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.24";
+our $VERSION = "1.4.25";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -110,6 +110,7 @@ our %EXPORT_TAGS = (
                         isIP
                         isInt
                         isInterface
+                        isJson
                         isLabel
                         isLinux
                         isMac
@@ -1112,6 +1113,16 @@ sub isIP ($) {
         $_ > 254 and return undef;
     }
     return $ip;
+}
+
+
+sub isJson($){
+    my $string = shift;
+    # wish there was a better way of validating the JSON returned but Test::JSON is_valid_json() also errored out badly from underlying JSON::Any module, similar to JSON's decode_json
+    if($string =~ /^[^A-Za-z]*$/ and $string !~ /{/){
+        return 0;        
+    }
+    return 1;
 }
 
 
