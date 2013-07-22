@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.27";
+our $VERSION = "1.4.28";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -120,6 +120,7 @@ our %EXPORT_TAGS = (
                         isProcessName
                         isScalar
                         isUrl
+                        isUrlPathSuffix
                         isUser
                         user_exists
                     ) ],
@@ -231,6 +232,7 @@ our %EXPORT_TAGS = (
                         validate_thresholds
                         validate_units
                         validate_url
+                        validate_url_path_suffix
                         validate_user
                         validate_user_exists
                         validate_username
@@ -1217,6 +1219,13 @@ sub isUrl ($) {
 }
 
 
+sub isUrlPathSuffix ($) {
+    my $url = shift;
+    $url =~ /^($url_path_suffix_regex)$/ or return undef;
+    return $1;
+}
+
+
 sub isUser ($) {
     #subtrace(@_);
     my $user = shift if $_[0];
@@ -2089,6 +2098,17 @@ sub validate_url ($;$) {
     $name .= " " if $name;
     defined($url) || usage "${name}url not specified";
     $url = isUrl($url) || usage "invalid ${name}url given: '$url'";
+    vlog_options("${name}url", $url);
+    return $url;
+}
+
+
+sub validate_url_path_suffix ($;$) {
+    my $url  = $_[0] if $_[0];
+    my $name = $_[1] || "";
+    $name .= " " if $name;
+    defined($url) || usage "${name}url not specified";
+    $url = isUrlPathSuffix($url) || usage "invalid ${name}url given: '$url'";
     vlog_options("${name}url", $url);
     return $url;
 }
