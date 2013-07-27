@@ -1,13 +1,13 @@
 #
-#   Author: Hari Sekhon
-#   Date: 2013-07-03 01:58:10 +0100 (Wed, 03 Jul 2013)
-#  $LastChangedBy$
-#  $LastChangedDate$
-#  $Revision$
-#  $URL$
-#  $Id$
+#  Author: Hari Sekhon
+#  Date: 2013-07-03 01:58:10 +0100 (Wed, 03 Jul 2013)
 #
-#  vim:ts=4:sts=4:et
+#  http://github.com/harisekhon
+#
+#  License: see accompanying LICENSE file
+#
+
+# Split off from Nagios plugin check_zookeeper.pl I wrote in 2011
 
 package HariSekhon::ZooKeeper;
 
