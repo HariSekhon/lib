@@ -244,6 +244,11 @@ is(isUrl("www.google.com"),         undef,                      'isUrl("www.goog
 is(isUrl(1),                        undef,                      'isUrl(1) eq undef');
 is(isUrl("http://cdh43:50070/dfsnodelist.jsp?whatNodes=LIVE"),  'http://cdh43:50070/dfsnodelist.jsp?whatNodes=LIVE', 'isUrl(http://cdh43:50070/dfsnodelist.jsp?whatNodes=LIVE)');
 
+is(isUrlPathSuffix("/"),                "/",                        'isUrlPathSuffix("/")');
+is(isUrlPathSuffix("/?var=something"),  "/?var=something",          'isUrlPathSuffix("/?var=something")');
+is(isUrlPathSuffix("/dir1/file.php?var=something+else&var2=more%20stuff"), "/dir1/file.php?var=something+else&var2=more%20stuff", 'isUrlPathSuffix("/dir1/file.php?var=something+else&var2=more%20stuff")');
+is(isUrlPathSuffix("/*"),               undef,                      'isUrlPathSuffix("/*") eq undef');
+
 is(isUser("hadoop"),    "hadoop",   'isUser("hadoop")');
 is(isUser("hari1983"),  "hari1983", 'isUser("hari1983")');
 ok(!isUser("-hari"),                '!isUser("-hari")');
