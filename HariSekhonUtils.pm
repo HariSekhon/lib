@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.4.28";
+our $VERSION = "1.5";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -184,6 +184,10 @@ our %EXPORT_TAGS = (
                         is_unknown
                         is_ok
                         get_status_code
+                        try
+                        catch
+                        die_handler_on
+                        die_handler_off
                         quit
                     ) ],
     'string' => [   qw(
@@ -273,6 +277,7 @@ our %EXPORT_TAGS = (
     'verbose' => [  qw(
                         code_error
                         debug
+                        hr
                         verbose_mode
                         vlog
                         vlog2
@@ -331,8 +336,9 @@ BEGIN {
         $| = 1; 
     }
 
-    $SIG{__DIE__} = sub {
+    sub die_sub {
         my $str = "@_" || "Died";
+        # mimic original die behaviour by only showing code line when there is no newline at end of string
         if(substr($str, -1, 1) eq "\n"){
             print STDERR $str;
         } else {
@@ -340,6 +346,18 @@ BEGIN {
         }
         exit 2;
     };
+    $SIG{__DIE__} = \&die_sub;
+
+    # This is because the die handler causes program exit instead of return from eval {} block required for exception handling
+    sub try(&) {
+        undef $SIG{__DIE__};
+        eval {$_[0]->()};
+        $SIG{__DIE__} = \&die_sub;
+    }
+
+    sub catch(&) {
+        $_[0]->($@) if $@;
+    }
 }
 
 # quick prototype to allow me to use this just below
@@ -909,6 +927,7 @@ sub go_flock_yourself (;$$) {
     }
     vlog2("truly flocked now");
 }
+
 sub flock_off (;$) {
     my $there_can_be_only_one = shift;
     if($there_can_be_only_one){
@@ -918,6 +937,11 @@ sub flock_off (;$) {
         open $selflock, $0 or die "Failed to open $0 for lock: $!\n";
         flock $selflock, LOCK_UN;
     }
+}
+
+
+sub hr() {
+    print "# " . "="x76 . " #\n";
 }
 
 
@@ -1160,6 +1184,12 @@ sub isNagiosUnit ($) {
     }
     return undef;
 }
+
+
+#sub isObject ($) {
+#    my $object = shift;
+#    ref $object eq "bless";
+#}
 
 
 sub isPort ($) {
