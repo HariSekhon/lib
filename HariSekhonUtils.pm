@@ -1872,6 +1872,8 @@ sub validate_int ($$$$) {
     my ($integer, $min, $max, $name) = @_;
     defined($integer) || usage "$name not specified";
     isInt($integer, 1) or usage "invalid $name given, must be an integer";
+    isFloat($min) or code_error "non-float value '$min' passed to validate_int() for 2nd arg min value";
+    isFloat($max) or code_error "non-float value '$max' passed to validate_int() for 3rd arg max value";
     ($integer >= $min && $integer <= $max) or usage "invalid $name given, must be integer between $min and $max";
     vlog_options($name, $integer);
     return $integer;
