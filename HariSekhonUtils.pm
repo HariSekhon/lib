@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5";
+our $VERSION = "1.5.1";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -400,7 +400,7 @@ our $host_regex         = "\\b(?:$hostname_regex|$ip_regex)\\b";
 # I did a scan of registered running process names across several hundred linux servers of a diverse group of enterprise applications with 500 unique process names (58k individual processes) to determine that there are cases with spaces, slashes, dashes, underscores, chevrons (<defunct>), dots (script.p[ly], in.tftpd etc) to determine what this regex should be. Incidentally it appears that Linux truncates registered process names to 15 chars.
 # This is not from ps -ef etc it is the actual process registered name, hence init not [init] as it appears in ps output
 our $process_name_regex = '[\w\s_\.\/\<\>-]+';
-our $url_path_suffix_regex = '/(?:[\w\.\/\%\?\=\+-]+)?';
+our $url_path_suffix_regex = '/(?:[\w\.\/\%\&\?\=\+-]+)?';
 our $url_regex          = '\b(?i:https?://' . $host_regex . '(?::\d{1,5})?(?:' . $url_path_suffix_regex . ')?)';
 our $user_regex         = '\b[A-Za-z][A-Za-z0-9]+\b';
 # ============================================================================ #
@@ -926,6 +926,7 @@ sub go_flock_yourself (;$$) {
         flock $selflock, $locking_options or die "Another instance of " . abs_path($0) . " is already running!\n";
     }
     vlog2("truly flocked now");
+    1;
 }
 
 sub flock_off (;$) {
@@ -1872,8 +1873,8 @@ sub validate_int ($$$$) {
     my ($integer, $min, $max, $name) = @_;
     defined($integer) || usage "$name not specified";
     isInt($integer, 1) or usage "invalid $name given, must be an integer";
-    isFloat($min) or code_error "non-float value '$min' passed to validate_int() for 2nd arg min value";
-    isFloat($max) or code_error "non-float value '$max' passed to validate_int() for 3rd arg max value";
+    isFloat($min, 1) or code_error "non-float value '$min' passed to validate_int() for 2nd arg min value";
+    isFloat($max, 1) or code_error "non-float value '$max' passed to validate_int() for 3rd arg max value";
     ($integer >= $min && $integer <= $max) or usage "invalid $name given, must be integer between $min and $max";
     vlog_options($name, $integer);
     return $integer;
