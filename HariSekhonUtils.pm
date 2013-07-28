@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.1";
+our $VERSION = "1.5.2";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2149,12 +2149,16 @@ sub validate_url_path_suffix ($;$) {
 
 sub verbose_mode () {
     vlog2("verbose mode on\n");
+    vlog3("running " . version_string() . "\n");
 }
 
+sub version_string () {
+    return "$progname version $main::VERSION  =>  Hari Sekhon Utils version $HariSekhonUtils::VERSION";
+}
 
 sub version () {
     defined($main::VERSION) or $main::VERSION = "unset";
-    usage "$progname version $main::VERSION  =>  Hari Sekhon Utils version $HariSekhonUtils::VERSION";
+    usage version_string();
 }
 
 
