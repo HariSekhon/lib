@@ -25,6 +25,8 @@ use Thrift;
 use Thrift::Socket;
 use Thrift::BinaryProtocol;
 use Thrift::BufferedTransport;
+# Thrift generated bindings for HBase, provided in lib
+use Hbase::Hbase;
 
 use Exporter;
 our @ISA = qw(Exporter);
