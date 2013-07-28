@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.2";
+our $VERSION = "1.5.3";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -186,6 +186,7 @@ our %EXPORT_TAGS = (
                         get_status_code
                         try
                         catch
+                        catch_quit
                         die_handler_on
                         die_handler_off
                         quit
@@ -547,6 +548,18 @@ sub status2 () {
 
 sub status3 () {
     vlog3("status: $status");
+}
+
+# requires that you 'use Data::Dumper' in calling program, since not all programs will need this
+sub catch_quit ($) {
+    my $errmsg = $_[0];
+    catch {
+        if(defined($@->{"message"})){
+            quit "CRITICAL", "$errmsg: " . ref($@) . ": " . $@->{"message"};
+        } else {
+            quit "CRITICAL", "$errmsg: " . Dumper($@);
+        }
+    }
 }
 
 # ============================================================================ #
