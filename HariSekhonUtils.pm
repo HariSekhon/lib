@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.3";
+our $VERSION = "1.5.4";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -184,6 +184,8 @@ our %EXPORT_TAGS = (
                         is_unknown
                         is_ok
                         get_status_code
+                        get_upper_threshold
+                        get_upper_thresholds
                         try
                         catch
                         catch_quit
@@ -919,6 +921,21 @@ sub get_path_owner ($) {
     return getpwuid($stats[4]) || 0;
 }
 
+sub get_upper_threshold ($) {
+    my $type = shift;
+    if($type eq "warning" or $type eq "critical"){
+        if(defined($thresholds{$type}{"upper"})){
+            return $thresholds{$type}{"upper"};
+        } else {
+            return "";
+        }
+    }
+    code_error "invalid threshold type '$type' passed to get_upper_threshold(), must be one of: warning critical";
+}
+
+sub get_upper_thresholds () {
+    return get_upper_threshold("warning") . ";" . get_upper_threshold("critical");
+}
 
 # go flock ur $self ;)
 sub go_flock_yourself (;$$) {
