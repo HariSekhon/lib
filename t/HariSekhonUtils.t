@@ -439,8 +439,9 @@ is(validate_units("c"),     "c",    'validate_units("c")');
 is(validate_url("http://www.google.com"),  "http://www.google.com",    'validate_url("http://www.google.com")');
 is(validate_url("https://gmail.com"),      "https://gmail.com",        'validate_url("https://gmail.com")');
 
+$verbose = 0;
 ok(!verbose_mode(),  '!verbose_mode()');
-$verbose = 2;
+$verbose = 1;
 ok(verbose_mode(),  'verbose_mode()');
 
 # TODO: errors out

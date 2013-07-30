@@ -2180,10 +2180,14 @@ sub validate_url_path_suffix ($;$) {
 sub verbose_mode () {
     vlog2("verbose mode on\n");
     vlog3("running " . version_string() . "\n");
+    return $verbose >= 1;
 }
 
 sub version_string () {
-    return "$progname version $main::VERSION  =>  Hari Sekhon Utils version $HariSekhonUtils::VERSION";
+    my $version_str = "";
+    $version_str .= "$progname version $main::VERSION  =>  " if defined($progname and $main::VERSION);
+    $version_str .= "Hari Sekhon Utils version $HariSekhonUtils::VERSION";
+    return $version_str;
 }
 
 sub version () {
