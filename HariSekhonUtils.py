@@ -12,6 +12,7 @@
 """ Personal Library originally started to standardize Nagios Plugin development but superceded by Perl version """
 
 #import os
+import re
 import sys
 #import re
 #import signal
@@ -103,6 +104,18 @@ def vprint(msg):
 
     if verbose:
         print msg,
+
+
+def read_file_without_comments(filename):
+    return [ x.rstrip("\n").split("#")[0].strip() for x in open(filename).readlines() ]
+
+
+# ============================================================================ #
+#                                   REGEX
+# ============================================================================ #
+RE_NAME           = re.compile(r'^[A-Za-z\s\.\'-]+$')
+RE_DOMAIN         = re.compile(r'\b(?:[A-Za-z][A-Za-z0-9]{0,62}|[A-Za-z][A-Za-z0-9_\-]{0,61}[a-zA-Z0-9])+\.(?:\b(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])\b\.)*\b(?:[A-Za-z]{2,4}|(?:local|museum|travel))\b', re.I)
+RE_EMAIL          = re.compile(r'\b[A-Za-z0-9\._\'\%\+-]{1,64}@[A-Za-z0-9\.-]{1,251}\.[A-Za-z]{2,4}\b')
 
 # ============================================================================ #
 
