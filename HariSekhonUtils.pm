@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.5";
+our $VERSION = "1.5.6";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1863,6 +1863,8 @@ sub validate_float ($$$$) {
     defined($float) || usage "$name not specified";
     isFloat($float,1) or usage "invalid $name given, must be a real number";
     ($float >= $min && $float <= $max) or usage "invalid $name given, must be real number between $min and $max";
+    $float =~ /^(-?\d+(?:\.\d+)?)$/ or usage "invalid float $name passed to validate_float(), WARNING: caught LATE";
+    $float = $1;
     vlog_options($name, $float);
     return $float;
 }
@@ -1906,6 +1908,8 @@ sub validate_int ($$$$) {
     isFloat($min, 1) or code_error "non-float value '$min' passed to validate_int() for 2nd arg min value";
     isFloat($max, 1) or code_error "non-float value '$max' passed to validate_int() for 3rd arg max value";
     ($integer >= $min && $integer <= $max) or usage "invalid $name given, must be integer between $min and $max";
+    $integer =~ /^(-?\d+)$/ or usage "invalid integer $name passed to validate_int(), WARNING: caught LATE";
+    $integer = $1;
     vlog_options($name, $integer);
     return $integer;
 }
