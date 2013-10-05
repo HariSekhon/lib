@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.6";
+our $VERSION = "1.5.7";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1659,7 +1659,14 @@ sub uniq_array (@) {
 
 sub usage (;@) {
     print STDERR "@_\n\n" if (@_);
-    print STDERR "$main::DESCRIPTION\n\n" if(not @_ and $main::DESCRIPTION);
+    if(not @_ and $main::DESCRIPTION){
+        print STDERR "Hari Sekhon - http://github.com/harisekhon";
+        if($main::DESCRIPTION =~ /Nagios/i){
+            print STDERR "/nagios-plugins";
+        }
+        print STDERR "\n\n$progname\n\n";
+        print STDERR "$main::DESCRIPTION\n\n";
+    }
     print STDERR "$usage_line\n\n";
     foreach my $key_orig (sort keys %options){
         my $key = $key_orig;
