@@ -136,6 +136,17 @@ ok(!HariSekhonUtils::isSub(1), '!HariSekhonUtils::isSub(1)');
 is(isAlNum("ABC123efg"),    "ABC123efg",    'isAlNum("ABC123efg") eq "ABC123efg"');
 is(isAlNum("1.2"),          undef,          'isAlNum("1.2") eq undef');
 
+is(isAwsAccessKey("A"x20),             "A"x20,         'isAwsAccessKey("A"x20)  eq "A"  x20');
+is(isAwsAccessKey("1"x20),             "1"x20,         'isAwsAccessKey("1"x20)  eq "1"  x20');
+is(isAwsAccessKey("A1"x10),            "A1"x10,        'isAwsAccessKey("A1"x10) eq "A1" x10');
+is(isAwsAccessKey("@"x20),             undef,          'isAwsAccessKey("@"x20)  eq undef');
+is(isAwsAccessKey("A"x40),             undef,          'isAwsAccessKey("A"x40)  eq undef');
+is(isAwsSecretKey("A"x40),             "A"x40,         'isAwsSecretKey("A"x40)  eq "A" x40');
+is(isAwsSecretKey("1"x40),             "1"x40,         'isAwsSecretKey("1"x40)  eq "1" x40');
+is(isAwsSecretKey("A1"x20),            "A1"x20,        'isAwsSecretKey("A1"x20) eq "A1"x20');
+is(isAwsSecretKey("@"x40),             undef,          'isAwsSecretKey("@"x40)  eq undef');
+is(isAwsSecretKey("A"x20),             undef,          'isAwsSecretKey("A"x20)  eq undef');
+
 is(isDatabaseColumnName("myColumn_1"),  "myColumn_1",   'isDatabaseColumnName("myColumn_1")');
 is(isDatabaseColumnName("'column'"),    undef,          'isDatabaseColumnName("\'column\'")');
 
@@ -328,6 +339,9 @@ is_deeply([uniq_array(("one", "two", "three", "", "one"))],     [ "", "one", "th
 
 ok(user_exists("root"),                 'user_exists("root")');
 ok(!user_exists("nonexistentuser"),     '!user_exists("nonexistentuser")');
+
+is(validate_aws_access_key("A"x20),             "A"x20,         'validate_aws_access_key("A"x20)');
+is(validate_aws_secret_key("A"x40),             "A"x40,         'validate_aws_secret_key("A"x40)');
 
 # TODO: can't actually test failure of these validation functions as they will error out
 is(validate_database("mysql"),                  "mysql",        'validate_database("mysql")');

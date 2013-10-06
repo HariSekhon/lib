@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.7";
+our $VERSION = "1.5.8";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -94,6 +94,8 @@ our %EXPORT_TAGS = (
     'is'    => [    qw(
                         isArray
                         isAlNum
+                        isAwsAccessKey
+                        isAwsSecretKey
                         isDatabaseColumnName
                         isDatabaseFieldName
                         isDatabaseTableName
@@ -210,6 +212,8 @@ our %EXPORT_TAGS = (
                         set_timeout_max
                     ) ],
     'validate' => [ qw(
+                        validate_aws_access_key
+                        validate_aws_secret_key
                         validate_database
                         validate_database_columnname
                         validate_database_fieldname
@@ -1010,6 +1014,21 @@ sub isArray ($) {
 }
 
 
+sub isAwsAccessKey($){
+    my $aws_access_key = shift;
+    defined($aws_access_key) or return undef;
+    $aws_access_key =~ /^([A-Za-z0-9]{20})$/ or return undef;
+    return $1;
+}
+
+sub isAwsSecretKey($){
+    my $aws_secret_key = shift;
+    defined($aws_secret_key) or return undef;
+    $aws_secret_key =~ /^([A-Za-z0-9]{40})$/ or return undef;
+    return $1;
+}
+
+
 # isSub/isCode is used by set_timeout() to determine if we were passed a valid function for the ALRM sub
 sub isCode ($) {
     my $isCode = ref $_[0] eq "CODE";
@@ -1738,6 +1757,24 @@ sub user_exists ($) {
 
     # More efficient
     return defined(getpwnam($user));
+}
+
+
+sub validate_aws_access_key($){
+    my $aws_access_key = shift;
+    defined($aws_access_key) || usage "aws access key not defined";
+    $aws_access_key = isAwsAccessKey($aws_access_key) || usage "invalid aws access key given, must be 20 alphanumeric characters";
+    vlog_options("aws_access_key", $aws_access_key);
+    return $aws_access_key;
+}
+
+
+sub validate_aws_secret_key($){
+    my $aws_secret_key = shift;
+    defined($aws_secret_key) || usage "aws secret key not defined";
+    $aws_secret_key = isAwsSecretKey($aws_secret_key) || usage "invalid aws secret key given, must be 40 alphanumeric characters";
+    vlog_options("aws_secret_key", $aws_secret_key);
+    return $aws_secret_key;
 }
 
 
