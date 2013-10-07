@@ -243,6 +243,7 @@ our %EXPORT_TAGS = (
                         validate_port
                         validate_process_name
                         validate_regex
+                        validate_resolveable
                         validate_thresholds
                         validate_units
                         validate_url
@@ -2134,6 +2135,14 @@ sub validate_password ($) {
     return $password;
 }
 
+sub validate_resolveable($){
+    my $host = shift;
+    #if(isIP($host)){
+    #    return 1;
+    #}
+    resolve_ip($host) or quit "CRITICAL", "failed to resolve host '$host'";
+    return 1;
+}
 
 sub validate_threshold ($$;$) {
     #subtrace(@_);
