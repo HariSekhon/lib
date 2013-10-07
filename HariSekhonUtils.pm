@@ -395,7 +395,7 @@ my  $domain_component   = '\b(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-
 # this matches everything except the XN--\w{6,10} TLDs as of 8/10/2012
 our $tld_regex          = '\b(?:[A-Za-z]{2,4}|(?i:local|museum|travel))\b';
 our $domain_regex       = '(?:' . $domain_component . '\.)+' . $tld_regex;
-our $hostname_component = '\b(?:[A-Za-z0-9]{3,63}|[A-Za-z0-9][A-Za-z0-9_\-]{0,61}[a-zA-Z0-9])\b';
+our $hostname_component = '\b(?:[A-Za-z0-9]{3,63}|[A-Za-z0-9][A-Za-z0-9_\-]{1,61}[a-zA-Z0-9])\b';
 our $hostname_regex     = "(?:$hostname_component(?:\.$domain_regex)?|$domain_regex)";
 our $filename_regex     = '[\/\w\s_\.,\*\=\%\?\+-]+';
 our $rwxt_regex         = '[r-][w-][x-][r-][w-][x-][r-][w-][xt-]';
