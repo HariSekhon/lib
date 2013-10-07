@@ -163,6 +163,8 @@ is(isDomain("harisekhon.com"),  "harisekhon.com",   'isDomain("harisekhon.com") 
 is(isDomain("harisekhon"),      undef,              '!isDomain("harisekhon") eq undef');
 is(isDomain("a"x256),           undef,              '!isDomain("a"x256) eq undef');
 
+is(isDnsShortname("AMm4q122309asd"),    "AMm4q122309asd",   'isDnsShortname("AMm4q122309asd") eq "AMm4q122309asd"');
+
 is(isEmail('hari\'sekhon@gmail.com'),   'hari\'sekhon@gmail.com',   'isEmail("hari\'sekhon@gmail.com") eq hari\'sekhon@gmail.com');
 is(isEmail("harisekhon"),               undef,                      '!isEmail("harisekhon") eq undef');
 
@@ -340,8 +342,12 @@ is_deeply([uniq_array(("one", "two", "three", "", "one"))],     [ "", "one", "th
 ok(user_exists("root"),                 'user_exists("root")');
 ok(!user_exists("nonexistentuser"),     '!user_exists("nonexistentuser")');
 
-is(validate_aws_access_key("A"x20),             "A"x20,         'validate_aws_access_key("A"x20)');
-is(validate_aws_secret_key("A"x40),             "A"x40,         'validate_aws_secret_key("A"x40)');
+is(validate_alnum("Alnum2Test99", "alnum test"),    "Alnum2Test99",   'validate_alnum("Alnum2Test99", "alnum test") eq "Alnum2Test99"');
+
+is(validate_aws_access_key("A"x20),     "A"x20,         'validate_aws_access_key("A"x20) eq "A"x20');
+is(validate_aws_bucket("BucKeT63"),     "BucKeT63",     'validate_aws_bucket("BucKeT63") eq "BucKeT63"');
+is(validate_aws_secret_key("A"x40),     "A"x40,         'validate_aws_secret_key("A"x40) eq "A"x40');
+
 
 # TODO: can't actually test failure of these validation functions as they will error out
 is(validate_database("mysql"),                  "mysql",        'validate_database("mysql")');

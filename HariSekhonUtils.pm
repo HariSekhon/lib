@@ -101,6 +101,7 @@ our %EXPORT_TAGS = (
                         isDatabaseTableName
                         isDigit
                         isDomain
+                        isDnsShortname
                         isEmail
                         isFilename
                         isFloat
@@ -212,7 +213,9 @@ our %EXPORT_TAGS = (
                         set_timeout_max
                     ) ],
     'validate' => [ qw(
+                        validate_alnum
                         validate_aws_access_key
+                        validate_aws_bucket
                         validate_aws_secret_key
                         validate_database
                         validate_database_columnname
@@ -996,7 +999,7 @@ sub inArray ($@) {
 
 sub isAlNum ($) {
     my $arg = shift;
-    defined($arg) or code_error("no arg passed to isAlNum()");
+    defined($arg) or return undef; #code_error("no arg passed to isAlNum()");
     $arg =~ /^([A-Za-z0-9]+)$/ or return undef;
     return $1;
 }
@@ -1078,6 +1081,15 @@ sub isDomain ($) {
     defined($domain) or return undef;
     return undef if(length($domain) > 255);
     $domain =~ /^($domain_regex)$/ or return undef;
+    return $1;
+}
+
+
+sub isDnsShortname($){
+    my $name = shift;
+    defined($name) or return undef;
+    return undef if(length($name) < 3 or length($name) > 63);
+    $name =~ /^($hostname_component)$/ or return undef;
     return $1;
 }
 
@@ -1171,7 +1183,7 @@ sub isInterface ($) {
 sub isInt ($;$) {
     my $number = shift;
     my $signed = shift() ? "-?" : "";
-    defined($number) or code_error("no number passed to isInt()");
+    defined($number) or return undef; # code_error("no number passed to isInt()");
     $number =~ /^($signed\d+)$/ or return undef;
     # can't return zero here as it would fail boolean tests for 0 which may be a valid int for purpose
     return 1;
@@ -1308,8 +1320,8 @@ sub isUrlPathSuffix ($) {
 
 sub isUser ($) {
     #subtrace(@_);
-    my $user = shift if $_[0];
-    #defined($user) || code_error "user arg not passed to isUser()";
+    my $user = shift;
+    defined($user) or return undef; # code_error "user arg not passed to isUser()";
     $user =~ /^($user_regex)$/ || return undef;
     return $1;
 }
@@ -1760,12 +1772,32 @@ sub user_exists ($) {
 }
 
 
+sub validate_alnum($$){
+    my $arg  = shift;
+    my $name = shift || croak "second argument (name) not defined when calling validate_alnum";
+    defined($arg) or usage "$name not defined";
+    $arg =~ /^([A-Za-z0-9]+)$/ or usage "invalid $name given, must be alphanumeric";
+    $arg = $1;
+    vlog_options($name, $arg);
+    return $arg;
+}
+
+
 sub validate_aws_access_key($){
     my $aws_access_key = shift;
     defined($aws_access_key) || usage "aws access key not defined";
     $aws_access_key = isAwsAccessKey($aws_access_key) || usage "invalid aws access key given, must be 20 alphanumeric characters";
     vlog_options("aws_access_key", $aws_access_key);
     return $aws_access_key;
+}
+
+
+sub validate_aws_bucket($){
+    my $bucket = shift;
+    $bucket = isDnsShortname($bucket); # sets undef if not valid
+    defined($bucket) or usage "invalid bucket name given, must be alphanumeric between 3 and 63 characters long";
+    vlog_options("bucket", $bucket);
+    return $bucket;
 }
 
 
