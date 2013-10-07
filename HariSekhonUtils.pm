@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.8";
+our $VERSION = "1.5.9";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1795,7 +1795,7 @@ sub validate_aws_access_key($){
 sub validate_aws_bucket($){
     my $bucket = shift;
     $bucket = isDnsShortname($bucket); # sets undef if not valid
-    defined($bucket) or usage "invalid bucket name given, must be alphanumeric between 3 and 63 characters long";
+    defined($bucket) or usage "invalid aws bucket name given, must be alphanumeric between 3 and 63 characters long";
     vlog_options("bucket", $bucket);
     return $bucket;
 }
