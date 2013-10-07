@@ -2260,7 +2260,7 @@ sub validate_url_path_suffix ($;$) {
 
 sub verbose_mode () {
     vlog2("verbose mode on\n");
-    vlog3("running " . version_string() . "\n");
+    vlog3(version_string() . "\n");
     return $verbose >= 1;
 }
 
