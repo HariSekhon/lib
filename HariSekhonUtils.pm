@@ -1794,6 +1794,7 @@ sub validate_aws_access_key($){
 
 sub validate_aws_bucket($){
     my $bucket = shift;
+    defined($bucket) or usage "no aws bucket specified";
     $bucket = isDnsShortname($bucket); # sets undef if not valid
     defined($bucket) or usage "invalid aws bucket name given, must be alphanumeric between 3 and 63 characters long";
     isIP($bucket) and usage "bucket names may not be formatted as an IP address";
