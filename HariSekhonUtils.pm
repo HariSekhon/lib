@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.9";
+our $VERSION = "1.5.10";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -260,6 +260,7 @@ our %EXPORT_TAGS = (
                         $msg
                         $msg_err
                         $msg_threshold
+                        $nagios_plugins_support_msg
                         $password
                         $plural
                         $port
@@ -386,6 +387,8 @@ our %ERRORS = (
     "UNKNOWN"   => 3,
     "DEPENDENT" => 4
 );
+
+our $nagios_plugins_support_msg = "Please re-run with -vvv and paste in support ticket here https://github.com/harisekhon/nagios-plugins/issues/new";
 
 # ============================================================================ #
 # Validation Regex - maybe should qr// here but it makes the vlog option output messy
