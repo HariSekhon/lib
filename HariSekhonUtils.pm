@@ -388,7 +388,7 @@ our %ERRORS = (
     "DEPENDENT" => 4
 );
 
-our $nagios_plugins_support_msg = "Please re-run with -vvv and paste in support ticket here https://github.com/harisekhon/nagios-plugins/issues/new";
+our $nagios_plugins_support_msg = "Please try latest version from https://github.com/harisekhon/nagios-plugins, re-run on command line with -vvv and if problem persists paste full output from -vvv mode in to a ticket requesting a fix/update at https://github.com/harisekhon/nagios-plugins/issues/new";
 
 # ============================================================================ #
 # Validation Regex - maybe should qr// here but it makes the vlog option output messy
