@@ -482,7 +482,7 @@ sub set_timeout_default ($) {
 
 # Optional options
 our %hostoptions = (
-    "H|host=s"      => [ \$host, "Host or IP address to connect to" ],
+    "H|host=s"      => [ \$host, "Host to connect to" ],
     "p|port=s"      => [ \$port, "Port to connect to" ],
 );
 our %useroptions = (
@@ -490,7 +490,7 @@ our %useroptions = (
     "P|password=s"  => [ \$password, "Password"  ],
 );
 our %thresholdoptions = (
-    "w|warning=s"   => [ \$warning,  "Warning threshold or ran:ge (inclusive)"  ],
+    "w|warning=s"   => [ \$warning,  "Warning  threshold or ran:ge (inclusive)" ],
     "c|critical=s"  => [ \$critical, "Critical threshold or ran:ge (inclusive)" ],
 );
 our %emailoptions = (
