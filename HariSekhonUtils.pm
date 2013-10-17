@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.11";
+our $VERSION = "1.5.12";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -189,6 +189,7 @@ our %EXPORT_TAGS = (
                         get_status_code
                         get_upper_threshold
                         get_upper_thresholds
+                        msg_thresholds
                         try
                         catch
                         catch_quit
@@ -705,9 +706,10 @@ sub check_threshold ($$) {
 sub check_thresholds ($;$) {
     #subtrace(@_);
     my $no_msg_thresholds = (defined($_[1]) ? 1 : 0);
-    check_threshold("critical", $_[0]) and
-    check_threshold("warning",  $_[0]);
+    my $status = check_threshold("critical", $_[0]) and
+                 check_threshold("warning",  $_[0]);
     msg_thresholds() unless $no_msg_thresholds;
+    return $status;
 }
 
 
