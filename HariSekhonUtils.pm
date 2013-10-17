@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.10";
+our $VERSION = "1.5.11";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -821,6 +821,11 @@ sub curl ($) {
     my $url = shift;
     #debug("url passed to curl: $url");
     isUrl($url) or code_error "invalid url supplied to curl()";
+    my $host = $url;
+    $host =~ s/^https?:\/\///;
+    $host =~ s/(?::\d+)?(?:\/.*)?$//;
+    isHost($host) or die "Invalid host determined from URL in curl()";
+    validate_resolveable($host);
     vlog2("HTTP GET $url");
     my $content = main::get $url;
     my ($result, $err) = ($?, $!);
@@ -1112,6 +1117,7 @@ sub isEmail ($) {
 sub isFilename($){
     my $filename = shift;
     return undef unless defined($filename);
+    return undef if $filename =~ /^\s*$/;
     return undef unless($filename =~ /^($filename_regex)$/);
     return $1;
 }
@@ -1308,7 +1314,7 @@ sub isScalar ($;$) {
 
 sub isUrl ($) {
     my $url = shift;
-    #defined($url) or return undef;
+    defined($url) or return undef;
     #debug("url_regex: $url_regex");
     $url =~ /^($url_regex)$/ or return undef;
     return $1;
@@ -1317,6 +1323,7 @@ sub isUrl ($) {
 
 sub isUrlPathSuffix ($) {
     my $url = shift;
+    defined($url) or return undef;
     $url =~ /^($url_path_suffix_regex)$/ or return undef;
     return $1;
 }
@@ -1926,13 +1933,17 @@ sub validate_filename ($;$$$) {
     my $noquit   = shift;
     my $name     = shift || "filename";
     my $no_vlog  = shift;
-    defined($filename) || usage "$name not specified";
-    unless($filename = isFilename($filename)){
+    if(not defined($filename) or $filename =~ /^\s*$/){
+        usage "$name not specified";
+        return undef;
+    }
+    my $filename2;
+    unless($filename2 = isFilename($filename)){
         usage "invalid $name given (does not match regex critera): '$filename'" unless $noquit;
         return undef;
     }
-    vlog_options($name, $filename) unless $no_vlog;
-    return $filename;
+    vlog_options($name, $filename2) unless $no_vlog;
+    return $filename2;
 }
 
 
