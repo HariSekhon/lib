@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.13";
+our $VERSION = "1.5.14";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -244,7 +244,7 @@ our %EXPORT_TAGS = (
                         validate_port
                         validate_process_name
                         validate_regex
-                        validate_resolveable
+                        validate_resolvable
                         validate_thresholds
                         validate_units
                         validate_url
@@ -827,7 +827,7 @@ sub curl ($) {
     $host =~ s/^https?:\/\///;
     $host =~ s/(?::\d+)?(?:\/.*)?$//;
     isHost($host) or die "Invalid host determined from URL in curl()";
-    validate_resolveable($host);
+    validate_resolvable($host);
     vlog2("HTTP GET $url");
     my $content = main::get $url;
     my ($result, $err) = ($?, $!);
@@ -2151,7 +2151,7 @@ sub validate_password ($) {
     return $password;
 }
 
-sub validate_resolveable($){
+sub validate_resolvable($){
     my $host = shift;
     #if(isIP($host)){
     #    return 1;
