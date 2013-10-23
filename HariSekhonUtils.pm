@@ -459,7 +459,7 @@ our $warning;
 our %default_options = (
     "D|debug+"     => [ \$debug,    "Debug code" ],
     "t|timeout=i"  => [ \$timeout,  "Timeout in secs (default: $timeout_default)" ],
-    "v|verbose+"   => [ \$verbose,  "Verbose mode" ],
+    "v|verbose+"   => [ \$verbose,  "Verbose mode (-v, -vv, -vvv ...)" ],
     "V|version"    => [ \$version,  "Print version and exit" ],
     "h|help"       => [ \$help,     "Print description and usage options" ],
 );
