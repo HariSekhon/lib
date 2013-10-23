@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.12";
+our $VERSION = "1.5.13";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -402,7 +402,7 @@ our $tld_regex          = '\b(?:[A-Za-z]{2,4}|(?i:local|museum|travel))\b';
 our $domain_regex       = '(?:' . $domain_component . '\.)+' . $tld_regex;
 our $hostname_component = '\b(?:[A-Za-z0-9]{3,63}|[A-Za-z0-9][A-Za-z0-9_\-]{1,61}[a-zA-Z0-9])\b';
 our $hostname_regex     = "(?:$hostname_component(?:\.$domain_regex)?|$domain_regex)";
-our $filename_regex     = '[\/\w\s_\.,\*\=\%\?\+-]+';
+our $filename_regex     = '[\/\w\s_\.:,\*\=\%\?\+-]+';
 our $rwxt_regex         = '[r-][w-][x-][r-][w-][x-][r-][w-][xt-]';
 our $fqdn_regex         = $hostname_component . '\.' . $domain_regex;
 # SECURITY NOTE: I'm allowing single quote through as it's found in Irish email addresses. This makes the $email_regex non-safe without further validation. This regex only tests whether it's a valid email address, nothing more. DO NOT UNTAINT EMAIL or pass to cmd to SQL without further validation!!!
@@ -2304,15 +2304,18 @@ sub version () {
 
 
 sub vlog (@) {
+    if($debug){
+        print strftime("%F %T %z  ", localtime);
+    }
     print STDERR "@_\n" if $verbose;
 }
 
 sub vlog2 (@) {
-    print STDERR "@_\n" if ($verbose >= 2);
+    vlog @_ if ($verbose >= 2);
 }
 
 sub vlog3 (@) {
-    print STDERR "@_\n" if ($verbose >= 3);
+    vlog @_ if ($verbose >= 3);
 }
 
 # TODO: check this
@@ -2321,7 +2324,7 @@ sub vlog4 (@){
     if($verbose){
         foreach(@_){
             foreach (split(/\n/, $_)){
-                print STDERR "$progname\[$$\]: $_\n";
+                vlog "$progname\[$$\]: $_";
             }
         }
         1;
