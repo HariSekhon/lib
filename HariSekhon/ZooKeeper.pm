@@ -56,6 +56,7 @@ sub zoo_cmd ($;$) {
             exit get_status_code("UNKNOWN");
         }
     }
+    validate_resolvable($host);
     vlog3 "connecting to $host:$zk_port";
     $zk_conn = IO::Socket::INET->new (
                                         Proto    => "tcp",
