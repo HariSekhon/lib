@@ -65,7 +65,7 @@ sub zoo_cmd ($;$) {
                                      ) or quit "CRITICAL", "Failed to connect to '$host:$zk_port': $!";
     vlog3 "OK connected";
     vlog3 "sending request: '$cmd'";
-    print $zk_conn $_[0] or quit "CRITICAL", "Failed to send request '$cmd': $!";
+    print $zk_conn $cmd or quit "CRITICAL", "Failed to send request '$cmd': $!";
     vlog3 "sent request:    '$cmd'";
 }
 
