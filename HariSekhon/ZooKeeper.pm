@@ -62,7 +62,7 @@ sub zoo_cmd ($;$) {
                                         PeerAddr => $host,
                                         PeerPort => $zk_port,
                                         Timeout  => $timeout,
-                                     ) or quit "CRITICAL", sprintf("Failed to connect to '%s:%s'%s: $!", $host, $zk_port, defined($timeout) ? " within $timeout secs" : "");
+                                     ) or quit "CRITICAL", sprintf("Failed to connect to '%s:%s'%s: $!", $host, $zk_port, (defined($timeout) and ($debug or $verbose > 2)) ? " within $timeout secs" : "");
     vlog3 "OK connected";
     vlog3 "sending request: '$cmd'";
     print $zk_conn $cmd or quit "CRITICAL", "Failed to send request '$cmd': $!";
