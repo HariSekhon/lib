@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.14";
+our $VERSION = "1.5.15";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -784,7 +784,7 @@ sub cmd ($;$$) {
     if ($errchk and $returncode != 0) {
         my $err = "";
         foreach (@output) {
-            $err .= " $_";
+            $err .= " " . trim($_);
         }
         quit("CRITICAL", "'$cmd' returned $returncode -$err");
     }
