@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.15";
+our $VERSION = "1.5.16";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -165,6 +165,7 @@ our %EXPORT_TAGS = (
                         $email_regex
                         $filename_regex
                         $fqdn_regex
+                        $host_regex
                         $hostname_regex
                         $ip_regex
                         $mac_regex
