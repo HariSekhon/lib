@@ -11,7 +11,7 @@
 
 package HariSekhon::HBase::Thrift;
 
-$VERSION = "0.1";
+$VERSION = "0.2";
 
 use strict;
 use warnings;
@@ -39,18 +39,23 @@ our @EXPORT_OK = ( @EXPORT );
 
 # using custom try/catch from my HariSekhonUtils as it's necessary to disable the custom die handler for this to work
 
-sub connect_hbase_thrift($$){
+sub connect_hbase_thrift($$;$$){
     my $host = shift;
     my $port = shift;
+    my $send_timeout = shift || 10000;
+    my $recv_timeout = shift || 10000;
     my $client;
     my $protocol;
     my $socket;
     my $transport;
+    vlog2 "connecting to HBase Thrift server at $host:$port\n";
     try {
         $socket    = new Thrift::Socket($host, $port);
     };
     catch_quit "failed to connect to Thrift server at '$host:$port'";
     try {
+        $socket->setSendTimeout($send_timeout);
+        $socket->setRecvTimeout($recv_timeout);
         $transport = new Thrift::BufferedTransport($socket,1024,1024);
     };
     catch_quit "failed to initiate Thrift Buffered Transport";
