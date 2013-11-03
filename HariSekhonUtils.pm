@@ -1705,7 +1705,7 @@ sub uniq_array (@) {
 sub usage (;@) {
     print STDERR "@_\n\n" if (@_);
     if(not @_ and $main::DESCRIPTION){
-        print STDERR "Hari Sekhon - http://github.com/harisekhon";
+        print STDERR "Hari Sekhon - https://github.com/harisekhon";
         if($main::DESCRIPTION =~ /Nagios/i){
             print STDERR "/nagios-plugins";
         }
