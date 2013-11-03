@@ -41,18 +41,18 @@ our $nodetool_port = $nodetool_default_port;
 sub validate_nodetool ($) {
     my $nodetool = shift;
     defined($nodetool) or usage "nodetool not defined";
-    $nodetool =~ /(?:^|\/)nodetool$/ or usage "invalid nodetool path given, must be the path to the nodetool command";
     $nodetool = validate_filename($nodetool, 0, "nodetool");
+    $nodetool =~ /(?:^|\/)nodetool$/ or usage "invalid nodetool path given, must be the path to the nodetool command";
     $nodetool = which($nodetool, 1);
     return $nodetool;
 }
 
 our %nodetool_options = (
-    "n|nodetool=s"     => [ \$main::nodetool,     "Path to 'nodetool' command" ],
-    "H|host=s"         => [ \$main::host,         "Remote node to query (optional, defaults to local node)" ],
-    "P|port=s"         => [ \$main::port,         "Remote node's JMX port (default: $nodetool_default_port)" ],
-    "u|user=s"         => [ \$main::user,         "JMX User (optional)" ],
-    "p|password=s"     => [ \$main::password,     "JMX Password (optional)" ],
+    "n|nodetool=s"     => [ \$main::nodetool,     "Path to 'nodetool' command if not in \$PATH ($ENV{PATH})" ],
+    "H|host=s"         => [ \$main::host,         "Cassandra node to connect to (optional, default: localhost)" ],
+    "P|port=s"         => [ \$main::port,         "Cassandra JMX port to connect to (default: $nodetool_default_port)" ],
+    "u|user=s"         => [ \$main::user,         "Cassandra JMX User (optional)" ],
+    "p|password=s"     => [ \$main::password,     "Cassandra JMX Password (optional)" ],
 );
 
 sub nodetool_options(;$$$$){
