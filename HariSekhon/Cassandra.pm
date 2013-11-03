@@ -78,7 +78,7 @@ our $nodetool_errors_regex = qr/
                                 user     |
                                 password |
                                 Exception |
-                                in thread |
+                                in thread
                              /xi;
 
 sub die_nodetool_unrecognized_output($){
