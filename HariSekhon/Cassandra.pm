@@ -9,7 +9,7 @@
 
 package HariSekhon::Cassandra;
 
-$VERSION = "0.1";
+$VERSION = "0.2";
 
 use strict;
 use warnings;
@@ -24,6 +24,7 @@ use Exporter;
 our @ISA = qw(Exporter);
 
 our @EXPORT = ( qw (
+                        die_nodetool_unrecognized_output
                         $nodetool_nodetool_default_port
                         $nodetool
                         $nodetool_errors_regex
@@ -75,5 +76,11 @@ our $nodetool_errors_regex = qr/
                                 failed\s+to\s+connect |
                                 error    |
                                 user     |
-                                password
+                                password |
+                                Exception |
+                                in thread |
                              /xi;
+
+sub die_nodetool_unrecognized_output($){
+    quit "UNKNOWN", sprintf("unrecognized output '%s', nodetool output format may have changed, aborting, $nagios_plugins_support_msg", $_[0]);
+}
