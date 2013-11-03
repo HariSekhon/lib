@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.17";
+our $VERSION = "1.5.18";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2141,14 +2141,17 @@ sub validate_user_exists ($) {
 
 
 sub validate_password ($) {
-    my $password = shift;
+    my $password  = shift;
+    my $allow_all = shift;
     defined($password) || usage "password not specified";
-    # Do not do anything stupid with this password like passing it to cmd() since we have to pass it through here as is
-    $password =~ /^(.+)$/ || usage "invalid password given";
+    if($allow_all){
+        # intentionally not untaining
+        $password =~ /^(.+)$/ || usage "invalid password given";
+    } else {
+        $password =~ /^([^'"`]+)$/ or usage "invalid password given, may not contain quotes of backticks";
+        $password = $1;
+    }
     vlog_options("password", "'$password'");
-    # TODO: review what this breaks in taint mode, my mysql code I think
-    #return $1;
-    # not untainting intentionally since it can contain anything
     return $password;
 }
 
