@@ -9,7 +9,7 @@
 
 package HariSekhon::Cassandra;
 
-$VERSION = "0.2";
+$VERSION = "0.2.1";
 
 use strict;
 use warnings;
@@ -28,6 +28,7 @@ our @EXPORT = ( qw (
                         $nodetool_nodetool_default_port
                         $nodetool
                         $nodetool_errors_regex
+                        $nodetool_status_header_regex
                         %nodetool_options
                         nodetool_options
                         validate_nodetool
@@ -81,6 +82,14 @@ our $nodetool_errors_regex = qr/
                                 in thread
                              /xi;
 
+# Cassandra 2.0 DataStax Community Edition (nodetool version gives 'ReleaseVersion: 2.0.2')
+our $nodetool_status_header_regex = qr/
+                                       ^Datacenter |
+                                       ^========== |
+                                       ^Status=Up\/Down |
+                                       ^\|\/\s+State=Normal\/Leaving\/Joining\/Moving |
+                                       ^--\s+Address\s+
+                                    /xi;
 sub die_nodetool_unrecognized_output($){
     quit "UNKNOWN", sprintf("unrecognized output '%s', nodetool output format may have changed, aborting, $nagios_plugins_support_msg", $_[0]);
 }
