@@ -9,7 +9,7 @@
 
 package HariSekhon::Cassandra;
 
-$VERSION = "0.2.1";
+$VERSION = "0.2.2";
 
 use strict;
 use warnings;
@@ -32,6 +32,7 @@ our @EXPORT = ( qw (
                         %nodetool_options
                         nodetool_options
                         validate_nodetool
+                        validate_nodetool_options
                 )
 );
 our @EXPORT_OK = ( @EXPORT );
@@ -68,6 +69,20 @@ sub nodetool_options(;$$$$){
     $options .= "--username '$user' "       if defined($user);
     $options .= "--password '$password' "   if defined($password);
     return $options;
+}
+
+sub validate_nodetool_options($$$$$){
+    my $nodetool = shift;
+    my $host     = shift;
+    my $port     = shift;
+    my $user     = shift;
+    my $password = shift;
+    $nodetool = validate_nodetool($nodetool);
+    $host     = validate_host($host)         if defined($host);
+    $port     = validate_port($port)         if defined($port);
+    $user     = validate_user($user)         if defined($user);
+    $password = validate_password($password) if defined($password);
+    return ($nodetool, $host, $port, $user, $password);
 }
 
 our $nodetool_errors_regex = qr/
