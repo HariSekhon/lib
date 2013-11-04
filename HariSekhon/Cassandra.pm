@@ -9,7 +9,7 @@
 
 package HariSekhon::Cassandra;
 
-$VERSION = "0.2.2";
+$VERSION = "0.2.3";
 
 use strict;
 use warnings;
@@ -51,7 +51,7 @@ sub validate_nodetool ($) {
 }
 
 our %nodetool_options = (
-    "n|nodetool=s"     => [ \$main::nodetool,     "Path to 'nodetool' command if not in \$PATH ($ENV{PATH})" ],
+    "n|nodetool=s"     => [ \$nodetool,           "Path to 'nodetool' command if not in \$PATH ($ENV{PATH})" ],
     "H|host=s"         => [ \$main::host,         "Cassandra node to connect to (optional, default: localhost)" ],
     "P|port=s"         => [ \$main::port,         "Cassandra JMX port to connect to (default: $nodetool_default_port)" ],
     "u|user=s"         => [ \$main::user,         "Cassandra JMX User (optional)" ],
