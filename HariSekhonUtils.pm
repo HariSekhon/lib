@@ -1188,15 +1188,6 @@ sub isHostname ($) {
 }
 
 
-sub isInterface ($) {
-    my $interface = shift;
-    defined($interface) || return undef;
-    # TODO: consider checking if the interface actually exists on the system
-    $interface =~ /^((?:eth|bond|lo)\d+|lo)$/ or return undef;
-    return $1;
-}
-
-
 sub isInt ($;$) {
     my $number = shift;
     my $signed = shift() ? "-?" : "";
@@ -1204,6 +1195,15 @@ sub isInt ($;$) {
     $number =~ /^($signed\d+)$/ or return undef;
     # can't return zero here as it would fail boolean tests for 0 which may be a valid int for purpose
     return 1;
+}
+
+
+sub isInterface ($) {
+    my $interface = shift;
+    defined($interface) || return undef;
+    # TODO: consider checking if the interface actually exists on the system
+    $interface =~ /^((?:eth|bond|lo)\d+|lo)$/ or return undef;
+    return $1;
 }
 
 
@@ -1251,6 +1251,7 @@ sub isKrb5Princ ($) {
     $principal =~ /^($krb5_principal_regex)$/ or return undef;
     return $1;
 }
+
 
 # Primarily for Nagios perfdata labels
 sub isLabel ($) {

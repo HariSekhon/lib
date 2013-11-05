@@ -227,6 +227,14 @@ is(isIP("10.10.10.255"),     undef,               '!isIP("10.10.10.255") eq unde
 is(isIP("10.10.10.300"),     undef,               '!isIP("10.10.10.300") eq undef');
 is(isIP("x.x.x.x"),          undef,               '!isIP("x.x.x.x") eq undef');
 
+ok(isJson('{ "test": "data" }'),   'isJson({ "test": "data" })');
+ok(!isJson(' { "test": }'),        '!isJson({ "test": })');
+
+is(isKrb5Princ('tgt/HARI.COM@HARI.COM'),        'tgt/HARI.COM@HARI.COM',        'isKrb5Princ("tgt/HARI.COM@HARI.COM") eq "tgt/HARI.COM@HARI.COM"');
+is(isKrb5Princ('hari'),                         'hari',                         'isKrb5Princ("hari") eq "hari"');
+is(isKrb5Princ('hari@HARI.COM'),                'hari@HARI.COM',                'isKrb5Princ("hari@HARI.COM") eq "hari@HARI.COM"');
+is(isKrb5Princ('hari/my.host.local@HARI.COM'),  'hari/my.host.local@HARI.COM',  'isKrb5Princ("hari/my.host.local@HARI.COM") eq "hari/my.host.local@HARI.COM"');
+
 is(isNagiosUnit("s"),   "s",    'isNagiosUnit(s) eq s');
 is(isNagiosUnit("ms"),  "ms",   'isNagiosUnit(s) eq ms');
 is(isNagiosUnit("%"),   "%",    'isNagiosUnit(%) eq %');
