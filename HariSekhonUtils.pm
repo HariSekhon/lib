@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.18";
+our $VERSION = "1.5.19";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -113,6 +113,7 @@ our %EXPORT_TAGS = (
                         isIP
                         isInt
                         isInterface
+                        isKrb5Princ
                         isJson
                         isLabel
                         isLinux
@@ -168,6 +169,7 @@ our %EXPORT_TAGS = (
                         $host_regex
                         $hostname_regex
                         $ip_regex
+                        $krb5_princ_regex
                         $mac_regex
                         $process_name_regex
                         $rwxt_regex
@@ -239,6 +241,7 @@ our %EXPORT_TAGS = (
                         validate_integer
                         validate_interface
                         validate_ip
+                        validate_krb5_princ
                         validate_label
                         validate_node_list
                         validate_password
@@ -419,6 +422,7 @@ our $process_name_regex = '[\w\s_\.\/\<\>-]+';
 our $url_path_suffix_regex = '/(?:[\w\.\/\%\&\?\=\+-]+)?';
 our $url_regex          = '\b(?i:https?://' . $host_regex . '(?::\d{1,5})?(?:' . $url_path_suffix_regex . ')?)';
 our $user_regex         = '\b[A-Za-z][A-Za-z0-9]+\b';
+our $krb5_principal_regex = "$user_regex(?:(?:\/$hostname_regex)?\@$domain_regex)?";
 # ============================================================================ #
 
 our $critical;
@@ -1241,6 +1245,13 @@ sub isJson($){
 }
 
 
+sub isKrb5Princ ($) {
+    my $principal = shift;
+    defined($principal) or return undef;
+    $principal =~ /^($krb5_principal_regex)$/ or return undef;
+    return $1;
+}
+
 # Primarily for Nagios perfdata labels
 sub isLabel ($) {
     my $label  = shift;
@@ -2027,6 +2038,14 @@ sub validate_ip ($) {
     $ip = isIP($ip) || usage "invalid IP given";
     vlog_options("IP", "'$ip'");
     return $ip;
+}
+
+
+sub validate_krb5_princ ($) {
+    my $principal = shift;
+    $principal = isKrb5Princ($principal) || usage "invalid principal given";
+    vlog_options("krb5 principal", $principal);
+    return $principal;
 }
 
 
