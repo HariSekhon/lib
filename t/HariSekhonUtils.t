@@ -218,14 +218,14 @@ is(isInterface("bond3"),    "bond3",    'isInterface("bond3")');
 is(isInterface("lo"),       "lo",       'isInterface("lo")');
 ok(!isInterface('b@interface'),         '!isInterface(\'b@dinterface\'');
 
-ok(isIP("10.10.10.1"),        'isIP("10.10.10.1")');
+is(isIP("10.10.10.1"),        "10.10.10.1",       'isIP("10.10.10.1") eq 10.10.10.1');
 is(isIP("10.10.10.10"),       "10.10.10.10",      'isIP("10.10.10.10") eq 10.10.10.10');
-ok(isIP("10.10.10.100"),      'isIP("10.10.10.100")');
-ok(isIP("254.0.0.254"),       'isIP("254.0.0.254")');
-ok(!isIP("10.10.10.0"),       '!isIP("10.10.10.0")');
-ok(!isIP("10.10.10.255"),     '!isIP("10.10.10.255")');
-ok(!isIP("10.10.10.300"),     '!isIP("10.10.10.300")');
-ok(!isIP("x.x.x.x"),          '!isIP("x.x.x.x")');
+is(isIP("10.10.10.100"),      "10.10.10.100",     'isIP("10.10.10.100") eq 10.10.10.100');
+is(isIP("254.0.0.254"),       "254.0.0.254",      'isIP("254.0.0.254") eq 254.0.0.254');
+is(isIP("10.10.10.0"),       undef,               '!isIP("10.10.10.0") eq undef');
+is(isIP("10.10.10.255"),     undef,               '!isIP("10.10.10.255") eq undef');
+is(isIP("10.10.10.300"),     undef,               '!isIP("10.10.10.300") eq undef');
+is(isIP("x.x.x.x"),          undef,               '!isIP("x.x.x.x") eq undef');
 
 is(isNagiosUnit("s"),   "s",    'isNagiosUnit(s) eq s');
 is(isNagiosUnit("ms"),  "ms",   'isNagiosUnit(s) eq ms');
