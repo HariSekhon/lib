@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.19";
+our $VERSION = "1.5.20";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1648,16 +1648,17 @@ sub set_sudo (;$) {
 
 
 sub set_timeout (;$$) {
-    $timeout = $_[0] if $_[0];
-    my $sub_ref = $_[1] if $_[1];
+    $timeout    = $_[0] if $_[0];
+    my $sub_ref;
+    $sub_ref = $_[1] if $_[1];
     $timeout =~ /^\d+$/ || usage("timeout value must be a positive integer\n");
     ($timeout >= $timeout_min && $timeout <= $timeout_max) || usage("timeout value must be between $timeout_min - $timeout_max secs\n");
-    if($sub_ref){
+    if(defined($sub_ref)){
         isSub($sub_ref) or code_error "invalid sub ref passed to set_timeout()";
     }
 
     $SIG{ALRM} = sub {
-        &$sub_ref if $sub_ref;
+        &$sub_ref if defined($sub_ref);
         quit("UNKNOWN", "self timed out after $timeout seconds");
     };
     #verbose_mode() unless $_[1];
