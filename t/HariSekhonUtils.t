@@ -261,7 +261,7 @@ ok(!isScalar(1),                '!isScalar(1)');
 
 is(isUrl("http://www.google.com"),  "http://www.google.com",    'isUrl("http://www.google.com")');
 is(isUrl("https://gmail.com"),      "https://gmail.com",        'isUrl("https://gmail.com")');
-is(isUrl("www.google.com"),         undef,                      'isUrl("www.google.com") eq undef');
+is(isUrl("www.google.com"),         "http://www.google.com",    'isUrl("www.google.com") eq http://www.google.com');
 is(isUrl(1),                        undef,                      'isUrl(1) eq undef');
 is(isUrl("http://cdh43:50070/dfsnodelist.jsp?whatNodes=LIVE"),  'http://cdh43:50070/dfsnodelist.jsp?whatNodes=LIVE', 'isUrl(http://cdh43:50070/dfsnodelist.jsp?whatNodes=LIVE)');
 
@@ -433,7 +433,7 @@ is(validate_label("st4ts_used(%)"),    "st4ts_used(%)",    'validate_label("st4t
 #is(validate_regex("some[Rr]egex.*(capture)"),   "(?-xism:some[Rr]egex.*(capture))",  'validate_regex("some[Rr]egex.*(capture)")');
 #is(validate_regex("some[Rr]egex.*(capture)"),   "(?^:some[Rr]egex.*(capture))",  'validate_regex("some[Rr]egex.*(capture)")');
 # Satisfies different outputs on Linux and Mac OS X 10.9 Maverick
-like(validate_regex("some[Rr]egex.*(capture)"),   qr/\(\?(?:^|-xism):some\[Rr\]egex\.\*\(capture\)\)/,  'validate_regex("some[Rr]egex.*(capture)")');
+like(validate_regex("some[Rr]egex.*(capture)"),   qr/\(\?(?:\^|-xism):some\[Rr\]egex\.\*\(capture\)\)/,  'validate_regex("some[Rr]egex.*(capture)")');
 # Errors out still, should detect and fail gracefully
 #is(validate_regex("some[Rr]egex.*(capture broken", 1),   undef,  'validate_regex("some[Rr]egex.*(capture broken", 1)');
 is(validate_regex("somePosix[Rr]egex.*(capture)", 0, 1),   "somePosix[Rr]egex.*(capture)",      'validate_regex("somePosix[Rr]egex.*(capture)", 0, 1)');
