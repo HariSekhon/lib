@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.20";
+our $VERSION = "1.5.21";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1331,6 +1331,7 @@ sub isUrl ($) {
     my $url = shift;
     defined($url) or return undef;
     #debug("url_regex: $url_regex");
+    $url = "http://$url" unless $url =~ /^http|:\//i;
     $url =~ /^($url_regex)$/ or return undef;
     return $1;
 }
