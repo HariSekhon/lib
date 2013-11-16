@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.21";
+our $VERSION = "1.5.22";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1610,8 +1610,14 @@ sub remove_timeout(){
 sub resolve_ip ($) {
     require Socket;
     import Socket;
-    my $tmp = inet_aton($_[0]) || return undef;
-    return inet_ntoa($tmp);
+    my $ip;
+    # returns packed binary address
+    $ip = inet_aton($_[0])  || return undef;
+    # returns human readable x.x.x.x - only supporting IPv4 for now
+    $ip = inet_ntoa($ip)    || return undef;
+    # validate what we have is a correct IP address
+    $ip = isIP($ip)         || return undef;
+    return $ip;
 }
 
 
