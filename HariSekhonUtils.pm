@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.24";
+our $VERSION = "1.5.25";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1422,12 +1422,17 @@ sub lstrip ($) {
 *ltrim = \&lstrip;
 
 
-sub msg_perf_thresholds () {
-    $msg .= ";";
-    $msg .= $thresholds{"warning"}{"upper"} if defined($thresholds{"warning"}{"upper"});
-    $msg .= ";";
-    $msg .= $thresholds{"critical"}{"upper"} if defined($thresholds{"critical"}{"upper"});
-    $msg .= ";";
+sub msg_perf_thresholds (;$) {
+    my $tmp = ";";
+    $tmp .= $thresholds{"warning"}{"upper"} if defined($thresholds{"warning"}{"upper"});
+    $tmp .= ";";
+    $tmp .= $thresholds{"critical"}{"upper"} if defined($thresholds{"critical"}{"upper"});
+    $tmp .= ";";
+    if(defined($_[0]) and $_[0]){
+        $msg .= $tmp;
+    } else {
+        return $tmp;
+    }
 }
 
 
