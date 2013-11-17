@@ -1430,9 +1430,9 @@ sub msg_perf_thresholds (;$) {
     $tmp .= $thresholds{"critical"}{"upper"} if defined($thresholds{"critical"}{"upper"});
     $tmp .= ";";
     if(defined($_[0]) and $_[0]){
-        $msg .= $tmp;
-    } else {
         return $tmp;
+    } else {
+        $msg .= $tmp;
     }
 }
 
