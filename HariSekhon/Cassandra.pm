@@ -9,7 +9,7 @@
 
 package HariSekhon::Cassandra;
 
-$VERSION = "0.2.3";
+$VERSION = "0.2.4";
 
 use strict;
 use warnings;
@@ -59,11 +59,11 @@ our %nodetool_options = (
 );
 
 sub nodetool_options(;$$$$){
-    my $host     = shift;
-    my $nodetool_port     = shift;
-    my $user     = shift;
-    my $password = shift;
-    my $options = "";
+    my $host            = validate_resolvable(shift);
+    my $nodetool_port   = shift;
+    my $user            = shift;
+    my $password        = shift;
+    my $options         = "";
     $options .= "--host '$host' "           if defined($host);
     $options .= "--port '$nodetool_port' "           if defined($nodetool_port);
     $options .= "--username '$user' "       if defined($user);
