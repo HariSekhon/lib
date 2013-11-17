@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.27";
+our $VERSION = "1.5.28";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2092,11 +2092,13 @@ sub validate_node_list (@) {
 }
 
 
-sub validate_port ($) {
+sub validate_port ($;$) {
     my $port = shift;
-    defined($port)      || usage "port not specified";
-    $port  = isPort($port) || usage "invalid port number given, must be a positive integer";
-    vlog_options("port", "'$port'");
+    my $name = shift;
+    $name    = "$name " if defined($name) and $name;
+    defined($port)         || usage "${name}port not specified";
+    $port  = isPort($port) || usage "invalid ${name}port number given, must be a positive integer";
+    vlog_options("${name}port", "'$port'");
     return $port;
 }
 
