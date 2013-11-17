@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.23";
+our $VERSION = "1.5.24";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2185,11 +2185,7 @@ sub validate_password ($) {
 
 sub validate_resolvable($){
     my $host = shift;
-    #if(isIP($host)){
-    #    return 1;
-    #}
-    resolve_ip($host) or quit "CRITICAL", "failed to resolve host '$host'";
-    return 1;
+    return resolve_ip($host) || quit "CRITICAL", "failed to resolve host '$host'";
 }
 
 sub validate_threshold ($$;$) {
