@@ -2094,8 +2094,8 @@ sub validate_node_list (@) {
 
 sub validate_port ($;$) {
     my $port = shift;
-    my $name = shift;
-    $name    = "$name " if defined($name) and $name;
+    my $name = shift || "";
+    $name    = "$name " if $name;
     defined($port)         || usage "${name}port not specified";
     $port  = isPort($port) || usage "invalid ${name}port number given, must be a positive integer";
     vlog_options("${name}port", "'$port'");
