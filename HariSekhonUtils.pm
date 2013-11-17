@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.25";
+our $VERSION = "1.5.27";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -203,6 +203,7 @@ our %EXPORT_TAGS = (
     'string' => [   qw(
                         lstrip
                         ltrim
+                        random_alnum
                         rstrip
                         rtrim
                         strip
@@ -1604,6 +1605,16 @@ sub quit (@) {
         #exit $ERRORS{"UNKNOWN"};
         code_error("invalid number of arguments passed to quit function (" . scalar(@_) . ", should be 0 - 2)");
     }
+}
+
+
+sub random_alnum($){
+    my $length = shift;
+    isInt($length) or code_error "invalid length passed to random_alnum";
+    my @chars  = ("A".."Z", "a".."z", 0..9);
+    my $string = "";
+    $string .= $chars[rand @chars] for 1..$length;
+    return $string;
 }
 
 
