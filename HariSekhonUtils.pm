@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.22";
+our $VERSION = "1.5.23";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -573,10 +573,10 @@ sub status3 () {
 sub catch_quit ($) {
     my $errmsg = $_[0];
     catch {
-        if(defined($@->{"message"})){
+        if(isHash($@) and defined($@->{"message"})){
             quit "CRITICAL", "$errmsg: " . ref($@) . ": " . $@->{"message"};
         } else {
-            quit "CRITICAL", "$errmsg: " . Dumper($@);
+            quit "CRITICAL", "$errmsg: $!";
         }
     }
 }
