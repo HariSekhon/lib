@@ -576,8 +576,12 @@ sub catch_quit ($) {
     catch {
         if(isHash($@) and defined($@->{"message"})){
             quit "CRITICAL", "$errmsg: " . ref($@) . ": " . $@->{"message"};
-        } else {
+        } elsif($!) {
             quit "CRITICAL", "$errmsg: $!";
+        } elsif($@) {
+            quit "CRITICAL", "$errmsg: $@";
+        } else {
+            quit "CRITICAL", $errmsg;
         }
     }
 }
