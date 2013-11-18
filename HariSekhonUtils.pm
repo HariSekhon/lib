@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.28";
+our $VERSION = "1.5.29";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1631,6 +1631,7 @@ sub resolve_ip ($) {
     require Socket;
     import Socket;
     my $ip;
+    defined($_[0]) or return undef;
     # returns packed binary address
     $ip = inet_aton($_[0])  || return undef;
     # returns human readable x.x.x.x - only supporting IPv4 for now
@@ -2207,6 +2208,7 @@ sub validate_password ($) {
 
 sub validate_resolvable($){
     my $host = shift;
+    defined($host) || code_error "undefined host passed to validate_resolvable()";
     return resolve_ip($host) || quit "CRITICAL", "failed to resolve host '$host'";
 }
 
