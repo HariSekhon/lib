@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.29";
+our $VERSION = "1.5.30";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1228,26 +1228,37 @@ sub isIP ($) {
 
 
 # wish there was a better way of validating the JSON returned but Test::JSON is_valid_json() also errored out badly from underlying JSON::Any module, similar to JSON's decode_json
-sub isJson($){
-    my $string = shift;
-    # slightly modified from http://stackoverflow.com/questions/2583472/regex-to-validate-json
-    my $json_regex = qr/
-      (?(DEFINE)
-         (?<number>   -? (?= [1-9]|0(?!\d) ) \d+ (\.\d+)? ([eE] [+-]? \d+)? )
-         (?<boolean>   true | false | null )
-         (?<string>    " ([^"\\\\]* | \\\\ ["\\\\bfnrt\/] | \\\\ u [0-9a-f]{4} )* " )
-         (?<array>     \[  (?: (?&json)  (?: , (?&json)  )*  )?  \s* \] )
-         (?<pair>      \s* (?&string) \s* : (?&json)  )
-         (?<object>    \{  (?: (?&pair)  (?: , (?&pair)  )*  )?  \s* \} )
-         (?<json>      \s* (?: (?&number) | (?&boolean) | (?&string) | (?&array) | (?&object) ) \s* )
-      )
-      \A (?&json) \Z
-      /six;
-    if($string =~ $json_regex){
-        return 1;        
-    }
-    return 0;
-}
+#sub isJson($){
+#    my $data = shift;
+#    # slightly modified from http://stackoverflow.com/questions/2583472/regex-to-validate-json
+#    # XXX: Unfortunately this only work on RHEL6's version of Perl and parse failure breaks all dependent code on RHEL5 now
+##    my $json_regex = qr/
+##      (?(DEFINE)
+##         (?<number>   -? (?= [1-9]|0(?!\d) ) \d+ (\.\d+)? ([eE] [+-]? \d+)? )
+##         (?<boolean>   true | false | null )
+##         (?<string>    " ([^"\\\\]* | \\\\ ["\\\\bfnrt\/] | \\\\ u [0-9a-f]{4} )* " )
+##         (?<array>     \[  (?: (?&json)  (?: , (?&json)  )*  )?  \s* \] )
+##         (?<pair>      \s* (?&string) \s* : (?&json)  )
+##         (?<object>    \{  (?: (?&pair)  (?: , (?&pair)  )*  )?  \s* \} )
+##         (?<json>      \s* (?: (?&number) | (?&boolean) | (?&string) | (?&array) | (?&object) ) \s* )
+##      )
+##      \A (?&json) \Z
+##      /six;
+#    # TODO: reinvestigate if this can be made to work
+##    my $json;
+##    my $number  = qr/(-? (?= [1-9]|0(?!\d) ) \d+ (\.\d+)? ([eE] [+-]? \d+)?)/six;
+##    my $boolean = qr/(true | false | null)/six;
+##    my $string  = qr/(" ([^"\\\\]* | \\\\ ["\\\\bfnrt\/] | \\\\ u [0-9a-f]{4} )* ")/six;
+##    my $array   = qr/(\[  (?: (&$json)  (?: , (&$json)  )*  )?  \s* \])/six;
+##    my $pair    = qr/\s* ($string) \s* : ($json)/six;
+##    my $object  = qr/(\{  (?: ($pair)  (?: , ($pair)  )*  )?  \s* \})/six;
+##    $json    = qr/(\s* (?: ($number) | ($boolean) | ($string) | ($array) | ($object) ) \s*)/six;
+##    my $json_regex = qr/\A ($json) \Z/six;
+#    #if($data =~ $json_regex){
+#    #    return 1;
+#    #}
+#    return 0;
+#}
 
 
 sub isKrb5Princ ($) {

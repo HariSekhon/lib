@@ -227,8 +227,8 @@ is(isIP("10.10.10.255"),     undef,               '!isIP("10.10.10.255") eq unde
 is(isIP("10.10.10.300"),     undef,               '!isIP("10.10.10.300") eq undef');
 is(isIP("x.x.x.x"),          undef,               '!isIP("x.x.x.x") eq undef');
 
-ok(isJson('{ "test": "data" }'),   'isJson({ "test": "data" })');
-ok(!isJson(' { "test": }'),        '!isJson({ "test": })');
+#ok(isJson('{ "test": "data" }'),   'isJson({ "test": "data" })');
+#ok(!isJson(' { "test": }'),        '!isJson({ "test": })');
 
 is(isKrb5Princ('tgt/HARI.COM@HARI.COM'),        'tgt/HARI.COM@HARI.COM',        'isKrb5Princ("tgt/HARI.COM@HARI.COM") eq "tgt/HARI.COM@HARI.COM"');
 is(isKrb5Princ('hari'),                         'hari',                         'isKrb5Princ("hari") eq "hari"');
