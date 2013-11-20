@@ -2208,8 +2208,8 @@ sub validate_user_exists ($) {
 
 sub validate_password ($;$$) {
     my $password  = shift;
-    my $allow_all = shift;
     my $name      = shift || "";
+    my $allow_all = shift;
     $name = "$name " if $name;
     defined($password) || usage "${name}password not specified";
     if($allow_all){
