@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.31";
+our $VERSION = "1.5.32";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2206,18 +2206,20 @@ sub validate_user_exists ($) {
 }
 
 
-sub validate_password ($) {
+sub validate_password ($;$$) {
     my $password  = shift;
     my $allow_all = shift;
-    defined($password) || usage "password not specified";
+    my $name      = shift || "";
+    $name = "$name " if $name;
+    defined($password) || usage "${name}password not specified";
     if($allow_all){
         # intentionally not untaining
-        $password =~ /^(.+)$/ || usage "invalid password given";
+        $password =~ /^(.+)$/ || usage "invalid ${name}password given";
     } else {
-        $password =~ /^([^'"`]+)$/ or usage "invalid password given, may not contain quotes of backticks";
+        $password =~ /^([^'"`]+)$/ or usage "invalid ${name}password given, may not contain quotes of backticks";
         $password = $1;
     }
-    vlog_options("password", "'$password'");
+    vlog_options("${name}password", "'$password'");
     return $password;
 }
 
