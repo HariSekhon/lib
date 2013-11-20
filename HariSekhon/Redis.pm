@@ -11,7 +11,7 @@
 
 package HariSekhon::Redis;
 
-$VERSION = "0.1";
+$VERSION = "0.2";
 
 use strict;
 use warnings;
@@ -69,21 +69,22 @@ sub connect_redis(%){
     my $host     = $params{"host"} || croak "no host passed to connect_redis";
     my $port     = $params{"port"} || $REDIS_DEFAULT_PORT;
     my $password = $params{"password"};
-    $host  = validate_resolvable($host);
-    vlog2 "\nconnecting to redis server '$host:$port'";
-    our $hostport = $host . ( $verbose ? ":$port" : "" );
+    my $host2    = validate_resolvable($host);
+    my $hostport = $host2 . ( $verbose ? ":$port" : "" );
+    $hostport   .= " ($host)";
+    vlog2 "connecting to redis server $hostport";
     my $redis;
     try {
-        $redis = Redis->new(server => "$host:$port", password => $password) || quit "CRITICAL", "failed to connect to redis server '$hostport'";
+        $redis = Redis->new(server => "$host2:$port", password => $password) || quit "CRITICAL", "failed to connect to redis server $hostport";
     };
-    catch_quit "failed to connect to redis server '$hostport'";
-    $redis or quit "CRITICAL", "failed to connect to Redis server '$hostport'";
-    vlog2 "API ping";
+    catch_quit "failed to connect to redis server $hostport";
+    $redis or quit "CRITICAL", "failed to connect to Redis server $hostport";
+    vlog2 "API ping to $hostport\n";
     try {
-        $redis->ping || quit "CRITICAL", "API ping failed, authentication required?";
+        $redis->ping || quit "CRITICAL", "API ping to $hostport failed, authentication required?";
     };
-    catch_quit "API ping failed, authentication required?";
-    return $redis;
+    catch_quit "API ping to $hostport failed, authentication required?";
+    return ($redis, $hostport);
 }
 
 1;
