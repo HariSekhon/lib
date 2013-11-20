@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.30";
+our $VERSION = "1.5.31";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2027,20 +2027,24 @@ sub validate_fqdn ($) {
 }
 
 
-sub validate_host ($) {
+sub validate_host ($;$) {
     my $host = shift;
-    defined($host) || usage "host not specified";
-    $host = isHost($host) || usage "invalid host given, not a validate hostname or IP address";
-    vlog_options("host", "'$host'");
+    my $name = shift || "";
+    $name = "$name " if $name;
+    defined($host) || usage "${name}host not specified";
+    $host = isHost($host) || usage "invalid ${name}host given, not a validate hostname or IP address";
+    vlog_options("${name}host", "'$host'");
     return $host;
 }
 
 
-sub validate_hostname ($) {
+sub validate_hostname ($;$) {
     my $hostname = shift;
-    defined($hostname) || usage "hostname not specified";
-    $hostname = isHostname($hostname) || usage "invalid hostname given";
-    vlog_options("hostname", "'$hostname'");
+    my $name     = shift || "";
+    $name = "$name " if $name;
+    defined($hostname) || usage "${name}hostname not specified";
+    $hostname = isHostname($hostname) || usage "invalid ${name}hostname given";
+    vlog_options("${name}hostname", "'$hostname'");
     return $hostname;
 }
 
