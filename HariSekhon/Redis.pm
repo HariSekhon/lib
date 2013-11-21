@@ -59,7 +59,7 @@ our %redis_options = (
 );
 
 our %redis_options_database = (
-    "d|database=s"     => [ \$database,     "Database to select (optional, will default to the default database 0)" ],
+    "d|database=s"     => [ \$database,     "Database to select (optional, default: 0)" ],
 );
 
 @usage_order = qw/host port database password warning critical precision/;
