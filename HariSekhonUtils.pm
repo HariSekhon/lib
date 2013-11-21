@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.32";
+our $VERSION = "1.5.33";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1554,7 +1554,7 @@ sub plural ($) {
     #} elsif (not isFloat($var)) {
     #    code_error "non-scalar, non-array ref and non-hash ref passed to plural()";
     }
-    isInt($var) or code_error("arg passed to plural() is not an integer");
+    isFloat($var) or code_error("arg passed to plural() is not a float");
     ( $var == 1 ) ? ( $plural = "" ) : ( $plural = "s" );
 }
 
