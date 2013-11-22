@@ -94,6 +94,13 @@ is_deeply([compact_array(( "one", "" , "two" ))], [ "one", "two" ], 'compact_arr
 is_deeply([compact_array(( "one", "\t\r\n" , "two" ))], [ "one", "two" ], 'compact_array() remove ^\s*$');
 is_deeply([compact_array(( "one", 0 , "two" ))], [ "one", 0, "two" ], 'compact_array() not remove zero');
 
+$warning  = 5;
+$critical = 10;
+validate_thresholds();
+ok(check_threshold("warning", 5),   'check_threshold("warning", 5)');
+ok(!check_threshold("warning", 6),  '!check_threshold("warning", 6)');
+ok(check_threshold("critical", 10),   'check_threshold("critical", 10)');
+ok(!check_threshold("critical", 11),   'check_threshold("critical", 11)');
 # TODO: check_threshold{,s}, code_error
 
 # TODO: curl onwards
@@ -289,17 +296,21 @@ is(ltrim(" \t \n ha ri \t \n"),      "ha ri \t \n",   'ltrim()');
 
 $warning  = 5;
 $critical = 10;
+validate_thresholds();
 ok(msg_thresholds(),        "msg_thresholds()  w=5/c=10");
 ok(msg_thresholds(1),       "msg_thresholds(1) w=5/c=10");
 $warning = 0;
 $critical = 0;
+validate_thresholds();
 ok(msg_thresholds(),        "msg_thresholds()  w=0/c0");
 ok(msg_thresholds(1),       "msg_thresholds(1) w=0/c=0");
 
 $warning = undef;
 $critical = undef;
-ok(!msg_thresholds(),        "msg_thresholds() w=undef/c=undef");
-ok(!msg_thresholds(1),       "msg_thresholds(1) w=undef/c=undef");
+validate_thresholds();
+$verbose = 0;
+ok(msg_thresholds(),        "msg_thresholds() w=undef/c=undef");
+ok(msg_thresholds(1),       "msg_thresholds(1) w=undef/c=undef");
 
 ok(msg_perf_thresholds(),   "msg_perf_thresholds()");
 
