@@ -287,6 +287,20 @@ ok(&HariSekhonUtils::log("hari testing"), '&HariSekhonUtils::log("hari testing")
 is(lstrip(" \t \n ha ri \t \n"),     "ha ri \t \n",   'lstrip()');
 is(ltrim(" \t \n ha ri \t \n"),      "ha ri \t \n",   'ltrim()');
 
+$warning  = 5;
+$critical = 10;
+ok(msg_thresholds(),        "msg_thresholds()  w=5/c=10");
+ok(msg_thresholds(1),       "msg_thresholds(1) w=5/c=10");
+$warning = 0;
+$critical = 0;
+ok(msg_thresholds(),        "msg_thresholds()  w=0/c0");
+ok(msg_thresholds(1),       "msg_thresholds(1) w=0/c=0");
+
+$warning = undef;
+$critical = undef;
+ok(!msg_thresholds(),        "msg_thresholds() w=undef/c=undef");
+ok(!msg_thresholds(1),       "msg_thresholds(1) w=undef/c=undef");
+
 ok(msg_perf_thresholds(),   "msg_perf_thresholds()");
 
 # TODO
