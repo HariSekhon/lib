@@ -1481,7 +1481,7 @@ sub msg_thresholds (;$) {
         }
         $msg2 .= ")";
     }
-    if(not $no_msg_thresholds){
+    unless($no_msg_thresholds){
         $msg .= " $msg2" if $msg2;
     }
     return $msg2;
