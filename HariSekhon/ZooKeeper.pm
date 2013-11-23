@@ -41,6 +41,13 @@ our $ZK_DEFAULT_PORT = 2181;
 our $zk_port         = $ZK_DEFAULT_PORT;
 our @zk_valid_states = qw/leader follower standalone/;
 
+if($ENV{"ZOOKEEPER_USER"}){
+    $main::user = $ENV{"ZOOKEEPER_USER"};
+}
+if($ENV{"ZOOKEEPER_PASSWORD"}){
+    $main::password = $ENV{"ZOOKEEPER_PASSWORD"};
+}
+
 our $zk_conn;
 # TODO: ZooKeeper closes connection after 1 cmd, see if I can work around this, as having to use several TCP connections is inefficient
 sub zoo_cmd ($;$) {
