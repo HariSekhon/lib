@@ -449,6 +449,8 @@ is_deeply([validate_node_list("node1", qw/node2 node3 node4, node5/)], [qw/node1
 # should error out with "node list empty"
 #is(!validate_node_list(""), '!validate_node_list("")');
 
+is(validate_nosql_key("HariSekhon:check_riak_write.pl:riak1:1385226607.02182:20abc"), "HariSekhon:check_riak_write.pl:riak1:1385226607.02182:20abc", 'validate_nosql_key()');
+
 is(validate_port(80),          80,     'validate_port(80)');
 is(validate_port(65535),       65535,  'validate_port(65535)');
 
