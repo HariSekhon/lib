@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.33";
+our $VERSION = "1.5.34";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1123,7 +1123,7 @@ sub isDnsShortname($){
 # SECURITY NOTE: this only checks if the email address is valid, it's doesn't make it safe to arbitrarily pass to commands or SQL etc!
 sub isEmail ($) {
     my $email = shift;
-    #defined($email) || return undef;
+    defined($email) or return undef;
     return undef if(length($email) > 256);
     $email =~ /^$email_regex$/ || return undef;
     # Intentionally not untainting this as it's not safe given the addition of ' to the $email_regex to support Irish email addresses
@@ -1143,14 +1143,14 @@ sub isFilename($){
 sub isFloat ($;$) {
     my $number = shift;
     my $negative = shift() ? "-?" : "";
-    #defined($number) or code_error("no number passed to isFloat subroutine");
+    defined($number) or return undef;
     $number =~ /^$negative\d+(?:\.\d+)?$/;
 }
 
 
 sub isFqdn ($) {
     my $fqdn = shift;
-    #defined($fqdn) or return undef;
+    defined($fqdn) or return undef;
     return undef if(length($fqdn) > 255);
     $fqdn =~ /^($fqdn_regex)$/ or return undef;
     return $1;
@@ -1170,7 +1170,7 @@ sub isHash ($) {
 
 sub isHex ($) {
     my $hex = shift;
-    #defined($hex) or return undef;
+    defined($hex) or return undef;
     $hex =~ /^(0x[A-Fa-f\d]+)$/ or return undef;
     return 1;
 }
@@ -1178,7 +1178,7 @@ sub isHex ($) {
 
 sub isHost ($) {
     my $host = shift;
-    #defined($host) or return undef;
+    defined($host) or return undef;
     if(length($host) > 255){ # Can't be a hostname
         return isIP($host);
     } else {
@@ -1191,7 +1191,7 @@ sub isHost ($) {
 
 sub isHostname ($) {
     my $hostname = shift;
-    #defined($hostname) or return undef;
+    defined($hostname) or return undef;
     return undef if(length($hostname) > 255);
     $hostname =~ /^($hostname_regex)$/ or return undef;
     return $1;
@@ -1219,7 +1219,7 @@ sub isInterface ($) {
 
 sub isIP ($) {
     my $ip = shift;
-    #defined($ip) or return undef;
+    defined($ip) or return undef;
     $ip =~ /^($ip_regex)$/ or return undef;
     $ip = $1;
     my @octets = split(/\./, $ip);
@@ -1235,6 +1235,7 @@ sub isIP ($) {
 # wish there was a better way of validating the JSON returned but Test::JSON is_valid_json() also errored out badly from underlying JSON::Any module, similar to JSON's decode_json
 #sub isJson($){
 #    my $data = shift;
+#    defined($data) or return undef;
 #    # slightly modified from http://stackoverflow.com/questions/2583472/regex-to-validate-json
 #    # XXX: Unfortunately this only work on RHEL6's version of Perl and parse failure breaks all dependent code on RHEL5 now
 ##    my $json_regex = qr/
@@ -1276,8 +1277,8 @@ sub isKrb5Princ ($) {
 
 # Primarily for Nagios perfdata labels
 sub isLabel ($) {
-    my $label  = shift;
-    defined($label) || return undef;
+    my $label = shift;
+    defined($label) or return undef;
     $label =~ /^[\%\(\)\/\*\w\s-]+$/ or return undef;
     return $label;
 }
@@ -1285,6 +1286,7 @@ sub isLabel ($) {
 
 sub isNagiosUnit ($) {
     my $units = shift;
+    defined($units) or return undef;
     foreach(@valid_units){
         if(lc $units eq lc $_){
             return $_;
@@ -1302,6 +1304,7 @@ sub isNagiosUnit ($) {
 
 sub isPort ($) {
     my $port = shift;
+    defined($port) or return undef;
     $port  =~ /^(\d+)$/ || return undef;
     $port = $1;
     ($port >= 1 && $port <= 65535) || return undef;
@@ -1311,7 +1314,7 @@ sub isPort ($) {
 
 sub isProcessName ($) {
     my $process = shift;
-    #defined($process) or return undef;
+    defined($process) or return undef;
     $process =~ /^($process_name_regex)$/ or return undef;
     return $1;
 }
