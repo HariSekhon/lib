@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.33";
+our $VERSION = "1.5.32";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -143,6 +143,7 @@ our %EXPORT_TAGS = (
     'options' => [  qw(
                         add_options
                         get_options
+                        check_threshold
                         check_thresholds
                         expand_units
                         msg_perf_thresholds
@@ -707,19 +708,22 @@ sub check_threshold ($$) {
         $thresholds{$threshold}{"error"} = $error;
         vlog2("result outside of $threshold thresholds: $error\n");
         eval $threshold;
-        return undef;
+        # $threshold_ok false
+        return 0;
     }
+    # $threshold_ok true
     return 1;
 }
 
 
 sub check_thresholds ($;$) {
     #subtrace(@_);
+    my $result            = shift;
     my $no_msg_thresholds = (defined($_[1]) ? 1 : 0);
-    my $status = check_threshold("critical", $_[0]) and
-                 check_threshold("warning",  $_[0]);
-    msg_thresholds() unless $no_msg_thresholds;
-    return $status;
+    my $status_ok = check_threshold("critical", $result) and
+                 check_threshold("warning",  $result);
+    #msg_thresholds() unless $no_msg_thresholds;
+    return ($status_ok, msg_thresholds($no_msg_thresholds));
 }
 
 
@@ -1452,7 +1456,8 @@ sub msg_perf_thresholds (;$) {
 }
 
 
-sub msg_thresholds () {
+sub msg_thresholds (;$) {
+    my $no_msg_thresholds = (defined($_[0]) ? 1 : 0);
     my $msg2 = "";
     if ($thresholds{"critical"}{"error"} or
         $thresholds{"warning"}{"error"}  or
@@ -1475,7 +1480,10 @@ sub msg_thresholds () {
         }
         $msg2 .= ")";
     }
-    $msg .= " $msg2" if $msg2;
+    if(not $no_msg_thresholds){
+        $msg .= " $msg2" if $msg2;
+    }
+    return $msg2;
 }
 
 
