@@ -720,7 +720,7 @@ sub check_threshold ($$) {
 sub check_thresholds ($;$) {
     #subtrace(@_);
     my $result            = shift;
-    my $no_msg_thresholds = (defined($_[1]) ? 1 : 0);
+    my $no_msg_thresholds = shift || 0;
     my $status_ok = check_threshold("critical", $result) and
                  check_threshold("warning",  $result);
     #msg_thresholds() unless $no_msg_thresholds;
@@ -1458,7 +1458,7 @@ sub msg_perf_thresholds (;$) {
 
 
 sub msg_thresholds (;$) {
-    my $no_msg_thresholds = (defined($_[0]) ? 1 : 0);
+    my $no_msg_thresholds = shift || 0;
     my $msg2 = "";
     if ($thresholds{"critical"}{"error"} or
         $thresholds{"warning"}{"error"}  or
