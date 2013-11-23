@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.32";
+our $VERSION = "1.5.33";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -246,6 +246,7 @@ our %EXPORT_TAGS = (
                         validate_krb5_princ
                         validate_label
                         validate_node_list
+                        validate_nosql_key
                         validate_password
                         validate_port
                         validate_process_name
@@ -2117,6 +2118,18 @@ sub validate_node_list (@) {
     }
     vlog_options("node list", "[ '" . join("', '", @nodes) . "' ]");
     return @nodes;
+}
+
+
+sub validate_nosql_key($;$){
+    my $key  = shift;
+    my $name = shift || "";
+    $name .= " " if $name;
+    defined($key) or usage "${name}key not defined";
+    $key =~ /^([\w\_\,\.\:\+\-]+)$/ or usage "invalid ${name}key name given, may only contain characters: alphanumeric, commas, colons, underscores, pluses, dashes";
+    $key = $1;
+    vlog_options("${name}key", $key);
+    return $key;
 }
 
 
