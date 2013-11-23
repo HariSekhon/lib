@@ -41,6 +41,13 @@ our $nodetool = "nodetool";
 our $nodetool_default_port = 7199;
 our $nodetool_port = $nodetool_default_port;
 
+if($ENV{"CASSANDRA_USER"}){
+    $main::user = $ENV{"CASSANDRA_USER"};
+}
+if($ENV{"CASSANDRA_PASSWORD"}){
+    $main::password = $ENV{"CASSANDRA_PASSWORD"};
+}
+
 sub validate_nodetool ($) {
     my $nodetool = shift;
     defined($nodetool) or usage "nodetool not defined";
