@@ -284,9 +284,9 @@ ok(!isUser("1983hari"),             '!isUser("1983hari")');
 
 ok(isOS($^O),    'isOS($^O)');
 
-ok(HariSekhonUtils::loginit(),   'HariSekhonUtils::loginit()');
-ok(HariSekhonUtils::loginit(),   'HariSekhonUtils::loginit() again since it should be initialized by first one');
-ok(&HariSekhonUtils::log("hari testing"), '&HariSekhonUtils::log("hari testing")');
+#ok(HariSekhonUtils::loginit(),   'HariSekhonUtils::loginit()');
+#ok(HariSekhonUtils::loginit(),   'HariSekhonUtils::loginit() again since it should be initialized by first one');
+#ok(&HariSekhonUtils::log("hari testing"), '&HariSekhonUtils::log("hari testing")');
 
 # TODO
 # logdie
