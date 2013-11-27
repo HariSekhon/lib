@@ -2246,7 +2246,7 @@ sub validate_password ($;$$) {
         $password =~ /^([^'"`]+)$/ or usage "invalid ${name}password given, may not contain quotes of backticks";
         $password = $1;
     }
-    vlog_options("${name}password", "'$password'");
+    vlog_options("${name}password", "'<omitted>'");
     return $password;
 }
 
