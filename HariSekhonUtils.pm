@@ -2401,7 +2401,7 @@ sub version () {
 
 sub vlog (@) {
     if($debug){
-        print strftime("%F %T %z  ", localtime);
+        print STDERR strftime("%F %T %z  ", localtime);
     }
     print STDERR "@_\n" if $verbose;
 }
