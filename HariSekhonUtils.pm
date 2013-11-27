@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.5.34";
+our $VERSION = "1.6.0";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -163,6 +163,7 @@ our %EXPORT_TAGS = (
                         mac_only
                     ) ],
     'regex' =>  [   qw(
+                        escape_regex
                         $domain_regex
                         $email_regex
                         $filename_regex
@@ -877,15 +878,14 @@ sub debug (@) {
 }
 
 
-# For reference purposes at this point
-#sub escape_regex ($) {
-#    my $regex = shift;
-#    defined($regex) or code_error "no regex arg passed to escape_regex() subroutine";
-#    #$regex =~ s/([^\w\s\r\n])/\\$1/g;
-#    # backslashes everything that isn't /[A-Za-z_0-9]/
-#    $regex = quotemeta($regex); # $regex = \Q$regex\E;
-#    return $regex;
-#}
+sub escape_regex ($) {
+    my $regex = shift;
+    defined($regex) or code_error "no regex arg passed to escape_regex() subroutine";
+    #$regex =~ s/([^\w\s\r\n])/\\$1/g;
+    # backslashes everything that isn't /[A-Za-z_0-9]/
+    $regex = quotemeta($regex); # $regex = \Q$regex\E;
+    return $regex;
+}
 
 
 sub expand_units ($$;$) {
@@ -1588,7 +1588,7 @@ sub print_options (@) {
             #debug $_;
             #debug $options{$_};
             #debug "options long value is $options{$_}{desc}";
-            if($options{$_}{"long"} =~ /^.*--(?:$option_regex)\s*$/){
+            if($options{$_}{"long"} =~ /^.*--(?:$option_regex)\s*$/ or $options{$_}{"short"} =~ /^-(?:$option_regex)\s*$/){
                 printf STDERR "%-${short_options_len}s  %-${long_options_len}s \t%s\n", $options{$_}{"short"}, $options{$_}{"long"}, $options{$_}{"desc"};
                 delete $options{$_};
                 last;
@@ -1822,7 +1822,8 @@ sub usage (;@) {
     foreach my $option (sort keys %options){
         #debug "iterating over general options $option";
         # TODO: improve this matching for more than one long opt
-        if(grep($_ =~ /\b$option\b/, keys %default_options)){
+        my $option_regex = escape_regex($option);
+        if(grep($_ =~ /\A$option_regex\Z/, keys %default_options)){
             #debug "skipping $option cos it matched \%default_options";
             next;
         }
@@ -2166,26 +2167,28 @@ sub validate_label ($) {
 
 
 # TODO: unify with isRegex and do not allow noquit
-sub validate_regex ($;$$) {
+sub validate_regex ($;$$$) {
     my $regex  = shift;
+    my $name   = shift || "";
     my $noquit = shift;
     my $posix  = shift;
+    $name = "${name} " if $name;
     my $regex2;
     if($noquit){
         defined($regex) || return undef;
     } else {
-        defined($regex) || usage "regex not specified";
+        defined($regex) || usage "${name}regex not specified";
     }
     if($posix){
         if($regex =~ /\$\(|\`/){
-            quit "UNKNOWN", "invalid posix regex supplied: contains sub shell metachars ( \$( / ` ) that would be dangerous to pass to shell" unless $noquit;
+            quit "UNKNOWN", "invalid ${name}posix regex supplied: contains sub shell metachars ( \$( / ` ) that would be dangerous to pass to shell" unless $noquit;
             return undef;
         } else {
             my @output = cmd("egrep '$regex' < /dev/null");
             #if(grep({$_ =~ "Unmatched"} @output)){
             if(@output){
                 #quit "UNKNOWN", "invalid posix regex supplied: contains unbalanced () or []" unless $noquit;
-                quit "UNKNOWN", "invalid posix regex supplied: @output" unless $noquit;
+                quit "UNKNOWN", "invalid ${name}posix regex supplied: @output" unless $noquit;
                 return undef;
             }
         }
@@ -2196,15 +2199,15 @@ sub validate_regex ($;$$) {
             my $errstr = $@;
             $errstr =~ s/;.*?$//;
             $errstr =~ s/in regex m\/.*?$/in regex/;
-            quit "UNKNOWN", "invalid regex supplied: $errstr" unless $noquit;
+            quit "UNKNOWN", "invalid ${name}regex supplied: $errstr" unless $noquit;
             return undef;
         }
     }
     if($regex2){
-        vlog_options("regex", $regex2) unless $noquit;
+        vlog_options("${name}regex", $regex2) unless $noquit;
         return $regex2;
     } else {
-        vlog_options("regex", $regex) unless $noquit;
+        vlog_options("${name}regex", $regex) unless $noquit;
         return $regex;
     }
 }
