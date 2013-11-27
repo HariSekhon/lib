@@ -466,12 +466,12 @@ is(validate_label("st4ts_used(%)"),    "st4ts_used(%)",    'validate_label("st4t
 like(validate_regex("some[Rr]egex.*(capture)"),   qr/\(\?(?:\^|-xism):some\[Rr\]egex\.\*\(capture\)\)/,  'validate_regex("some[Rr]egex.*(capture)")');
 # Errors out still, should detect and fail gracefully
 #is(validate_regex("some[Rr]egex.*(capture broken", 1),   undef,  'validate_regex("some[Rr]egex.*(capture broken", 1)');
-is(validate_regex("somePosix[Rr]egex.*(capture)", 0, 1),   "somePosix[Rr]egex.*(capture)",      'validate_regex("somePosix[Rr]egex.*(capture)", 0, 1)');
-is(validate_regex("somePosix[Rr]egex.*(capture broken", 1, 1),  undef,       'validate_regex("somePosix[Rr]egex.*(capture broken", 1, 1) eq undef');
-is(validate_regex('somePosix[Rr]egex.*$(evilcmd)', 1, 1),       undef,       'validate_regex("somePosix[Rr]egex.*$(evilcmd)", 1, 1) eq undef');
-is(validate_regex('somePosix[Rr]egex.*$(evilcmd', 1, 1),        undef,       'validate_regex("somePosix[Rr]egex.*$(evilcmd", 1, 1) eq undef');
-is(validate_regex('somePosix[Rr]egex.*`evilcmd`', 1, 1),        undef,       'validate_regex("somePosix[Rr]egex.*`evilcmd`", 1, 1) eq undef');
-is(validate_regex('somePosix[Rr]egex.*`evilcmd', 1, 1),         undef,       'validate_regex("somePosix[Rr]egex.*`evilcmd", 1, 1) eq undef');
+is(validate_regex("somePosix[Rr]egex.*(capture)", undef, 0, "posix"),   "somePosix[Rr]egex.*(capture)",      'validate_regex("somePosix[Rr]egex.*(capture)", undef, 0, 1)');
+is(validate_regex("somePosix[Rr]egex.*(capture broken", undef, "noquit", "posix"),  undef,       'validate_regex("somePosix[Rr]egex.*(capture broken", undef, 1, 1) eq undef');
+is(validate_regex('somePosix[Rr]egex.*$(evilcmd)', undef, "noquit", "posix"),       undef,       'validate_regex("somePosix[Rr]egex.*$(evilcmd)", undef, 1, 1) eq undef');
+is(validate_regex('somePosix[Rr]egex.*$(evilcmd', undef, "noquit", "posix"),        undef,       'validate_regex("somePosix[Rr]egex.*$(evilcmd", undef, 1, 1) eq undef');
+is(validate_regex('somePosix[Rr]egex.*`evilcmd`', undef, "noquit", "posix"),        undef,       'validate_regex("somePosix[Rr]egex.*`evilcmd`", undef, 1, 1) eq undef');
+is(validate_regex('somePosix[Rr]egex.*`evilcmd', undef, "noquit", "posix"),         undef,       'validate_regex("somePosix[Rr]egex.*`evilcmd", undef, 1, 1) eq undef');
 
 is(validate_user("hadoop"),    "hadoop",   'validate_user("hadoop")');
 is(validate_user("hari1983"),  "hari1983", 'validate_user("hari1983")');
