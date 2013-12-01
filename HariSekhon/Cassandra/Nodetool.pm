@@ -18,7 +18,7 @@ BEGIN {
     use lib dirname(__FILE__) . "..";
 }
 use HariSekhonUtils;
-use HariSekhonUtils::Cassandra;
+use HariSekhon::Cassandra;
 use Carp;
 
 use Exporter;
