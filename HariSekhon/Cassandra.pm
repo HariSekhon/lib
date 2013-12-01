@@ -58,8 +58,8 @@ sub set_cassandra_port($){
     %cassandra_options = (
         %cassandra_options,
         "P|port=s"         => [ \$main::port,         sprintf("Cassandra %s port to connect to (default: %d)", $type, $DEFAULT_CASSANDRA_PORT{$type}) ],
-        "u|user=s"         => [ \$main::user,         sprintf("Cassandra %s User (optional)", $type) ],
-        "p|password=s"     => [ \$main::password,     sprintf("Cassandra %s Password (optional)", $type) ],
+        "u|user=s"         => [ \$main::user,         sprintf("Cassandra %s User (optional, \$CASSANDRA_USER)", $type) ],
+        "p|password=s"     => [ \$main::password,     sprintf("Cassandra %s Password (optional, \$CASSANDRA_PASSWORD)", $type) ],
     );
     return $DEFAULT_CASSANDRA_PORT{$type};
 }
