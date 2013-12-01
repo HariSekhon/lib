@@ -9,7 +9,7 @@
 
 package HariSekhon::Cassandra;
 
-$VERSION = "0.2.5";
+$VERSION = "0.1";
 
 use strict;
 use warnings;
@@ -24,23 +24,19 @@ use Exporter;
 our @ISA = qw(Exporter);
 
 our @EXPORT = ( qw (
-                        check_nodetool_errors
-                        die_nodetool_unrecognized_output
-                        $nodetool_nodetool_default_port
-                        $nodetool
-                        $nodetool_errors_regex
-                        $nodetool_status_header_regex
-                        %nodetool_options
-                        nodetool_options
-                        validate_nodetool
-                        validate_nodetool_options
+                    %DEFAULT_CASSANDRA_PORT
+                    $cassandra_cql_port
+                    $cassandra_jmx_port
+                    $cassandra_thrift_port
                 )
 );
 our @EXPORT_OK = ( @EXPORT );
 
-our $nodetool = "nodetool";
-our $nodetool_default_port = 7199;
-our $nodetool_port = $nodetool_default_port;
+our %DEFAULT_CASSANDRA_PORT = (
+    "CQL"    => 9042,
+    "JMX"    => 7199,
+    "THRIFT" => 9160,
+);
 
 if($ENV{"CASSANDRA_USER"}){
     $main::user = $ENV{"CASSANDRA_USER"};
@@ -49,78 +45,19 @@ if($ENV{"CASSANDRA_PASSWORD"}){
     $main::password = $ENV{"CASSANDRA_PASSWORD"};
 }
 
-sub validate_nodetool ($) {
-    my $nodetool = shift;
-    defined($nodetool) or usage "nodetool not defined";
-    $nodetool = validate_filename($nodetool, 0, "nodetool");
-    $nodetool =~ /(?:^|\/)nodetool$/ or usage "invalid nodetool path given, must be the path to the nodetool command";
-    $nodetool = which($nodetool, 1);
-    return $nodetool;
-}
-
-our %nodetool_options = (
-    "n|nodetool=s"     => [ \$nodetool,           "Path to 'nodetool' command if not in \$PATH ($ENV{PATH})" ],
-    "H|host=s"         => [ \$main::host,         "Cassandra node to connect to (optional, default: localhost)" ],
-    "P|port=s"         => [ \$main::port,         "Cassandra JMX port to connect to (default: $nodetool_default_port)" ],
-    "u|user=s"         => [ \$main::user,         "Cassandra JMX User (optional)" ],
-    "p|password=s"     => [ \$main::password,     "Cassandra JMX Password (optional)" ],
+our %cassandra_options = (
+    "H|host=s"         => [ \$main::host,         "Cassandra node to connect to" ],
 );
 
-sub nodetool_options(;$$$$){
-    my $host            = shift;
-    my $nodetool_port   = shift;
-    my $user            = shift;
-    my $password        = shift;
-    my $options         = "";
-    $host     = validate_resolvable($host)  if defined($host);
-    $options .= "--host '$host' "           if defined($host);
-    $options .= "--port '$nodetool_port' "  if defined($nodetool_port);
-    $options .= "--username '$user' "       if defined($user);
-    $options .= "--password '$password' "   if defined($password);
-    return $options;
-}
-
-sub validate_nodetool_options($$$$$){
-    my $nodetool = shift;
-    my $host     = shift;
-    my $port     = shift;
-    my $user     = shift;
-    my $password = shift;
-    $nodetool = validate_nodetool($nodetool);
-    $host     = validate_host($host)         if defined($host);
-    $port     = validate_port($port)         if defined($port);
-    $user     = validate_user($user)         if defined($user);
-    $password = validate_password($password) if defined($password);
-    return ($nodetool, $host, $port, $user, $password);
-}
-
-our $nodetool_errors_regex = qr/
-                                Cannot\s+resolve |
-                                unknown\s+host   |
-                                connection\s+refused  |
-                                failed\s+to\s+connect |
-                                error    |
-                                user     |
-                                password |
-                                Exception |
-                                in thread
-                             /xi;
-sub check_nodetool_errors($){
-    defined(@_) or code_error "no input passed to check_nodetool_errors to check";
-    my $str = join(" ", @_);
-    quit "CRITICAL", $str if $str =~ /$nodetool_errors_regex/;
-}
-
-# Cassandra 2.0 DataStax Community Edition (nodetool version gives 'ReleaseVersion: 2.0.2')
-our $nodetool_status_header_regex = qr/
-                                       ^Datacenter |
-                                       ^========== |
-                                       ^Status=Up\/Down |
-                                       ^\|\/\s+State=Normal\/Leaving\/Joining\/Moving |
-                                       ^--\s+Address\s+
-                                    /xi;
-sub die_nodetool_unrecognized_output($){
-    defined(@_) or code_error "no input passed to die_nodetool_unrecognized_output to check";
-    my $str = join(" ", @_);
-    quit "UNKNOWN", sprintf("unrecognized output '%s', nodetool output format may have changed, aborting, $nagios_plugins_support_msg", $str);
+sub set_cassandra_port($){
+    my $type         = shift;
+    defined($type) or code_error "no type passed to set_cassandra_port";
+    defined($DEFAULT_CASSANDRA_PORT{$type}) or code_error "'$type' cassandra port not defined in HariSekhon::Cassandra::DEFAULT_CASSANDRA_PORT hash, passed in wrong type as arg?";
+    %cassandra_options = (
+        %cassandra_options,
+        "P|port=s"         => [ \$main::port,         sprintf("Cassandra %s port to connect to (default: %d)", $type, $DEFAULT_CASSANDRA_PORT{$type}) ],
+        "u|user=s"         => [ \$main::user,         sprintf("Cassandra %s User (optional)", $type) ],
+        "p|password=s"     => [ \$main::password,     sprintf("Cassandra %s Password (optional)", $type) ],
+    );
+    return $DEFAULT_CASSANDRA_PORT{$type};
 }
