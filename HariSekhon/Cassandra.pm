@@ -25,6 +25,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT = ( qw (
                     %DEFAULT_CASSANDRA_PORT
+                    %cassandra_options
                     $cassandra_cql_port
                     $cassandra_jmx_port
                     $cassandra_thrift_port
