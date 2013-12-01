@@ -115,3 +115,5 @@ sub die_nodetool_unrecognized_output($){
     my $str = join(" ", @_);
     quit "UNKNOWN", sprintf("unrecognized output '%s', nodetool output format may have changed, aborting, $nagios_plugins_support_msg", $str);
 }
+
+1;

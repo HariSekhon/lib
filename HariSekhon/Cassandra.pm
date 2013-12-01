@@ -61,3 +61,5 @@ sub set_cassandra_port($){
     );
     return $DEFAULT_CASSANDRA_PORT{$type};
 }
+
+1;
