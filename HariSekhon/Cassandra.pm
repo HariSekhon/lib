@@ -29,6 +29,7 @@ our @EXPORT = ( qw (
                     $cassandra_cql_port
                     $cassandra_jmx_port
                     $cassandra_thrift_port
+                    set_cassandra_port
                 )
 );
 our @EXPORT_OK = ( @EXPORT );
