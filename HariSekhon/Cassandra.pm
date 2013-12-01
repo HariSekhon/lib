@@ -9,7 +9,7 @@
 
 package HariSekhon::Cassandra;
 
-$VERSION = "0.2.4";
+$VERSION = "0.2.5";
 
 use strict;
 use warnings;
@@ -24,6 +24,7 @@ use Exporter;
 our @ISA = qw(Exporter);
 
 our @EXPORT = ( qw (
+                        check_nodetool_errors
                         die_nodetool_unrecognized_output
                         $nodetool_nodetool_default_port
                         $nodetool
@@ -104,6 +105,11 @@ our $nodetool_errors_regex = qr/
                                 Exception |
                                 in thread
                              /xi;
+sub check_nodetool_errors($){
+    defined(@_) or code_error "no input passed to check_nodetool_errors to check";
+    my $str = join(" ", @_);
+    quit "CRITICAL", $str if $str =~ /$nodetool_errors_regex/;
+}
 
 # Cassandra 2.0 DataStax Community Edition (nodetool version gives 'ReleaseVersion: 2.0.2')
 our $nodetool_status_header_regex = qr/
@@ -114,5 +120,7 @@ our $nodetool_status_header_regex = qr/
                                        ^--\s+Address\s+
                                     /xi;
 sub die_nodetool_unrecognized_output($){
-    quit "UNKNOWN", sprintf("unrecognized output '%s', nodetool output format may have changed, aborting, $nagios_plugins_support_msg", $_[0]);
+    defined(@_) or code_error "no input passed to die_nodetool_unrecognized_output to check";
+    my $str = join(" ", @_);
+    quit "UNKNOWN", sprintf("unrecognized output '%s', nodetool output format may have changed, aborting, $nagios_plugins_support_msg", $str);
 }
