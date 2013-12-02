@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.6.0";
+our $VERSION = "1.6.1";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -489,6 +489,12 @@ sub set_timeout_default ($) {
     $default_options{"t|timeout=i"} = [ \$timeout, "Timeout in secs (default: $timeout_default)" ];
 }
 
+if($ENV{"USER"}){
+    $user = $ENV{"USER"};
+}
+if($ENV{"PASSWORD"}){
+    $password = $ENV{"PASSWORD"};
+}
 
 # Optional options
 our %hostoptions = (
