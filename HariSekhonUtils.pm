@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.6.1";
+our $VERSION = "1.6.2";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -494,6 +494,18 @@ if($ENV{"USER"}){
 }
 if($ENV{"PASSWORD"}){
     $password = $ENV{"PASSWORD"};
+}
+
+sub env_creds($){
+    my $name = shift;
+    ( defined($name) and $name ) or code_error "no name arg passed to env_credentials";
+    $name = uc $name;
+    if($ENV{"${name}_USER"}){
+        $user = $ENV{"${name}_USER"};
+    }
+    if($ENV{"${name}_PASSWORD"}){
+        $password = $ENV{"${name}_PASSWORD"};
+    }
 }
 
 # Optional options
