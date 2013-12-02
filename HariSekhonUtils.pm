@@ -145,6 +145,7 @@ our %EXPORT_TAGS = (
                         get_options
                         check_threshold
                         check_thresholds
+                        env_creds
                         expand_units
                         msg_perf_thresholds
                         parse_file_option
@@ -498,7 +499,7 @@ if($ENV{"PASSWORD"}){
 
 sub env_creds($){
     my $name = shift;
-    ( defined($name) and $name ) or code_error "no name arg passed to env_credentials";
+    ( defined($name) and $name ) or code_error("no name arg passed to env_credentials");
     $name = uc $name;
     if($ENV{"${name}_USER"}){
         $user = $ENV{"${name}_USER"};
