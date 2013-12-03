@@ -9,7 +9,7 @@
 
 package HariSekhon::Cassandra;
 
-$VERSION = "0.1";
+$VERSION = "0.2";
 
 use strict;
 use warnings;
@@ -40,12 +40,7 @@ our %DEFAULT_CASSANDRA_PORT = (
     "THRIFT" => 9160,
 );
 
-if($ENV{"CASSANDRA_USER"}){
-    $main::user = $ENV{"CASSANDRA_USER"};
-}
-if($ENV{"CASSANDRA_PASSWORD"}){
-    $main::password = $ENV{"CASSANDRA_PASSWORD"};
-}
+env_creds("CASSANDRA");
 
 our %cassandra_options = (
     "H|host=s"         => [ \$main::host,         "Cassandra node to connect to" ],
