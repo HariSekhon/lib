@@ -501,7 +501,7 @@ if($ENV{"PASSWORD"}){
 
 sub env_creds($){
     my $name = shift;
-    ( defined($name) and $name ) or code_error("no name arg passed to env_credentials");
+    ( defined($name) and $name ) or code_error("no name arg passed to env_creds()");
     $name = uc $name;
     if($ENV{"${name}_USERNAME"}){
         $user = $ENV{"${name}_USERNAME"};
