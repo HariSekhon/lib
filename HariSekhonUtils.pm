@@ -881,6 +881,7 @@ sub curl ($;$$) {
     unless(defined($main::ua)){
         code_error "LWP useragent \$ua not defined, must import to main before calling curl(), do either \"use LWP::Simple '\$ua'\" or \"use LWP::UserAgent; my \$ua = LWP::UserAgent->new\"";
     }
+    $main::ua->show_progress(1) if $debug;
     my $req = HTTP::Request->new('GET', $url);
     # Doesn't work
     #$ua->credentials($host, '', $user, $password);
