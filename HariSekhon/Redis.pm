@@ -46,9 +46,7 @@ our $port               = $REDIS_DEFAULT_PORT;
 
 $password = undef;
 
-if($ENV{'REDIS_PASSWORD'}){
-    $password = $ENV{'REDIS_PASSWORD'};
-}
+env_creds("REDIS");
 
 our $database;
 
