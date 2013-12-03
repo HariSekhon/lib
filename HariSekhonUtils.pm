@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.6.2";
+our $VERSION = "1.6.3";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2086,7 +2086,8 @@ sub validate_int ($$$$) {
 #    my $min     = $_[1] || 0;
 #    my $max     = $_[2] || code_error "no max value given for validate_int()";
 #    my $name    = $_[3] || code_error "no name passed to validate_int()";
-    my ($integer, $min, $max, $name) = @_;
+    my ($integer, $name, $min, $max) = @_;
+    defined($name) || code_error "name not specified when calling validate_int()";
     defined($integer) || usage "$name not specified";
     isInt($integer, 1) or usage "invalid $name given, must be an integer";
     isFloat($min, 1) or code_error "non-float value '$min' passed to validate_int() for 2nd arg min value";
