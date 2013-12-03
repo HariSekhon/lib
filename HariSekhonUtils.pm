@@ -490,7 +490,9 @@ sub set_timeout_default ($) {
     $default_options{"t|timeout=i"} = [ \$timeout, "Timeout in secs (default: $timeout_default)" ];
 }
 
-if($ENV{"USER"}){
+if($ENV{"USERNAME"}){
+    $user = $ENV{"USERNAME"};
+} elsif($ENV{"USER"}){
     $user = $ENV{"USER"};
 }
 if($ENV{"PASSWORD"}){
@@ -501,7 +503,9 @@ sub env_creds($){
     my $name = shift;
     ( defined($name) and $name ) or code_error("no name arg passed to env_credentials");
     $name = uc $name;
-    if($ENV{"${name}_USER"}){
+    if($ENV{"${name}_USERNAME"}){
+        $user = $ENV{"${name}_USERNAME"};
+    } elsif($ENV{"${name}_USER"}){
         $user = $ENV{"${name}_USER"};
     }
     if($ENV{"${name}_PASSWORD"}){
