@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.6.3";
+our $VERSION = "1.6.4";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -850,31 +850,48 @@ sub compact_array (@) {
 }
 
 
-sub curl ($) {
-    unless(defined(&main::get)){
-        # inefficient, it'll import for each curl call, instead force top level author to 
-        # use LWP::Simple 'get'
-        #debug("importing LWP::Simple 'get'\n");
-        #require LWP::Simple;
-        #import LWP::Simple "get";
-        code_error "called curl() without declaring \"use LWP::Simple 'get'\"";
-    }
-    my $url = shift;
+sub curl ($;$$) {
+    my $url      = shift;
+    my $user     = shift;
+    my $password = shift;
     #debug("url passed to curl: $url");
     isUrl($url) or code_error "invalid url supplied to curl()";
     my $host = $url;
     $host =~ s/^https?:\/\///;
     $host =~ s/(?::\d+)?(?:\/.*)?$//;
     isHost($host) or die "Invalid host determined from URL in curl()";
+    my $auth = (defined($user) and defined($password));
     validate_resolvable($host);
-    vlog2("HTTP GET $url");
-    my $content = main::get $url;
-    my ($result, $err) = ($?, $!);
+    vlog2("HTTP GET $url" . ( $auth ? " (basic authentication)" : "") );
+    #unless(defined(&main::get)){
+        # inefficient, it'll import for each curl call, instead force top level author to 
+        # use LWP::Simple 'get'
+        #debug("importing LWP::Simple 'get'\n");
+        #require LWP::Simple;
+        #import LWP::Simple "get";
+        #code_error "called curl() without declaring \"use LWP::Simple 'get'\"";
+    #}
+    #$content = main::get $url;
+    #my ($result, $err) = ($?, $!);
+    #vlog2("result: $result");
+    #vlog2("error:  " . ( $err ? $err : "<none>" ) . "\n");
+    #if($result ne 0 or $err){
+    #    quit("CRITICAL", "failed to get '$url': $err");
+    #}
+    unless(defined($main::ua)){
+        code_error "LWP useragent \$ua not defined, must import to main before calling curl(), do either \"use LWP::Simple '\$ua'\" or \"use LWP::UserAgent; my \$ua = LWP::UserAgent->new\"";
+    }
+    my $req = HTTP::Request->new('GET', $url);
+    # Doesn't work
+    #$ua->credentials($host, '', $user, $password);
+    $req->authorization_basic($user, $password) if (defined($user) and defined($password));
+    my $response = $main::ua->request($req);
+    my $content  = $response->content;
     vlog3("returned HTML:\n\n" . ( $content ? $content : "<blank>" ) . "\n");
-    vlog2("result: $result");
-    vlog2("error:  " . ( $err ? $err : "<none>" ) . "\n");
-    if($result ne 0 or $err){
-        quit("CRITICAL", "failed to get '$url': $err");
+    vlog2("http status code:     " . $response->code);
+    vlog2("http status message:  " . $response->message);
+    unless($response->code eq "200"){
+        quit("UNKNOWN", $response->code . " " . $response->message);
     }
     unless($content){
         quit("CRITICAL", "blank content returned from '$url'");
