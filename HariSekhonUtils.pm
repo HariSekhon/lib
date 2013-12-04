@@ -896,7 +896,7 @@ sub curl ($;$$$) {
     my $content  = $response->content;
     vlog3("returned HTML:\n\n" . ( $content ? $content : "<blank>" ) . "\n");
     vlog2("http status code:     " . $response->code);
-    vlog2("http status message:  " . $response->message);
+    vlog2("http status message:  " . $response->message . "\n");
     unless($response->code eq "200"){
         quit("UNKNOWN", $response->code . " " . $response->message);
     }
