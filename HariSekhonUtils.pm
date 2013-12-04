@@ -864,7 +864,7 @@ sub curl ($;$$$) {
     my $auth = (defined($user) and defined($password));
     validate_resolvable($host);
     if($name){
-        vlog2 "querying $name";
+        vlog2("querying $name");
         vlog3("HTTP GET $url" . ( $auth ? " (basic authentication)" : "") );
     } else {
         vlog2("HTTP GET $url" . ( $auth ? " (basic authentication)" : "") );
