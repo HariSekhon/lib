@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.6.4";
+our $VERSION = "1.6.5";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -850,8 +850,9 @@ sub compact_array (@) {
 }
 
 
-sub curl ($;$$) {
+sub curl ($;$$$) {
     my $url      = shift;
+    my $name     = shift;
     my $user     = shift;
     my $password = shift;
     #debug("url passed to curl: $url");
@@ -862,7 +863,12 @@ sub curl ($;$$) {
     isHost($host) or die "Invalid host determined from URL in curl()";
     my $auth = (defined($user) and defined($password));
     validate_resolvable($host);
-    vlog2("HTTP GET $url" . ( $auth ? " (basic authentication)" : "") );
+    if($name){
+        vlog2 "querying $name";
+        vlog3("HTTP GET $url" . ( $auth ? " (basic authentication)" : "") );
+    } else {
+        vlog2("HTTP GET $url" . ( $auth ? " (basic authentication)" : "") );
+    }
     #unless(defined(&main::get)){
         # inefficient, it'll import for each curl call, instead force top level author to 
         # use LWP::Simple 'get'
