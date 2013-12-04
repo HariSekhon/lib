@@ -1752,7 +1752,7 @@ sub set_http_timeout($){
     my $http_timeout = shift;
     isFloat($http_timeout) or code_error "invalid arg passed to set_http_timeout(), must be float";
     defined_main_ua();
-    $http_timeout = minimum_value($http_timeout, 1);
+    $http_timeout = sprintf("%.2f", minimum_value($http_timeout, 1) );
     vlog2("setting http per request timeout to $http_timeout secs\n");
     $main::ua->timeout($http_timeout);
 }
