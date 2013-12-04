@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.6.5";
+our $VERSION = "1.6.6";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -148,6 +148,7 @@ our %EXPORT_TAGS = (
                         env_creds
                         expand_units
                         msg_perf_thresholds
+                        minimum_value
                         parse_file_option
                         plural
                         remove_timeout
@@ -1491,6 +1492,18 @@ sub lstrip ($) {
 }
 #sub ltrim { lstrip(@_) }
 *ltrim = \&lstrip;
+
+
+sub minimum_value ($$) {
+    my $value = shift;
+    my $min   = shift;
+    isFloat($value) or code_error "invalid first arg passed to minimum_value(), must be float";
+    isFloat($min)   or code_error "invalid second arg passed to minimum_value(), must be float";
+    if($value < $min){
+        return $min;
+    }
+    return $value;
+}
 
 
 sub msg_perf_thresholds (;$) {
