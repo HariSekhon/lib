@@ -217,6 +217,7 @@ our %EXPORT_TAGS = (
                         sec2min
                     ) ],
     'timeout' => [  qw(
+                        set_http_timeout
                         set_timeout
                         set_timeout_default
                         set_timeout_max
@@ -885,9 +886,7 @@ sub curl ($;$$$) {
     #if($result ne 0 or $err){
     #    quit("CRITICAL", "failed to get '$url': $err");
     #}
-    unless(defined($main::ua)){
-        code_error "LWP useragent \$ua not defined (or inaccessibly defined with my instead of our), must import to main before calling curl(), do either \"use LWP::Simple '\$ua'\" or \"use LWP::UserAgent; my \$ua = LWP::UserAgent->new\"";
-    }
+    defined_main_ua();
     $main::ua->show_progress(1) if $debug;
     my $req = HTTP::Request->new('GET', $url);
     # Doesn't work
@@ -923,6 +922,13 @@ sub debug (@) {
     }
     #printf "${prefix_newline}debug: %s => %s\n", $sub, $debug_msg;
     printf "debug: %s => %s\n", $sub, $debug_msg;
+}
+
+
+sub defined_main_ua(){
+    unless(defined($main::ua)){
+        code_error "LWP useragent \$ua not defined (or inaccessibly defined with my instead of our), must import to main before calling curl(), do either \"use LWP::Simple '\$ua'\" or \"use LWP::UserAgent; our \$ua = LWP::UserAgent->new\"";
+    }
 }
 
 
@@ -1739,6 +1745,16 @@ sub sec2min ($){
     my $secs = shift;
     isFloat($secs) or return undef;
     return sprintf("%d:%.2d", int($secs / 60), $secs % 60);
+}
+
+
+sub set_http_timeout($){
+    my $http_timeout = shift;
+    isFloat($http_timeout) or code_error "invalid arg passed to set_http_timeout(), must be float";
+    defined_main_ua();
+    $http_timeout = minimum_value($http_timeout, 1);
+    vlog2("setting http per request timeout to $http_timeout secs\n");
+    $main::ua->timeout($http_timeout);
 }
 
 
