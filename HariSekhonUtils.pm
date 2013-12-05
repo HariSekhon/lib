@@ -214,6 +214,7 @@ our %EXPORT_TAGS = (
                         rtrim
                         strip
                         trim
+                        trim_float
                     ) ],
     'time'    => [  qw(
                         sec2min
@@ -1068,28 +1069,35 @@ sub hr() {
 
 sub human_units ($_) {
     my $num = shift;
-    isFloat($num) or isScientific($num) or code_error "non-float passed to human_readable()";
+    my $units;
+    defined($num) or code_error "no arg passed to human_units()";
+    isFloat($num) or isScientific($num) or code_error "non-float passed to human_units()";
     if(     $num >= (1024**7)){
         code_error "determine suspicious units for number $num, larger than Exabytes??!!";
     } elsif($num >= (1024**6)){
-        $num = sprintf("%.2fEB", $num / (1024**6));
+        $num = sprintf("%.2f", $num / (1024**6));
+        $units = "EB";
     } elsif($num >= (1024**5)){
-        $num = sprintf("%.2fPB", $num / (1024**5));
+        $num = sprintf("%.2f", $num / (1024**5));
+        $units = "PB";
     } elsif($num >= (1024**4)){
-        $num = sprintf("%.2fTB", $num / (1024**4));
+        $num = sprintf("%.2f", $num / (1024**4));
+        $units = "TB";
     } elsif($num >= (1024**3)){
-        $num = sprintf("%.2fGB", $num / (1024**3));
+        $num = sprintf("%.2f", $num / (1024**3));
+        $units = "GB";
     } elsif($num >= (1024**2)){
-        $num = sprintf("%.2fMB", $num / (1024**2));
+        $num = sprintf("%.2f", $num / (1024**2));
+        $units = "MB";
     } elsif($num >= (1024**1)){
-        $num = sprintf("%.2fKB", $num / (1024**1));
+        $num = sprintf("%.2f", $num / (1024**1));
+        $units = "KB";
     } elsif($num < 1024){
-        $num = "$num bytes";
+        return "$num bytes";
     } else {
         code_error "unable to determine units for number $num";
     }
-    $num =~ s/\.0+([^\d])/$1/;
-    return $num;
+    return trim_float($num) . $units;
 }
 
 
@@ -1857,6 +1865,14 @@ sub subtrace (@) {
     my $prefix_newline = $1 || "";
     # TODO: can improve this if we can go one level up, dedupe with debug, do this later
     printf "${prefix_newline}debug: %s() => $debug_msg\n", (caller(1))[3];
+}
+
+
+sub trim_float($_) {
+    my $num = shift;
+    defined($num) or code_error "no arg passed to trim_float()";
+    $num =~ s/\.0+$/$1/;
+    return $num;
 }
 
 
