@@ -1071,21 +1071,24 @@ sub human_units ($_) {
     if(     $num >= (1024**7)){
         code_error "determine suspicious units for number $num, larger than Exabytes??!!";
     } elsif($num >= (1024**6)){
-        return (sprintf("%.2fEB", $num / (1024**6)));
+        $num = sprintf("%.2fEB", $num / (1024**6));
     } elsif($num >= (1024**5)){
-        return (sprintf("%.2fPB", $num / (1024**5)));
+        $num = sprintf("%.2fPB", $num / (1024**5));
     } elsif($num >= (1024**4)){
-        return (sprintf("%.2fTB", $num / (1024**4)));
+        $num = sprintf("%.2fTB", $num / (1024**4));
     } elsif($num >= (1024**3)){
-        return (sprintf("%.2fGB", $num / (1024**3)));
+        $num = sprintf("%.2fGB", $num / (1024**3));
     } elsif($num >= (1024**2)){
-        return (sprintf("%.2fMB", $num / (1024**2)));
+        $num = sprintf("%.2fMB", $num / (1024**2));
     } elsif($num >= (1024**1)){
-        return (sprintf("%.2fKB", $num / (1024**1)));
+        $num = sprintf("%.2fKB", $num / (1024**1));
     } elsif($num < 1024){
-        return "$num bytes";
+        $num = "$num bytes";
+    } else {
+        code_error "unable to determine units for number $num";
     }
-    code_error "unable to determine units for number $num, surely it's not larger than Exabytes??!!";
+    $num =~ s/\.0+([^\d])/$1/;
+    return $num;
 }
 
 
