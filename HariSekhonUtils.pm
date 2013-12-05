@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.6.7";
+our $VERSION = "1.6.8";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -147,6 +147,7 @@ our %EXPORT_TAGS = (
                         check_thresholds
                         env_creds
                         expand_units
+                        human_units
                         msg_perf_thresholds
                         minimum_value
                         parse_file_option
@@ -241,6 +242,7 @@ our %EXPORT_TAGS = (
                         validate_filename
                         validate_float
                         validate_fqdn
+                        validate_host_port_user_password
                         validate_host
                         validate_hostname
                         validate_int
@@ -1060,6 +1062,30 @@ sub flock_off (;$) {
 
 sub hr() {
     print "# " . "="x76 . " #\n";
+}
+
+
+sub human_units ($_) {
+    my $num = shift;
+    isFloat($num) or code_error "non-float passed to human_readable()";
+    if(     $num >= (1024**7)){
+        code_error "determine suspicious units for number $number, larger than Exabytes??!!";
+    } elsif($num >= (1024**6)){
+        return "EB";
+    } elsif($num >= (1024**5)){
+        return "PB";
+    } elsif($num >= (1024**4)){
+        return "TB";
+    } elsif($num >= (1024**3)){
+        return "GB";
+    } elsif($num >= (1024**2)){
+        return "MB";
+    } elsif($num >= (1024**1)){
+        return "KB";
+    } elsif($num < 1024){
+        return "bytes";
+    }
+    code_error "unable to determine units for number $number, surely it's not larger than Exabytes??!!";
 }
 
 
@@ -2113,6 +2139,11 @@ sub validate_fqdn ($) {
     $fqdn = isFqdn($fqdn) || usage "invalidate FQDN given";
     vlog_options("fqdn", "'$fqdn'");
     return $fqdn
+}
+
+
+sub validate_host_port_user_password($$$$){
+    return (validate_host($host), validate_port($port), validate_user($user), validate_password($password));
 }
 
 
