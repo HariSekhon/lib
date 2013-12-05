@@ -410,29 +410,29 @@ is(validate_file("/etc/nonexistentfile", 1),    undef,          'validate_file("
 is(validate_filename("/etc/passwd"),                "/etc/passwd",              'validate_filename("/etc/passwd")');
 is(validate_filename("/etc/nonexistentfile", 1),    "/etc/nonexistentfile",     'validate_filename("/etc/nonexistentfile", 1)');
 
-is(validate_float(2,0,10,"two"),            2,      'validate_float(2,0,10,"two")');
-is(validate_float(-2,-10,10,"minus-two"),   -2,     'validate_float(-2,-10,10,"minus-two")');
-is(validate_float(2.1,0,10,"two-float"),    2.1,    'validate_float(2.1,0,10,"two-float")');
-is(validate_float(6.8,5,10,"six-float"),    6.8,    'validate_float(6.8,5,10,"six")');
-is(validate_float(-6,-6,0,"minus-six"),     -6,     'validate_float(-6,-6,0,"minus-six")');
+is(validate_float(2,"two",0,10),            2,      'validate_float(2,"two",0,10)');
+is(validate_float(-2,"minus-two",-10,10),   -2,     'validate_float(-2,"minus-two",-10,10)');
+is(validate_float(2.1,"two-float",0,10),    2.1,    'validate_float(2.1,"two-float",0,10)');
+is(validate_float(6.8,"six-float",5,10),    6.8,    'validate_float(6.8,"six",5,10)');
+is(validate_float(-6,"minus-six",-6,0),     -6,     'validate_float(-6,"minus-six",-6,0)');
 # should error out
-#is(validate_float(3,4,10,"three"),  0,  'validate_float(3,4,10,"three")');
+#is(validate_float(3,"three",4,10),  0,  'validate_float(3,"three",4,10)');
 
 is(validate_fqdn("www.harisekhon.com"),     "www.harisekhon.com",      'validate_fqdn("www.harisekhon.com")');
 # should error out
 #is(validate_fqdn("harisekhon.com"),     0,      'validate_fqdn("harisekhon.com")');
 
 
-is(validate_int(2,0,10,"two"),    2,  'validate_int(2,0,10,"two")');
-is(validate_int(-2,-10,10,"minus-two"),    -2,  'validate_int(-2,-10,10,"minus-two")');
+is(validate_int(2,"two",0,10),    2,  'validate_int(2,"two",0,10)');
+is(validate_int(-2,"minus-two",-10,10),    -2,  'validate_int(-2,"minus-two",-10,10)');
 # should error out
-#is(validate_int(2.1,0,10,"two-float"),  0,  'validate_int(2.0,0,10,"two-float")');
-is(validate_int(6,5,10,"six"),    6,  'validate_int(6,5,10,"six")');
-is(validate_int(-6,-6,0,"minus-six"),    -6,  'validate_int(-6,-6,0,"minus-six")');
-is(validate_integer(2,0,10,"two"),    2,  'validate_integer(2,0,10,"two")');
-is(validate_integer(6,5,7,"six"),    6,  'validate_integer(6,5,7,"six")');
+#is(validate_int(2.1,0,10,"two-float"),  0,  'validate_int(2.0,"two-float",0,10)');
+is(validate_int(6,"six",5,10),    6,  'validate_int(6,"six",5,10)');
+is(validate_int(-6,"minus-six",-6,0),    -6,  'validate_int(-6,"minus-six",-6,0)');
+is(validate_integer(2,"two",0,10),    2,  'validate_integer(2,"two",0,10)');
+is(validate_integer(6,"six",5,7),    6,  'validate_integer(6,"six",5,7)');
 # should error out
-#is(validate_int(3,4,10,"three"),  0,  'validate_int(3,4,10,"three")');
+#is(validate_int(3,"three",4,10),  0,  'validate_int(3,"three",4,10)');
 
 is(validate_interface("eth0"),     "eth0",     'validate_interface("eth0")');
 is(validate_interface("bond3"),    "bond3",    'validate_interface("bond3")');
