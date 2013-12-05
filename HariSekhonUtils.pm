@@ -1069,23 +1069,23 @@ sub human_units ($_) {
     my $num = shift;
     isFloat($num) or code_error "non-float passed to human_readable()";
     if(     $num >= (1024**7)){
-        code_error "determine suspicious units for number $number, larger than Exabytes??!!";
+        code_error "determine suspicious units for number $num, larger than Exabytes??!!";
     } elsif($num >= (1024**6)){
-        return "EB";
+        return (sprintf("%.2fEB", $num / (1024**6)));
     } elsif($num >= (1024**5)){
-        return "PB";
+        return (sprintf("%.2fPB", $num / (1024**5)));
     } elsif($num >= (1024**4)){
-        return "TB";
+        return (sprintf("%.2fTB", $num / (1024**4)));
     } elsif($num >= (1024**3)){
-        return "GB";
+        return (sprintf("%.2fGB", $num / (1024**3)));
     } elsif($num >= (1024**2)){
-        return "MB";
+        return (sprintf("%.2fMB", $num / (1024**2)));
     } elsif($num >= (1024**1)){
-        return "KB";
+        return (sprintf("%.2fKB", $num / (1024**1)));
     } elsif($num < 1024){
-        return "bytes";
+        return "$num bytes";
     }
-    code_error "unable to determine units for number $number, surely it's not larger than Exabytes??!!";
+    code_error "unable to determine units for number $num, surely it's not larger than Exabytes??!!";
 }
 
 
