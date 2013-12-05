@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.6.8";
+our $VERSION = "1.6.9";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -123,6 +123,7 @@ our %EXPORT_TAGS = (
                         isPort
                         isProcessName
                         isScalar
+                        isScientific
                         isUrl
                         isUrlPathSuffix
                         isUser
@@ -1067,7 +1068,7 @@ sub hr() {
 
 sub human_units ($_) {
     my $num = shift;
-    isFloat($num) or code_error "non-float passed to human_readable()";
+    isFloat($num) or isScientific($num) or code_error "non-float passed to human_readable()";
     if(     $num >= (1024**7)){
         code_error "determine suspicious units for number $num, larger than Exabytes??!!";
     } elsif($num >= (1024**6)){
@@ -1425,6 +1426,14 @@ sub isScalar ($;$) {
         }
     }
     return $isScalar;
+}
+
+
+sub isScientific($){
+    my $num = shift;
+    defined($num) or code_error "no arg passed to isScientific()";
+    $num =~ /^\d+\.\d+e[+-]\d+$/ or return undef;
+    return $num;
 }
 
 
