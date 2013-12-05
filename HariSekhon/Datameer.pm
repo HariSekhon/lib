@@ -26,6 +26,7 @@ our @ISA = qw(Exporter);
 our @EXPORT = ( qw (
                      $DATAMEER_DEFAULT_PORT
                      %datameer_options
+                     datameer_curl
                 )
 );
 our @EXPORT_OK = ( @EXPORT );
@@ -41,3 +42,18 @@ our %datameer_options = (
     "u|user=s"         => [ \$user,         "Datameer user     (\$DATAMEER_USER)" ],
     "p|password=s"     => [ \$password,     "Datameer password (\$DATAMEER_PASSWORD)" ],
 );
+
+sub datameer_curl($$$){
+    # curl takes care of the error handling in HariSekhonUtils
+    my $content = curl $_[0], "Datameer", $_[1], $_[2];
+
+    my $json;
+    try{
+        $json = decode_json $content;
+    };
+    catch{
+        quit "CRITICAL", "invalid json returned by '$host:$port'";
+    };
+
+    return $json;
+}
