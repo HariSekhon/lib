@@ -123,8 +123,8 @@ is(expand_units("10", "Pb"), 11258999068426240, 'expand_units("10", "Pb") eq 112
 
 is(human_units(1023),               "1023 bytes",   'human_units(1023) eq "1023 bytes"');
 is(human_units(1023*(1024**1)),     "1023KB",       'human_units KB');
-is(human_units(1023.1*(1024**2)),   "1023.10MB",    'human_units MB');
-is(human_units(1023.2*(1024**3)),   "1023.20GB",    'human_units GB');
+is(human_units(1023.1*(1024**2)),   "1023.1MB",    'human_units MB');
+is(human_units(1023.2*(1024**3)),   "1023.2GB",    'human_units GB');
 is(human_units(1023.31*(1024**4)),  "1023.31TB",    'human_units TB');
 is(human_units(1023.012*(1024**5)), "1023.01PB",    'human_units PB');
 is(human_units(1023*(1024**6)), "1023EB", 'human_units EB"');
@@ -374,6 +374,9 @@ is(set_timeout(10),     10,     "set_timeout(10) eq 10");
 
 is(strip(" \t \n ha ri \t \n"),     "ha ri",   'strip()');
 is(trim(" \t \n ha ri \t \n"),      "ha ri",   'trim()');
+
+is(trim_float("0.10"), "0.1", 'trim_float("0.10") eq "0.1"');
+is(trim_float("0.101"), "0.101", 'trim_float("0.101") eq "0.101"');
 
 # TODO:
 #ok(subtrace("test"), 'subtrace("test")');
