@@ -26,6 +26,7 @@ our @ISA = qw(Exporter);
 our @EXPORT = ( qw (
                      $DATAMEER_DEFAULT_PORT
                      %datameer_options
+                     %datameer_job_state
                      datameer_curl
                 )
 );
@@ -42,6 +43,11 @@ our %datameer_options = (
     "u|user=s"         => [ \$user,         "Datameer user     (\$DATAMEER_USER)" ],
     "p|password=s"     => [ \$password,     "Datameer password (\$DATAMEER_PASSWORD)" ],
 );
+
+our %datameer_job_state;
+$datameer_job_state{"OK"}       = [qw/RUNNING WAITING_FOR_OTHER_JOB COMPLETED QUEUED/];
+$datameer_job_state{"WARNING"}  = [qw/COMPLETED_WITH_Warnings CANCELED CANCELLED/];
+$datameer_job_state{"CRITICAL"} = [qw/ERROR/];
 
 sub datameer_curl($$$){
     # curl takes care of the error handling in HariSekhonUtils
