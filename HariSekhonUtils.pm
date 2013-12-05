@@ -61,7 +61,7 @@ use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
 
-our $VERSION = "1.6.6";
+our $VERSION = "1.6.7";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2096,7 +2096,7 @@ sub validate_float ($$$$) {
 #    my $min     = $_[1] || 0;
 #    my $max     = $_[2] || code_error "no max value given for validate_float()";
 #    my $name    = $_[3] || code_error "no name passed to validate_float()";
-    my ($float, $min, $max, $name) = @_;
+    my ($float, $name, $min, $max) = @_;
     defined($float) || usage "$name not specified";
     isFloat($float,1) or usage "invalid $name given, must be a real number";
     ($float >= $min && $float <= $max) or usage "invalid $name given, must be real number between $min and $max";
