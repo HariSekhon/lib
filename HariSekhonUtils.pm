@@ -1871,7 +1871,8 @@ sub subtrace (@) {
 sub trim_float($_) {
     my $num = shift;
     defined($num) or code_error "no arg passed to trim_float()";
-    $num =~ s/\.0+$/$1/;
+    $num =~ s/\.0+$//;
+    $num =~ s/\.([1-9]*)0+$/\.$1/;
     return $num;
 }
 
