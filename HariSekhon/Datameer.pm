@@ -37,7 +37,7 @@ env_creds("DATAMEER");
 
 our %datameer_options = (
     "H|host=s"         => [ \$host,         "Datameer server" ],
-    "P|port=s"         => [ \$port,         "Datameer port (default: $DATAMEER_DEFAULT_PORT)" ],
+    "P|port=s"         => [ \$port,         "Datameer port     (default: $DATAMEER_DEFAULT_PORT)" ],
     "u|user=s"         => [ \$user,         "Datameer user     (\$DATAMEER_USER)" ],
     "p|password=s"     => [ \$password,     "Datameer password (\$DATAMEER_PASSWORD)" ],
 );
