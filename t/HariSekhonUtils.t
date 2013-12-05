@@ -121,6 +121,14 @@ is(expand_units("10", "Gb"), 10737418240, 'expand_units("10", "Gb") eq 107374182
 is(expand_units("10", "tb"), 10995116277760, 'expand_units("10", "tb") eq 10995116277760');
 is(expand_units("10", "Pb"), 11258999068426240, 'expand_units("10", "Pb") eq 11258999068426240');
 
+is(human_units(1023),               "1023 bytes",   'human_units(1023) eq "1023 bytes"');
+is(human_units(1023*(1024**1)),     "1023KB",       'human_units KB');
+is(human_units(1023.1*(1024**2)),   "1023.10MB",    'human_units MB');
+is(human_units(1023.2*(1024**3)),   "1023.20GB",    'human_units GB');
+is(human_units(1023.31*(1024**4)),  "1023.31TB",    'human_units TB');
+is(human_units(1023.012*(1024**5)), "1023.01PB",    'human_units PB');
+is(human_units(1023*(1024**6)), "1023EB", 'human_units EB"');
+
 # TODO: get_options
 
 is(get_path_owner("/etc/passwd"), "root", 'get_path_owner("/etc/passwd") eq "root"');
