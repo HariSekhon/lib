@@ -18,6 +18,7 @@ BEGIN {
     use lib dirname(__FILE__) . "/..";
 }
 use HariSekhonUtils;
+use JSON::XS;
 use Carp;
 
 use Exporter;
@@ -33,7 +34,7 @@ our @EXPORT = ( qw (
 our @EXPORT_OK = ( @EXPORT );
 
 our $DATAMEER_DEFAULT_PORT = 8080;
-$port = $default_port;
+$port = $DATAMEER_DEFAULT_PORT;
 
 env_creds("DATAMEER");
 
