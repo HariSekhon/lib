@@ -60,6 +60,7 @@ use File::Basename;
 use Getopt::Long qw(:config bundling);
 use POSIX;
 #use Sys::Hostname;
+use Time::Local;
 
 our $VERSION = "1.6.9";
 
@@ -151,9 +152,11 @@ our %EXPORT_TAGS = (
                         human_units
                         msg_perf_thresholds
                         minimum_value
+                        month2int
                         parse_file_option
                         plural
                         remove_timeout
+                        timecomponents2days
                         usage
                         validate_thresholds
                         version
@@ -1603,6 +1606,28 @@ sub msg_thresholds (;$) {
 }
 
 
+sub month2int($){
+    my $month = shift;
+    defined($month) or code_error "no arg passed to month2int";
+    my %months = (
+        "Jan" => 0,
+        "Feb" => 1,
+        "Mar" => 2,
+        "Apr" => 3,
+        "May" => 4,
+        "Jun" => 5,
+        "Jul" => 6,
+        "Aug" => 7,
+        "Sep" => 8,
+        "Oct" => 9,
+        "Nov" => 10,
+        "Dec" => 11
+    );
+    grep { $month eq $_ } keys %months or code_error "non-month passed to month2int()";
+    return $months{$month};
+}
+
+
 sub open_file ($;$) {
     my $filename = shift;
     my $lock = shift;
@@ -1785,6 +1810,25 @@ sub rstrip ($) {
 }
 #sub rtrim { rstrip(@_) }
 *rtrim = \&rstrip;
+
+
+sub timecomponents2days($$$$$$){
+    my $year  = shift;
+    my $month = shift;
+    my $day   = shift;
+    my $hour  = shift;
+    my $min   = shift;
+    my $sec   = shift;
+    my $month_int;
+    if(isInt($month)){
+        $month_int = $month;
+    } else {
+        $month_int = month2int($month);
+    }
+    my $epoch = timegm($sec, $min, $hour, $day, $month_int, $year-1900) || code_error "failed to convert timestamp $year-$month-$day $hour:$min:$sec";
+    my $now   = time || code_error "failed to get epoch timestamp";
+    return ($epoch - $now) / (86400);
+}
 
 
 sub sec2min ($){
