@@ -62,7 +62,7 @@ use POSIX;
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.6.9";
+our $VERSION = "1.6.10";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1070,7 +1070,7 @@ sub hr() {
 }
 
 
-sub human_units ($_) {
+sub human_units ($) {
     my $num = shift;
     my $units;
     defined($num) or code_error "no arg passed to human_units()";
@@ -1912,7 +1912,7 @@ sub subtrace (@) {
 }
 
 
-sub trim_float($_) {
+sub trim_float ($) {
     my $num = shift;
     defined($num) or code_error "no arg passed to trim_float()";
     $num =~ s/\.0+$//;
