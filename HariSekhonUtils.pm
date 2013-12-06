@@ -1552,8 +1552,8 @@ sub lstrip ($) {
 sub minimum_value ($$) {
     my $value = shift;
     my $min   = shift;
-    isFloat($value) or code_error "invalid first arg passed to minimum_value(), must be float";
-    isFloat($min)   or code_error "invalid second arg passed to minimum_value(), must be float";
+    isFloat($value) or code_error "invalid first arg passed to minimum_value(), must be positive float";
+    isFloat($min)   or code_error "invalid second arg passed to minimum_value(), must be positive float";
     if($value < $min){
         return $min;
     }
