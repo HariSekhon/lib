@@ -954,15 +954,15 @@ sub expand_units ($$;$) {
     my $units = shift;
     my $name  = shift;
     my $power;
-    #defined($num)   || code_error "no num passed to expand_units()";
-    isFloat($num)   || code_error "non-float arg 1 passed to expand_units()";
-    #defined($units) || code_error "no units passed to expand_units()";
+    defined($num)   || code_error "no num arg 1 passed to expand_units()";
+    defined($units) || code_error "no units arg 2 passed to expand_units()";
+    isFloat($num)   || code_error "non-float num arg 1 passed to expand_units()";
     if   ($units =~ /^KB$/i){ $power = 1; }
     elsif($units =~ /^MB$/i){ $power = 2; }
     elsif($units =~ /^GB$/i){ $power = 3; }
     elsif($units =~ /^TB$/i){ $power = 4; }
     elsif($units =~ /^PB$/i){ $power = 5; }
-    else { code_error "unrecognized units " . ($name ? "for $name" : "passed to expand_units()" ) . ", code may need updating, run with -vvv to debug"; }
+    else { code_error "unrecognized units " . ($name ? "for $name" : "passed to expand_units()" ) . ". $nagios_plugins_support_msg"; }
     return $num * (1024**$power);
 }
 
@@ -1552,8 +1552,8 @@ sub lstrip ($) {
 sub minimum_value ($$) {
     my $value = shift;
     my $min   = shift;
-    isFloat($value) or code_error "invalid first arg passed to minimum_value(), must be positive float";
-    isFloat($min)   or code_error "invalid second arg passed to minimum_value(), must be positive float";
+    isFloat($value) or code_error "invalid first arg passed to minimum_value(), must be float";
+    isFloat($min)   or code_error "invalid second arg passed to minimum_value(), must be float";
     if($value < $min){
         return $min;
     }
