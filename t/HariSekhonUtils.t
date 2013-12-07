@@ -249,6 +249,8 @@ is(isKrb5Princ('tgt/HARI.COM@HARI.COM'),        'tgt/HARI.COM@HARI.COM',        
 is(isKrb5Princ('hari'),                         'hari',                         'isKrb5Princ("hari") eq "hari"');
 is(isKrb5Princ('hari@HARI.COM'),                'hari@HARI.COM',                'isKrb5Princ("hari@HARI.COM") eq "hari@HARI.COM"');
 is(isKrb5Princ('hari/my.host.local@HARI.COM'),  'hari/my.host.local@HARI.COM',  'isKrb5Princ("hari/my.host.local@HARI.COM") eq "hari/my.host.local@HARI.COM"');
+is(isKrb5Princ('cloudera-scm/admin@REALM.COM'),  'cloudera-scm/admin@REALM.COM', 'isKrb5Princ("cloudera-scm/admin@REALM.COM")');
+is(isKrb5Princ('cloudera-scm/admin@SUB.REALM.COM'),  'cloudera-scm/admin@SUB.REALM.COM', 'isKrb5Princ("cloudera-scm/admin@SUB.REALM.COM")');
 
 is(isNagiosUnit("s"),   "s",    'isNagiosUnit(s) eq s');
 is(isNagiosUnit("ms"),  "ms",   'isNagiosUnit(s) eq ms');
@@ -287,6 +289,8 @@ is(isUrlPathSuffix("/*"),               undef,                      'isUrlPathSu
 
 is(isUser("hadoop"),    "hadoop",   'isUser("hadoop")');
 is(isUser("hari1983"),  "hari1983", 'isUser("hari1983")');
+is(isUser('cloudera-scm'),  'cloudera-scm', 'isUser("cloudera-scm")');
+is(isUser('cloudera-scm'),  'cloudera-scm', 'isUser("cloudera-scm")');
 ok(!isUser("-hari"),                '!isUser("-hari")');
 ok(!isUser("1983hari"),             '!isUser("1983hari")');
 
