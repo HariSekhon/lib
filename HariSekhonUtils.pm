@@ -1581,7 +1581,7 @@ sub msg_thresholds (;$) {
     if ($thresholds{"critical"}{"error"} or
         $thresholds{"warning"}{"error"}  or
         ($verbose and (defined($warning) or defined($critical))) ) {
-        $msg2 .= "(";
+        $msg2 .= " (";
         if($thresholds{"critical"}{"error"}){
             $msg2 .= "$thresholds{critical}{error}, ";
         }
@@ -1600,7 +1600,7 @@ sub msg_thresholds (;$) {
         $msg2 .= ")";
     }
     unless($no_msg_thresholds){
-        $msg .= " $msg2" if $msg2;
+        $msg .= $msg2 if $msg2;
     }
     return $msg2;
 }
