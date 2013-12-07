@@ -178,7 +178,7 @@ our %EXPORT_TAGS = (
                         $host_regex
                         $hostname_regex
                         $ip_regex
-                        $krb5_princ_regex
+                        $krb5_principal_regex
                         $mac_regex
                         $process_name_regex
                         $rwxt_regex
