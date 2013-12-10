@@ -2160,11 +2160,12 @@ sub validate_email ($) {
 sub validate_file ($;$$$) {
     my $filename = shift;
     my $noquit   = shift;
-    my $name     = shift;
+    my $name     = shift || "";
     my $no_vlog  = shift;
     $filename = validate_filename($filename, $noquit, $name, $no_vlog) or return undef;
     unless( -f $filename ){
-        usage "file not found: '$filename' ($!)" unless $noquit;
+        $name .= " " if $name;
+        usage "${name}file not found: '$filename' ($!)" unless $noquit;
         return undef
     }
     return $filename;
