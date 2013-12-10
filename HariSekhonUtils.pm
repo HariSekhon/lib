@@ -2134,14 +2134,15 @@ sub validate_domain ($) {
 sub validate_directory ($;$$$) {
     my $dir     = shift;
     my $noquit  = shift;
-    my $name    = shift || "directory";
+    my $name    = shift || "";
     my $no_vlog = shift;
+    $name .= " " if $name;
     if($noquit){
         return validate_filename($dir, 1);
     }
-    defined($dir) || usage "directory not specified";
-    $dir = validate_filename($dir, "noquit", $name, $no_vlog) || usage "Invalid directory given (does not match regex criteria): '$dir'";
-    ( -d $dir) || usage "cannot find directory: '$dir'";
+    defined($dir) || usage "${name}directory not specified";
+    $dir = validate_filename($dir, "noquit", "${name}directory", $no_vlog) || usage "Invalid directory given (does not match regex criteria): '$dir'";
+    ( -d $dir) || usage "cannot find ${name}directory: '$dir'";
     return $dir;
 }
 *validate_dir = \&validate_directory;
