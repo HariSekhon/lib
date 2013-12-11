@@ -61,6 +61,9 @@ sub datameer_curl($$$){
     catch{
         quit "CRITICAL", "invalid json returned by '$host:$port'";
     };
+    if(defined($json->{"error"})){
+	quit "CRITICAL", $json->{"error"};
+    }
 
     return $json;
 }
