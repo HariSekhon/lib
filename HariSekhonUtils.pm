@@ -500,6 +500,27 @@ sub set_timeout_default ($) {
 }
 
 # ============================================================================ #
+# Optional options
+our %hostoptions = (
+    "H|host=s"      => [ \$host, "Host to connect to" ],
+    "p|port=s"      => [ \$port, "Port to connect to" ],
+);
+our %useroptions = (
+    "u|user=s"      => [ \$user,     "User      (\$USERNAME or \$USER)" ],
+    "p|password=s"  => [ \$password, "Password  (\$PASSWORD)"           ],
+);
+our %thresholdoptions = (
+    "w|warning=s"   => [ \$warning,  "Warning  threshold or ran:ge (inclusive)" ],
+    "c|critical=s"  => [ \$critical, "Critical threshold or ran:ge (inclusive)" ],
+);
+our %emailoptions = (
+    "E|email=s"     => [ \$email,   "Email address" ],
+);
+my $short_options_len = 0;
+my $long_options_len  = 0;
+
+# ============================================================================ #
+# Environment Host/Port and Credentials
 if($ENV{"HOST"}){
     $host = $ENV{"HOST"};
 }
@@ -515,10 +536,18 @@ if($ENV{"PASSWORD"}){
     $password = $ENV{"PASSWORD"};
 }
 
-sub env_creds($){
-    my $name = shift;
+sub env_creds($;$){
+    my $name     = shift;
+    my $longname = shift;
     ( defined($name) and $name ) or code_error("no name arg passed to env_creds()");
     $name = uc $name;
+    unless($longname){
+        if(length($name) < 4){
+            $longname = $name;
+        } else {
+            $longname = join " ", map {ucfirst} split " ", $longname;
+        }
+    }
     if($ENV{"${name}_HOST"}){
         $host = $ENV{"${name}_HOST"};
     }
@@ -533,27 +562,10 @@ sub env_creds($){
     if($ENV{"${name}_PASSWORD"}){
         $password = $ENV{"${name}_PASSWORD"};
     }
-}
 
-# ============================================================================ #
-# Optional options
-our %hostoptions = (
-    "H|host=s"      => [ \$host, "Host to connect to" ],
-    "p|port=s"      => [ \$port, "Port to connect to" ],
-);
-our %useroptions = (
-    "U|user=s"      => [ \$user,     "User"      ],
-    "P|password=s"  => [ \$password, "Password"  ],
-);
-our %thresholdoptions = (
-    "w|warning=s"   => [ \$warning,  "Warning  threshold or ran:ge (inclusive)" ],
-    "c|critical=s"  => [ \$critical, "Critical threshold or ran:ge (inclusive)" ],
-);
-our %emailoptions = (
-    "E|email=s"     => [ \$email,   "Email address" ],
-);
-my $short_options_len = 0;
-my $long_options_len  = 0;
+    $useroptions{"u|user=s"}     = [ \$user,    "$longname user     (\$${name}_USERNAME, \$${name}_USER, \$USERNAME, \$USER)" ];
+    $useroptions{"p|password=s"} = [ \$user,    "$longname password (\$${name}_PASSWORD, \$PASSWORD)" ];
+}
 
 # ============================================================================ #
 #                           Nagios Exit Code Functions
