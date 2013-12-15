@@ -545,7 +545,7 @@ sub env_creds($;$){
         if(length($name) < 4){
             $longname = $name;
         } else {
-            $longname = join " ", map {ucfirst} split " ", $longname;
+            $longname = join " ", map {ucfirst} split " ", lc $name;
         }
     }
     if($ENV{"${name}_HOST"}){
