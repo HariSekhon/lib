@@ -62,7 +62,7 @@ use POSIX;
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.6.11";
+our $VERSION = "1.6.12";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -499,6 +499,13 @@ sub set_timeout_default ($) {
     $default_options{"t|timeout=i"} = [ \$timeout, "Timeout in secs (default: $timeout_default)" ];
 }
 
+# ============================================================================ #
+if($ENV{"HOST"}){
+    $host = $ENV{"HOST"};
+}
+if($ENV{"PORT"}){
+    $port = $ENV{"PORT"};
+}
 if($ENV{"USERNAME"}){
     $user = $ENV{"USERNAME"};
 } elsif($ENV{"USER"}){
@@ -512,6 +519,12 @@ sub env_creds($){
     my $name = shift;
     ( defined($name) and $name ) or code_error("no name arg passed to env_creds()");
     $name = uc $name;
+    if($ENV{"${name}_HOST"}){
+        $host = $ENV{"${name}_HOST"};
+    }
+    if($ENV{"${name}_PORT"}){
+        $port = $ENV{"${name}_PORT"};
+    }
     if($ENV{"${name}_USERNAME"}){
         $user = $ENV{"${name}_USERNAME"};
     } elsif($ENV{"${name}_USER"}){
@@ -522,6 +535,7 @@ sub env_creds($){
     }
 }
 
+# ============================================================================ #
 # Optional options
 our %hostoptions = (
     "H|host=s"      => [ \$host, "Host to connect to" ],
