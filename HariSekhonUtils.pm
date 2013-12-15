@@ -563,8 +563,8 @@ sub env_creds($;$){
         $password = $ENV{"${name}_PASSWORD"};
     }
 
-    $hostoptions{"H|host=s"}     = [ \$host,    "$longname host (\${name}_HOST, \$HOST)" ];
-    $hostoptions{"P|port=s"}     = [ \$port,    "$longname port (\${name}_PORT, \$PORT)" ];
+    $hostoptions{"H|host=s"}     = [ \$host,    "$longname host (\$${name}_HOST, \$HOST)" ];
+    $hostoptions{"P|port=s"}     = [ \$port,    "$longname port (\$${name}_PORT, \$PORT" . ( defined($main::default_port) ? ", default: $main::default_port)" : ")") ];
     $useroptions{"u|user=s"}     = [ \$user,    "$longname user     (\$${name}_USERNAME, \$${name}_USER, \$USERNAME, \$USER)" ];
     $useroptions{"p|password=s"} = [ \$user,    "$longname password (\$${name}_PASSWORD, \$PASSWORD)" ];
 }
