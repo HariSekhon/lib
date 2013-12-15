@@ -502,8 +502,8 @@ sub set_timeout_default ($) {
 # ============================================================================ #
 # Optional options
 our %hostoptions = (
-    "H|host=s"      => [ \$host, "Host to connect to" ],
-    "p|port=s"      => [ \$port, "Port to connect to" ],
+    "H|host=s"      => [ \$host, "Host to connect to (\$HOST)" ],
+    "P|port=s"      => [ \$port, "Port to connect to (\$PORT)" ],
 );
 our %useroptions = (
     "u|user=s"      => [ \$user,     "User      (\$USERNAME or \$USER)" ],
@@ -520,7 +520,7 @@ my $short_options_len = 0;
 my $long_options_len  = 0;
 
 # ============================================================================ #
-# Environment Host/Port and Credentials
+# Environment Host/Port and User/Password Credentials
 if($ENV{"HOST"}){
     $host = $ENV{"HOST"};
 }
@@ -563,6 +563,8 @@ sub env_creds($;$){
         $password = $ENV{"${name}_PASSWORD"};
     }
 
+    $hostoptions{"H|host=s"}     = [ \$host,    "$longname host (\${name}_HOST, \$HOST)" ];
+    $hostoptions{"P|port=s"}     = [ \$port,    "$longname port (\${name}_PORT, \$PORT)" ];
     $useroptions{"u|user=s"}     = [ \$user,    "$longname user     (\$${name}_USERNAME, \$${name}_USER, \$USERNAME, \$USER)" ];
     $useroptions{"p|password=s"} = [ \$user,    "$longname password (\$${name}_PASSWORD, \$PASSWORD)" ];
 }
