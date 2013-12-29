@@ -62,7 +62,7 @@ use POSIX;
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.6.12";
+our $VERSION = "1.6.13";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2169,7 +2169,7 @@ sub validate_directory ($;$$$) {
         return validate_filename($dir, 1);
     }
     defined($dir) || usage "${name}directory not specified";
-    $dir = validate_filename($dir, "noquit", "${name}directory", $no_vlog) || usage "Invalid directory given (does not match regex criteria): '$dir'";
+    $dir = validate_filename($dir, "noquit", "${name}directory", $no_vlog) || usage "invalid ${name}directory (does not match regex criteria): '$dir'";
     ( -d $dir) || usage "cannot find ${name}directory: '$dir'";
     return $dir;
 }
@@ -2212,7 +2212,7 @@ sub validate_filename ($;$$$) {
     }
     my $filename2;
     unless($filename2 = isFilename($filename)){
-        usage "invalid $name given (does not match regex critera): '$filename'" unless $noquit;
+        usage "invalid $name (does not match regex critera): '$filename'" unless $noquit;
         return undef;
     }
     vlog_options($name, $filename2) unless $no_vlog;
@@ -2221,14 +2221,10 @@ sub validate_filename ($;$$$) {
 
 
 sub validate_float ($$$$) {
-#    my $float = $_[0] if defined($_[0]);
-#    my $min     = $_[1] || 0;
-#    my $max     = $_[2] || code_error "no max value given for validate_float()";
-#    my $name    = $_[3] || code_error "no name passed to validate_float()";
     my ($float, $name, $min, $max) = @_;
     defined($float) || usage "$name not specified";
-    isFloat($float,1) or usage "invalid $name given, must be a real number";
-    ($float >= $min && $float <= $max) or usage "invalid $name given, must be real number between $min and $max";
+    isFloat($float,1) or usage "invalid $name, must be a real number";
+    ($float >= $min && $float <= $max) or usage "invalid $name, must be real number between $min and $max";
     $float =~ /^(-?\d+(?:\.\d+)?)$/ or usage "invalid float $name passed to validate_float(), WARNING: caught LATE";
     $float = $1;
     vlog_options($name, $float);
@@ -2236,11 +2232,13 @@ sub validate_float ($$$$) {
 }
 
 
-sub validate_fqdn ($) {
+sub validate_fqdn ($;$) {
     my $fqdn = shift;
-    defined($fqdn) || usage "FQDN not defined";
-    $fqdn = isFqdn($fqdn) || usage "invalidate FQDN given";
-    vlog_options("fqdn", "'$fqdn'");
+    my $name = shift || "";
+    $name .= " " if $name;
+    defined($fqdn) || usage "${name}FQDN not defined";
+    $fqdn = isFqdn($fqdn) || usage "invalidate ${name}FQDN";
+    vlog_options("${name}fqdn", "'$fqdn'");
     return $fqdn
 }
 
@@ -2255,7 +2253,7 @@ sub validate_host ($;$) {
     my $name = shift || "";
     $name = "$name " if $name;
     defined($host) || usage "${name}host not specified";
-    $host = isHost($host) || usage "invalid ${name}host given, not a validate hostname or IP address";
+    $host = isHost($host) || usage "invalid ${name}host, not a validate hostname or IP address";
     vlog_options("${name}host", "'$host'");
     return $host;
 }
@@ -2266,24 +2264,20 @@ sub validate_hostname ($;$) {
     my $name     = shift || "";
     $name = "$name " if $name;
     defined($hostname) || usage "${name}hostname not specified";
-    $hostname = isHostname($hostname) || usage "invalid ${name}hostname given";
+    $hostname = isHostname($hostname) || usage "invalid ${name}hostname";
     vlog_options("${name}hostname", "'$hostname'");
     return $hostname;
 }
 
 
 sub validate_int ($$$$) {
-#    my $integer = $_[0] if defined($_[0]);
-#    my $min     = $_[1] || 0;
-#    my $max     = $_[2] || code_error "no max value given for validate_int()";
-#    my $name    = $_[3] || code_error "no name passed to validate_int()";
     my ($integer, $name, $min, $max) = @_;
     defined($name) || code_error "name not specified when calling validate_int()";
     defined($integer) || usage "$name not specified";
-    isInt($integer, 1) or usage "invalid $name given, must be an integer";
+    isInt($integer, 1) or usage "invalid $name, must be an integer";
     isFloat($min, 1) or code_error "non-float value '$min' passed to validate_int() for 2nd arg min value";
     isFloat($max, 1) or code_error "non-float value '$max' passed to validate_int() for 3rd arg max value";
-    ($integer >= $min && $integer <= $max) or usage "invalid $name given, must be integer between $min and $max";
+    ($integer >= $min && $integer <= $max) or usage "invalid $name, must be integer between $min and $max";
     $integer =~ /^(-?\d+)$/ or usage "invalid integer $name passed to validate_int(), WARNING: caught LATE";
     $integer = $1;
     vlog_options($name, $integer);
@@ -2301,19 +2295,23 @@ sub validate_interface ($) {
 }
 
 
-sub validate_ip ($) {
-    my $ip = shift;
-    defined($ip) || usage "ip not specified";
-    $ip = isIP($ip) || usage "invalid IP given";
-    vlog_options("IP", "'$ip'");
+sub validate_ip ($;$) {
+    my $ip   = shift;
+    my $name = shift || "";
+    $name   .= " " if $name;
+    defined($ip) || usage "${name}IP not specified";
+    $ip = isIP($ip) || usage "invalid ${name}IP";
+    vlog_options("${name}IP", "'$ip'");
     return $ip;
 }
 
 
-sub validate_krb5_princ ($) {
+sub validate_krb5_princ ($;$) {
     my $principal = shift;
-    $principal = isKrb5Princ($principal) || usage "invalid principal given";
-    vlog_options("krb5 principal", $principal);
+    my $name      = shift;
+    $name .= " " if $name;
+    $principal = isKrb5Princ($principal) || usage "invalid ${name}krb5 principal";
+    vlog_options("${name}krb5 principal", $principal);
     return $principal;
 }
 
@@ -2341,7 +2339,7 @@ sub validate_nosql_key($;$){
     my $name = shift || "";
     $name .= " " if $name;
     defined($key) or usage "${name}key not defined";
-    $key =~ /^([\w\_\,\.\:\+\-]+)$/ or usage "invalid ${name}key name given, may only contain characters: alphanumeric, commas, colons, underscores, pluses, dashes";
+    $key =~ /^([\w\_\,\.\:\+\-]+)$/ or usage "invalid ${name}key name, may only contain characters: alphanumeric, commas, colons, underscores, pluses, dashes";
     $key = $1;
     vlog_options("${name}key", $key);
     return $key;
@@ -2353,17 +2351,19 @@ sub validate_port ($;$) {
     my $name = shift || "";
     $name    = "$name " if $name;
     defined($port)         || usage "${name}port not specified";
-    $port  = isPort($port) || usage "invalid ${name}port number given, must be a positive integer";
+    $port  = isPort($port) || usage "invalid ${name}port number, must be a positive integer";
     vlog_options("${name}port", "'$port'");
     return $port;
 }
 
 
-sub validate_process_name ($) {
+sub validate_process_name ($;$) {
     my $process = shift;
-    defined($process) || usage "no process name given";
-    $process = isProcessName($process) || usage "invalid process name, failed regex validation";
-    vlog_options("process name", $process);
+    my $name    = shift;
+    $name .= " " if $name;
+    defined($process) || usage "no ${name}process name";
+    $process = isProcessName($process) || usage "invalid ${name}process name, failed regex validation";
+    vlog_options("${name}process name", $process);
     return $process;
 }
 
@@ -2424,22 +2424,26 @@ sub validate_regex ($;$$$) {
 }
 
 
-sub validate_user ($) {
+sub validate_user ($;$) {
     #subtrace(@_);
     my $user = shift;
-    defined($user) || usage "username not specified";
-    $user = isUser($user) || usage "invalid username given, must be alphanumeric";
-    vlog_options("user", "'$user'");
+    my $name = shift;
+    $name .= " " if $name;
+    defined($user) || usage "${name}username not specified";
+    $user = isUser($user) || usage "invalid ${name}username, must be alphanumeric";
+    vlog_options("${name}user", "'$user'");
     return $user;
 }
 *validate_username = \&validate_user;
 
 
-sub validate_user_exists ($) {
+sub validate_user_exists ($;$) {
     #subtrace(@_);
     my $user = shift;
+    my $name = shift;
+    $name .= " " if $name;
     $user = validate_user($user);
-    user_exists($user) || usage "invalid user given, not found on local system";
+    user_exists($user) || usage "invalid ${name}user, not found on local system";
     return $user;
 }
 
@@ -2461,11 +2465,15 @@ sub validate_password ($;$$) {
     return $password;
 }
 
-sub validate_resolvable($){
+
+sub validate_resolvable($;$){
     my $host = shift;
-    defined($host) || code_error "undefined host passed to validate_resolvable()";
-    return resolve_ip($host) || quit "CRITICAL", "failed to resolve host '$host'";
+    my $name = shift;
+    $name .= " " if $name;
+    defined($host) || code_error "${name}host not specified";
+    return resolve_ip($host) || quit "CRITICAL", "failed to resolve ${name}host '$host'";
 }
+
 
 sub validate_threshold ($$;$) {
     #subtrace(@_);
@@ -2560,11 +2568,13 @@ sub validate_thresholds (;$$$) {
 
 
 # Not sure if I can relax the case sensitivity on these according to the Nagios Developer guidelines
-sub validate_units ($) {
+sub validate_units ($;$) {
     my $units = shift;
-    $units or usage("units not defined");
-    $units = isNagiosUnit($units) || usage("invalid unit specified, must be one of: " . join(" ", @valid_units));
-    vlog_options("units", $units);
+    my $name  = shift;
+    $name .= " " if $name;
+    $units or usage("${name}units not defined");
+    $units = isNagiosUnit($units) || usage("invalid ${name}units, must be one of: " . join(" ", @valid_units));
+    vlog_options("${name}units", $units);
     return $units;
 }
 
