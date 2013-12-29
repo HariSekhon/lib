@@ -18,8 +18,8 @@ BEGIN {
     use lib dirname(__FILE__) . "/..";
 }
 use HariSekhonUtils;
-use JSON::XS;
 use Carp;
+use JSON::XS;
 
 use Exporter;
 our @ISA = qw(Exporter);
@@ -39,10 +39,9 @@ $port = $DATAMEER_DEFAULT_PORT;
 env_creds("DATAMEER");
 
 our %datameer_options = (
-    "H|host=s"         => [ \$host,         "Datameer server" ],
-    "P|port=s"         => [ \$port,         "Datameer port     (default: $DATAMEER_DEFAULT_PORT)" ],
-    "u|user=s"         => [ \$user,         "Datameer user     (\$DATAMEER_USER)" ],
-    "p|password=s"     => [ \$password,     "Datameer password (\$DATAMEER_PASSWORD)" ],
+    "H|host=s"         => [ \$host,         "Datameer server   (\$DATAMEER_HOST, \$HOST)" ],
+    "P|port=s"         => [ \$port,         "Datameer port     (\$DATAMEER_PORT, \$PORT, default: $DATAMEER_DEFAULT_PORT)" ],
+    %useroptions,
 );
 
 our %datameer_job_state;
