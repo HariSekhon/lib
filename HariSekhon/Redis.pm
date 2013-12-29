@@ -54,14 +54,14 @@ my $REDIS_DEFAULT_PRECISION = 5;
 our $precision = $REDIS_DEFAULT_PRECISION;
 
 our %redis_options = (
-    "H|host=s"         => [ \$host,         "Redis Host to connect to" ],
-    "P|port=s"         => [ \$port,         "Redis Port to connect to (default: $REDIS_DEFAULT_PORT)" ],
-    "p|password=s"     => [ \$password,     "Password to connect with (use if Redis is configured with requirepass. Recommended to use \$REDIS_PASSWORD environment variable to avoid password showing up in the process list)" ],
+    "H|host=s"         => [ \$host,         "Redis host (\$REDIS_HOST, \$HOST)" ],
+    "P|port=s"         => [ \$port,         "Redis port (default: $REDIS_DEFAULT_PORT, \$REDIS_PORT, \$PORT)" ],
+    "p|password=s"     => [ \$password,     "Redis password (\$REDIS_PASSWORD, \$PASSWORD. Optional, use if Redis is configured with requirepass)" ],
     "precision=i"      => [ \$precision,    "Number of decimal places for timings (default: $REDIS_DEFAULT_PRECISION)" ],
 );
 
 our %redis_options_database = (
-    "d|database=s"     => [ \$database,     "Database to select (optional, default: 0)" ],
+    "d|database=s"     => [ \$database,     "Database to select (default: 0)" ],
 );
 
 @usage_order = qw/host port database password warning critical precision/;
