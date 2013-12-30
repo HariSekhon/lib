@@ -276,6 +276,11 @@ ok(!isScalar(\@usage_order),    '!isScalar(\@usage_order)');
 ok(!isScalar(\%ERRORS),         '!isScalar(\%ERRORS)');
 ok(!isScalar(1),                '!isScalar(1)');
 
+is(isScientific("1.2345E10"),   "1.2345E10",    'isScientific(1.2345E10)');
+is(isScientific("1e-10"),       "1e-10",        'isScientific(1e-10)');
+is(isScientific("-1e-10"),      undef,          'isScientific(-1e-10) eq undef');
+is(isScientific("-1e-10", 1),   "-1e-10",       'isScientific(-1e-10, 1) eq -1e-10');
+
 ok(isThreshold(5),      'isThreshold(5)');
 ok(isThreshold("5"),    'isThreshold("5")');
 ok(isThreshold(0),      'isThreshold(0)');

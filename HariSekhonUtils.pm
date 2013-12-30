@@ -62,7 +62,7 @@ use POSIX;
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.6.15";
+our $VERSION = "1.6.16";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1501,10 +1501,11 @@ sub isScalar ($;$) {
 }
 
 
-sub isScientific($){
-    my $num = shift;
+sub isScientific($;$){
+    my $num      = shift;
+    my $negative = shift() ? "-?" : "";
     defined($num) or code_error "no arg passed to isScientific()";
-    $num =~ /^-?\d+\.\d+e[+-]\d+$/ or return undef;
+    $num =~ /^$negative\d+(?:\.\d+)?e[+-]?\d+$/i or return undef;
     return $num;
 }
 
@@ -2353,7 +2354,7 @@ sub validate_ip ($;$) {
 
 sub validate_krb5_princ ($;$) {
     my $principal = shift;
-    my $name      = shift;
+    my $name      = shift || "";
     $name .= " " if $name;
     $principal = isKrb5Princ($principal) || usage "invalid ${name}krb5 principal";
     vlog_options("${name}krb5 principal", $principal);
@@ -2404,7 +2405,7 @@ sub validate_port ($;$) {
 
 sub validate_process_name ($;$) {
     my $process = shift;
-    my $name    = shift;
+    my $name    = shift || "";
     $name .= " " if $name;
     defined($process) || usage "no ${name}process name";
     $process = isProcessName($process) || usage "invalid ${name}process name, failed regex validation";
@@ -2614,7 +2615,7 @@ sub validate_thresholds (;$$$) {
 # Not sure if I can relax the case sensitivity on these according to the Nagios Developer guidelines
 sub validate_units ($;$) {
     my $units = shift;
-    my $name  = shift;
+    my $name  = shift || "";
     $name .= " " if $name;
     $units or usage("${name}units not defined");
     $units = isNagiosUnit($units) || usage("invalid ${name}units, must be one of: " . join(" ", @valid_units));
