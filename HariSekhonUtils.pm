@@ -62,7 +62,7 @@ use POSIX;
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.6.13";
+our $VERSION = "1.6.15";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -156,6 +156,8 @@ our %EXPORT_TAGS = (
                         parse_file_option
                         plural
                         remove_timeout
+                        set_port_default
+                        set_threshold_defaults
                         timecomponents2days
                         usage
                         validate_thresholds
@@ -437,6 +439,8 @@ our $url_path_suffix_regex = '/(?:[\w\.\/\%\&\?\=\+-]+)?';
 our $url_regex          = '\b(?i:https?://' . $host_regex . '(?::\d{1,5})?(?:' . $url_path_suffix_regex . ')?)';
 our $user_regex         = '\b[A-Za-z][A-Za-z0-9-]*[A-Za-z0-9]\b';
 our $krb5_principal_regex = "$user_regex(?:(?:\/$hostname_regex)?\@$domain_regex)?";
+our $threshold_range_regex  = qr/^(\@)?(-?\d+(?:\.\d+)?)(:)(-?\d+(?:\.\d+)?)?$/;
+our $threshold_simple_regex = qr/^(-?\d+(?:\.\d+)?)$/;
 # ============================================================================ #
 
 our $critical;
@@ -502,8 +506,8 @@ sub set_timeout_default ($) {
 # ============================================================================ #
 # Optional options
 our %hostoptions = (
-    "H|host=s"      => [ \$host, "Host to connect to (\$HOST)" ],
-    "P|port=s"      => [ \$port, "Port to connect to (\$PORT)" ],
+    "H|host=s"      => [ \$host, "Host (\$HOST)" ],
+    "P|port=s"      => [ \$port, "Port (\$PORT)" ],
 );
 our %useroptions = (
     "u|user=s"      => [ \$user,     "User      (\$USERNAME or \$USER)" ],
@@ -518,6 +522,24 @@ our %emailoptions = (
 );
 my $short_options_len = 0;
 my $long_options_len  = 0;
+
+sub set_port_default($){
+    my $default_port = shift;
+    isPort($default_port) or code_error("invalid port passed as first arg to set_port_default");
+    $port = $default_port;
+    $hostoptions{"P|port=s"}[1] =~ s/\)$/, default: $default_port\)/;
+}
+
+sub set_threshold_defaults($$){
+    my $default_warning  = shift;
+    my $default_critical = shift;
+    isThreshold($default_warning)  or code_error("invalid warning threshold passed as first arg to set_threshold_defaults()");
+    isThreshold($default_critical) or code_error("invalid critical threshold passed as second arg to set_threshold_defaults()");
+    $warning  = $default_warning;
+    $critical = $default_critical;
+    $thresholdoptions{"w|warning=s"}[1]  =~ s/\)$/, default: $default_warning\)/;
+    $thresholdoptions{"c|critical=s"}[1] =~ s/\)$/, default: $default_critical\)/;
+}
 
 # ============================================================================ #
 # Environment Host/Port and User/Password Credentials
@@ -563,10 +585,10 @@ sub env_creds($;$){
         $password = $ENV{"${name}_PASSWORD"};
     }
 
-    $hostoptions{"H|host=s"}     = [ \$host,    "$longname host (\$${name}_HOST, \$HOST)" ];
-    $hostoptions{"P|port=s"}     = [ \$port,    "$longname port (\$${name}_PORT, \$PORT" . ( defined($main::default_port) ? ", default: $main::default_port)" : ")") ];
-    $useroptions{"u|user=s"}     = [ \$user,    "$longname user     (\$${name}_USERNAME, \$${name}_USER, \$USERNAME, \$USER)" ];
-    $useroptions{"p|password=s"} = [ \$user,    "$longname password (\$${name}_PASSWORD, \$PASSWORD)" ];
+    $hostoptions{"H|host=s"}[1]     = "$longname host (\$${name}_HOST, \$HOST)";
+    $hostoptions{"P|port=s"}[1]     = "$longname port (\$${name}_PORT, \$PORT" . ( defined($port) ? ", default: $port)" : ")");
+    $useroptions{"u|user=s"}[1]     = "$longname user     (\$${name}_USERNAME, \$${name}_USER, \$USERNAME, \$USER)";
+    $useroptions{"p|password=s"}[1] = "$longname password (\$${name}_PASSWORD, \$PASSWORD)";
 }
 
 # ============================================================================ #
@@ -1480,6 +1502,18 @@ sub isScientific($){
 #    isCode(@_);
 #}
 *isSub = \&isCode;
+
+
+sub isThreshold($){
+    my $threshold = shift;
+    defined($threshold) or code_error "threshold arg to isThreshold() not defined";
+    if($threshold =~ $threshold_range_regex){
+        return 1;
+    } elsif($threshold =~ $threshold_simple_regex){
+        return 1;
+    }
+    return 0;
+}
 
 
 sub isUrl ($) {
@@ -2427,7 +2461,7 @@ sub validate_regex ($;$$$) {
 sub validate_user ($;$) {
     #subtrace(@_);
     my $user = shift;
-    my $name = shift;
+    my $name = shift || "";
     $name .= " " if $name;
     defined($user) || usage "${name}username not specified";
     $user = isUser($user) || usage "invalid ${name}username, must be alphanumeric";
@@ -2440,7 +2474,7 @@ sub validate_user ($;$) {
 sub validate_user_exists ($;$) {
     #subtrace(@_);
     my $user = shift;
-    my $name = shift;
+    my $name = shift || "";
     $name .= " " if $name;
     $user = validate_user($user);
     user_exists($user) || usage "invalid ${name}user, not found on local system";
@@ -2468,12 +2502,11 @@ sub validate_password ($;$$) {
 
 sub validate_resolvable($;$){
     my $host = shift;
-    my $name = shift;
+    my $name = shift || "";
     $name .= " " if $name;
     defined($host) || code_error "${name}host not specified";
     return resolve_ip($host) || quit "CRITICAL", "failed to resolve ${name}host '$host'";
 }
-
 
 sub validate_threshold ($$;$) {
     #subtrace(@_);
@@ -2495,7 +2528,7 @@ sub validate_threshold ($$;$) {
     defined($threshold) or code_error "no threshold (arg 2) given to validate_threshold subroutine";
     $thresholds{"$name"}{"invert_range"} = 0;
     # Make this more flexible
-    if ($threshold =~ /^(\@)?(-?\d+(?:\.\d+)?)(:)(-?\d+(?:\.\d+)?)?$/) {
+    if ($threshold =~ $threshold_range_regex) {
         $thresholds{$name}{"invert_range"} = 1 if $1;
         if(defined($3)){
             $thresholds{$name}{"upper"} = $4 if defined($4);
@@ -2506,7 +2539,7 @@ sub validate_threshold ($$;$) {
         if(defined($thresholds{$name}{"upper"}) and defined($thresholds{$name}{"lower"})){
             $thresholds{$name}{"upper"} < $thresholds{$name}{"lower"} and usage "invalid args: upper $name threshold cannot be lower than lower $name threshold";
         }
-    } elsif($threshold =~ /^(-?\d+(?:\.\d+)?)$/) {
+    } elsif($threshold =~ $threshold_simple_regex) {
         if($options_ref->{"simple"} eq "upper"){
             $thresholds{$name}{"upper"} = $1;
         } elsif($options_ref->{"simple"} eq "lower"){
