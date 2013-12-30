@@ -230,6 +230,7 @@ our %EXPORT_TAGS = (
                         set_timeout
                         set_timeout_default
                         set_timeout_max
+                        set_timeout_range
                     ) ],
     'validate' => [ qw(
                         validate_alnum
@@ -502,6 +503,15 @@ sub set_timeout_default ($) {
     ($timeout_default < $timeout_min) and code_error("\$timeout_default ($timeout_default) may not be lower than \$timeout_min ($timeout_min)");
     $timeout = $timeout_default;
     $default_options{"t|timeout=i"} = [ \$timeout, "Timeout in secs (default: $timeout_default)" ];
+}
+
+sub set_timeout_range($$){
+    my $min = shift;
+    my $max = shift;
+    isInt($min) or code_error("non-integer passed to set_timeout_range for min (first arg)");
+    isInt($max) or code_error("non-integer passed to set_timeout_range for max (second arg)");
+    $timeout_min = $min;
+    $timeout_max = $max;
 }
 
 # ============================================================================ #
