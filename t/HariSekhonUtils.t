@@ -276,6 +276,14 @@ ok(!isScalar(\@usage_order),    '!isScalar(\@usage_order)');
 ok(!isScalar(\%ERRORS),         '!isScalar(\%ERRORS)');
 ok(!isScalar(1),                '!isScalar(1)');
 
+ok(isThreshold(5),      'isThreshold(5)');
+ok(isThreshold("5"),    'isThreshold("5")');
+ok(isThreshold(0),      'isThreshold(0)');
+ok(isThreshold(-1),     'isThreshold(-1)');
+ok(isThreshold("1:10"), 'isThreshold(1:10)');
+ok(isThreshold("-1:0"), 'isThreshold(-1:0)');
+ok(!isThreshold("a"),   '!isThreshold("a")');
+
 is(isUrl("http://www.google.com"),  "http://www.google.com",    'isUrl("http://www.google.com")');
 is(isUrl("https://gmail.com"),      "https://gmail.com",        'isUrl("https://gmail.com")');
 is(isUrl("www.google.com"),         "http://www.google.com",    'isUrl("www.google.com") eq http://www.google.com');

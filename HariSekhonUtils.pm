@@ -125,6 +125,7 @@ our %EXPORT_TAGS = (
                         isProcessName
                         isScalar
                         isScientific
+                        isThreshold
                         isUrl
                         isUrlPathSuffix
                         isUser
@@ -1493,7 +1494,7 @@ sub isScalar ($;$) {
 sub isScientific($){
     my $num = shift;
     defined($num) or code_error "no arg passed to isScientific()";
-    $num =~ /^\d+\.\d+e[+-]\d+$/ or return undef;
+    $num =~ /^-?\d+\.\d+e[+-]\d+$/ or return undef;
     return $num;
 }
 
