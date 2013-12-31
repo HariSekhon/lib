@@ -62,7 +62,7 @@ use POSIX;
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.6.17";
+our $VERSION = "1.6.18";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -261,6 +261,7 @@ our %EXPORT_TAGS = (
                         validate_interface
                         validate_ip
                         validate_krb5_princ
+                        validate_krb5_realm
                         validate_label
                         validate_node_list
                         validate_nosql_key
@@ -2220,11 +2221,13 @@ sub validate_database_query_select_show ($) {
 }
 
 
-sub validate_domain ($) {
+sub validate_domain ($;$) {
     my $domain = shift;
-    defined($domain) || usage "domain name not specified";
-    $domain = isDomain($domain) || usage "invalid domain name given '$domain'";
-    vlog_options("domain", "'$domain'");
+    my $name   = shift || "";
+    $name .= " " if $name;
+    defined($domain) || usage "${name}domain name not specified";
+    $domain = isDomain($domain) || usage "invalid ${name}domain name given '$domain'";
+    vlog_options("${name}domain", "'$domain'");
     return $domain;
 }
 
@@ -2389,6 +2392,17 @@ sub validate_krb5_princ ($;$) {
     vlog_options("${name}krb5 principal", $principal);
     return $principal;
 }
+
+sub validate_krb5_realm ($;$) {
+    my $realm = shift;
+    my $name   = shift || "";
+    $name .= " " if $name;
+    defined($realm) || usage "${name}realm name not specified";
+    $realm = isDomain($realm) || usage "invalid ${name}realm name given '$realm'";
+    vlog_options("${name}realm", "'$realm'");
+    return $realm;
+}
+
 
 
 sub validate_node_list (@) {

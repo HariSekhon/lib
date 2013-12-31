@@ -423,6 +423,7 @@ is(validate_database_query_select_show("SELECT count(*) from database.field"),  
 #ok(!validate_database_query_select_show("SELECT count(*) from (DELETE FROM database.field)"),  'validate_database_query_select_show("SELECT count(*) from (DELETE FROM database.field)")');
 
 is(validate_domain("harisekhon.com"),  "harisekhon.com",    'validate_domain("harisekhon.com") eq harisekhon.com');
+is(validate_krb5_realm("harisekhon.com"),  "harisekhon.com",    'validate_krb5_realm("harisekhon.com") eq harisekhon.com');
 
 is(validate_directory("/etc/"),     "/etc/",    'validate_directory("/etc/")');
 is(validate_dir("/etc/"),           "/etc/",    'validate_dir("/etc/")');
