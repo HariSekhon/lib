@@ -62,7 +62,7 @@ use POSIX;
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.6.16";
+our $VERSION = "1.6.17";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1787,6 +1787,8 @@ sub parse_file_option($;$){
 sub pkill ($;$) {
     my $search    = $_[0] || code_error "No search arg specified for pkill sub";
     my $kill_args = $_[1] || "";
+    $search =~ s/(\/)/\\$1/g;
+    $search =~ s/'/./g;
     return `ps aux | awk '/$search/ {print \$2}' | while read pid; do kill $kill_args \$pid >/dev/null 2>&1; done`;
 }
 
