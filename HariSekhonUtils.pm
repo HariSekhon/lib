@@ -145,6 +145,8 @@ our %EXPORT_TAGS = (
                     ) ],
     'options' => [  qw(
                         add_options
+                        add_host_options
+                        add_user_options
                         get_options
                         check_threshold
                         check_thresholds
@@ -534,6 +536,31 @@ our %emailoptions = (
 my $short_options_len = 0;
 my $long_options_len  = 0;
 
+
+sub add_host_options($){
+    my $name = shift;
+    defined($name) or code_error("no name arg passed to add_host_options()");
+    if(length($name) >= 4){
+        $name = join " ", map {ucfirst} split " ", lc $name;
+    }
+    foreach(keys %hostoptions){
+        $hostoptions{$_}[1] =~ s/^(.)/$name \L$1/;
+    }
+    %options = ( %options, %hostoptions );
+}
+
+sub add_user_options($){
+    my $name = shift;
+    defined($name) or code_error("no name arg passed to add_user_options()");
+    if(length($name) >= 4){
+        $name = join " ", map {ucfirst} split " ", lc $name;
+    }
+    foreach(keys %useroptions){
+        $useroptions{$_}[1] =~ s/^(.)/$name \L$1/;
+    }
+    %options = ( %options, %useroptions );
+}
+
 sub set_port_default($){
     my $default_port = shift;
     isPort($default_port) or code_error("invalid port passed as first arg to set_port_default");
@@ -574,13 +601,6 @@ sub env_creds($;$){
     my $longname = shift;
     ( defined($name) and $name ) or code_error("no name arg passed to env_creds()");
     $name = uc $name;
-    unless($longname){
-        if(length($name) < 4){
-            $longname = $name;
-        } else {
-            $longname = join " ", map {ucfirst} split " ", lc $name;
-        }
-    }
     if($ENV{"${name}_HOST"}){
         $host = $ENV{"${name}_HOST"};
     }
@@ -596,6 +616,13 @@ sub env_creds($;$){
         $password = $ENV{"${name}_PASSWORD"};
     }
 
+    unless($longname){
+        if(length($name) < 4){
+            $longname = $name;
+        } else {
+            $longname = join " ", map {ucfirst} split " ", lc $name;
+        }
+    }
     $hostoptions{"H|host=s"}[1]     = "$longname host (\$${name}_HOST, \$HOST)";
     $hostoptions{"P|port=s"}[1]     = "$longname port (\$${name}_PORT, \$PORT" . ( defined($port) ? ", default: $port)" : ")");
     $useroptions{"u|user=s"}[1]     = "$longname user     (\$${name}_USERNAME, \$${name}_USER, \$USERNAME, \$USER)";
