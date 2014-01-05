@@ -601,6 +601,15 @@ sub env_creds($;$){
     my $name     = shift;
     my $longname = shift;
     ( defined($name) and $name ) or code_error("no name arg passed to env_creds()");
+    unless($longname){
+        if($name ne uc $name){
+            $longname = $name;
+        } elsif(length($name) < 5){
+            $longname = $name;
+        } else {
+            $longname = join " ", map {ucfirst} split " ", lc $name;
+        }
+    }
     $name = uc $name;
     if($ENV{"${name}_HOST"}){
         $host = $ENV{"${name}_HOST"};
@@ -617,13 +626,6 @@ sub env_creds($;$){
         $password = $ENV{"${name}_PASSWORD"};
     }
 
-    unless($longname){
-        if(length($name) < 4){
-            $longname = $name;
-        } else {
-            $longname = join " ", map {ucfirst} split " ", lc $name;
-        }
-    }
     $hostoptions{"H|host=s"}[1]     = "$longname host (\$${name}_HOST, \$HOST)";
     $hostoptions{"P|port=s"}[1]     = "$longname port (\$${name}_PORT, \$PORT" . ( defined($port) ? ", default: $port)" : ")");
     $useroptions{"u|user=s"}[1]     = "$longname user     (\$${name}_USERNAME, \$${name}_USER, \$USERNAME, \$USER)";
