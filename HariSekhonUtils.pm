@@ -638,8 +638,6 @@ sub env_creds($;$){
         }
     }
 
-    print "<" . ref(\$name) . ">";
-    print "\n";
     if(isScalar(\$name)){
         env_cred($name);
     } elsif(isArray($name)){
