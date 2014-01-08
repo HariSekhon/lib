@@ -62,7 +62,7 @@ use POSIX;
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.6.19";
+our $VERSION = "1.6.20";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -123,6 +123,7 @@ our %EXPORT_TAGS = (
                         isOS
                         isPort
                         isProcessName
+                        isRef
                         isScalar
                         isScientific
                         isThreshold
@@ -520,12 +521,12 @@ sub set_timeout_range($$){
 # ============================================================================ #
 # Optional options
 our %hostoptions = (
-    "H|host=s"      => [ \$host, "Host (\$HOST)" ],
-    "P|port=s"      => [ \$port, "Port (\$PORT)" ],
+    "H|host=s"      => [ \$host, "Host to connect to" ],
+    "P|port=s"      => [ \$port, "Port to connect to" ],
 );
 our %useroptions = (
-    "u|user=s"      => [ \$user,     "User      (\$USERNAME or \$USER)" ],
-    "p|password=s"  => [ \$password, "Password  (\$PASSWORD)"           ],
+    "u|user=s"      => [ \$user,     "User     to connect with" ],
+    "p|password=s"  => [ \$password, "Password to connect with" ],
 );
 our %thresholdoptions = (
     "w|warning=s"   => [ \$warning,  "Warning  threshold or ran:ge (inclusive)" ],
@@ -582,19 +583,42 @@ sub set_threshold_defaults($$){
 
 # ============================================================================ #
 # Environment Host/Port and User/Password Credentials
-if($ENV{"HOST"}){
-    $host = $ENV{"HOST"};
-}
-if($ENV{"PORT"}){
-    $port = $ENV{"PORT"};
-}
-if($ENV{"USERNAME"}){
-    $user = $ENV{"USERNAME"};
-} elsif($ENV{"USER"}){
-    $user = $ENV{"USER"};
-}
-if($ENV{"PASSWORD"}){
-    $password = $ENV{"PASSWORD"};
+
+my @host_envs;
+my @port_envs;
+my @user_envs;
+my @password_envs;
+
+sub env_cred($){
+    my $name = shift;
+    $name = uc $name;
+    $name =~ s/[^A-Za-z0-9]/_/g;
+    $name .= "_" if $name;
+    push(@host_envs,     "\$${name}HOST");
+    push(@port_envs,     "\$${name}PORT");
+    push(@user_envs,     "\$${name}USERNAME");
+    push(@user_envs,     "\$${name}USER");
+    push(@password_envs, "\$${name}PASSWORD");
+    # Can't vlog here since verbose mode and debug mode aren't set until after option processing
+    if($ENV{"${name}HOST"} and not $host){
+        #vlog2("reading host from \$${name}HOST environment variable");
+        $host = $ENV{"${name}HOST"};
+    }
+    if($ENV{"${name}PORT"} and not $port){
+        #vlog2("reading port from \$${name}PORT environment variable");
+        $port = $ENV{"${name}PORT"};
+    }
+    if($ENV{"${name}USERNAME"} and not $user){
+        #vlog2("reading user from \$${name}USERNAME environment variable");
+        $user = $ENV{"${name}USERNAME"};
+    } elsif($ENV{"${name}USER"} and not $user){
+        #vlog2("reading user from \$${name}USER environment variable");
+        $user = $ENV{"${name}USER"};
+    }
+    if($ENV{"${name}PASSWORD"} and not $password){
+        #vlog2("reading password from \$${name}PASSWORD environment variable");
+        $password = $ENV{"${name}PASSWORD"};
+    }
 }
 
 sub env_creds($;$){
@@ -602,6 +626,9 @@ sub env_creds($;$){
     my $longname = shift;
     ( defined($name) and $name ) or code_error("no name arg passed to env_creds()");
     unless($longname){
+        unless(isScalar($name)){
+            code_error("must supply longname second arg to env_creds() if first arg for ENV is not a scalar");
+        }
         if($name ne uc $name){
             $longname = $name;
         } elsif(length($name) < 5){
@@ -610,27 +637,39 @@ sub env_creds($;$){
             $longname = join " ", map {ucfirst} split " ", lc $name;
         }
     }
-    $name = uc $name;
-    $name =~ s/[^A-Za-z0-9]/_/g;
-    if($ENV{"${name}_HOST"}){
-        $host = $ENV{"${name}_HOST"};
-    }
-    if($ENV{"${name}_PORT"}){
-        $port = $ENV{"${name}_PORT"};
-    }
-    if($ENV{"${name}_USERNAME"}){
-        $user = $ENV{"${name}_USERNAME"};
-    } elsif($ENV{"${name}_USER"}){
-        $user = $ENV{"${name}_USER"};
-    }
-    if($ENV{"${name}_PASSWORD"}){
-        $password = $ENV{"${name}_PASSWORD"};
+
+    print "<" . ref(\$name) . ">";
+    print "\n";
+    if(isScalar(\$name)){
+        env_cred($name);
+    } elsif(isArray($name)){
+        foreach (@{$name}){
+            env_cred($_);
+        }
+    } else {
+        code_error("non-scalar/non-array passed as first arg to env_creds()");
     }
 
-    $hostoptions{"H|host=s"}[1]     = "$longname host (\$${name}_HOST, \$HOST)";
-    $hostoptions{"P|port=s"}[1]     = "$longname port (\$${name}_PORT, \$PORT" . ( defined($port) ? ", default: $port)" : ")");
-    $useroptions{"u|user=s"}[1]     = "$longname user     (\$${name}_USERNAME, \$${name}_USER, \$USERNAME, \$USER)";
-    $useroptions{"p|password=s"}[1] = "$longname password (\$${name}_PASSWORD, \$PASSWORD)";
+    env_cred("");
+#    if($ENV{"HOST"}){
+#        $host = $ENV{"HOST"} unless $host;
+#    }
+#    if($ENV{"PORT"}){
+#        $port = $ENV{"PORT"} unless $port;
+#    }
+#    if($ENV{"USERNAME"}){
+#        $user = $ENV{"USERNAME"} unless $user;
+#    } elsif($ENV{"USER"}){
+#        $user = $ENV{"USER"} unless $user;
+#    }
+#    if($ENV{"PASSWORD"}){
+#        $password = $ENV{"PASSWORD"} unless $password;
+#    }
+
+    $hostoptions{"H|host=s"}[1]     = "$longname host (" . join(", ", @host_envs) . ")";
+    $hostoptions{"P|port=s"}[1]     = "$longname port (" . join(", ", @port_envs) . ( defined($port) ? ", default: $port)" : ")");
+    $useroptions{"u|user=s"}[1]     = "$longname user     (" . join(", ", @user_envs) . ")";
+    $useroptions{"p|password=s"}[1] = "$longname password (" . join(", ", @password_envs) . ")";
 }
 
 # ============================================================================ #
@@ -1519,6 +1558,17 @@ sub isProcessName ($) {
 #        return undef;
 #    }
 #}
+
+
+sub isRef ($;$) {
+    my $isRef = ref $_[0] eq "REF";
+    if($_[1]){
+        unless($isRef){
+            code_error "non REF reference passed";
+        }
+    }
+    return $isRef;
+}
 
 
 sub isScalar ($;$) {
