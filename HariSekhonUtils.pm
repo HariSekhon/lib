@@ -611,6 +611,7 @@ sub env_creds($;$){
         }
     }
     $name = uc $name;
+    $name =~ s/[^A-Za-z0-9]/_/g;
     if($ENV{"${name}_HOST"}){
         $host = $ENV{"${name}_HOST"};
     }
