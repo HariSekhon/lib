@@ -645,7 +645,7 @@ sub env_creds($;$){
             env_cred($_);
         }
     } else {
-        code_error("non-scalar/non-array passed as first arg to env_creds()");
+        code_error("non-scalar/non-array ref passed as first arg to env_creds()");
     }
 
     env_cred("");
