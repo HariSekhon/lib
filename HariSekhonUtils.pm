@@ -62,7 +62,7 @@ use POSIX;
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.6.20";
+our $VERSION = "1.6.21";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -736,16 +736,16 @@ sub status3 () {
 
 # requires that you 'use Data::Dumper' in calling program, since not all programs will need this
 sub catch_quit ($) {
-    my $errmsg = $_[0];
+    my $my_errmsg = $_[0];
     catch {
-        if(isHash($@) and defined($@->{"message"})){
-            quit "CRITICAL", "$errmsg: " . ref($@) . ": " . $@->{"message"};
+        if(defined($@->{"message"})){
+            quit "CRITICAL", "$my_errmsg: " . ref($@) . ": " . $@->{"message"};
         } elsif($!) {
-            quit "CRITICAL", "$errmsg: $!";
+            quit "CRITICAL", "$my_errmsg: $!";
         } elsif($@) {
-            quit "CRITICAL", "$errmsg: $@";
+            quit "CRITICAL", "$my_errmsg: $@";
         } else {
-            quit "CRITICAL", $errmsg;
+            quit "CRITICAL", $my_errmsg;
         }
     }
 }
@@ -1298,7 +1298,7 @@ sub isCode ($) {
 sub isDatabaseColumnName ($) {
     my $column = shift;
     defined($column) || return undef;
-    $column =~ /^(\w+)$/ or return undef;
+    $column =~ /^([\w:]+)$/ or return undef;
     return $1;
 }
 
