@@ -11,7 +11,7 @@
 
 package HariSekhon::HBase::Thrift;
 
-$VERSION = "0.2";
+$VERSION = "0.2.1";
 
 use strict;
 use warnings;
@@ -48,6 +48,7 @@ sub connect_hbase_thrift($$;$$){
     my $protocol;
     my $socket;
     my $transport;
+    validate_resolvable($host);
     vlog2 "connecting to HBase Thrift server at $host:$port\n";
     try {
         $socket    = new Thrift::Socket($host, $port);
