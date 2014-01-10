@@ -1321,10 +1321,10 @@ sub isDatabaseTableName ($;$) {
     my $allow_qualified = shift;
     defined($table) || return undef;
     if($allow_qualified){
-        $table =~ /^((?:\w+\.)?\w+)$/i or return undef;
+        $table =~ /^([A-Za-z0-9][\w\.]*[A-Za-z0-9])$/i or return undef;
         return $1;
     } else {
-        $table =~ /^(\w+)$/i or return undef;
+        $table =~ /^([A-Za-z0-9]\w*[A-Za-z0-9])$/i or return undef;
         return $1;
     }
     return undef;
