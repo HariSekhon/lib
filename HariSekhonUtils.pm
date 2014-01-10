@@ -2069,7 +2069,9 @@ sub timecomponents2days($$$$$$){
 
 
 sub tprint ($) {
-    print strftime("%F %T %z  ", localtime) . "$@\n";
+    my $msg = shift;
+    defined($msg) or code_error "tprint msg arg not defined";
+    print strftime("%F %T %z  ", localtime) . "$msg\n";
 }
 
 
