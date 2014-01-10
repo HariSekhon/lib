@@ -961,8 +961,12 @@ sub cmd ($;$$) {
     }
     if ($errchk and $returncode != 0) {
         my $err = "";
-        foreach (@output) {
-            $err .= " " . trim($_);
+        if(substr($progname, 0, 6) eq "check_"){
+            foreach (@output) {
+                $err .= " " . trim($_);
+            }
+        } else {
+            $err = join("\n", @output);
         }
         quit("CRITICAL", "'$cmd' returned $returncode -$err");
     }
