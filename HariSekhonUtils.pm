@@ -62,7 +62,7 @@ use POSIX;
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.6.21";
+our $VERSION = "1.6.22";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -317,6 +317,7 @@ our %EXPORT_TAGS = (
                         code_error
                         debug
                         hr
+                        tprint
                         verbose_mode
                         vlog
                         vlog2
@@ -1967,25 +1968,6 @@ sub rstrip ($) {
 *rtrim = \&rstrip;
 
 
-sub timecomponents2days($$$$$$){
-    my $year  = shift;
-    my $month = shift;
-    my $day   = shift;
-    my $hour  = shift;
-    my $min   = shift;
-    my $sec   = shift;
-    my $month_int;
-    if(isInt($month)){
-        $month_int = $month;
-    } else {
-        $month_int = month2int($month);
-    }
-    my $epoch = timegm($sec, $min, $hour, $day, $month_int, $year-1900) || code_error "failed to convert timestamp $year-$month-$day $hour:$min:$sec";
-    my $now   = time || code_error "failed to get epoch timestamp";
-    return ($epoch - $now) / (86400);
-}
-
-
 sub sec2min ($){
     my $secs = shift;
     isFloat($secs) or return undef;
@@ -2064,6 +2046,30 @@ sub subtrace (@) {
     my $prefix_newline = $1 || "";
     # TODO: can improve this if we can go one level up, dedupe with debug, do this later
     printf "${prefix_newline}debug: %s() => $debug_msg\n", (caller(1))[3];
+}
+
+
+sub timecomponents2days($$$$$$){
+    my $year  = shift;
+    my $month = shift;
+    my $day   = shift;
+    my $hour  = shift;
+    my $min   = shift;
+    my $sec   = shift;
+    my $month_int;
+    if(isInt($month)){
+        $month_int = $month;
+    } else {
+        $month_int = month2int($month);
+    }
+    my $epoch = timegm($sec, $min, $hour, $day, $month_int, $year-1900) || code_error "failed to convert timestamp $year-$month-$day $hour:$min:$sec";
+    my $now   = time || code_error "failed to get epoch timestamp";
+    return ($epoch - $now) / (86400);
+}
+
+
+sub tprint ($) {
+    print strftime("%F %T %z  ", localtime) . "$@\n";
 }
 
 
