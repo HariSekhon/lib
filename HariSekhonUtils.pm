@@ -62,7 +62,7 @@ use POSIX;
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.6.22";
+our $VERSION = "1.6.23";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -627,7 +627,7 @@ sub env_creds($;$){
     my $longname = shift;
     ( defined($name) and $name ) or code_error("no name arg passed to env_creds()");
     unless($longname){
-        unless(isScalar($name)){
+        unless(isScalar(\$name)){
             code_error("must supply longname second arg to env_creds() if first arg for ENV is not a scalar");
         }
         if($name ne uc $name){
