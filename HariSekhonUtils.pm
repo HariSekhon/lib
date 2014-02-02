@@ -62,7 +62,7 @@ use POSIX;
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.6.23";
+our $VERSION = "1.6.24";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -240,6 +240,7 @@ our %EXPORT_TAGS = (
                         validate_aws_access_key
                         validate_aws_bucket
                         validate_aws_secret_key
+                        validate_collection
                         validate_database
                         validate_database_columnname
                         validate_database_fieldname
@@ -257,6 +258,7 @@ our %EXPORT_TAGS = (
                         validate_host_port_user_password
                         validate_host
                         validate_hostname
+                        validate_hostport
                         validate_int
                         validate_integer
                         validate_interface
@@ -833,7 +835,7 @@ sub check_threshold ($$) {
     my $result    = shift;
 
     $threshold =~ /^warning|critical$/ or code_error("invalid threshold name passed to check_threshold subroutine");
-    isFloat($result, 1) or code_error("Non-float passed to check_threshold subroutine");
+    isFloat($result, 1) or isScientific($result, 1) or code_error("Non-float passed to check_threshold subroutine");
 
     my $upper = defined($thresholds{$threshold}{"upper"}) ? $thresholds{$threshold}{"upper"} : undef;
     my $lower = defined($thresholds{$threshold}{"lower"}) ? $thresholds{$threshold}{"lower"} : undef;
@@ -2232,12 +2234,26 @@ sub validate_aws_secret_key($){
 }
 
 
-sub validate_database ($) {
+sub validate_collection ($;$) {
+    my $collection = shift;
+    my $name       = shift || "";
+    $name .= " " if $name;
+    defined($collection) || usage "${name}collection not defined";
+    $collection =~ /^(\w(?:[\w\.]*\w)?)$/  || usage "invalid ${name}collection defined: must be alphanumeric, with optional periods in the middle";
+    $collection = $1;
+    vlog_options("${name}collection", $collection);
+    return $collection;
+}
+
+
+sub validate_database ($;$) {
     my $database = shift;
-    defined($database)      || usage "database not defined";
-    $database =~ /^(\w*)$/  || usage "invalid database defined: must be alphanumeric";
+    my $name     = shift || "";
+    $name .= " " if $name;
+    defined($database)      || usage "${name}database not defined";
+    $database =~ /^(\w*)$/  || usage "invalid ${name}database defined: must be alphanumeric";
     $database = $1;
-    vlog_options("database", $database);
+    vlog_options("${name}database", $database);
     return $database;
 }
 
@@ -2399,6 +2415,27 @@ sub validate_host ($;$) {
     $host = isHost($host) || usage "invalid ${name}host defined: not a validate hostname or IP address";
     vlog_options("${name}host", $host);
     return $host;
+}
+
+
+sub validate_hostport ($;$) {
+    my $hostport      = shift;
+    my $name          = shift || "";
+    my $port_required = shift;
+    my $no_vlog       = shift;
+    $name .= " " if $name;
+    defined($hostport) || usage "${name}host:port option not defined";
+    my ($host, $port) = split(":", $hostport, 2);
+    $host = isHost($host) || usage "invalid ${name}host defined: not a validate hostname or IP address";
+    if($port){
+        $port = isPort($port) || usage "invalid ${name}port defined: must be a positive integer";
+    } elsif($port_required){
+        usage "':port' is required for ${name}host:port option";
+    }
+    $hostport = $host;
+    $hostport .= ":$port" if $port;
+    vlog_options("${name}host:port", $hostport) unless $no_vlog;
+    return $hostport;
 }
 
 
