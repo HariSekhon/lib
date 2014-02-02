@@ -412,9 +412,10 @@ is(validate_aws_access_key("A"x20),     "A"x20,         'validate_aws_access_key
 is(validate_aws_bucket("BucKeT63"),     "BucKeT63",     'validate_aws_bucket("BucKeT63") eq "BucKeT63"');
 is(validate_aws_secret_key("A"x40),     "A"x40,         'validate_aws_secret_key("A"x40) eq "A"x40');
 
+is(validate_collection("students.grades"),      "students.grades",  'validate_collection("students.grades")');
 
 # TODO: can't actually test failure of these validation functions as they will error out
-is(validate_database("mysql"),                  "mysql",        'validate_database("mysql")');
+is(validate_database("mysql", "MySQL"),         "mysql",        'validate_database("mysql")');
 is(validate_database_fieldname(10),             10,             'validate_database_fieldname(10)');
 is(validate_database_fieldname("count(*)"),     "count(*)",     'validate_database_fieldname("count(*)")');
 
