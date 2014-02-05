@@ -59,10 +59,11 @@ use Fcntl ':flock';
 use File::Basename;
 use Getopt::Long qw(:config bundling);
 use POSIX;
+use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.6.24";
+our $VERSION = "1.6.25";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -120,6 +121,7 @@ our %EXPORT_TAGS = (
                         isLinux
                         isMac
                         isNagiosUnit
+                        isObject
                         isOS
                         isPort
                         isProcessName
@@ -741,7 +743,7 @@ sub status3 () {
 sub catch_quit ($) {
     my $my_errmsg = $_[0];
     catch {
-        if(defined($@->{"message"})){
+        if(isObject($@) and defined($@->{"message"})){
             quit "CRITICAL", "$my_errmsg: " . ref($@) . ": " . $@->{"message"};
         } elsif($!) {
             quit "CRITICAL", "$my_errmsg: $!";
@@ -1527,10 +1529,10 @@ sub isNagiosUnit ($) {
 }
 
 
-#sub isObject ($) {
-#    my $object = shift;
-#    ref $object eq "bless";
-#}
+sub isObject ($) {
+    my $object = shift;
+    return blessed($object);
+}
 
 
 sub isPort ($) {
