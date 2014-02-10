@@ -59,11 +59,12 @@ use Fcntl ':flock';
 use File::Basename;
 use Getopt::Long qw(:config bundling);
 use POSIX;
+use JSON 'decode_json';
 use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.6.25";
+our $VERSION = "1.6.26";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1043,7 +1044,17 @@ sub curl ($;$$$) {
     vlog2("http status code:     " . $response->code);
     vlog2("http status message:  " . $response->message . "\n");
     unless($response->code eq "200"){
-        quit("UNKNOWN", $response->code . " " . $response->message);
+        my $additional_information = "";
+        my $json;
+        if($json = isJson($content)){
+            if(defined($json->{"status"})){
+                $additional_information .= ". Status: " . $json->{"status"};
+            }
+            if(defined($json->{"reason"})){
+                $additional_information .= ". Reason: " . $json->{"reason"};
+            }
+        }
+        quit("UNKNOWN", $response->code . " " . $response->message . $additional_information);
     }
     unless($content){
         quit("CRITICAL", "blank content returned from '$url'");
@@ -1498,6 +1509,16 @@ sub isIP ($) {
 #    #}
 #    return 0;
 #}
+
+sub isJson($){
+    my $string = shift;
+    defined($string) or return undef;
+    my $json = undef;
+    try {
+        $json = decode_json($string);
+    };
+    return $json;
+}
 
 
 sub isKrb5Princ ($) {
