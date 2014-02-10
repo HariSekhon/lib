@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.6.26";
+our $VERSION = "1.6.27";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -745,14 +745,17 @@ sub catch_quit ($) {
     my $my_errmsg = $_[0];
     catch {
         if(isObject($@) and defined($@->{"message"})){
-            quit "CRITICAL", "$my_errmsg: " . ref($@) . ": " . $@->{"message"};
-        } elsif($!) {
-            quit "CRITICAL", "$my_errmsg: $!";
-        } elsif($@) {
-            quit "CRITICAL", "$my_errmsg: $@";
-        } else {
-            quit "CRITICAL", $my_errmsg;
+            $my_errmsg .= ": " . ref($@) . ": " . $@->{"message"};
         }
+        if($!) {
+            $my_errmsg .= ": $!";
+            chomp $my_errmsg;
+        }
+        if($@ and not isObject($@)) {
+            $my_errmsg .= ": $@";
+            chomp $my_errmsg;
+        }
+        quit "CRITICAL", $my_errmsg;
     }
 }
 
