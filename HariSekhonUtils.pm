@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.6.27";
+our $VERSION = "1.6.28";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -368,6 +368,17 @@ $EXPORT_TAGS{'most'}        = [ @EXPORT     ];
 $EXPORT_TAGS{'EXPORT_OK'}   = [ @EXPORT_OK  ];
 $EXPORT_TAGS{'EXPORT'}      = [ @EXPORT     ];
 
+# This now needs to be before BEGIN{} so we can reference it in die_sub()
+#
+# Std Nagios Exit Codes. Not using weak nagios utils.pm. Also improves portability to not rely on it being present
+our %ERRORS = (
+    "OK"        => 0,
+    "WARNING"   => 1,
+    "CRITICAL"  => 2,
+    "UNKNOWN"   => 3,
+    "DEPENDENT" => 4
+);
+
 BEGIN {
     delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
     $ENV{'PATH'} = '/bin:/usr/bin';
@@ -382,22 +393,32 @@ BEGIN {
     }
 
     sub die_sub {
-        my $str = "@_" || "Died";
+        # this is auto-translated in to equivalent system error string, we're not interested in system interpretation
+        # so explicitly cast back to int so we can compare with std error codes
+        my $exit_code = int($!);
+        my $str   = "@_" || "Died";
+        my $status_prefixes = join("|", keys %ERRORS);
+        $str =~ s/\s(?:$status_prefixes)://g;
         # mimic original die behaviour by only showing code line when there is no newline at end of string
         if(substr($str, -1, 1) eq "\n"){
             print STDERR $str;
         } else {
             carp $str;
         }
-        exit 2;
+        if(grep(/^$exit_code$/, values %ERRORS)){
+            exit $exit_code;
+        }
+        exit $ERRORS{"CRITICAL"};
     };
     $SIG{__DIE__} = \&die_sub;
 
     # This is because the die handler causes program exit instead of return from eval {} block required for exception handling
     sub try(&) {
+        my $old_die = $SIG{__DIE__};
         undef $SIG{__DIE__};
         eval {$_[0]->()};
-        $SIG{__DIE__} = \&die_sub;
+        #$SIG{__DIE__} = \&die_sub;
+        $SIG{__DIE__} = $old_die;
     }
 
     sub catch(&) {
@@ -411,15 +432,6 @@ sub quit(@);
 our $progname = basename $0;
 $progname =~ /^([\w\.\/_-]+)$/ or quit("UNKNOWN", "Invalid program name - does not adhere to strict regex validation, you should name the program simply and sanely");
 $progname = $1;
-
-# Std Nagios Exit Codes. Not using weak nagios utils.pm. Also improves portability to not rely on it being present
-our %ERRORS = (
-    "OK"        => 0,
-    "WARNING"   => 1,
-    "CRITICAL"  => 2,
-    "UNKNOWN"   => 3,
-    "DEPENDENT" => 4
-);
 
 our $nagios_plugins_support_msg = "Please try latest version from https://github.com/harisekhon/nagios-plugins, re-run on command line with -vvv and if problem persists paste full output from -vvv mode in to a ticket requesting a fix/update at https://github.com/harisekhon/nagios-plugins/issues/new";
 
@@ -1931,27 +1943,27 @@ sub quit (@) {
     if(@_ eq 0){
         chomp $msg;
         # This ends up bit shifting to 255 instead of 0
-        #$! = $ERRORS{$status};
-        #die "$status: $msg\n";
         grep(/^$status$/, keys %ERRORS) or die "Code error: unrecognized exit code '$status' specified on quit call, not found in %ERRORS hash\n";
-        print "${status_prefix}$status: $msg\n";
-        exit $ERRORS{$status};
+        $! = $ERRORS{$status};
+        die "${status_prefix}$status: $msg\n";
+        #print "${status_prefix}$status: $msg\n";
+        #exit $ERRORS{$status};
     } elsif(@_ eq 1){
         $msg = $_[0];
         chomp $msg;
-        #$! = $ERRORS{"CRITICAL"};
-        #die "CRITICAL: $msg\n";
-        print "${status_prefix}CRITICAL: $msg\n";
-        exit $ERRORS{"CRITICAL"};
+        $! = $ERRORS{"CRITICAL"};
+        die "${status_prefix}CRITICAL: $msg\n";
+        #print "${status_prefix}CRITICAL: $msg\n";
+        #exit $ERRORS{"CRITICAL"};
     } elsif(@_ eq 2) {
         $status = $_[0];
         $msg    = $_[1];
         chomp $msg;
         grep(/^$status$/, keys %ERRORS) or die "Code error: unrecognized exit code '$status' specified on quit call, not found in %ERRORS hash\n";
-        #$! = $ERRORS{$status};
-        #die "$status: $msg\n";
-        print "${status_prefix}$status: $msg\n";
-        exit $ERRORS{$status};
+        $! = $ERRORS{$status};
+        die "${status_prefix}$status: $msg\n";
+        #print "${status_prefix}$status: $msg\n";
+        #exit $ERRORS{$status};
     } else {
         #print "UNKNOWN: Code Error - Invalid number of arguments passed to quit function (" . scalar(@_). ", should be 0 - 2)\n";
         #exit $ERRORS{"UNKNOWN"};
