@@ -397,8 +397,8 @@ BEGIN {
         # so explicitly cast back to int so we can compare with std error codes
         my $exit_code = int($!);
         my $str   = "@_" || "Died";
-        my $status_prefixes = join("|", keys %ERRORS);
-        $str =~ s/\s(?:$status_prefixes)://g;
+        #my $status_prefixes = join("|", keys %ERRORS);
+        #$str =~ s/\s(?:$status_prefixes)://g;
         # mimic original die behaviour by only showing code line when there is no newline at end of string
         if(substr($str, -1, 1) eq "\n"){
             print STDERR $str;
