@@ -1069,7 +1069,7 @@ sub curl ($;$$$) {
                 $additional_information .= ". Reason: " . $json->{"reason"};
             }
         }
-        quit("UNKNOWN", $response->code . " " . $response->message . $additional_information);
+        quit("CRITICAL", $response->code . " " . $response->message . $additional_information);
     }
     unless($content){
         quit("CRITICAL", "blank content returned from '$url'");
