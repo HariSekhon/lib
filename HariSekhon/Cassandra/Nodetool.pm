@@ -9,7 +9,7 @@
 
 package HariSekhon::Cassandra::Nodetool;
 
-$VERSION = "0.2.6";
+$VERSION = "0.2.7";
 
 use strict;
 use warnings;
@@ -97,7 +97,7 @@ our $nodetool_errors_regex = qr/
                                 in thread
                              /xi;
 sub check_nodetool_errors($){
-    defined(@_) or code_error "no input passed to check_nodetool_errors to check";
+    @_ or code_error "no input passed to check_nodetool_errors to check";
     my $str = join(" ", @_);
     quit "CRITICAL", $str if $str =~ /$nodetool_errors_regex/;
 }
@@ -111,7 +111,7 @@ our $nodetool_status_header_regex = qr/
                                        ^--\s+Address\s+
                                     /xi;
 sub die_nodetool_unrecognized_output($){
-    defined(@_) or code_error "no input passed to die_nodetool_unrecognized_output to check";
+    @_ or code_error "no input passed to die_nodetool_unrecognized_output to check";
     my $str = join(" ", @_);
     quit "UNKNOWN", sprintf("unrecognized output '%s', nodetool output format may have changed, aborting, $nagios_plugins_support_msg", $str);
 }
