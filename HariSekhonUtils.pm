@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.6.28";
+our $VERSION = "1.7.0";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -214,8 +214,6 @@ our %EXPORT_TAGS = (
                         try
                         catch
                         catch_quit
-                        die_handler_on
-                        die_handler_off
                         quit
                     ) ],
     'string' => [   qw(
@@ -379,6 +377,8 @@ our %ERRORS = (
     "DEPENDENT" => 4
 );
 
+our $status_prefix = "";
+
 BEGIN {
     delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
     $ENV{'PATH'} = '/bin:/usr/bin';
@@ -397,8 +397,20 @@ BEGIN {
         # so explicitly cast back to int so we can compare with std error codes
         my $exit_code = int($!);
         my $str   = "@_" || "Died";
+        # better to add the status prefix in here instead of in quit calls
         #my $status_prefixes = join("|", keys %ERRORS);
-        #$str =~ s/\s(?:$status_prefixes)://g;
+        #$str =~ s/:\s+(?:$status_prefixes):/:/g;
+        #if(substr(basename($0), 0, 6) eq "check_"){
+            my $prefix = "";
+            foreach(keys %ERRORS){
+                if($exit_code == $ERRORS{$_}){
+                    $prefix = $_;
+                    last;
+                }
+            }
+            $prefix = "CRITICAL" unless $prefix;
+            $str = "${status_prefix}${prefix}: $str";
+        #}
         # mimic original die behaviour by only showing code line when there is no newline at end of string
         if(substr($str, -1, 1) eq "\n"){
             print STDERR $str;
@@ -481,7 +493,6 @@ our $password;
 our $port;
 my  $selflock;
 our $status = "UNKNOWN";
-our $status_prefix = "";
 our $sudo = "";
 our $syslog_initialized = 0;
 our $timeout_default = 10;
@@ -1945,14 +1956,16 @@ sub quit (@) {
         # This ends up bit shifting to 255 instead of 0
         grep(/^$status$/, keys %ERRORS) or die "Code error: unrecognized exit code '$status' specified on quit call, not found in %ERRORS hash\n";
         $! = $ERRORS{$status};
-        die "${status_prefix}$status: $msg\n";
+        #die "${status_prefix}$status: $msg\n";
+        die "$msg\n";
         #print "${status_prefix}$status: $msg\n";
         #exit $ERRORS{$status};
     } elsif(@_ eq 1){
         $msg = $_[0];
         chomp $msg;
         $! = $ERRORS{"CRITICAL"};
-        die "${status_prefix}CRITICAL: $msg\n";
+        #die "${status_prefix}CRITICAL: $msg\n";
+        die "$msg\n";
         #print "${status_prefix}CRITICAL: $msg\n";
         #exit $ERRORS{"CRITICAL"};
     } elsif(@_ eq 2) {
@@ -1961,7 +1974,8 @@ sub quit (@) {
         chomp $msg;
         grep(/^$status$/, keys %ERRORS) or die "Code error: unrecognized exit code '$status' specified on quit call, not found in %ERRORS hash\n";
         $! = $ERRORS{$status};
-        die "${status_prefix}$status: $msg\n";
+        #die "${status_prefix}$status: $msg\n";
+        die "$msg\n";
         #print "${status_prefix}$status: $msg\n";
         #exit $ERRORS{$status};
     } else {
