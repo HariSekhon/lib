@@ -1011,9 +1011,9 @@ sub code_error (@) {
     #quit("UNKNOWN", "Code Error - @_");
     $! = $ERRORS{"UNKNOWN"};
     if($debug){
-        confess "UNKNOWN: Code Error - @_";
+        confess "Code Error - @_";
     } else {
-        croak "UNKNOWN: Code Error - @_";
+        croak "Code Error - @_";
     }
 }
 
