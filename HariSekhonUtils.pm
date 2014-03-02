@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.7.1";
+our $VERSION = "1.7.2";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -395,7 +395,7 @@ BEGIN {
     sub die_sub {
         # this is auto-translated in to equivalent system error string, we're not interested in system interpretation
         # so explicitly cast back to int so we can compare with std error codes
-        my $exit_code = (defined($!) and $! ne "" ? int($!) : $ERRORS{"CRITICAL"});
+        my $exit_code = (defined($?) and $? ne "" ? int($?) : $ERRORS{"CRITICAL"});
         my $str   = "@_" || "Died";
         # better to add the status prefix in here instead of in quit calls
         #my $status_prefixes = join("|", keys %ERRORS);
@@ -1955,7 +1955,7 @@ sub quit (@) {
         chomp $msg;
         # This ends up bit shifting to 255 instead of 0
         grep(/^$status$/, keys %ERRORS) or die "Code error: unrecognized exit code '$status' specified on quit call, not found in %ERRORS hash\n";
-        $! = $ERRORS{$status};
+        $? = $ERRORS{$status};
         #die "${status_prefix}$status: $msg\n";
         die "$msg\n";
         #print "${status_prefix}$status: $msg\n";
@@ -1963,7 +1963,7 @@ sub quit (@) {
     } elsif(@_ eq 1){
         $msg = $_[0];
         chomp $msg;
-        $! = $ERRORS{"CRITICAL"};
+        $? = $ERRORS{"CRITICAL"};
         #die "${status_prefix}CRITICAL: $msg\n";
         die "$msg\n";
         #print "${status_prefix}CRITICAL: $msg\n";
@@ -1973,7 +1973,7 @@ sub quit (@) {
         $msg    = $_[1];
         chomp $msg;
         grep(/^$status$/, keys %ERRORS) or die "Code error: unrecognized exit code '$status' specified on quit call, not found in %ERRORS hash\n";
-        $! = $ERRORS{$status};
+        $? = $ERRORS{$status};
         #die "${status_prefix}$status: $msg\n";
         die "$msg\n";
         #print "${status_prefix}$status: $msg\n";
