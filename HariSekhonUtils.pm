@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.7.0";
+our $VERSION = "1.7.1";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -395,7 +395,7 @@ BEGIN {
     sub die_sub {
         # this is auto-translated in to equivalent system error string, we're not interested in system interpretation
         # so explicitly cast back to int so we can compare with std error codes
-        my $exit_code = int($!);
+        my $exit_code = (defined($!) and $! ne "" ? int($!) : $ERRORS{"CRITICAL"});
         my $str   = "@_" || "Died";
         # better to add the status prefix in here instead of in quit calls
         #my $status_prefixes = join("|", keys %ERRORS);
