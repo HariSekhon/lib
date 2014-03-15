@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.7.2";
+our $VERSION = "1.7.3";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1124,19 +1124,23 @@ sub escape_regex ($) {
 }
 
 
-sub expand_units ($$;$) {
+sub expand_units ($;$$) {
     my $num   = shift;
     my $units = shift;
     my $name  = shift;
     my $power;
     defined($num)   || code_error "no num arg 1 passed to expand_units()";
+    if((!defined($units)) and $num =~ /^(\d+(?:\.\d+)?)([A-Za-z]{1,2})$/){
+        $num   = $1;
+        $units = $2;
+    }
     defined($units) || code_error "no units arg 2 passed to expand_units()";
     isFloat($num)   || code_error "non-float num arg 1 passed to expand_units()";
-    if   ($units =~ /^KB$/i){ $power = 1; }
-    elsif($units =~ /^MB$/i){ $power = 2; }
-    elsif($units =~ /^GB$/i){ $power = 3; }
-    elsif($units =~ /^TB$/i){ $power = 4; }
-    elsif($units =~ /^PB$/i){ $power = 5; }
+    if   ($units =~ /^KB?$/i){ $power = 1; }
+    elsif($units =~ /^MB?$/i){ $power = 2; }
+    elsif($units =~ /^GB?$/i){ $power = 3; }
+    elsif($units =~ /^TB?$/i){ $power = 4; }
+    elsif($units =~ /^PB?$/i){ $power = 5; }
     else { code_error "unrecognized units " . ($name ? "for $name" : "passed to expand_units()" ) . ". $nagios_plugins_support_msg"; }
     return $num * (1024**$power);
 }
