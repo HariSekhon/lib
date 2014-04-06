@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.7.3";
+our $VERSION = "1.7.4";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -291,6 +291,7 @@ our %EXPORT_TAGS = (
                         $msg_err
                         $msg_threshold
                         $nagios_plugins_support_msg
+                        $nagios_plugins_support_msg_api
                         $password
                         $plural
                         $port
@@ -446,6 +447,7 @@ $progname =~ /^([\w\.\/_-]+)$/ or quit("UNKNOWN", "Invalid program name - does n
 $progname = $1;
 
 our $nagios_plugins_support_msg = "Please try latest version from https://github.com/harisekhon/nagios-plugins, re-run on command line with -vvv and if problem persists paste full output from -vvv mode in to a ticket requesting a fix/update at https://github.com/harisekhon/nagios-plugins/issues/new";
+our $nagios_plugins_support_msg_api = "API may have changed. $nagios_plugins_support_msg";
 
 # ============================================================================ #
 # Validation Regex - maybe should qr// here but it makes the vlog option output messy
@@ -471,7 +473,7 @@ our $host_regex         = "\\b(?:$hostname_regex|$ip_regex)\\b";
 # I did a scan of registered running process names across several hundred linux servers of a diverse group of enterprise applications with 500 unique process names (58k individual processes) to determine that there are cases with spaces, slashes, dashes, underscores, chevrons (<defunct>), dots (script.p[ly], in.tftpd etc) to determine what this regex should be. Incidentally it appears that Linux truncates registered process names to 15 chars.
 # This is not from ps -ef etc it is the actual process registered name, hence init not [init] as it appears in ps output
 our $process_name_regex = '[\w\s_\.\/\<\>-]+';
-our $url_path_suffix_regex = '/(?:[\w\.\/\%\&\?\=\+-]+)?';
+our $url_path_suffix_regex = '/(?:[\w\.\/\%\&\?\!\=\+-]+)?';
 our $url_regex          = '\b(?i:https?://' . $host_regex . '(?::\d{1,5})?(?:' . $url_path_suffix_regex . ')?)';
 our $user_regex         = '\b[A-Za-z][A-Za-z0-9-]*[A-Za-z0-9]\b';
 our $krb5_principal_regex = "$user_regex(?:(?:\/$hostname_regex)?\@$domain_regex)?";
@@ -1078,6 +1080,8 @@ sub curl ($;$$$) {
             }
             if(defined($json->{"reason"})){
                 $additional_information .= ". Reason: " . $json->{"reason"};
+            } elsif(defined($json->{"message"})){
+                $additional_information .= ". Message: " . $json->{"message"};
             }
         }
         quit("CRITICAL", $response->code . " " . $response->message . $additional_information);
