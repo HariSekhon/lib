@@ -47,7 +47,7 @@ our @EXPORT = ( qw (
                     $url
                     $url_prefix
                     %cm_options
-                    cm_tls
+                    cm_query
                 )
 );
 our @EXPORT_OK = ( @EXPORT );
