@@ -96,12 +96,12 @@ our $tls_noverify;
 our $url;
 our $url_prefix;
 
-our $list_activities;
-our $list_clusters;
-our $list_hosts;
-our $list_nameservices;
-our $list_roles;
-our $list_services;
+our $list_activities    = 0;
+our $list_clusters      = 0;
+our $list_hosts         = 0;
+our $list_nameservices  = 0;
+our $list_roles         = 0;
+our $list_services      = 0;
 
 env_creds("CM", "Cloudera Manager");
 
@@ -175,6 +175,8 @@ sub cm_query() {
         }
         if($content =~ /java\.net\.NoRouteToHostException/i){
             $err .= " (Cluster host on which the required components are deployment must be down)";
+        } elsif($content =~ /org\.apache\.avro\.AvroRemoteException: java\.net\.ConnectException: Connection refused/i){
+            $err .= " (Mgmt services stopped?)";
         } elsif($response->message =~ /Can't verify SSL peers without knowing which Certificate Authorities to trust/){
             $err .= ". Do you need to use --ssl-CA-path or --tls-noverify?";
         }
@@ -340,11 +342,11 @@ sub list_services(;$){
 }
 
 sub listing_cm_components(){
-    $list_activities    or
-    $list_clusters      or
-    $list_hosts         or
-    $list_nameservices  or
-    $list_roles         or
+    $list_activities    +
+    $list_clusters      +
+    $list_hosts         +
+    $list_nameservices  +
+    $list_roles         +
     $list_services;
 }
 
@@ -427,6 +429,9 @@ sub validate_cm_cluster_options(){
     --cluster --service --roleId
     --hostId
     ";
+    }
+    if(listing_cm_components() > 1){
+        usage "cannot specify more than one --list operation";
     }
 }
 
