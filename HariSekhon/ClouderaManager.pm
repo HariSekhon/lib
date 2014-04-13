@@ -13,7 +13,7 @@
 
 package HariSekhon::ClouderaManager;
 
-$VERSION = "0.2";
+$VERSION = "0.3";
 
 use strict;
 use warnings;
@@ -54,6 +54,7 @@ our @EXPORT = ( qw (
                     $url
                     $url_prefix
                     %cm_options
+                    %cm_options_tls
                     %cm_options_list
                     cm_query
                     list_activities
@@ -105,10 +106,14 @@ our $list_services      = 0;
 
 env_creds("CM", "Cloudera Manager");
 
-our %cm_options = (
+our %cm_options_tls = (
     "T|tls"            => [ \$tls,          "Use TLS connection to Cloudera Manager (automatically updates port to $ssl_port if still set to $default_port to save one 302 redirect round trip)" ],
     "ssl-CA-path=s"    => [ \$ssl_ca_path,  "Path to CA certificate directory for validating SSL certificate (automatically enables --tls)" ],
     "tls-noverify"     => [ \$tls_noverify, "Do not verify SSL certificate from Cloudera Manager (automatically enables --tls)" ],
+);
+
+our %cm_options = (
+    %cm_options_tls,
     "C|cluster=s"      => [ \$cluster,      "Cluster Name as shown in Cloudera Manager (eg. \"Cluster - CDH4\")" ],
     "S|service=s"      => [ \$service,      "Service Name as shown in Cloudera Manager (eg. hdfs1, mapreduce4). Requires --cluster" ],
     "I|hostId=s"       => [ \$hostid,       "HostId to collect metric for (eg. datanode1.domain.com)" ],
@@ -127,7 +132,8 @@ our %cm_options_list = (
 
 @usage_order = qw/host port user password tls ssl-CA-path tls-noverify metrics all-metrics cluster service hostId activityId nameservice roleId list-activities list-clusters list-hosts list-nameservices list-roles list-services warning critical/;
 
-sub cm_query() {
+sub cm_query(;$) {
+    my $no_items;
     $tls = 1 if(defined($ssl_ca_path) or defined($tls_noverify));
     if(defined($tls_noverify)){
         $ua->ssl_opts( verify_hostname => 0 );
@@ -200,14 +206,7 @@ sub cm_query() {
     catch{
         quit "invalid json returned by Cloudera Manager at '$url_prefix', did you try to connect to the SSL port without --tls?";
     };
-
-    quit "CRITICAL", "no items returned by Cloudera Manager '$url_prefix'" unless(@{$json->{"items"}});
-
-#    foreach(@{$json->{"items"}}){
-#        foreach my $field (qw/name data/){
-#            defined($_->{$field}) or quit "UNKNOWN", "no '$field' field returned item collection from Cloudera Manager. $nagios_plugins_support_msg_api";
-#        }
-#    }
+    return $json;
 }
 
 sub list_activities(;$){
@@ -360,13 +359,15 @@ sub list_cm_components(){
 }
 
 sub validate_cm_activity(){
-        $activity =~ /^\s*([\w-]+)\s*$/ or usage "Invalid activity given, must be alphanumeric with dashes";
-        $activity = $1;
-        vlog_options "activity", $activity;
-        return $activity;
+    defined($activity) or usage "activity not defined";
+    $activity =~ /^\s*([\w-]+)\s*$/ or usage "Invalid activity given, must be alphanumeric with dashes";
+    $activity = $1;
+    vlog_options "activity", $activity;
+    return $activity;
 }
 
 sub validate_cm_cluster(){
+    defined($cluster) or usage "cluster not defined";
     $cluster    =~ /^\s*([\w\s\.-]+)\s*$/ or usage "Invalid cluster name given, may only contain alphanumeric, space, dash, dots or underscores";
     $cluster = $1;
     vlog_options "cluster", $cluster;
@@ -374,12 +375,14 @@ sub validate_cm_cluster(){
 }
 
 sub validate_cm_hostid(){
+    defined($hostid) or usage "host id not defined";
     $hostid = isHostname($hostid) || usage "invalid host id given";
     vlog_options "hostId", "$hostid";
     return $hostid;
 }
 
 sub validate_cm_nameservice(){
+    defined($nameservice) or usage "nameservice not defined";
     $nameservice =~ /^\s*([\w-]+)\s*$/ or usage "Invalid nameservice given, must be alphanumeric with dashes";
     $nameservice = $1;
     vlog_options "nameservice", $nameservice;
@@ -387,6 +390,7 @@ sub validate_cm_nameservice(){
 }
 
 sub validate_cm_role(){
+    defined($role) or usage "role not defined";
     $role =~ /^\s*([\w-]+-\w+-\w+)\s*$/ or usage "Invalid role id given, expected in format such as <service>-<role>-<hexid> (eg hdfs4-NAMENODE-73d774cdeca832ac6a648fa305019cef). Use --list-roleIds to see available roles + IDs for a given cluster service";
     $role = $1;
     vlog_options "roleId", $role;
@@ -394,6 +398,7 @@ sub validate_cm_role(){
 }
 
 sub validate_cm_service(){
+    defined($service) or usage "service not defined";
     $service    =~ /^\s*([\w-]+)\s*$/ or usage "Invalid service name given, must be alphanumeric with dashes";
     $service = $1;
     vlog_options "service", $service;
