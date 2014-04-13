@@ -122,11 +122,11 @@ our %cm_options = (
 );
 
 our %cm_options_list = (
-    "list-activities"   => [ \$list_activities,          "List activities for a given cluster service. Convenience switch to find the activityId to query, prints activity ids and exits immediately. Requires --cluster and --service" ],
-    "list-clusters"     => [ \$list_clusters,           "List clusters for a given cluster service. Convenience switch to find the clusterId to query, prints cluster ids and exits immediately. Requires --cluster and --service" ],
-    "list-hosts"        => [ \$list_hosts,              "List host nodes. Convenience switch to find the hostId to query, prints host ids and exits immediately" ],
-    "list-nameservices" => [ \$list_nameservices,       "List nameservices for a given cluster service. Convenience switch to find the nameserviceId to query, prints nameservice ids and exits immediately. Requires --cluster and --service. Service should be an HDFS service id" ],
-    "list-roles"        => [ \$list_roles,              "List roles for a given cluster service. Convenience switch to find the roleId to query, prints role ids and exits immediately. Requires --cluster and --service" ],
+    "list-activities"   => [ \$list_activities,          "List activities for a given cluster service. Requires --cluster and --service" ],
+    "list-clusters"     => [ \$list_clusters,           "List clusters for a given cluster service. Requires --cluster and --service" ],
+    "list-hosts"        => [ \$list_hosts,              "List host id of nodes managed my Cloudera Manager" ],
+    "list-nameservices" => [ \$list_nameservices,       "List nameservices for a given cluster service. Requires --cluster and --service. Service should be an HDFS service id" ],
+    "list-roles"        => [ \$list_roles,              "List roles for a given cluster service. Requires --cluster and --service" ],
     "list-services"     => [ \$list_services,           "List services for a given cluster. Convenience switch to find the serviceId to query, prints service ids and exits immediately. Requires --cluster" ],
 );
 
@@ -237,39 +237,48 @@ sub list_clusters(;$){
     my $quit = shift;
     $url = "$api/clusters";
     cm_query();
-    my @clusters;
-    foreach(@{$json->{"items"}}){
-        if(defined($_->{"name"})){
-            push(@clusters, $_->{"name"});
-        } else {
-            code_error "no 'name' field returned in item from cluster listing from Cloudera Manager at '$url_prefix'. $nagios_plugins_support_msg_api";
+    my %clusters;
+    foreach my $item (@{$json->{"items"}}){
+        foreach(qw/name version/){
+            defined($item->{$_}) or quit "UNKNOWN", "'$_' field not returned in item from cluster listing from Cloudera Manager at '$url_prefix'. $nagios_plugins_support_msg_api";
         }
+        $clusters{$item->{"name"}} = $item->{"version"};
     }
-    @clusters = sort @clusters;
     if($quit){
-        print "CM clusters available:\n\n" . join("\n", @clusters) . "\n";
+        print "CM clusters available:\n\n";
+        printf("%-20s => CDH version\n\n", "cluster name");
+        foreach(sort keys %clusters){
+            printf("%-20s => %s\n", $_, $clusters{$_});
+        }
         exit $ERRORS{"UNKNOWN"};
     }
-    return @clusters;
+    return %clusters;
 }
 
 sub list_hosts(;$){
     my $quit = shift;
     $url = "$api/hosts";
     cm_query();
+    #my %hosts;
     my @hosts;
-    foreach(@{$json->{"items"}}){
-        if(defined($_->{"hostId"})){
-            push(@hosts, $_->{"hostId"});
-        } else {
-            code_error "no 'hostId' field returned in item from host listing from Cloudera Manager at '$url_prefix'. $nagios_plugins_support_msg_api";
+    foreach my $item (@{$json->{"items"}}){
+        foreach(qw/hostname hostId/){
+            defined($item->{$_}) or quit "UNKNOWN", "'$_' field not returned in item from host listing from Cloudera Manager at '$url_prefix'. $nagios_plugins_support_msg_api";
         }
+        #$hosts{$item->{"hostname"}} = $item->{"hostId"};
+        push(@hosts, $item->{"hostname"});
     }
     @hosts = sort @hosts;
     if($quit){
-        print "hosts available:\n\n" . join("\n", @hosts) . "\n";
+        #printf("%-36s => %s\n\n", "hostId", "hostname");
+        #foreach(sort keys %hosts){
+        #    print $hosts{$_} . " => $_\n";
+        #}
+        #exit $ERRORS{"UNKNOWN"};
+        print "hosts managed by Cloudera Manager:\n\n" . join("\n", @hosts) . "\n";
         exit $ERRORS{"UNKNOWN"};
     }
+    #return %hosts;
     return @hosts;
 }
 
@@ -350,6 +359,9 @@ sub listing_cm_components(){
 }
 
 sub list_cm_components(){
+    if(listing_cm_components() > 1){
+        usage "cannot specify more than one --list operation";
+    }
     list_activities(1)    if($list_activities);
     list_clusters(1)      if($list_clusters);
     list_hosts(1)         if($list_hosts);
