@@ -13,7 +13,7 @@
 
 package HariSekhon::ClouderaManager;
 
-$VERSION = "0.3";
+$VERSION = "0.4";
 
 use strict;
 use warnings;
@@ -57,6 +57,7 @@ our @EXPORT = ( qw (
                     %cm_options_tls
                     %cm_options_list
                     cm_query
+                    check_cm_field
                     list_activities
                     list_clusters
                     list_hosts
@@ -116,9 +117,9 @@ our %cm_options = (
     %cm_options_tls,
     "C|cluster=s"      => [ \$cluster,      "Cluster Name as shown in Cloudera Manager (eg. \"Cluster - CDH4\")" ],
     "S|service=s"      => [ \$service,      "Service Name as shown in Cloudera Manager (eg. hdfs1, mapreduce4). Requires --cluster" ],
-    "I|hostId=s"       => [ \$hostid,       "HostId to collect metric for (eg. datanode1.domain.com)" ],
-    "N|nameservice=s"  => [ \$nameservice,  "Nameservice to collect metric for (as specified in your HA configuration under dfs.nameservices). Requires --cluster and --service" ],
-    "R|roleId=s"       => [ \$role,         "RoleId to collect metric for (eg. hdfs4-NAMENODE-73d774cdeca832ac6a648fa305019cef - use --list-roleIds to find CM's role ids for a given service). Requires --cluster and --service" ],
+    "I|hostId=s"       => [ \$hostid,       "FQDN or HostId of node, see --list-hosts" ],
+    "N|nameservice=s"  => [ \$nameservice,  "Nameservice (as specified in your HA configuration under dfs.nameservices). Requires --cluster and --service, see --list-nameservices" ],
+    "R|roleId=s"       => [ \$role,         "RoleId (eg. hdfs4-NAMENODE-73d774cdeca832ac6a648fa305019cef). Requires --cluster and --service, see --list-roles" ],
 );
 
 our %cm_options_list = (
@@ -207,6 +208,12 @@ sub cm_query(;$) {
         quit "invalid json returned by Cloudera Manager at '$url_prefix', did you try to connect to the SSL port without --tls?";
     };
     return $json;
+}
+
+sub check_cm_field($){
+    my $field = shift;
+    defined($json->{$field}) or quit "UNKNOWN", "field '$field' not returned from Cloudera Manager. $nagios_plugins_support_msg_api";
+    $json->{$field} =~ /^\s*$/ and quit "UNKNOWN", "field '$field' is empty";
 }
 
 sub list_activities(;$){
@@ -403,7 +410,7 @@ sub validate_cm_nameservice(){
 
 sub validate_cm_role(){
     defined($role) or usage "role not defined";
-    $role =~ /^\s*([\w-]+-\w+-\w+)\s*$/ or usage "Invalid role id given, expected in format such as <service>-<role>-<hexid> (eg hdfs4-NAMENODE-73d774cdeca832ac6a648fa305019cef). Use --list-roleIds to see available roles + IDs for a given cluster service";
+    $role =~ /^\s*([\w-]+-\w+-\w+)\s*$/ or usage "Invalid role id given, expected in format such as <service>-<role>-<hexid> (eg hdfs4-NAMENODE-73d774cdeca832ac6a648fa305019cef). Use --list-roles to see available roles + IDs for a given cluster service";
     $role = $1;
     vlog_options "roleId", $role;
     return $role;
