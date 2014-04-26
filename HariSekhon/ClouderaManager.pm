@@ -13,7 +13,7 @@
 
 package HariSekhon::ClouderaManager;
 
-$VERSION = "0.4";
+$VERSION = "0.5";
 
 use strict;
 use warnings;
@@ -33,6 +33,7 @@ our @EXPORT = ( qw (
                     $api
                     $activity
                     $cluster
+                    $cm_mgmt
                     $default_port
                     $hostid
                     $json
@@ -87,6 +88,7 @@ our $ssl_port     = 7183;
 
 our $activity;
 our $cluster;
+our $cm_mgmt;
 our $hostid;
 our $json;
 our $nameservice;
@@ -119,7 +121,8 @@ our %cm_options = (
     "S|service=s"      => [ \$service,      "Service Name as shown in Cloudera Manager (eg. hdfs1, mapreduce4). Requires --cluster" ],
     "I|hostId=s"       => [ \$hostid,       "FQDN or HostId of node, see --list-hosts" ],
     "N|nameservice=s"  => [ \$nameservice,  "Nameservice (as specified in your HA configuration under dfs.nameservices). Requires --cluster and --service, see --list-nameservices" ],
-    "R|roleId=s"       => [ \$role,         "RoleId (eg. hdfs4-NAMENODE-73d774cdeca832ac6a648fa305019cef). Requires --cluster and --service, see --list-roles" ],
+    "R|roleId=s"       => [ \$role,         "RoleId (eg. hdfs4-NAMENODE-73d774cdeca832ac6a648fa305019cef). Requires --cluster and --service, or --CM-mgmt, see --list-roles for what to pass this option" ],
+    "M|CM-mgmt"        => [ \$cm_mgmt,      "Cloudera Manager Management services" ],
 );
 
 our %cm_options_list = (
@@ -131,7 +134,7 @@ our %cm_options_list = (
     "list-services"     => [ \$list_services,           "List services for a given cluster. Convenience switch to find the serviceId to query, prints service ids and exits immediately. Requires --cluster" ],
 );
 
-@usage_order = qw/host port user password tls ssl-CA-path tls-noverify metrics all-metrics cluster service hostId activityId nameservice roleId list-activities list-clusters list-hosts list-nameservices list-roles list-services warning critical/;
+@usage_order = qw/host port user password tls ssl-CA-path tls-noverify metrics all-metrics cluster service hostId activityId nameservice roleId CM-mgmt list-activities list-clusters list-hosts list-nameservices list-roles list-services warning critical/;
 
 sub cm_query(;$) {
     my $no_items;
@@ -216,6 +219,7 @@ sub check_cm_field($){
     $json->{$field} =~ /^\s*$/ and quit "UNKNOWN", "field '$field' is empty";
 }
 
+# XXX: maybe could do something more with these, such as N out of M failed
 sub list_activities(;$){
     my $quit = shift;
     unless(defined($cluster) and defined($service)){
@@ -314,10 +318,13 @@ sub list_nameservices(;$){
 
 sub list_roles(;$){
     my $quit = shift;
-    unless(defined($cluster) and defined($service)){
-        usage "must define cluster and service to be able to list roles";
+    if(defined($cluster) and defined($service)){
+        $url = "$api/clusters/$cluster/services/$service/roles";
+    } elsif(defined($cm_mgmt)){
+        $url = "$api/cm/service/roles";
+    } else {
+        usage "must define cluster and service or --CM-mgmt to be able to list roles";
     }
-    $url = "$api/clusters/$cluster/services/$service/roles";
     cm_query();
     my @roles;
     foreach(@{$json->{"items"}}){
@@ -329,7 +336,11 @@ sub list_roles(;$){
     }
     @roles = sort @roles;
     if($quit){
-        print "roles available for cluster '$cluster', service '$service':\n\n" . join("\n", @roles) . "\n";
+        if(defined($cluster) and defined($service)){
+            print "roles available for cluster '$cluster', service '$service':\n\n" . join("\n", @roles) . "\n";
+        } elsif(defined($cm_mgmt)){
+            print "roles available for CM mgmt services:\n\n" . join("\n", @roles) . "\n";
+        }
         exit $ERRORS{"UNKNOWN"};
     }
     return @roles;
