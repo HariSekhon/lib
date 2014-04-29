@@ -104,6 +104,7 @@ sub check_nodetool_errors($){
 
 # Cassandra 2.0 DataStax Community Edition (nodetool version gives 'ReleaseVersion: 2.0.2')
 our $nodetool_status_header_regex = qr/
+                                       ^Note |
                                        ^Datacenter |
                                        ^========== |
                                        ^Status=Up\/Down |
