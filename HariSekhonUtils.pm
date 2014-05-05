@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.7.4";
+our $VERSION = "1.7.5";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -272,6 +272,7 @@ our %EXPORT_TAGS = (
                         validate_password
                         validate_port
                         validate_process_name
+                        validate_program_path
                         validate_regex
                         validate_resolvable
                         validate_thresholds
@@ -1032,7 +1033,7 @@ sub curl ($;$$$) {
     my $user     = shift;
     my $password = shift;
     #debug("url passed to curl: $url");
-    isUrl($url) or code_error "invalid url supplied to curl()";
+    $url = isUrl($url) or code_error "invalid url supplied to curl()";
     my $host = $url;
     $host =~ s/^https?:\/\///;
     $host =~ s/(?::\d+)?(?:\/.*)?$//;
@@ -1675,7 +1676,8 @@ sub isUrl ($) {
     my $url = shift;
     defined($url) or return undef;
     #debug("url_regex: $url_regex");
-    $url = "http://$url" unless $url =~ /^http|:\//i;
+    $url = trim($url);
+    $url = "http://$url" unless $url =~ /:\/\//i;
     $url =~ /^($url_regex)$/ or return undef;
     return $1;
 }
@@ -2617,6 +2619,18 @@ sub validate_process_name ($;$) {
     $process = isProcessName($process) || usage "invalid ${name}process name defined";
     vlog_options("${name}process name", $process);
     return $process;
+}
+
+
+sub validate_program_path ($$) {
+    my $path = shift;
+    my $name    = shift;
+    defined($path) or usage "$name program path not defined";
+    defined($name)    or usage "$path program name not defined";
+    $path = validate_filename($path) or usage "invalid path given for $name, failed filename regex";
+    $path =~ /(?:^|\/)$name$/ || usage "invalid path given for $name, is not a path to the $name command";
+    vlog_options("${name}program path", $path);
+    return $path;
 }
 
 
