@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.7.5";
+our $VERSION = "1.7.6";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -166,6 +166,7 @@ our %EXPORT_TAGS = (
                         set_port_default
                         set_threshold_defaults
                         timecomponents2days
+                        tls_options
                         usage
                         validate_thresholds
                         version
@@ -287,6 +288,7 @@ our %EXPORT_TAGS = (
                         $critical
                         $debug
                         $email
+                        $expected_version
                         $host
                         $msg
                         $msg_err
@@ -300,6 +302,9 @@ our %EXPORT_TAGS = (
                         $status
                         $status_prefix
                         $sudo
+                        $ssl_ca_path
+                        $tls
+                        $tls_noverify
                         $timeout
                         $timeout_default
                         $timeout_max
@@ -311,10 +316,12 @@ our %EXPORT_TAGS = (
                         $warning
                         %ERRORS
                         %emailoptions
+                        %expected_version_option
                         %hostoptions
                         %options
                         %thresholdoptions
                         %thresholds
+                        %tlsoptions
                         %useroptions
                         @usage_order
                     ) ],
@@ -459,7 +466,7 @@ my  $domain_component   = '\b(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-
 # this matches everything except the XN--\w{6,10} TLDs as of 8/10/2012
 our $tld_regex          = '\b(?:[A-Za-z]{2,4}|(?i:local|museum|travel))\b';
 our $domain_regex       = '(?:' . $domain_component . '\.)+' . $tld_regex;
-our $hostname_component = '\b(?:[A-Za-z0-9]{1,63}|[A-Za-z0-9][A-Za-z0-9_\-]{1,61}[a-zA-Z0-9])\b';
+our $hostname_component = '\b(?:[A-Za-z]{1,63}|[A-Za-z][A-Za-z0-9_\-]{1,61}[a-zA-Z0-9])\b';
 our $hostname_regex     = "(?:$hostname_component(?:\.$domain_regex)?|$domain_regex)";
 our $filename_regex     = '[\/\w\s_\.:,\*\=\%\?\+-]+';
 our $rwxt_regex         = '[r-][w-][x-][r-][w-][x-][r-][w-][xt-]';
@@ -485,6 +492,7 @@ our $threshold_simple_regex = qr/^(-?\d+(?:\.\d+)?)$/;
 our $critical;
 our $debug = 0;
 our $email;
+our $expected_version;
 our $help;
 our $host;
 our $msg = "";
@@ -498,6 +506,9 @@ my  $selflock;
 our $status = "UNKNOWN";
 our $sudo = "";
 our $syslog_initialized = 0;
+our $ssl_ca_path;
+our $tls;
+our $tls_noverify;
 our $timeout_default = 10;
 our $timeout_max     = 60;
 our $timeout_min     = 1;
@@ -566,6 +577,14 @@ our %thresholdoptions = (
 );
 our %emailoptions = (
     "E|email=s"     => [ \$email,   "Email address" ],
+);
+our %expected_version_option = (
+    "e|expected=s"     => [ \$expected_version,     "Expected version regex, raises CRITICAL if not matching, optional" ]
+);
+our %tlsoptions = (
+    "T|tls"            => [ \$tls,          "Use TLS connection" ],
+    "ssl-CA-path=s"    => [ \$ssl_ca_path,  "Path to CA certificate directory for validating SSL certificate (automatically enables --tls)" ],
+    "tls-noverify"     => [ \$tls_noverify, "Do not verify SSL certificate (automatically enables --tls)" ],
 );
 my $short_options_len = 0;
 my $long_options_len  = 0;
@@ -2133,6 +2152,29 @@ sub timecomponents2days($$$$$$){
     my $epoch = timegm($sec, $min, $hour, $day, $month_int, $year-1900) || code_error "failed to convert timestamp $year-$month-$day $hour:$min:$sec";
     my $now   = time || code_error "failed to get epoch timestamp";
     return ($epoch - $now) / (86400);
+}
+
+
+sub tls_options(){
+    defined_main_ua();
+    $tls = 1 if(defined($ssl_ca_path) or defined($tls_noverify));
+    if(defined($tls_noverify)){
+        $main::ua->ssl_opts( verify_hostname => 0 );
+        $tls = 1;
+    }
+    if(defined($ssl_ca_path)){
+        $ssl_ca_path = validate_directory($ssl_ca_path, undef, "SSL CA directory", "no vlog");
+        $main::ua->ssl_opts( SSL_ca_path => $ssl_ca_path );
+        $tls = 1;
+    }
+    if($tls){
+        vlog_options("TLS enabled",  "true");
+        vlog_options("SSL CA Path",  $ssl_ca_path) if defined($ssl_ca_path);
+        vlog_options("TLS noverify", $tls_noverify ? "true" : "false");
+    }
+    if($tls){
+        $main::protocol = "https" if defined($main::protocol);
+    }
 }
 
 
