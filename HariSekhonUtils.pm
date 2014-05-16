@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.7.6";
+our $VERSION = "1.7.7";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1031,7 +1031,7 @@ sub cmd ($;$$) {
 sub code_error (@) {
     use Carp;
     #quit("UNKNOWN", "Code Error - @_");
-    $! = $ERRORS{"UNKNOWN"};
+    $? = $! = $ERRORS{"UNKNOWN"};
     if($debug){
         confess "Code Error - @_";
     } else {
