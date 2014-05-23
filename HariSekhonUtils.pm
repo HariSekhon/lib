@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.7.7";
+our $VERSION = "1.7.8";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1800,12 +1800,14 @@ sub minimum_value ($$) {
 
 
 sub msg_perf_thresholds (;$) {
+    my $return = shift;
+    my $type   = shift() ? "lower" : "upper";
     my $tmp = ";";
-    $tmp .= $thresholds{"warning"}{"upper"} if defined($thresholds{"warning"}{"upper"});
+    $tmp .= $thresholds{"warning"}{$type}  if defined($thresholds{"warning"}{$type});
     $tmp .= ";";
-    $tmp .= $thresholds{"critical"}{"upper"} if defined($thresholds{"critical"}{"upper"});
+    $tmp .= $thresholds{"critical"}{$type} if defined($thresholds{"critical"}{$type});
     $tmp .= ";";
-    if(defined($_[0]) and $_[0]){
+    if(defined($return) and $return){
         return $tmp;
     } else {
         $msg .= $tmp;
