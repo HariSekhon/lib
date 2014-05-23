@@ -1799,7 +1799,7 @@ sub minimum_value ($$) {
 }
 
 
-sub msg_perf_thresholds (;$) {
+sub msg_perf_thresholds (;$$) {
     my $return = shift;
     my $type   = shift() ? "lower" : "upper";
     my $tmp = ";";
