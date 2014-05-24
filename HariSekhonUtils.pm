@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.7.8";
+our $VERSION = "1.7.9";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1160,7 +1160,8 @@ sub expand_units ($;$$) {
     }
     defined($units) || code_error "no units arg 2 passed to expand_units()";
     isFloat($num)   || code_error "non-float num arg 1 passed to expand_units()";
-    if   ($units =~ /^KB?$/i){ $power = 1; }
+    if   ($units =~ /^B?$/i) { return $num; }
+    elsif($units =~ /^KB?$/i){ $power = 1; }
     elsif($units =~ /^MB?$/i){ $power = 2; }
     elsif($units =~ /^GB?$/i){ $power = 3; }
     elsif($units =~ /^TB?$/i){ $power = 4; }
