@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.7.10";
+our $VERSION = "1.7.11";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1523,10 +1523,11 @@ sub isIP ($) {
     $ip = $1;
     my @octets = split(/\./, $ip);
     (@octets == 4) or return undef;
-    $octets[3] eq 0 and return undef;
     foreach(@octets){
-        $_ > 254 and return undef;
+        $_ > 255 and return undef;
     }
+    $octets[3] eq 0  and return undef;
+    $octets[3] > 254 and return undef;
     return $ip;
 }
 
