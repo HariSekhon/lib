@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.7.9";
+our $VERSION = "1.7.10";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2667,14 +2667,16 @@ sub validate_process_name ($;$) {
 }
 
 
-sub validate_program_path ($$) {
-    my $path = shift;
-    my $name    = shift;
+sub validate_program_path ($$;$) {
+    my $path  = shift;
+    my $name  = shift;
+    my $regex = shift() || $name;
     defined($path) or usage "$name program path not defined";
-    defined($name)    or usage "$path program name not defined";
+    defined($name) or usage "$path program name not defined";
+    validate_regex($regex, "program path regex", 1) or code_error "invalid regex given to validate_program_path()";
     $path = validate_filename($path) or usage "invalid path given for $name, failed filename regex";
-    $path =~ /(?:^|\/)$name$/ || usage "invalid path given for $name, is not a path to the $name command";
-    vlog_options("${name}program path", $path);
+    $path =~ /(?:^|\/)$regex$/ || usage "invalid path given for $name, is not a path to the $name command";
+    vlog_options("${name} program path", $path);
     return $path;
 }
 
