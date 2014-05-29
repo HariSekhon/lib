@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.7.11";
+our $VERSION = "1.7.12";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -464,7 +464,7 @@ our $nagios_plugins_support_msg_api = "API may have changed. $nagios_plugins_sup
 my  $domain_component   = '\b(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])\b';
 # validated against http://data.iana.org/TLD/tlds-alpha-by-domain.txt which lists all possible TLDs assigned by IANA
 # this matches everything except the XN--\w{6,10} TLDs as of 8/10/2012
-our $tld_regex          = '\b(?:[A-Za-z]{2,4}|(?i:local|museum|travel))\b';
+our $tld_regex          = '\b(?:[A-Za-z]{2,4}|(?i:museum|travel|local|localdomain))\b';
 our $domain_regex       = '(?:' . $domain_component . '\.)+' . $tld_regex;
 our $hostname_component = '\b(?:[A-Za-z]{1,63}|[A-Za-z][A-Za-z0-9_\-]{1,61}[a-zA-Z0-9])\b';
 our $hostname_regex     = "(?:$hostname_component(?:\.$domain_regex)?|$domain_regex)";
