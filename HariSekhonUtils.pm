@@ -465,9 +465,9 @@ my  $domain_component   = '\b(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-
 # validated against http://data.iana.org/TLD/tlds-alpha-by-domain.txt which lists all possible TLDs assigned by IANA
 # this matches everything except the XN--\w{6,10} TLDs as of 8/10/2012
 our $tld_regex          = '\b(?:[A-Za-z]{2,4}|(?i:museum|travel|local|localdomain))\b';
-our $domain_regex       = '(?:' . $domain_component . '\.)+' . $tld_regex;
+our $domain_regex       = '(?:' . $domain_component . '\.)*' . $tld_regex;
 our $hostname_component = '\b(?:[A-Za-z]{1,63}|[A-Za-z][A-Za-z0-9_\-]{1,61}[a-zA-Z0-9])\b';
-our $hostname_regex     = "(?:$hostname_component(?:\.$domain_regex)?|$domain_regex)";
+our $hostname_regex     = "$hostname_component(?:\.$domain_regex)?";
 our $filename_regex     = '[\/\w\s_\.:,\*\=\%\?\+-]+';
 our $rwxt_regex         = '[r-][w-][x-][r-][w-][x-][r-][w-][xt-]';
 our $fqdn_regex         = $hostname_component . '\.' . $domain_regex;
