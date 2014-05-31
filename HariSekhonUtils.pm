@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.7.12";
+our $VERSION = "1.7.13";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -937,8 +937,9 @@ sub check_thresholds ($;$) {
     #subtrace(@_);
     my $result            = shift;
     my $no_msg_thresholds = shift || 0;
+    defined($result) or code_error("no result passed to check_thresholds()");
     my $status_ok = check_threshold("critical", $result) and
-                 check_threshold("warning",  $result);
+                    check_threshold("warning",  $result);
     #msg_thresholds() unless $no_msg_thresholds;
     return ($status_ok, msg_thresholds($no_msg_thresholds));
 }
