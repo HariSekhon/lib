@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.7.13";
+our $VERSION = "1.7.14";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1047,11 +1047,12 @@ sub compact_array (@) {
 }
 
 
-sub curl ($;$$$) {
+sub curl ($;$$$$) {
     my $url      = shift;
     my $name     = shift;
     my $user     = shift;
     my $password = shift;
+    my $err_sub  = shift;
     #debug("url passed to curl: $url");
     $url = isUrl($url) or code_error "invalid url supplied to curl()";
     my $host = $url;
@@ -1092,23 +1093,28 @@ sub curl ($;$$$) {
     vlog3("returned HTML:\n\n" . ( $content ? $content : "<blank>" ) . "\n");
     vlog2("http status code:     " . $response->code);
     vlog2("http status message:  " . $response->message . "\n");
-    unless($response->code eq "200"){
-        my $additional_information = "";
-        my $json;
-        if($json = isJson($content)){
-            if(defined($json->{"status"})){
-                $additional_information .= ". Status: " . $json->{"status"};
+    if($err_sub){
+        isCode($err_sub) or code_error "invalid subroutine passed to curl() as error handler";
+        &$err_sub($response);
+    } else {
+        unless($response->code eq "200"){
+            my $additional_information = "";
+            my $json;
+            if($json = isJson($content)){
+                if(defined($json->{"status"})){
+                    $additional_information .= ". Status: " . $json->{"status"};
+                }
+                if(defined($json->{"reason"})){
+                    $additional_information .= ". Reason: " . $json->{"reason"};
+                } elsif(defined($json->{"message"})){
+                    $additional_information .= ". Message: " . $json->{"message"};
+                }
             }
-            if(defined($json->{"reason"})){
-                $additional_information .= ". Reason: " . $json->{"reason"};
-            } elsif(defined($json->{"message"})){
-                $additional_information .= ". Message: " . $json->{"message"};
-            }
+            quit("CRITICAL", $response->code . " " . $response->message . $additional_information);
         }
-        quit("CRITICAL", $response->code . " " . $response->message . $additional_information);
-    }
-    unless($content){
-        quit("CRITICAL", "blank content returned from '$url'");
+        unless($content){
+            quit("CRITICAL", "blank content returned from '$url'");
+        }
     }
     return $content;
 }
