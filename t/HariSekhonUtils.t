@@ -198,7 +198,8 @@ ok(!isFloat("nan"),     '!isFloat("nan")');
 ok(!isFloat("nan", 1),  '!isFloat("nan", 1)');
 
 is(isFqdn("hari.sekhon.com"),   "hari.sekhon.com",  'isFqdn("hari.sekhon.com") eq harisekhon.com');
-is(isFqdn("harisekhon.com"),    undef,              '!isFqdn("harisekhon.com") eq undef');
+# denying this results in failing host.local as well
+#is(isFqdn("harisekhon.com"),    undef,              '!isFqdn("harisekhon.com") eq undef');
 
 # TODO:
 #ok(isHash(%{ ( "one" => 1 ) }), "isHash()");
