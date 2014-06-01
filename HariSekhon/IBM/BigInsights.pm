@@ -9,7 +9,7 @@
 
 package HariSekhon::IBM::BigInsights;
 
-$VERSION = "0.3";
+$VERSION = "0.3.1";
 
 use strict;
 use warnings;
@@ -72,16 +72,18 @@ sub get_field2($$){
     return $json->{$field};
 }
 
+
 sub curl_biginsights($$$;$$){
-    my $url_prefix = "$protocol://$host:$port";
     ($host and $port) or code_error "host and port not defined before calling curl_biginsights()";
+    my $url_prefix = "$protocol://$host:$port";
     my $url      = shift;
     my $user     = shift;
     my $password = shift;
     my $err_sub  = shift   || \&curl_biginsights_err_handler;
     my $api      = shift() || $api;
-    $url =~ s/\///;
+    $url =~ s/^\///;
     $url = "$url_prefix/$api/$url";
+    isUrl($url) or code_error "invalid URL '$url' supplied to curl_biginsights/bigsheets";
     my $content  = curl $url, "IBM BigInsights Console", $user, $password, $err_sub;
     try{
         $json = decode_json $content;
