@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.7.14";
+our $VERSION = "1.7.15";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -404,7 +404,8 @@ BEGIN {
     sub die_sub {
         # this is auto-translated in to equivalent system error string, we're not interested in system interpretation
         # so explicitly cast back to int so we can compare with std error codes
-        my $exit_code = (defined($?) and $? ne "" ? int($?) : $ERRORS{"CRITICAL"});
+        my $exit_code = $?;
+        $exit_code = (defined($exit_code) and $exit_code ne "" ? int($exit_code) : $ERRORS{"CRITICAL"});
         my $str   = "@_" || "Died";
         # better to add the status prefix in here instead of in quit calls
         #my $status_prefixes = join("|", keys %ERRORS);
@@ -431,7 +432,9 @@ BEGIN {
         }
         exit $ERRORS{"CRITICAL"};
     };
-    $SIG{__DIE__} = \&die_sub;
+    if(substr(basename($0), 0, 6) eq "check_"){
+        $SIG{__DIE__} = \&die_sub;
+    }
 
     # This is because the die handler causes program exit instead of return from eval {} block required for exception handling
     sub try(&) {
@@ -468,7 +471,7 @@ our $tld_regex          = '\b(?:[A-Za-z]{2,4}|(?i:museum|travel|local|localdomai
 our $domain_regex       = '(?:' . $domain_component . '\.)*' . $tld_regex;
 our $hostname_component = '\b(?:[A-Za-z]{1,63}|[A-Za-z][A-Za-z0-9_\-]{1,61}[a-zA-Z0-9])\b';
 our $hostname_regex     = "$hostname_component(?:\.$domain_regex)?";
-our $filename_regex     = '[\/\w\s_\.:,\*\=\%\?\+-]+';
+our $filename_regex     = '[\/\w\s_\.:,\*\(\)\=\%\?\+-]+';
 our $rwxt_regex         = '[r-][w-][x-][r-][w-][x-][r-][w-][xt-]';
 our $fqdn_regex         = $hostname_component . '\.' . $domain_regex;
 # SECURITY NOTE: I'm allowing single quote through as it's found in Irish email addresses. This makes the $email_regex non-safe without further validation. This regex only tests whether it's a valid email address, nothing more. DO NOT UNTAINT EMAIL or pass to cmd to SQL without further validation!!!
@@ -1054,6 +1057,7 @@ sub curl ($;$$$$) {
     my $password = shift;
     my $err_sub  = shift;
     #debug("url passed to curl: $url");
+    defined($url)      or code_error "no url passed to curl()";
     $url = isUrl($url) or code_error "invalid url supplied to curl()";
     my $host = $url;
     $host =~ s/^https?:\/\///;
