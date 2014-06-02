@@ -9,7 +9,7 @@
 
 package HariSekhon::IBM::BigInsights;
 
-$VERSION = "0.3.1";
+$VERSION = "0.3.2";
 
 use strict;
 use warnings;
@@ -119,18 +119,24 @@ sub curl_biginsights_err_handler($){
     }
 }
 
-
+# http://www-01.ibm.com/support/knowledgecenter/SSPT3X_2.1.2/com.ibm.swg.im.infosphere.biginsights.analyze.doc/doc/bigsheets_restapi.html
 sub curl_bigsheets_err_handler($){
     my $response = shift;
     my $content  = $response->content;
     my $json;
     my $additional_information = "";
     if($json = isJson($content)){
-        if(defined($json->{"status"})){
-            $additional_information .= ". Status: " . $json->{"status"};
-        }
         if(defined($json->{"errorMsg"})){
-            $additional_information .= ". Reason: " . $json->{"errorMsg"};
+            $additional_information .= ". errorMsg: " . $json->{"errorMsg"};
+        }
+        if(defined($json->{"error"})){
+            isHash($json->{"error"}) or quit "UNKNOWN", "error occurred but error field is not a hash as expected to obtain further information. $nagios_plugins_support_msg_api";
+            if(defined($json->{"error"}{"errorCode"})){
+                $additional_information .= ". ErrorCode: " . $json->{"error"}{"errorCode"};
+            }
+            if(defined($json->{"error"}{"message"})){
+                $additional_information .= ". Message: " . $json->{"error"}{"message"};
+            }
         }
     }
     unless($response->code eq "200" or $response->code eq "201"){
