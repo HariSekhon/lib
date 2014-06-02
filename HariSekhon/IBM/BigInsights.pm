@@ -9,7 +9,7 @@
 
 package HariSekhon::IBM::BigInsights;
 
-$VERSION = "0.3.2";
+$VERSION = "0.3.3";
 
 use strict;
 use warnings;
@@ -112,6 +112,9 @@ sub curl_biginsights_err_handler($){
         }
     }
     unless($response->code eq "200"){
+        if($content =~ /not.+deployed/i and length(() = split("\n", $content)) < 3){
+            $additional_information .= ". $content";
+        }
         quit "CRITICAL", $response->code . " " . $response->message . $additional_information;
     }
     unless($content){
@@ -137,6 +140,10 @@ sub curl_bigsheets_err_handler($){
             if(defined($json->{"error"}{"message"})){
                 $additional_information .= ". Message: " . $json->{"error"}{"message"};
             }
+        }
+    } else {
+        if($content =~ /not.+deployed/i and length(() = split("\n", $content)) < 3){
+            $additional_information .= ". $content";
         }
     }
     unless($response->code eq "200" or $response->code eq "201"){
