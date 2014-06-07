@@ -79,7 +79,15 @@ our %EXPORT_TAGS = (
     'array' =>  [   qw(
                         compact_array
                         get_field
+                        get_field_array
+                        get_field_float
+                        get_field_hash
+                        get_field_int
                         get_field2
+                        get_field2_array
+                        get_field2_float
+                        get_field2_hash
+                        get_field2_int
                         inArray
                         uniq_array
                     ) ],
@@ -1227,11 +1235,59 @@ sub get_field($){
     get_field2($json, $_[0]);
 }
 
+sub get_field_array($){
+    my $value = get_field($_[0]);
+    require_array($value, $_[0]);
+    return $value;
+}
+
+sub get_field_float($){
+    my $value = get_field($_[0]);
+    require_float($value, $_[0]);
+    return $value;
+}
+
+sub get_field_hash($){
+    my $value = get_field($_[0]);
+    require_hash($value, $_[0]);
+    return $value;
+}
+
+sub get_field_int($){
+    my $value = get_field($_[0]);
+    require_int($value, $_[0]);
+    return $value;
+}
+
 sub get_field2($$){
     my $hash_ref  = shift;
     my $field     = shift;
     defined($hash_ref->{$field}) or quit "UNKNOWN", "'$field' field not found. $nagios_plugins_support_msg_api";
     return $hash_ref->{$field};
+}
+
+sub get_field2_array($$){
+    my $value = get_field2($_[0], $_[1]);
+    require_array($value, $_[1]);
+    return $value;
+}
+
+sub get_field2_float($$){
+    my $value = get_field2($_[0], $_[1]);
+    require_float($value, $_[1]);
+    return $value;
+}
+
+sub get_field2_hash($$){
+    my $value = get_field2($_[0], $_[1]);
+    require_hash($value, $_[1]);
+    return $value;
+}
+
+sub get_field2_int($$){
+    my $value = get_field2($_[0], $_[1]);
+    require_int($value, $_[1]);
+    return $value;
 }
 
 
@@ -2108,6 +2164,31 @@ sub random_alnum($){
 
 sub remove_timeout(){
     delete $HariSekhonUtils::default_options{"t|timeout=i"};
+}
+
+
+sub require_array($$) {
+    my $array = shift;
+    my $name  = shift;
+    isArray($array) or quit "UNKNOWN", "$name is not a array! $nagios_plugins_support_msg";
+}
+
+sub require_float($$) {
+    my $float = shift;
+    my $name  = shift;
+    isFloat($float) or quit "UNKNOWN", "$name is not a float! $nagios_plugins_support_msg";
+}
+
+sub require_hash($$) {
+    my $hash = shift;
+    my $name = shift;
+    isHash($hash) or quit "UNKNOWN", "$name is not a hash! $nagios_plugins_support_msg";
+}
+
+sub require_int($$) {
+    my $int  = shift;
+    my $name = shift;
+    isInt($int) or quit "UNKNOWN", "$name is not an integer! $nagios_plugins_support_msg";
 }
 
 
