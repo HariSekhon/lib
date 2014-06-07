@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.7.15";
+our $VERSION = "1.8.0";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -78,6 +78,8 @@ our @ISA = qw(Exporter);
 our %EXPORT_TAGS = (
     'array' =>  [   qw(
                         compact_array
+                        get_field
+                        get_field2
                         inArray
                         uniq_array
                     ) ],
@@ -133,6 +135,7 @@ our %EXPORT_TAGS = (
                         isUrl
                         isUrlPathSuffix
                         isUser
+                        isVersion
                         user_exists
                     ) ],
     'lock'  =>  [   qw(
@@ -152,6 +155,8 @@ our %EXPORT_TAGS = (
                         add_host_options
                         add_user_options
                         get_options
+                        check_regex
+                        check_string
                         check_threshold
                         check_thresholds
                         env_creds
@@ -197,6 +202,7 @@ our %EXPORT_TAGS = (
                         $url_path_suffix_regex
                         $url_regex
                         $user_regex
+                        $version_regex
                     ) ],
     'status' =>  [  qw(
                         $status
@@ -290,6 +296,7 @@ our %EXPORT_TAGS = (
                         $email
                         $expected_version
                         $host
+                        $json
                         $msg
                         $msg_err
                         $msg_threshold
@@ -490,6 +497,7 @@ our $user_regex         = '\b[A-Za-z][A-Za-z0-9-]*[A-Za-z0-9]\b';
 our $krb5_principal_regex = "$user_regex(?:(?:\/$hostname_regex)?\@$domain_regex)?";
 our $threshold_range_regex  = qr/^(\@)?(-?\d+(?:\.\d+)?)(:)(-?\d+(?:\.\d+)?)?$/;
 our $threshold_simple_regex = qr/^(-?\d+(?:\.\d+)?)$/;
+our $version_regex      = '\d(\.\d+)*';
 # ============================================================================ #
 
 our $critical;
@@ -498,6 +506,7 @@ our $email;
 our $expected_version;
 our $help;
 our $host;
+our $json;
 our $msg = "";
 our $msg_err = "";
 our $msg_threshold = "";
@@ -883,12 +892,38 @@ sub autoflush () {
 }
 
 
+sub check_regex ($$;$) {
+    my $string = shift;
+    my $regex  = shift;
+    my $no_msg = shift;
+    if($regex and $string !~ /$regex/){
+        critical;
+        $msg .= " (expected: $regex)" unless $no_msg;
+        return undef;
+    }
+    return 1;
+}
+
+
+sub check_string ($$;$) {
+    my $string           = shift;
+    my $expected_string  = shift;
+    my $no_msg           = shift;
+    if($expected_string and $string ne $expected_string){
+        critical;
+        $msg .= " (expected: $expected_string)" unless $no_msg;
+        return undef;
+    }
+    return 1;
+}
+
+
 sub check_threshold ($$) {
     #subtrace(@_);
     my $threshold = shift;
     my $result    = shift;
 
-    $threshold =~ /^warning|critical$/ or code_error("invalid threshold name passed to check_threshold subroutine");
+    $threshold =~ /(?:warning|critical)$/ or code_error("invalid threshold name passed to check_threshold subroutine");
     isFloat($result, 1) or isScientific($result, 1) or code_error("Non-float passed to check_threshold subroutine");
 
     my $upper = defined($thresholds{$threshold}{"upper"}) ? $thresholds{$threshold}{"upper"} : undef;
@@ -927,7 +962,11 @@ sub check_threshold ($$) {
     if($error){
         $thresholds{$threshold}{"error"} = $error;
         vlog2("result outside of $threshold thresholds: $error\n");
-        eval $threshold;
+        if($threshold =~ /warning/){
+            warning;
+        } else {
+            critical;
+        }
         # $threshold_ok false
         return 0;
     }
@@ -936,15 +975,17 @@ sub check_threshold ($$) {
 }
 
 
-sub check_thresholds ($;$) {
+sub check_thresholds ($;$$) {
     #subtrace(@_);
     my $result            = shift;
     my $no_msg_thresholds = shift || 0;
+    my $name              = shift() || "";
+    $name .= " " if $name;
     defined($result) or code_error("no result passed to check_thresholds()");
-    my $status_ok = check_threshold("critical", $result) and
-                    check_threshold("warning",  $result);
+    my $status_ok = check_threshold("${name}critical", $result) and
+                    check_threshold("${name}warning",  $result);
     #msg_thresholds() unless $no_msg_thresholds;
-    return ($status_ok, msg_thresholds($no_msg_thresholds));
+    return ($status_ok, msg_thresholds($no_msg_thresholds, $name));
 }
 
 
@@ -1179,6 +1220,18 @@ sub expand_units ($;$$) {
     elsif($units =~ /^PB?$/i){ $power = 5; }
     else { code_error "unrecognized units " . ($name ? "for $name" : "passed to expand_units()" ) . ". $nagios_plugins_support_msg"; }
     return $num * (1024**$power);
+}
+
+
+sub get_field($){
+    get_field2($json, $_[0]);
+}
+
+sub get_field2($$){
+    my $hash_ref  = shift;
+    my $field     = shift;
+    defined($hash_ref->{$field}) or quit "UNKNOWN", "'$field' field not found. $nagios_plugins_support_msg_api";
+    return $hash_ref->{$field};
 }
 
 
@@ -1732,6 +1785,13 @@ sub isUser ($) {
 }
 
 
+sub isVersion($){
+    my $version = shift;
+    defined($version) or return undef;
+    $version =~ /^($version_regex)$/ || return undef;
+    return $1;
+}
+
 # =============================== OS CHECKS ================================== #
 sub isOS ($) {
     $^O eq shift;
@@ -1828,27 +1888,33 @@ sub msg_perf_thresholds (;$$) {
 }
 
 
-sub msg_thresholds (;$) {
+sub msg_thresholds (;$$) {
     my $no_msg_thresholds = shift || 0;
+    my $name = shift() || "";
     my $msg2 = "";
-    if ($thresholds{"critical"}{"error"} or
-        $thresholds{"warning"}{"error"}  or
-        ($verbose and (defined($warning) or defined($critical))) ) {
+    if (defined($thresholds{"${name}critical"}{"error"}) or
+        defined($thresholds{"${name}warning"}{"error"})  or
+            ($verbose and (
+                            defined($thresholds{"${name}warning"}{"range"}) or
+                            defined($thresholds{"${name}critical"}{"range"})
+                          )
+            ) 
+        ) {
         $msg2 .= " (";
-        if($thresholds{"critical"}{"error"}){
-            $msg2 .= "$thresholds{critical}{error}, ";
+        if(defined($thresholds{"${name}critical"}{"error"})){
+            $msg2 .= $thresholds{"${name}critical"}{"error"} . ", ";
         }
-        elsif($thresholds{"warning"}{"error"}){
-            $msg2 .= "$thresholds{warning}{error}, ";
+        elsif(defined($thresholds{"${name}warning"}{"error"})){
+            $msg2 .= $thresholds{"${name}warning"}{"error"} . ", ";
         }
-        if(defined($warning)){
-            $msg2 .= "w=$warning";
+        if(defined($thresholds{"${name}warning"}{"range"})){
+            $msg2 .= "w=" . $thresholds{"${name}warning"}{"range"};
         }
-        if(defined($warning) and defined($critical)){
+        if(defined($thresholds{"${name}warning"}{"range"}) and defined($thresholds{"${name}critical"}{"range"})){
             $msg2 .= "/";
         }
-        if(defined($critical)){
-            $msg2 .= "c=$critical";
+        if(defined($thresholds{"${name}critical"}{"range"})){
+            $msg2 .= "c=" . $thresholds{"${name}critical"}{"range"};
         }
         $msg2 .= ")";
     }
@@ -2799,11 +2865,12 @@ sub validate_resolvable($;$){
     return resolve_ip($host) || quit "CRITICAL", "failed to resolve ${name}host '$host'";
 }
 
+
 sub validate_threshold ($$;$) {
     #subtrace(@_);
-    my $name        = $_[0];
-    my $threshold   = $_[1];
-    my $options_ref = $_[2] || {};
+    my $name        = shift;
+    my $threshold   = shift;
+    my $options_ref = shift() || {};
     isHash($options_ref) or code_error "3rd arg to validate_threshold() must be a hash ref of options";
     $options_ref->{"positive"} = 1 unless defined($options_ref->{"positive"});
     $options_ref->{"simple"} = "upper" unless $options_ref->{"simple"};
@@ -2854,6 +2921,10 @@ sub validate_threshold ($$;$) {
         }
     }
     $thresholds{"defined"} = 1 if (defined($thresholds{$name}{"upper"}) or defined($thresholds{$name}{"lower"}));
+    $thresholds{$name}{"range"} = "";
+    $thresholds{$name}{"range"} .= $thresholds{$name}{"lower"} if defined($thresholds{$name}{"lower"});
+    $thresholds{$name}{"range"} .= ":" if (defined($thresholds{$name}{"lower"}) and defined($thresholds{$name}{"upper"}));
+    $thresholds{$name}{"range"}.= $thresholds{$name}{"upper"} if defined($thresholds{$name}{"upper"});
     vlog_options(sprintf("%-8s lower", $name), $thresholds{"$name"}{"lower"}) if defined($thresholds{"$name"}{"lower"});
     vlog_options(sprintf("%-8s upper", $name), $thresholds{"$name"}{"upper"}) if defined($thresholds{"$name"}{"upper"});
     vlog_options(sprintf("%-8s range inversion", $name), "on") if $thresholds{$name}{"invert_range"};
@@ -2861,30 +2932,44 @@ sub validate_threshold ($$;$) {
 }
 
 
-# 1st/2nd arg determines if warning/critical are mandatory respectively
-# 3rd arg must be "upper" or "lower" to specify to only allow single threshold used as the upper or lower boundary
-sub validate_thresholds (;$$$) {
+sub validate_thresholds (;$$$$$) {
     # TODO: CRITICAL vs WARNING threshold logic is only applied to simple thresholds, not to range ones, figure out if I can reasonably do range ones later
-    if($_[0]){
-        defined($warning)  || usage "warning threshold not defined";
-    }
-    if($_[1]){
-        defined($critical) || usage "critical threshold not defined";
-    }
-    validate_threshold("warning",  $warning,  $_[2]) if(defined($warning));
-    validate_threshold("critical", $critical, $_[2]) if(defined($critical));
-    # sanity checking on thresholds for simple upper or lower thresholds only
-    if(isHash($_[2]) and $_[2]->{"simple"} and $_[2]->{"simple"} eq "lower"){
-        if (defined($thresholds{"warning"}{"lower"})
-        and defined($thresholds{"critical"}{"lower"})
-        and $thresholds{"warning"}{"lower"} < $thresholds{"critical"}{"lower"}){
-            usage "warning threshold ($thresholds{warning}{lower}) cannot be lower than critical threshold ($thresholds{critical}{lower}) for lower limit thresholds";
+    my $require_warning  = shift;
+    my $require_critical = shift;
+    my $options          = shift;
+    my $name             = shift() || "";
+    my $dual_threshold   = shift;
+    my $warning          = $warning;
+    my $critical         = $critical;
+    if($name){
+        $name .= " ";
+        ($warning, $critical) = split(",", $dual_threshold, 2);
+        if(defined($warning) and not defined($critical)){
+            $critical = $warning;
+            $warning  = undef;
         }
-    } elsif(isHash($_[2]) and $_[2]->{"simple"} and $_[2]->{"simple"} eq "upper"){
-        if (defined($thresholds{"warning"}{"upper"})
-        and defined($thresholds{"critical"}{"upper"})
-        and $thresholds{"warning"}{"upper"} > $thresholds{"critical"}{"upper"}){
-            usage "warning threshold ($thresholds{warning}{upper}) cannot be higher than critical threshold ($thresholds{critical}{upper}) for upper limit thresholds";
+    }
+    if($require_warning){
+        defined($warning)  || usage "${name}warning threshold not defined";
+    }
+    if($require_critical){
+        defined($critical) || usage "${name}critical threshold not defined";
+    }
+    # replace $warning and $critical with $name options somehow
+    validate_threshold("${name}warning",  $warning,  $options) if(defined($warning));
+    validate_threshold("${name}critical", $critical, $options) if(defined($critical));
+    # sanity checking on thresholds for simple upper or lower thresholds only
+    if(isHash($options) and $options->{"simple"} and $options->{"simple"} eq "lower"){
+        if (defined($thresholds{"${name}warning"}{"lower"})
+        and defined($thresholds{"${name}critical"}{"lower"})
+        and $thresholds{"${name}warning"}{"lower"} < $thresholds{"${name}critical"}{"lower"}){
+            usage "${name}warning threshold (" . $thresholds{"${name}warning"}{"lower"} . ") cannot be lower than ${name}critical threshold (" . $thresholds{"${name}critical"}{"lower"} . ") for lower limit thresholds";
+        }
+    } elsif(isHash($options) and $options->{"simple"} and $options->{"simple"} eq "upper"){
+        if (defined($thresholds{"${name}warning"}{"upper"})
+        and defined($thresholds{"${name}critical"}{"upper"})
+        and $thresholds{"${name}warning"}{"upper"} > $thresholds{"${name}critical"}{"upper"}){
+            usage "${name}warning threshold (" . $thresholds{"${name}warning"}{"upper"} . ") cannot be higher than ${name}critical threshold (" . $thresholds{"${name}critical"}{"upper"} . ") for upper limit thresholds";
         }
     }
     1;
