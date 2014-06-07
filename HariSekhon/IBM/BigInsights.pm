@@ -9,7 +9,7 @@
 
 package HariSekhon::IBM::BigInsights;
 
-$VERSION = "0.3.3";
+$VERSION = "0.4";
 
 use strict;
 use warnings;
@@ -27,14 +27,11 @@ use Exporter;
 our @ISA = qw(Exporter);
 
 our @EXPORT = ( qw (
-                    $json
                     $api
                     $bigsheets_api
                     $protocol
                     $ua
                     %biginsights_options
-                    get_field
-                    get_field2
                     curl_biginsights
                     curl_bigsheets
                 )
@@ -58,20 +55,6 @@ our $api           = "data/controller";
 our $bigsheets_api = "bigsheets/api";
 
 our $protocol = "http";
-
-our $json;
-
-sub get_field($){
-    get_field2($json, $_[0]);
-}
-
-sub get_field2($$){
-    my $json  = shift;
-    my $field = shift;
-    defined($json->{$field}) or quit "UNKNOWN", "'$field' field not found in output from BigInsights Console. $nagios_plugins_support_msg_api";
-    return $json->{$field};
-}
-
 
 sub curl_biginsights($$$;$$){
     ($host and $port) or code_error "host and port not defined before calling curl_biginsights()";
