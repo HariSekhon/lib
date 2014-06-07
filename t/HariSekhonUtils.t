@@ -103,6 +103,13 @@ ok(check_threshold("critical", 10),   'check_threshold("critical", 10)');
 ok(!check_threshold("critical", 11),   'check_threshold("critical", 11)');
 # TODO: check_threshold{,s}, code_error
 
+ok(check_threshold("these nodes critical", 10),  'check_threshold("these nodes critical", 10)');
+
+is(check_string("test", "test"),    1,      'check_string("test", "test") eq 1');
+is(check_string("test", "testa"),    undef,  '!check_string("test", "testa") eq undef');
+is(check_regex("test", '^test$'),   1,      'check_regex("test", "^test$") eq 1');
+is(check_regex("test", '^tes$'),    undef,  'check_regex("test", "^tes$") eq undef');
+
 # TODO: curl onwards
 #$verbose = 3;
 #use_ok("LWP::Simple", 'get');
