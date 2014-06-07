@@ -3024,10 +3024,16 @@ sub validate_thresholds (;$$$$$) {
     my $critical         = $critical;
     if($name){
         $name .= " ";
-        ($warning, $critical) = split(",", $dual_threshold, 2);
-        if(defined($warning) and not defined($critical)){
-            $critical = $warning;
-            $warning  = undef;
+        if(defined($dual_threshold)){
+            ($warning, $critical) = split(",", $dual_threshold, 2);
+            if(defined($warning) and not defined($critical)){
+                $critical = $warning;
+                $warning  = undef;
+            }
+        } else {
+            if($require_warning or $require_critical){
+                usage "no threshold given for $name";
+            }
         }
     }
     if($require_warning){
