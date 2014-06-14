@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.8.0";
+our $VERSION = "1.8.1";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -179,8 +179,9 @@ our %EXPORT_TAGS = (
                         set_port_default
                         set_threshold_defaults
                         timecomponents2days
-                        tls_options
                         usage
+                        validate_ssl
+                        validate_tls
                         validate_thresholds
                         version
                     ) ],
@@ -290,6 +291,8 @@ our %EXPORT_TAGS = (
                         validate_program_path
                         validate_regex
                         validate_resolvable
+                        validate_ssl
+                        validate_tls
                         validate_thresholds
                         validate_units
                         validate_url
@@ -317,9 +320,10 @@ our %EXPORT_TAGS = (
                         $status
                         $status_prefix
                         $sudo
+                        $ssl
                         $ssl_ca_path
                         $tls
-                        $tls_noverify
+                        $ssl_noverify
                         $timeout
                         $timeout_default
                         $timeout_max
@@ -334,6 +338,7 @@ our %EXPORT_TAGS = (
                         %expected_version_option
                         %hostoptions
                         %options
+                        %ssloptions
                         %thresholdoptions
                         %thresholds
                         %tlsoptions
@@ -526,9 +531,10 @@ my  $selflock;
 our $status = "UNKNOWN";
 our $sudo = "";
 our $syslog_initialized = 0;
+our $ssl;
 our $ssl_ca_path;
+our $ssl_noverify;
 our $tls;
-our $tls_noverify;
 our $timeout_default = 10;
 our $timeout_max     = 60;
 our $timeout_min     = 1;
@@ -537,7 +543,7 @@ our $usage_line      = "usage: $progname [ options ]";
 our $user;
 our %thresholds;
 # Standard ordering of usage options for help. Exported and overridable inside plugin to customize usage()
-our @usage_order = qw(host port user users groups password database query field regex warning critical);
+our @usage_order = qw/host port user users groups password database query field regex warning critical ssl tls ssl-CA-path ssl-noverify/;
 # Not sure if I can relax the case sensitivity on these according to the Nagios Developer guidelines
 my  @valid_units = qw/% s ms us B KB MB GB TB c/;
 our $verbose = 0;
@@ -601,10 +607,15 @@ our %emailoptions = (
 our %expected_version_option = (
     "e|expected=s"     => [ \$expected_version,     "Expected version regex, raises CRITICAL if not matching, optional" ]
 );
+our %ssloptions = (
+    "S|ssl"            => [ \$ssl,          "Use SSL connection" ],
+    "ssl-CA-path=s"    => [ \$ssl_ca_path,  "Path to CA certificate directory for validating SSL certificate (automatically enables --ssl)" ],
+    "ssl-noverify"     => [ \$ssl_noverify, "Do not verify SSL certificate (automatically enables --ssl)" ],
+);
 our %tlsoptions = (
     "T|tls"            => [ \$tls,          "Use TLS connection" ],
     "ssl-CA-path=s"    => [ \$ssl_ca_path,  "Path to CA certificate directory for validating SSL certificate (automatically enables --tls)" ],
-    "tls-noverify"     => [ \$tls_noverify, "Do not verify SSL certificate (automatically enables --tls)" ],
+    "tls-noverify"     => [ \$ssl_noverify, "Do not verify SSL certificate (automatically enables --tls)" ],
 );
 my $short_options_len = 0;
 my $long_options_len  = 0;
@@ -906,7 +917,7 @@ sub check_regex ($$;$) {
     my $no_msg = shift;
     if($regex and $string !~ /$regex/){
         critical;
-        $msg .= " (expected: $regex)" unless $no_msg;
+        $msg .= " (expected regex: '$regex')" unless $no_msg;
         return undef;
     }
     return 1;
@@ -919,7 +930,7 @@ sub check_string ($$;$) {
     my $no_msg           = shift;
     if($expected_string and $string ne $expected_string){
         critical;
-        $msg .= " (expected: $expected_string)" unless $no_msg;
+        $msg .= " (expected: '$expected_string')" unless $no_msg;
         return undef;
     }
     return 1;
@@ -1310,6 +1321,15 @@ sub get_options {
             code_error("invalid value for %options key '$_', should be an array not " . lc ref($options{$_}) );
         }
         $options3{$_} = $options{$_}[0];
+    }
+    my %option_count;
+    foreach my $option (keys %options3){
+        foreach my $switch (split(/\s*\|\s*/, $option)){
+            $option_count{$switch}++;
+        }
+    }
+    foreach(keys %option_count){
+        $option_count{$_} > 1 and code_error("Duplicate option key detected '$_'");
     }
     GetOptions(%options3) or usage();
     # TODO: finish this debug code
@@ -2317,29 +2337,6 @@ sub timecomponents2days($$$$$$){
 }
 
 
-sub tls_options(){
-    defined_main_ua();
-    $tls = 1 if(defined($ssl_ca_path) or defined($tls_noverify));
-    if(defined($tls_noverify)){
-        $main::ua->ssl_opts( verify_hostname => 0 );
-        $tls = 1;
-    }
-    if(defined($ssl_ca_path)){
-        $ssl_ca_path = validate_directory($ssl_ca_path, undef, "SSL CA directory", "no vlog");
-        $main::ua->ssl_opts( SSL_ca_path => $ssl_ca_path );
-        $tls = 1;
-    }
-    if($tls){
-        vlog_options("TLS enabled",  "true");
-        vlog_options("SSL CA Path",  $ssl_ca_path) if defined($ssl_ca_path);
-        vlog_options("TLS noverify", $tls_noverify ? "true" : "false");
-    }
-    if($tls){
-        $main::protocol = "https" if defined($main::protocol);
-    }
-}
-
-
 sub tprint ($) {
     my $msg = shift;
     defined($msg) or code_error "tprint msg arg not defined";
@@ -2944,6 +2941,40 @@ sub validate_resolvable($;$){
     $name .= " " if $name;
     defined($host) or code_error "${name}host not defined";
     return resolve_ip($host) || quit "CRITICAL", "failed to resolve ${name}host '$host'";
+}
+
+
+sub validate_ssl_opts(){
+    if(defined($ssl_noverify)){
+        $main::ua->ssl_opts( verify_hostname => 0 );
+    }
+    if(defined($ssl_ca_path)){
+        $ssl_ca_path = validate_directory($ssl_ca_path, undef, "SSL CA directory", "no vlog");
+        $main::ua->ssl_opts( SSL_ca_path => $ssl_ca_path );
+    }
+    if($ssl or $tls){
+        vlog_options("SSL CA Path",  $ssl_ca_path) if defined($ssl_ca_path);
+        vlog_options("SSL noverify", $ssl_noverify ? "true" : "false");
+        $main::protocol = "https" if defined($main::protocol);
+    }
+}
+
+sub validate_ssl(){
+    defined_main_ua();
+    $ssl = 1 if(defined($ssl_ca_path) or defined($ssl_noverify));
+    if($ssl){
+        vlog_options("SSL enabled",  "true");
+    }
+    validate_ssl_opts();
+}
+
+sub validate_tls(){
+    defined_main_ua();
+    $tls = 1 if(defined($ssl_ca_path) or defined($ssl_noverify));
+    if($tls){
+        vlog_options("TLS enabled",  "true");
+    }
+    validate_ssl_opts();
 }
 
 
