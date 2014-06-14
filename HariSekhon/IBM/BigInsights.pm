@@ -47,9 +47,8 @@ env_creds("BIGINSIGHTS", "IBM BigInsights Console");
 our %biginsights_options = (
     %hostoptions,
     %useroptions,
-    %tlsoptions,
+    %ssloptions,
 );
-@usage_order = qw/host port user password tls ssl-CA-path tls-noverify warning critical/;
 
 our $api           = "data/controller";
 our $bigsheets_api = "bigsheets/api";
