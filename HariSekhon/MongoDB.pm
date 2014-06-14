@@ -18,24 +18,26 @@ BEGIN {
     use lib dirname(__FILE__) . "..";
 }
 use HariSekhonUtils;
-use MongoDB::MongoClient;
 use Carp;
+use JSON;
+use MongoDB::MongoClient;
 
 use Exporter;
 our @ISA = qw(Exporter);
 
 our @EXPORT = ( qw (
                     $hosts
-                    @hosts
-                    $ssl
                     $sasl
                     $sasl_mechanism
+                    $ssl
                     %mongo_host_option
                     %mongo_sasl_options
+                    @hosts
+                    @valid_concerns
                     connect_mongo
+                    curl_mongo
                     validate_mongo_hosts
                     validate_mongo_sasl
-                    @valid_concerns
                 )
 );
 our @EXPORT_OK = ( @EXPORT );
@@ -88,6 +90,41 @@ sub connect_mongo(;$){
 
     vlog2 "connection initiated to $host\n";
     return $client;
+}
+
+
+sub curl_mongo($){
+    my $url = "http://$host:$port/$_[0]";
+    my $content = curl $url, "MongoDB", undef, undef, \&curl_mongo_err_handler;
+    try{
+        $json = decode_json $content;
+    };
+    catch{
+        my $additional_information = "";
+        if($content =~ /It looks like you are trying to access MongoDB over HTTP on the native driver port/){
+            chomp $content;
+            $additional_information .= ". " . $content . " Try setting your --port to 1000 higher for the rest interface and ensure mongod --rest option is enabled";
+        }
+        quit "invalid json returned by MongoDB rest interface at '$url'$additional_information";
+    };
+    return $json;
+}
+
+
+sub curl_mongo_err_handler($){
+    my $response = shift;
+    my $content  = $response->content;
+    my $json;
+    my $additional_information = "";
+    unless($response->code eq "200"){
+        if($response->code eq "500"){
+            $additional_information .= ". Have you enabled the rest interface with the mongod --rest option?";
+        }
+        quit "CRITICAL", $response->code . " " . $response->message . $additional_information;
+    }
+    unless($content){
+        quit "CRITICAL", "blank content returned by MongoDB rest interface";
+    }
 }
 
 
