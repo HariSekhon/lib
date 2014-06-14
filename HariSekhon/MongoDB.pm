@@ -94,7 +94,9 @@ sub connect_mongo(;$){
 
 
 sub curl_mongo($){
-    my $url = "http://$host:$port/$_[0]";
+    my $path = shift;
+    $path =~ s/^\///;
+    my $url = "http://$host:$port/$path";
     my $content = curl $url, "MongoDB", undef, undef, \&curl_mongo_err_handler;
     try{
         $json = decode_json $content;
