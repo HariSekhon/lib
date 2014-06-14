@@ -68,7 +68,7 @@ our %mongo_sasl_options = (
 push(@usage_order, qw/ssl sasl sasl-mechanism/);
 
 sub connect_mongo(;$){
-    my %mongo_connect_options = shift() || ();
+    my $mongo_connect_options_hashref = shift() || {};
     my $client;
     try {
         $client = MongoDB::MongoClient->new(
@@ -81,7 +81,7 @@ sub connect_mongo(;$){
                                             "ssl"            => $ssl,
                                             "sasl"           => $sasl,
                                             "sasl-mechanism" => $sasl_mechanism,
-                                            %mongo_connect_options,
+                                            %{$mongo_connect_options_hashref},
                                            ) || quit "CRITICAL", "$!";
     };
     catch_quit "failed to connect to MongoDB host '$hosts'";
