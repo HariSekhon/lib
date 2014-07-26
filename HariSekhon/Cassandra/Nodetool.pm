@@ -25,18 +25,21 @@ use Exporter;
 our @ISA = qw(Exporter);
 
 our @EXPORT = ( qw (
-                        check_nodetool_errors
-                        die_nodetool_unrecognized_output
                         $nodetool
                         $nodetool_errors_regex
                         $nodetool_status_header_regex
                         %nodetool_options
+                        check_nodetool_errors
+                        die_nodetool_unrecognized_output
                         nodetool_options
+                        skip_nodetool_output
                         validate_nodetool
                         validate_nodetool_options
                 )
 );
 our @EXPORT_OK = ( @EXPORT );
+
+$ENV{"PATH"} .= ":/usr/bin:/usr/sbin:/usr/local/cassandra/bin";
 
 our $nodetool = "nodetool";
 
@@ -96,10 +99,21 @@ our $nodetool_errors_regex = qr/
                                 Exception |
                                 in thread
                              /xi;
+
 sub check_nodetool_errors($){
-    @_ or code_error "no input passed to check_nodetool_errors to check";
+    @_ or code_error "no input passed to check_nodetool_errors()";
     my $str = join(" ", @_);
     quit "CRITICAL", $str if $str =~ /$nodetool_errors_regex/;
+}
+
+sub skip_nodetool_output($){
+    @_ or code_error "no input passed to skip_nodetool_output()";
+    my $str = join(" ", @_);
+    return 1 if $str =~ /^\s*$/;
+    if(skip_java_output($str)){
+        return 1;
+    }
+    return 0;
 }
 
 # Cassandra 2.0 DataStax Community Edition (nodetool version gives 'ReleaseVersion: 2.0.2')

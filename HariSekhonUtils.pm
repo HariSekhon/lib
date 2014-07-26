@@ -90,6 +90,7 @@ our %EXPORT_TAGS = (
                         get_field2_int
                         inArray
                         uniq_array
+                        uniq_array2
                     ) ],
     'cmd'   =>  [   qw(
                         cmd
@@ -253,6 +254,7 @@ our %EXPORT_TAGS = (
                         set_timeout_range
                     ) ],
     'validate' => [ qw(
+                        skip_java_output
                         validate_alnum
                         validate_aws_access_key
                         validate_aws_bucket
@@ -1273,8 +1275,19 @@ sub get_field_int($){
 sub get_field2($$){
     my $hash_ref  = shift;
     my $field     = shift;
-    defined($hash_ref->{$field}) or quit "UNKNOWN", "'$field' field not found. $nagios_plugins_support_msg_api";
-    return $hash_ref->{$field};
+    my @parts     = split(/\./, $field);
+    if(scalar(@parts) > 1){
+        my $ref = $hash_ref;
+        foreach(@parts){
+            defined($ref->{$_}) or quit "UNKNOWN", "'$_' field not found. $nagios_plugins_support_msg_api";
+            $ref = $ref->{$_};
+        }
+        return $ref;
+    } else {
+        defined($hash_ref->{$field}) or quit "UNKNOWN", "'$field' field not found. $nagios_plugins_support_msg_api";
+        return $hash_ref->{$field};
+    }
+    code_error "hit end of get_field2 sub";
 }
 
 sub get_field2_array($$){
@@ -2295,6 +2308,16 @@ sub set_timeout (;$$) {
 #    quit "UNKNOWN", "Code Error: no arg supplied to subroutine " . (caller(1))[3];
 #}
 
+sub skip_java_output($){
+    @_ or code_error "no input passed to skip_java_output()";
+    my $str = join(" ", @_);
+    # warning due to Oracle 7 JDK bug fixed in 7u60
+    # objc[54213]: Class JavaLaunchHelper is implemented in both /Library/Java/JavaVirtualMachines/jdk1.7.0_45.jdk/Contents/Home/bin/java and /Library/Java/JavaVirtualMachines/jdk1.7.0_45.jdk/Contents/Home/jre/lib/libinstrument.dylib. One of the two will be used. Which one is undefined.
+    if($str =~ /Class JavaLaunchHelper is implemented in both/){
+        return 1;
+    }
+    return 0;
+}
 
 sub strip ($) {
     my $string = shift;
@@ -2372,6 +2395,19 @@ sub uniq_array (@) {
     return ( sort keys %{{ map { $_ => 1 } @array }} );
 }
 
+
+sub uniq_array2(@){
+    my @array = @_; # or code_error "no arg passed to uniq_array";
+    isArray(\@array) or code_error "uniq_array2 was passed a non-array";
+    scalar @array or code_error "uniq_array2 was passed an empty array";
+    my @array2;
+    my $item;
+    foreach $item (@array){
+        grep { $item eq $_ } @array2 and next;
+        push(@array2, $item);
+    }
+    return @array2;
+}
 
 sub usage (;@) {
     print STDERR "@_\n\n" if (@_);
