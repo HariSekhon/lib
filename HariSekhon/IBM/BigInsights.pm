@@ -100,7 +100,7 @@ sub curl_biginsights_err_handler($){
         quit "CRITICAL", $response->code . " " . $response->message . $additional_information;
     }
     unless($content){
-        quit "CRITICAL", "blank content returned from by BigInsights Console";
+        quit "CRITICAL", "blank content returned by BigInsights Console";
     }
 }
 
