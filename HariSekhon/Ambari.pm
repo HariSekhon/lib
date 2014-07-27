@@ -54,6 +54,7 @@ our @EXPORT = ( qw (
                     node_required
                     service_required
                     curl_ambari
+                    hadoop_service_name
                     list_ambari_components
                     list_clusters
                     list_hosts
@@ -95,17 +96,21 @@ our $list_users          = 0;
 our $nameservices        = 0;
 
 our %service_map = (
-    "GANGLIA"       => "Ganglia",
+    #"GANGLIA"       => "Ganglia",
+    #"FALCON"        => "Falcon",
     "HBASE"         => "HBase",
     "HCATALOG"      => "HCatalog",
     "HDFS"          => "HDFS",
-    "HIVE"          => "Hive",
+    #"HIVE"          => "Hive",
     "MAPREDUCE"     => "MapReduce",
     "MAPREDUCE2"    => "MapReduce2",
-    "NAGIOS"        => "Nagios",
-    "OOZIE"         => "Oozie",
+    #"NAGIOS"        => "Nagios",
+    #"OOZIE"         => "Oozie",
+    #"PIG"           => "Pig",
+    #"STORM"         => "Storm",
+    #"TEZ"           => "Tez",
     "WEBHCAT"       => "WebHCat",
-    "YARN"          => "Yarn",
+    #"YARN"          => "Yarn",
     "ZOOKEEPER"     => "ZooKeeper",
 );
 
@@ -168,6 +173,16 @@ sub service_required(){
 }
 sub component_required(){
     $component or usage "--component required";
+}
+
+sub hadoop_service_name($){
+    my $service = shift;
+    if(grep { $service eq $_ } keys %service_map){
+        $service = $service_map{$service};
+    } else {
+        $service = ucfirst lc $service;
+    }
+    return $service;
 }
 
 sub list_clusters(;$){
