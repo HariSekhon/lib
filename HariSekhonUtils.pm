@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.8.1";
+our $VERSION = "1.8.2";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -506,7 +506,7 @@ our $host_regex         = "\\b(?:$hostname_regex|$ip_regex)\\b";
 # I did a scan of registered running process names across several hundred linux servers of a diverse group of enterprise applications with 500 unique process names (58k individual processes) to determine that there are cases with spaces, slashes, dashes, underscores, chevrons (<defunct>), dots (script.p[ly], in.tftpd etc) to determine what this regex should be. Incidentally it appears that Linux truncates registered process names to 15 chars.
 # This is not from ps -ef etc it is the actual process registered name, hence init not [init] as it appears in ps output
 our $process_name_regex = '[\w\s_\.\/\<\>-]+';
-our $url_path_suffix_regex = '/(?:[\w\.\/\%\&\?\!\=\+-]+)?';
+our $url_path_suffix_regex = '/(?:[\w\.\/\%\&\?\!\=\*\+-]+)?';
 our $url_regex          = '\b(?i:https?://' . $host_regex . '(?::\d{1,5})?(?:' . $url_path_suffix_regex . ')?)';
 our $user_regex         = '\b[A-Za-z][A-Za-z0-9-]*[A-Za-z0-9]\b';
 our $krb5_principal_regex = "$user_regex(?:(?:\/$hostname_regex)?\@$domain_regex)?";
@@ -1249,31 +1249,24 @@ sub get_field($){
 }
 
 sub get_field_array($){
-    my $value = get_field($_[0]);
-    require_array($value, $_[0]);
-    return $value;
+    get_field2_array($json, $_[0]);
 }
 
 sub get_field_float($){
-    my $value = get_field($_[0]);
-    require_float($value, $_[0]);
-    return $value;
+    get_field2_float($json, $_[0]);
 }
 
 sub get_field_hash($){
-    my $value = get_field($_[0]);
-    require_hash($value, $_[0]);
-    return $value;
+    get_field2_hash($json, $_[0]);
 }
 
 sub get_field_int($){
-    my $value = get_field($_[0]);
-    require_int($value, $_[0]);
-    return $value;
+    get_field2_int($json, $_[0]);
 }
 
 sub get_field2($$){
     my $hash_ref  = shift;
+    isHash($hash_ref) or code_error "non-hash ref passed to get_field2()";
     my $field     = shift || code_error "field not passed to get_field2()";
     my @parts     = split(/\./, $field);
     if(scalar(@parts) > 1){
@@ -1293,7 +1286,7 @@ sub get_field2($$){
 sub get_field2_array($$){
     my $value = get_field2($_[0], $_[1]);
     require_array($value, $_[1]);
-    return $value;
+    return @{$value};
 }
 
 sub get_field2_float($$){
@@ -1305,7 +1298,7 @@ sub get_field2_float($$){
 sub get_field2_hash($$){
     my $value = get_field2($_[0], $_[1]);
     require_hash($value, $_[1]);
-    return $value;
+    return %{$value};
 }
 
 sub get_field2_int($$){
@@ -2203,7 +2196,7 @@ sub remove_timeout(){
 sub require_array($$) {
     my $array = shift;
     my $name  = shift;
-    isArray($array) or quit "UNKNOWN", "$name is not a array! $nagios_plugins_support_msg";
+    isArray($array) or quit "UNKNOWN", "$name is not an array! $nagios_plugins_support_msg";
 }
 
 sub require_float($$) {
