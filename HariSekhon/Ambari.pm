@@ -326,14 +326,6 @@ sub validate_ambari_cluster($){
     return $cluster;
 }
 
-sub validate_ambari_host($){
-    my $host = shift;
-    defined($node) or usage "node not defined";
-    $node = isHostname($node) || usage "invalid node given";
-    vlog_options "node", $node;
-    return $node;
-}
-
 sub validate_ambari_component($){
     my $component = shift;
     defined($component) or usage "component not defined";
@@ -341,6 +333,14 @@ sub validate_ambari_component($){
     $component = uc $1;
     vlog_options "component", $component;
     return $component;
+}
+
+sub validate_ambari_node($){
+    my $host = shift;
+    defined($node) or usage "node not defined";
+    $node = isHostname($node) || usage "invalid node given";
+    vlog_options "node", $node;
+    return $node;
 }
 
 sub validate_ambari_service($){
