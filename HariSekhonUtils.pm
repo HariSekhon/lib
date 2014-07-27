@@ -1274,7 +1274,7 @@ sub get_field_int($){
 
 sub get_field2($$){
     my $hash_ref  = shift;
-    my $field     = shift;
+    my $field     = shift || code_error "field not passed to get_field2()";
     my @parts     = split(/\./, $field);
     if(scalar(@parts) > 1){
         my $ref = $hash_ref;
