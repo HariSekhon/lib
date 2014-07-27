@@ -1,0 +1,390 @@
+#
+#  Author: Hari Sekhon
+#  Date: 2014-07-27 15:20:09 +0100 (Sun, 27 Jul 2014)
+#
+#  http://github.com/harisekhon
+#
+#  License: see accompanying LICENSE file
+#  
+
+# Forked from check_ambari.pl from the Advanced Nagios Plugins Collection
+#
+# to share with other Ambari check programs
+
+package HariSekhon::Ambari;
+
+$VERSION = "0.1";
+
+use strict;
+use warnings;
+BEGIN {
+    use File::Basename;
+    use lib dirname(__FILE__) . "..";
+}
+use HariSekhonUtils;
+use Carp;
+use Data::Dumper;
+use JSON 'decode_json';
+use LWP::UserAgent;
+
+use Exporter;
+our @ISA = qw(Exporter);
+
+our @EXPORT = ( qw (
+                    $api
+                    $cluster
+                    $node
+                    $list_clusters
+                    $list_hosts
+                    $list_nameservices
+                    $list_components
+                    $list_services
+                    $list_users
+                    $nameservice
+                    $protocol
+                    $component
+                    $service
+                    $ua
+                    $url_prefix
+                    %ambari_options
+                    %ambari_options_list
+                    %service_map
+                    cluster_required
+                    component_required
+                    node_required
+                    service_required
+                    curl_ambari
+                    list_ambari_components
+                    list_clusters
+                    list_hosts
+                    list_nameservices
+                    list_components
+                    list_services
+                    list_users
+                    validate_ambari_cluster
+                    validate_ambari_cluster_options
+                    validate_ambari_node
+                    validate_ambari_component
+                    validate_ambari_service
+                )
+);
+our @EXPORT_OK = ( @EXPORT );
+
+our $ua = LWP::UserAgent->new;
+
+our $protocol = "http";
+our $api      = "/api/v1";
+set_port_default(8080);
+
+our $url_prefix;
+
+our $cluster;
+our $node;
+our $nameservice;
+our $component;
+our $service;
+
+our $list_nodes          = 0;
+our $list_clusters       = 0;
+our $list_svc_components = 0;
+our $list_svc_nodes      = 0;
+our $list_svcs           = 0;
+our $list_svcs_nodes     = 0;
+our $list_users          = 0;
+
+our $nameservices        = 0;
+
+our %service_map = (
+    "GANGLIA"       => "Ganglia",
+    "HBASE"         => "HBase",
+    "HCATALOG"      => "HCatalog",
+    "HDFS"          => "HDFS",
+    "HIVE"          => "Hive",
+    "MAPREDUCE"     => "MapReduce",
+    "MAPREDUCE2"    => "MapReduce2",
+    "NAGIOS"        => "Nagios",
+    "OOZIE"         => "Oozie",
+    "WEBHCAT"       => "WebHCat",
+    "YARN"          => "Yarn",
+    "ZOOKEEPER"     => "ZooKeeper",
+);
+
+env_creds("Ambari");
+
+# Ambari REST API:
+#
+# /clusters                                                 - list clusters + version HDP-1.2.0
+# /clusters/$cluster                                        - list svcs + host in cluster
+# /clusters/$cluster/services                               - list svcs
+# /clusters/$cluster/services/$service                      - service state + components
+# /clusters/$cluster/services/$service/components/DATANODE  - state, hosts, TODO: metrics
+# /clusters/$cluster/hosts                                  - list hosts
+# /clusters/$cluster/host/$node                             - host_state, disks, rack, TODO: metrics
+# /clusters/$cluster/host/$node/host_components             - list host components
+# /clusters/$cluster/host/$node/host_components/DATANODE    - state + metrics
+
+our %ambari_options_list = (
+    "list-clusters"             => [ \$list_clusters,       "Lists all the clusters managed by the Ambari server" ],
+    "list-nodes"                => [ \$list_nodes,          "Lists all the nodes managed by the Ambari server for given --cluster (includes Ambari server itself)" ],
+    "list-services"             => [ \$list_svcs,           "Lists all services in the given --cluster" ],
+    "list-service-components"   => [ \$list_svc_components, "Lists all components of a given service. Requires --cluster, --service" ],
+    "list-service-nodes"        => [ \$list_svc_nodes,      "Lists all nodes for a given service. Requires --cluster, --service, --component" ],
+);
+
+our %ambari_options = (
+    %tlsoptions,
+    "C|cluster=s"               => [ \$cluster,             "Cluster Name as shown in Ambari (eg. \"MyCluster\")" ],
+    "S|service=s"               => [ \$service,             "Service Name as shown in Ambari (eg. HDFS, HBASE, usually capitalized). Requires --cluster" ],
+    "N|node=s"                  => [ \$node,                "Specify FQDN of node to check, use in conjunction with other switches such as --node-state" ],
+    "O|component=s"             => [ \$component,           "Service component to check (eg. DATANODE)" ],
+    %ambari_options_list,
+);
+
+splice @usage_order, 6, 0, qw/cluster service node component list-clusters list-nodes list-services list-service-nodes list-service-components list-users/;
+
+sub curl_ambari($){
+    my $url = shift;
+    # { status: 404, message: blah } handled in curl() in lib
+    my $content = curl $url, ($debug ? "" : "Ambari"), $user, $password;
+
+    my $json;
+    try{
+        $json = decode_json $content;
+    };
+    catch{
+        quit "invalid json returned by Ambari at '$url_prefix', did you try to connect to the SSL port without --tls?";
+    };
+    return $json;
+}
+
+sub cluster_required(){
+    $cluster or usage "--cluster required";
+}
+sub node_required(){
+    $node or usage "--node required";
+}
+sub service_required(){
+    $service or usage "--service required";
+}
+sub component_required(){
+    $component or usage "--component required";
+}
+
+sub list_clusters(;$){
+    my $quit = shift;
+    my %clusters;
+    $json = curl_ambari "$url_prefix/clusters";
+    my @items = get_field_array("items");
+    my $cluster_name;
+    my $cluster_version;
+    foreach(@items){
+        $cluster_name    = get_field2($_, "Clusters.cluster_name");
+        $cluster_version = get_field2($_, "Clusters.version");
+        $clusters{$cluster_name} = $cluster_version;
+        #vlog2   sprintf("%-19s %s\n", $cluster_name, $cluster_version);
+        $msg .= sprintf("%s (%s), ",  $cluster_name, $cluster_version);
+    }
+    $msg =~ s/, $//;
+    if($quit){
+        my $num_clusters = scalar keys %clusters;
+        plural $num_clusters;
+        print "$num_clusters cluster$plural managed by Ambari:\n\n" . join("\n", sort keys %clusters) . "\n";
+        exit $ERRORS{"UNKNOWN"};
+    }
+    return %clusters;
+}
+
+sub list_nodes(;$){
+    my $quit = shift;
+    cluster_required();
+    $json = curl_ambari "$url_prefix/clusters/$cluster/hosts";
+    my @items = get_field_array("items");
+    my @nodes;
+    my $node;
+    foreach(@items){
+        $node = get_field2($_, "Hosts.host_name");
+        #vlog2 sprintf("node %s", $node);
+        push(@nodes, $node);
+    }
+    @nodes = sort @nodes;
+    if($quit){
+        my $num_nodes = scalar @items;
+        plural $num_nodes;
+        print "$num_nodes node$plural in cluster '$cluster':\n\n" . join("\n", @nodes) . "\n";
+        exit $ERRORS{"UNKNOWN"};
+    }
+    #return %nodes;
+    return @nodes;
+}
+
+sub list_services(;$){
+    my $quit = shift;
+    cluster_required();
+    $json = curl_ambari "$url_prefix/clusters/$cluster/services";
+    my @items = get_field_array("items");
+    my @services;
+    foreach(@items){
+        push(@services, get_field2($_, "ServiceInfo.service_name"));
+    }
+    # comes sorted
+    #@services = sort @services;
+    if($quit){
+        print "cluster '$cluster' services:\n\n" . join("\n", @services) . "\n";
+        exit $ERRORS{"UNKNOWN"};
+    }
+    return @services;
+}
+
+sub list_service_components(;$){
+    my $quit = shift;
+    cluster_required();
+    service_required();
+    $json = curl_ambari "$url_prefix/clusters/$cluster/services/$service";
+    my @items = get_field_array("components");
+    my @components;
+    foreach(@items){
+        push(@components, get_field2($_, "ServiceComponentInfo.component_name"));
+    }
+    @components = sort @components;
+    if($quit){
+        print "cluster '$cluster', service '$service' components:\n\n" . join("\n", @components) . "\n";
+        exit $ERRORS{"UNKNOWN"};
+    }
+    return @components;
+}
+
+sub list_service_nodes(;$){
+    my $quit = shift;
+    $cluster   or usage "--cluster required";
+    $service   or usage "--service required";
+    $component or usage "--component required";
+    $json = curl_ambari "$url_prefix/clusters/$cluster/services/$service/components/$component";
+    my @nodes;
+    my $host;
+    foreach (get_field_array("host_components")){
+        $host = get_field2($_, "HostRoles.host_name");
+        push(@nodes, $host);
+    }
+    if($quit){
+        my $num_nodes = scalar @nodes;
+        plural $num_nodes;
+        print "$num_nodes node$plural in cluster '$cluster' service '$service' component '$component':\n\n" . join("\n", @nodes) . "\n";
+        exit $ERRORS{"UNKNOWN"};
+    }
+    return @nodes;
+}
+
+sub list_users(;$){
+    my $quit = shift;
+    $json = curl_ambari "$url_prefix/users?fields=*";
+    my %users;
+    my $user;
+    foreach(get_field_array("items")){
+        @users{get_field2($_, "Users.user_name")} = get_field2_array($_, "Users.roles");
+    }
+    if($quit){
+        print "Ambari users:\n\n";
+        foreach(sort keys %users){
+            print $_;
+            if($verbose){
+                print " [roles: " . join(",", $users{$_}) . "]";
+            }
+            print "\n";
+        }
+        exit $ERRORS{"UNKNOWN"};
+    }
+    return %users;
+}
+
+sub listing_ambari_components(){
+    $list_clusters       +
+    $list_nodes          +
+    $list_svc_nodes      +
+    $list_svc_components +
+    $list_svcs           +
+    $list_users;
+}
+
+sub list_ambari_components(){
+    if(listing_ambari_components() > 1){
+        usage "cannot specify more than one --list operation";
+    }
+    list_clusters(1)           if($list_clusters);
+    list_nodes(1)              if($list_nodes);
+    list_service_components(1) if($list_svc_components);
+    list_service_nodes(1)      if($list_svc_nodes);
+    list_services(1)           if($list_svcs);
+    list_users(1)              if($list_users);
+}
+
+sub validate_ambari_cluster($){
+    my $cluster = shift;
+    defined($cluster) or usage "cluster not defined";
+    $cluster =~ /^\s*([\w\s\.-]+)\s*$/ or usage "Invalid cluster name given, may only contain alphanumeric, space, dash, dots or underscores";
+    $cluster = $1;
+    vlog_options "cluster", $cluster;
+    return $cluster;
+}
+
+sub validate_ambari_host($){
+    my $host = shift;
+    defined($node) or usage "node not defined";
+    $node = isHostname($node) || usage "invalid node given";
+    vlog_options "node", $node;
+    return $node;
+}
+
+sub validate_ambari_component($){
+    my $component = shift;
+    defined($component) or usage "component not defined";
+    $component =~ /^\s*([A-Za-z]+)\s*$/ or usage "Invalid component given, use --list-components to see available components for a given cluster service";
+    $component = uc $1;
+    vlog_options "component", $component;
+    return $component;
+}
+
+sub validate_ambari_service($){
+    my $service = shift;
+    defined($service) or usage "service not defined";
+    $service    =~ /^\s*([\w-]+)\s*$/ or usage "Invalid service name given, must be alphanumeric with dashes";
+    $service = uc $1;
+    vlog_options "service", $service;
+    return $service;
+}
+
+#sub validate_ambari_cluster_options(){
+#    defined($hostid and ($cluster or $service or $activity or $nameservice or $component)) and usage "cannot mix --hostId with other options such as and --cluster/service/componentId/activityId at the same time";
+#    if(defined($cluster) and defined($service)){
+#        $cluster    = validate_ambari_cluster();
+#        $service    = validate_ambari_service();
+#        $url = "$api/clusters/$cluster/services/$service";
+#        if(defined($activity)){
+#            $activity = validate_ambari_activity();
+#            $url .= "/activities/$activity";
+#        } elsif(defined($nameservice)){
+#            $nameservice = validate_ambari_nameservice();
+#            $url .= "/nameservices/$nameservice";
+#        } elsif(defined($component)){
+#            $component = validate_ambari_component();
+#            $url .= "/components/$component";
+#        }
+#    } elsif(defined($hostid)){
+#        $hostid = validate_ambari_hostid();
+#        $url .= "$api/hosts/$hostid";
+#    } elsif(listing_ambari_components()){
+#    } else {
+#        usage "no valid combination of types given, must be one of the following combinations:
+#
+#    --cluster --service
+#    --cluster --service --activityId
+#    --cluster --service --nameservice
+#    --cluster --service --componentId
+#    --hostId
+#    ";
+#    }
+#    if(listing_ambari_components() > 1){
+#        usage "cannot specify more than one --list operation";
+#    }
+#}
+
+1;
