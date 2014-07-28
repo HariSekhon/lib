@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.8.2";
+our $VERSION = "1.8.3";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -489,7 +489,7 @@ our $nagios_plugins_support_msg_api = "API may have changed. $nagios_plugins_sup
 my  $domain_component   = '\b(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])\b';
 # validated against http://data.iana.org/TLD/tlds-alpha-by-domain.txt which lists all possible TLDs assigned by IANA
 # this matches everything except the XN--\w{6,10} TLDs as of 8/10/2012
-our $tld_regex          = '\b(?:[A-Za-z]{2,4}|(?i:museum|travel|local|localdomain))\b';
+our $tld_regex          = '\b(?:[A-Za-z]{2,4}|(?i:london|museum|travel|local|localdomain|intra))\b';
 our $domain_regex       = '(?:' . $domain_component . '\.)*' . $tld_regex;
 our $hostname_component = '\b(?:[A-Za-z]{1,63}|[A-Za-z][A-Za-z0-9_\-]{1,61}[a-zA-Z0-9])\b';
 our $hostname_regex     = "$hostname_component(?:\.$domain_regex)?";
@@ -2859,7 +2859,7 @@ sub validate_program_path ($$;$) {
     defined($path) or usage "$name program path not defined";
     defined($name) or usage "$path program name not defined";
     validate_regex($regex, "program path regex", 1) or code_error "invalid regex given to validate_program_path()";
-    $path = validate_filename($path) or usage "invalid path given for $name, failed filename regex";
+    $path = validate_filename($path, undef, undef, "no vlog") or usage "invalid path given for $name, failed filename regex";
     $path =~ /(?:^|\/)$regex$/ || usage "invalid path given for $name, is not a path to the $name command";
     vlog_options("${name} program path", $path);
     return $path;
