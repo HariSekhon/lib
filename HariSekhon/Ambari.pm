@@ -13,7 +13,7 @@
 
 package HariSekhon::Ambari;
 
-$VERSION = "0.1";
+$VERSION = "0.2";
 
 use strict;
 use warnings;
@@ -48,6 +48,8 @@ our @EXPORT = ( qw (
                     $url_prefix
                     %ambari_options
                     %ambari_options_list
+                    %ambari_options_node
+                    %ambari_options_service
                     %service_map
                     cluster_required
                     component_required
@@ -129,20 +131,27 @@ env_creds("Ambari");
 # /clusters/$cluster/host/$node/host_components/DATANODE    - state + metrics
 
 our %ambari_options_list = (
-    "list-clusters"             => [ \$list_clusters,       "Lists all the clusters managed by the Ambari server" ],
-    "list-nodes"                => [ \$list_nodes,          "Lists all the nodes managed by the Ambari server for given --cluster (includes Ambari server itself)" ],
-    "list-services"             => [ \$list_svcs,           "Lists all services in the given --cluster" ],
-    "list-service-components"   => [ \$list_svc_components, "Lists all components of a given service. Requires --cluster, --service" ],
-    "list-service-nodes"        => [ \$list_svc_nodes,      "Lists all nodes for a given service. Requires --cluster, --service, --component" ],
+    "list-users"                => [ \$list_users,          "List Ambari users" ],
 );
 
 our %ambari_options = (
     %tlsoptions,
     "C|cluster=s"               => [ \$cluster,             "Cluster Name as shown in Ambari (eg. \"MyCluster\")" ],
-    "S|service=s"               => [ \$service,             "Service Name as shown in Ambari (eg. HDFS, HBASE, usually capitalized). Requires --cluster" ],
-    "N|node=s"                  => [ \$node,                "Specify FQDN of node to check, use in conjunction with other switches such as --node-state" ],
-    "O|component=s"             => [ \$component,           "Service component to check (eg. DATANODE)" ],
+    "list-clusters"             => [ \$list_clusters,       "Lists all the clusters managed by the Ambari server" ],
     %ambari_options_list,
+);
+our %ambari_options_node = (
+    %ambari_options,
+    "N|node=s"                  => [ \$node,                "Specify FQDN of node to check, use in conjunction with other switches such as --node-state" ],
+    "list-nodes"                => [ \$list_nodes,          "Lists all the nodes managed by the Ambari server for given --cluster (includes Ambari server itself)" ],
+);
+our %ambari_options_service = (
+    %ambari_options,
+    "S|service=s"               => [ \$service,             "Service Name as shown in Ambari (eg. HDFS, HBASE, usually capitalized). Requires --cluster" ],
+    "O|component=s"             => [ \$component,           "Service component to check (eg. DATANODE)" ],
+    "list-services"             => [ \$list_svcs,           "Lists all services in the given --cluster" ],
+    "list-service-components"   => [ \$list_svc_components, "Lists all components of a given service. Requires --cluster, --service" ],
+    "list-service-nodes"        => [ \$list_svc_nodes,      "Lists all nodes for a given service. Requires --cluster, --service, --component" ],
 );
 
 splice @usage_order, 6, 0, qw/cluster service node component list-clusters list-nodes list-services list-service-nodes list-service-components list-users/;
@@ -176,7 +185,7 @@ sub component_required(){
 }
 
 sub hadoop_service_name($){
-    my $service = shift;
+    my $service = shift || code_error "no service name passed to hadoop_service_name()";
     if(grep { $service eq $_ } keys %service_map){
         $service = $service_map{$service};
     } else {
