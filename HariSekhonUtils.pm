@@ -1126,6 +1126,7 @@ sub curl ($;$$$$) {
     $host =~ s/(?::\d+)?(?:\/.*)?$//;
     isHost($host) or die "Invalid host determined from URL in curl()";
     my $auth = (defined($user) and defined($password));
+    # Don't replace $host with resolved host as this changes the vlog output and also affects proxy exceptions
     validate_resolvable($host);
     if($name){
         vlog2("querying $name");
