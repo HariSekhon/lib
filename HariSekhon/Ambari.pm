@@ -13,7 +13,7 @@
 
 package HariSekhon::Ambari;
 
-$VERSION = "0.2";
+$VERSION = "0.3";
 
 use strict;
 use warnings;
@@ -36,11 +36,9 @@ our @EXPORT = ( qw (
                     $node
                     $list_clusters
                     $list_hosts
-                    $list_nameservices
                     $list_components
                     $list_services
                     $list_users
-                    $nameservice
                     $protocol
                     $component
                     $service
@@ -60,7 +58,6 @@ our @EXPORT = ( qw (
                     list_ambari_components
                     list_clusters
                     list_hosts
-                    list_nameservices
                     list_components
                     list_services
                     list_users
@@ -83,7 +80,6 @@ our $url_prefix;
 
 our $cluster;
 our $node;
-our $nameservice;
 our $component;
 our $service;
 
@@ -94,8 +90,6 @@ our $list_svc_nodes      = 0;
 our $list_svcs           = 0;
 our $list_svcs_nodes     = 0;
 our $list_users          = 0;
-
-our $nameservices        = 0;
 
 our %service_map = (
     #"GANGLIA"       => "Ganglia",
@@ -118,6 +112,22 @@ our %service_map = (
 
 env_creds("Ambari");
 
+if($ENV{"AMBARI_CLUSTER"}){
+    $cluster = $ENV{"AMBARI_CLUSTER"};
+}
+
+if($ENV{"AMBARI_SERVICE"}){
+    $service = $ENV{"AMBARI_SERVICE"};
+}
+
+if($ENV{"AMBARI_COMPONENT"}){
+    $component = $ENV{"AMBARI_COMPONENT"};
+}
+
+if($ENV{"AMBARI_NODE"}){
+    $node = $ENV{"AMBARI_NODE"};
+}
+
 # Ambari REST API:
 #
 # /clusters                                                 - list clusters + version HDP-1.2.0
@@ -136,19 +146,19 @@ our %ambari_options_list = (
 
 our %ambari_options = (
     %tlsoptions,
-    "C|cluster=s"               => [ \$cluster,             "Cluster Name as shown in Ambari (eg. \"MyCluster\")" ],
+    "C|cluster=s"               => [ \$cluster,             "Cluster Name as shown in Ambari or --list-clusters (\$AMBARI_CLUSTER)" ],
     "list-clusters"             => [ \$list_clusters,       "Lists all the clusters managed by the Ambari server" ],
     %ambari_options_list,
 );
 our %ambari_options_node = (
     %ambari_options,
-    "N|node=s"                  => [ \$node,                "Specify FQDN of node to check, use in conjunction with other switches such as --node-state" ],
-    "list-nodes"                => [ \$list_nodes,          "Lists all the nodes managed by the Ambari server for given --cluster (includes Ambari server itself)" ],
+    "N|node=s"                  => [ \$node,                "Node in cluster as shown in Ambari or --list-nodes (\$AMBARI_NODE)" ],
+    "list-nodes"                => [ \$list_nodes,          "Lists all the nodes managed by the Ambari server for given --cluster" ],
 );
 our %ambari_options_service = (
     %ambari_options,
-    "S|service=s"               => [ \$service,             "Service Name as shown in Ambari (eg. HDFS, HBASE, usually capitalized). Requires --cluster" ],
-    "O|component=s"             => [ \$component,           "Service component to check (eg. DATANODE)" ],
+    "S|service=s"               => [ \$service,             "Service Name as shown in Ambari or --list-services (eg. HDFS, HBASE, usually capitalized, \$AMBARI_SERVICE). Requires --cluster" ],
+    "O|component=s"             => [ \$component,           "Service component to check, see --list-service-components (eg. DATANODE, \$AMBARI_COMPONENT)" ],
     "list-services"             => [ \$list_svcs,           "Lists all services in the given --cluster" ],
     "list-service-components"   => [ \$list_svc_components, "Lists all components of a given service. Requires --cluster, --service" ],
     "list-service-nodes"        => [ \$list_svc_nodes,      "Lists all nodes for a given service. Requires --cluster, --service, --component" ],
@@ -375,40 +385,5 @@ sub validate_ambari_service($){
     vlog_options "service", $service;
     return $service;
 }
-
-#sub validate_ambari_cluster_options(){
-#    defined($hostid and ($cluster or $service or $activity or $nameservice or $component)) and usage "cannot mix --hostId with other options such as and --cluster/service/componentId/activityId at the same time";
-#    if(defined($cluster) and defined($service)){
-#        $cluster    = validate_ambari_cluster();
-#        $service    = validate_ambari_service();
-#        $url = "$api/clusters/$cluster/services/$service";
-#        if(defined($activity)){
-#            $activity = validate_ambari_activity();
-#            $url .= "/activities/$activity";
-#        } elsif(defined($nameservice)){
-#            $nameservice = validate_ambari_nameservice();
-#            $url .= "/nameservices/$nameservice";
-#        } elsif(defined($component)){
-#            $component = validate_ambari_component();
-#            $url .= "/components/$component";
-#        }
-#    } elsif(defined($hostid)){
-#        $hostid = validate_ambari_hostid();
-#        $url .= "$api/hosts/$hostid";
-#    } elsif(listing_ambari_components()){
-#    } else {
-#        usage "no valid combination of types given, must be one of the following combinations:
-#
-#    --cluster --service
-#    --cluster --service --activityId
-#    --cluster --service --nameservice
-#    --cluster --service --componentId
-#    --hostId
-#    ";
-#    }
-#    if(listing_ambari_components() > 1){
-#        usage "cannot specify more than one --list operation";
-#    }
-#}
 
 1;
