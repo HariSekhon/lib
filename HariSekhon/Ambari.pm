@@ -13,7 +13,7 @@
 
 package HariSekhon::Ambari;
 
-$VERSION = "0.3";
+$VERSION = "0.3.1";
 
 use strict;
 use warnings;
@@ -363,7 +363,7 @@ sub validate_ambari_cluster($){
 sub validate_ambari_component($){
     my $component = shift;
     defined($component) or usage "component not defined";
-    $component =~ /^\s*([A-Za-z]+)\s*$/ or usage "Invalid component given, use --list-components to see available components for a given cluster service";
+    $component =~ /^\s*([\w-]+)\s*$/ or usage "Invalid component given, use --list-components to see available components for a given cluster service";
     $component = uc $1;
     vlog_options "component", $component;
     return $component;
