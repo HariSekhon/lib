@@ -1446,6 +1446,8 @@ sub human_units ($) {
     } elsif($num >= (1024**1)){
         $num = sprintf("%.2f", $num / (1024**1));
         $units = "KB";
+    } elsif($num == 0){
+        return "0";
     } elsif($num < 1024){
         return "$num bytes";
     } else {
