@@ -1265,11 +1265,12 @@ sub get_field_int($){
     get_field2_int($json, $_[0]);
 }
 
-sub get_field2($$){
+sub get_field2($$;$){
     my $hash_ref  = shift;
     isHash($hash_ref) or code_error "non-hash ref passed to get_field2()";
     my $field     = shift || code_error "field not passed to get_field2()";
-    my @parts     = split(/\./, $field);
+    my $split_fields = shift;
+    my @parts     = defined($split_fields) ? split(/\./, $field) : $field;
     if(scalar(@parts) > 1){
         my $ref = $hash_ref;
         foreach(@parts){
