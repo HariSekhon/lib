@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.8.3";
+our $VERSION = "1.8.4";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2307,7 +2307,7 @@ sub skip_java_output($){
     my $str = join(" ", @_);
     # warning due to Oracle 7 JDK bug fixed in 7u60
     # objc[54213]: Class JavaLaunchHelper is implemented in both /Library/Java/JavaVirtualMachines/jdk1.7.0_45.jdk/Contents/Home/bin/java and /Library/Java/JavaVirtualMachines/jdk1.7.0_45.jdk/Contents/Home/jre/lib/libinstrument.dylib. One of the two will be used. Which one is undefined.
-    if($str =~ /Class JavaLaunchHelper is implemented in both/){
+    if($str =~ /Class JavaLaunchHelper is implemented in both|^SLF4J/){
         return 1;
     }
     return 0;
