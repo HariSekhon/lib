@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.8.4";
+our $VERSION = "1.8.5";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -647,8 +647,10 @@ sub add_user_options($){
     %options = ( %options, %useroptions );
 }
 
+my $default_port;
 sub set_port_default($){
-    my $default_port = shift;
+    defined($default_port) and code_error("default port cannot be set twice");
+    $default_port = shift;
     isPort($default_port) or code_error("invalid port passed as first arg to set_port_default");
     $port = $default_port;
     $hostoptions{"P|port=s"}[1] =~ s/\)$/, default: $default_port\)/;
@@ -673,6 +675,8 @@ my @port_envs;
 my @user_envs;
 my @password_envs;
 
+my $port_env_found = 0;
+
 sub env_cred($){
     my $name = shift;
     $name = uc $name;
@@ -688,9 +692,10 @@ sub env_cred($){
         #vlog2("reading host from \$${name}HOST environment variable");
         $host = $ENV{"${name}HOST"};
     }
-    if($ENV{"${name}PORT"} and not $port){
+    if($ENV{"${name}PORT"} and not $port_env_found){
         #vlog2("reading port from \$${name}PORT environment variable");
         $port = $ENV{"${name}PORT"};
+        $port_env_found++;
     }
     if($ENV{"${name}USERNAME"} and not $user){
         #vlog2("reading user from \$${name}USERNAME environment variable");
