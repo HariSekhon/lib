@@ -1666,7 +1666,7 @@ sub isInterface ($) {
     my $interface = shift;
     defined($interface) || return undef;
     # TODO: consider checking if the interface actually exists on the system
-    $interface =~ /^((?:eth|bond|lo)\d+|lo)$/ or return undef;
+    $interface =~ /^((?:em|eth|bond|lo)\d+|lo)$/ or return undef;
     return $1;
 }
 
