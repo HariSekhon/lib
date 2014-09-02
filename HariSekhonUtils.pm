@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.8.6";
+our $VERSION = "1.8.7";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1274,10 +1274,13 @@ sub get_field2($$){
     my $hash_ref  = shift;
     isHash($hash_ref) or code_error "non-hash ref passed to get_field2()";
     my $field     = shift || code_error "field not passed to get_field2()";
-    my @parts     = split(/\./, $field);
+    # negative lookbehind allows for escaping dot in the field name
+    my @parts     = split(/(?<!\\)\./, $field);
+    $field =~ s/\\\././g;
     if(scalar(@parts) > 1){
         my $ref = $hash_ref;
         foreach(@parts){
+            s/\\\././g;
             defined($ref->{$_}) or quit "UNKNOWN", "'$_' field not found. $nagios_plugins_support_msg_api";
             $ref = $ref->{$_};
         }
