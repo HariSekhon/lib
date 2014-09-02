@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.8.5";
+our $VERSION = "1.8.6";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -3058,7 +3058,7 @@ sub validate_threshold ($$;$) {
         if($options_ref->{"positive"} and defined($thresholds{$name}{$_}) and $thresholds{$name}{$_} < 0){
             usage "$name threshold may not be less than zero";
         }
-        if($options_ref->{"integer"} and defined($thresholds{$name}{$_}) and not isInt($thresholds{$name}{$_})){
+        if($options_ref->{"integer"} and defined($thresholds{$name}{$_}) and not isInt($thresholds{$name}{$_}, 1)){
             usage "$name threshold must be an integer";
         }
         if($options_ref->{"min"} and defined($thresholds{$name}{$_}) and $thresholds{$name}{$_} < $options_ref->{"min"}){
