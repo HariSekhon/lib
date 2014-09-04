@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.8.7";
+our $VERSION = "1.8.8";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -360,6 +360,7 @@ our %EXPORT_TAGS = (
                     ) ],
     'web'   =>  [   qw(
                         curl
+                        curl_json
                         wget
                     ) ],
 );
@@ -1191,6 +1192,16 @@ sub curl ($;$$$$) {
     return $content;
 }
 
+
+sub curl_json ($;$$$$) {
+    my $url         = shift;
+    my $name        = shift;
+    my $user        = shift;
+    my $password    = shift;
+    my $err_handler = shift;
+    my $content = curl $url, $name, $user, $password, $err_handler;
+    $json = isJson($content) or quit "CRITICAL", "invalid json returned " . ( $name ? "by $name at $url" : "from $url");
+}
 
 sub debug (@) {
     return undef unless $debug;
@@ -2752,14 +2763,19 @@ sub validate_hostname ($;$) {
 }
 
 
-sub validate_int ($$$$) {
+sub validate_int ($$;$$) {
     my ($integer, $name, $min, $max) = @_;
     defined($name) || code_error "name not defined when calling validate_int()";
     defined($integer) || usage "$name not defined";
     isInt($integer, 1) or usage "invalid $name defined: must be an integer";
-    isFloat($min, 1) or code_error "invalid min value '$min' passed to validate_int() for 2nd arg (min value): must be float value";
-    isFloat($max, 1) or code_error "invalid max value '$max' passed to validate_int() for 3rd arg (max value): must be float value";
-    ($integer >= $min && $integer <= $max) or usage "invalid $name defined: must be integer between $min and $max";
+    if(defined($min)){
+        isFloat($min, 1) or code_error "invalid min value '$min' passed to validate_int() for 2nd arg (min value): must be float value";
+        $integer < $min and usage "invalid $name defined: cannot be lower than $min";
+    }
+    if(defined($max)){
+        isFloat($max, 1) or code_error "invalid max value '$max' passed to validate_int() for 3rd arg (max value): must be float value";
+        $integer > $max and usage "invalid $name defined: cannot be greater than $max";
+    }
     $integer =~ /^(-?\d+)$/ or usage "invalid integer $name passed to validate_int() - WARNING: caught LATE code may need updating";
     $integer = $1;
     vlog_options($name, $integer);
