@@ -31,10 +31,12 @@ our @EXPORT = ( qw (
                     $list_keyspaces
                     %clusteroption
                     %keyspaceoption
+                    %nodeipoption
                     curl_opscenter
                     curl_opscenter_err_handler
                     list_clusters
                     list_keyspaces
+                    list_nodes
                     validate_cluster
                     validate_keyspace
                 )
@@ -47,8 +49,10 @@ env_creds("DataStax OpsCenter");
 
 our $cluster;
 our $keyspace;
+our $node_ip;
 our $list_clusters;
 our $list_keyspaces;
+our $list_nodes;
 
 env_vars(["DATASTAX_OPSCENTER_CLUSTER",  "CLUSTER"],  \$cluster);
 env_vars(["DATASTAX_OPSCENTER_KEYSPACE", "KEYSPACE"], \$keyspace);
@@ -61,8 +65,12 @@ our %keyspaceoption = (
     "K|keyspace=s"   =>  [ \$keyspace,       "KeySpace to check (\$DATASTAX_OPSCENTER_KEYSPACE, \$KEYSPACE). See --list-keyspaces" ],
     "list-keyspaces" =>  [ \$list_keyspaces, "List keyspaces in given Cassandra cluster managed by DataStax OpsCenter. Requires --cluster" ],
 );
+our %nodeipoption = (
+    "node-ip=s"      => [ \$node_ip,    "Node IP for cluster node to fetch metrics for (optional). See --list-nodes" ],
+    "list-nodes"     => [ \$list_nodes, "List nodes and their node IPs managed by DataStax OpsCenter" ],
+);
 
-splice @usage_order, 6, 0, qw/cluster keyspace list-clusters list-keyspaces/;
+splice @usage_order, 6, 0, qw/cluster keyspace node-ip list-clusters list-keyspaces list-nodes/;
 
 sub curl_opscenter_err_handler($){
     my $response = shift;
@@ -124,6 +132,18 @@ sub list_keyspaces(){
         print "Keyspaces in cluster '$cluster':\n\n";
         foreach(sort keys %{$json}){
             print "$_\n";
+        }
+        exit $ERRORS{"UNKNOWN"};
+    }
+}
+
+sub list_nodes(){
+    if($list_nodes){
+        $json = curl_opscenter "$cluster/nodes";
+        vlog3 Dumper($json);
+        print "Nodes in cluster '$cluster':\n\n";
+        foreach(@{$json}){
+            print get_field2($_, "node_name") . " => " . get_field2($_, "node_ip") . "\n";
         }
         exit $ERRORS{"UNKNOWN"};
     }
