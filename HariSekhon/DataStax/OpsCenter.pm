@@ -9,7 +9,7 @@
 
 package HariSekhon::DataStax::OpsCenter;
 
-$VERSION = "0.1";
+$VERSION = "0.2";
 
 use strict;
 use warnings;
@@ -80,9 +80,9 @@ sub curl_opscenter_err_handler($){
                 $additional_information .= ". Reason: " . $json->{"reason"};
             } elsif(defined($json->{"message"})){
                 $additional_information .= ". Message: " . $json->{"message"};
-                if($json->{"message"} eq "Resource not found."){
-                    $additional_information = ". Message: keyspace not found - wrong keyspace specified? (case sensitive)";
-                }
+                #if($json->{"message"} eq "Resource not found."){
+                #    $additional_information = ". Message: keyspace not found - wrong keyspace specified? (case sensitive)";
+                #}
             }
         }
         quit("CRITICAL", $response->code . " " . $response->message . $additional_information);
