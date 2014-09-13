@@ -9,7 +9,7 @@
 
 package HariSekhon::DataStax::OpsCenter;
 
-$VERSION = "0.2";
+$VERSION = "0.3";
 
 use strict;
 use warnings;
@@ -86,6 +86,9 @@ sub curl_opscenter_err_handler($){
             }
         }
         quit("CRITICAL", $response->code . " " . $response->message . $additional_information);
+    }
+    if($content =~ /^null$/i) {
+        quit "UNKNOWN", $response->code. " ". $response->message . " - null returned by DataStax OpsCenter - invalid parameter?";
     }
     unless($content){
         quit("CRITICAL", "blank content returned from DataStax OpsCenter");
