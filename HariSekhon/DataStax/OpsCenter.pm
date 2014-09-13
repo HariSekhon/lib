@@ -132,14 +132,14 @@ sub list_keyspaces(){
 sub validate_cluster(){
     unless($list_clusters){
         $cluster or usage "must specify cluster, use --list-clusters to show clusters managed by DataStax OpsCenter";
-        $cluster = validate_alnum($cluster, "cluster name");
+        $cluster = validate_alnum($cluster, "cluster");
     }
 }
 
 sub validate_keyspace(){
     unless($list_clusters or $list_keyspaces){
         $keyspace or usage "must specify keyspace, use --list-keyspaces to show keyspaces managed by Cassandra cluster '$cluster'";
-        $keyspace = validate_alnum($keyspace, "keyspace name");
+        $keyspace = validate_alnum($keyspace, "keyspace");
     }
 }
 
