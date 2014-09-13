@@ -69,7 +69,7 @@ our %keyspaceoption = (
 );
 our %nodeipoption = (
     "node-ip=s"      => [ \$node_ip,    "Node IP for cluster node to fetch metrics for (optional). See --list-nodes" ],
-    "list-nodes"     => [ \$list_nodes, "List nodes and their node IPs managed by DataStax OpsCenter" ],
+    "list-nodes"     => [ \$list_nodes, "List nodes and their node IPs managed by DataStax OpsCenter. Requires --cluster" ],
 );
 
 splice @usage_order, 6, 0, qw/cluster keyspace node-ip list-clusters list-keyspaces list-nodes/;
@@ -129,6 +129,7 @@ sub list_clusters(){
 
 sub list_keyspaces(){
     if($list_keyspaces){
+        $cluster or code_error "list_keyspaces() called without cluster being defined";
         $json = curl_opscenter "$cluster/keyspaces";
         vlog3 Dumper($json);
         print "Keyspaces in cluster '$cluster':\n\n";
@@ -141,6 +142,7 @@ sub list_keyspaces(){
 
 sub list_nodes(){
     if($list_nodes){
+        $cluster or code_error "list_nodes() called without cluster being defined";
         $json = curl_opscenter "$cluster/nodes";
         vlog3 Dumper($json);
         print "Nodes in cluster '$cluster':\n\n";
