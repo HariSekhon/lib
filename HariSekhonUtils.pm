@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.8.8";
+our $VERSION = "1.8.9";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -169,6 +169,7 @@ our %EXPORT_TAGS = (
                         check_threshold
                         check_thresholds
                         env_creds
+                        env_vars
                         expand_units
                         human_units
                         msg_perf_thresholds
@@ -758,6 +759,28 @@ sub env_creds($;$){
     $hostoptions{"P|port=s"}[1]     = "$longname port (" . join(", ", @port_envs) . ( defined($port) ? ", default: $port)" : ")");
     $useroptions{"u|user=s"}[1]     = "$longname user     (" . join(", ", @user_envs) . ")";
     $useroptions{"p|password=s"}[1] = "$longname password (" . join(", ", @password_envs) . ")";
+}
+
+sub env_var($$){
+    my $name    = shift;
+    my $var_ref = shift;
+    if($ENV{$name} and not $$var_ref){
+        $$var_ref = $ENV{$name};
+    }
+}
+
+sub env_vars($$){
+    my $name    = shift;
+    my $var_ref = shift;
+    if(isScalar(\$name)){
+        env_var($name, $var_ref);
+    } elsif(isArray($name)){
+        foreach (@{$name}){
+            env_var($_, $var_ref);
+        }
+    } else {
+        code_error("non-scalar/non-array ref passed as first arg to env_vars()");
+    }
 }
 
 # ============================================================================ #
