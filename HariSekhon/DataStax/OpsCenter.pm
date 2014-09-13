@@ -29,6 +29,8 @@ our @EXPORT = ( qw (
                     $keyspace
                     $list_clusters
                     $list_keyspaces
+                    $list_nodes
+                    $node_ip
                     %clusteroption
                     %keyspaceoption
                     %nodeipoption
