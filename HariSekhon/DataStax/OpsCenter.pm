@@ -68,7 +68,7 @@ our %keyspaceoption = (
     "list-keyspaces" =>  [ \$list_keyspaces, "List keyspaces in given Cassandra cluster managed by DataStax OpsCenter. Requires --cluster" ],
 );
 our %nodeipoption = (
-    "node-ip=s"      => [ \$node_ip,    "Node IP for cluster node to fetch metrics for (optional). See --list-nodes" ],
+    "N|node-ip=s"    => [ \$node_ip,    "Node IP for cluster node to fetch metrics for (optional). See --list-nodes" ],
     "list-nodes"     => [ \$list_nodes, "List nodes and their node IPs managed by DataStax OpsCenter. Requires --cluster" ],
 );
 
