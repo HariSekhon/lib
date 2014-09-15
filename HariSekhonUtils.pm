@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.8.9";
+our $VERSION = "1.8.10";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1069,10 +1069,11 @@ sub check_thresholds ($;$$) {
 #}
 
 
-sub cmd ($;$$) {
-    my $cmd       = shift;
-    my $errchk    = shift;
-    my $inbuilt   = shift;
+sub cmd ($;$$$) {
+    my $cmd     = shift;
+    my $errchk  = shift;
+    my $inbuilt = shift;
+    my $return_exitcode = shift;
     $cmd =~ s/^\s+//;
     my $prog      = (split(/\s+/, $cmd))[0];
     if($prog eq "exec"){
@@ -1098,16 +1099,16 @@ sub cmd ($;$$) {
         return $fh;
     }
     vlog3("cmd: $cmd");
-    my $return_output   = `$cmd 2>&1`;
-    my $returncode      = $?;
-    my @output          = split("\n", $return_output);
-    $returncode         = $returncode >> 8;
+    my $return_output = `$cmd 2>&1`;
+    my $exitcode      = $?;
+    my @output        = split("\n", $return_output);
+    $exitcode         = $exitcode >> 8;
     if ($verbose >= 3) {
         #foreach(@output){ print "output: $_\n"; }
         print "output:\n\n$return_output\n";
-        print "returncode: $returncode\n\n";
+        print "exitcode: $exitcode\n\n";
     }
-    if ($errchk and $returncode != 0) {
+    if ($errchk and $exitcode != 0) {
         my $err = "";
         if(substr($progname, 0, 6) eq "check_"){
             foreach (@output) {
@@ -1116,10 +1117,13 @@ sub cmd ($;$$) {
         } else {
             $err = join("\n", @output);
         }
-        quit("CRITICAL", "'$cmd' returned $returncode -$err");
+        quit("CRITICAL", "'$cmd' returned $exitcode -$err");
     }
-    # TODO: extend to return result and output and not check returncode in func or use wrapper func to throw error on non zero return code
-    return @output;
+    if($return_exitcode){
+        return ($exitcode, @output);
+    } else {
+        return @output;
+    }
 }
 
 
@@ -1141,12 +1145,14 @@ sub compact_array (@) {
 }
 
 
-sub curl ($;$$$$) {
+sub curl ($;$$$$$) {
     my $url      = shift;
     my $name     = shift;
     my $user     = shift;
     my $password = shift;
     my $err_sub  = shift;
+    my $type     = shift() || 'GET';
+    $type eq "GET" or $type eq "POST" or code_error "unsupported type passed to curl() as sixth argument";
     #debug("url passed to curl: $url");
     defined($url)      or code_error "no url passed to curl()";
     $url = isUrl($url) or code_error "invalid url supplied to curl()";
@@ -1180,7 +1186,7 @@ sub curl ($;$$$$) {
     #}
     defined_main_ua();
     $main::ua->show_progress(1) if $debug;
-    my $req = HTTP::Request->new('GET', $url);
+    my $req = HTTP::Request->new($type, $url);
     # Doesn't work
     #$ua->credentials($host, '', $user, $password);
     $req->authorization_basic($user, $password) if (defined($user) and defined($password));
@@ -1216,13 +1222,14 @@ sub curl ($;$$$$) {
 }
 
 
-sub curl_json ($;$$$$) {
+sub curl_json ($;$$$$$) {
     my $url         = shift;
     my $name        = shift;
     my $user        = shift;
     my $password    = shift;
     my $err_handler = shift;
-    my $content = curl $url, $name, $user, $password, $err_handler;
+    my $type        = shift() || 'GET';
+    my $content = curl $url, $name, $user, $password, $err_handler, $type;
     $json = isJson($content) or quit "CRITICAL", "invalid json returned " . ( $name ? "by $name at $url" : "from $url");
 }
 
