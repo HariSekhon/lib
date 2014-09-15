@@ -9,7 +9,7 @@
 
 package HariSekhon::DataStax::OpsCenter;
 
-$VERSION = "0.3";
+$VERSION = "0.4";
 
 use strict;
 use warnings;
@@ -105,14 +105,15 @@ sub curl_opscenter_err_handler($){
     }
 }
 
-sub curl_opscenter($;$){
+sub curl_opscenter($;$$){
     my $path = shift;
     my $ssl  = shift;
+    my $type = shift() || 'GET';
     my $http = "http";
     $http .= "s" if $ssl;
     ($host and $port and $user and $password) or code_error "host/port/user/password not set before calling curl_opscenter()";
     $path =~ s/^\///g;
-    $json = curl_json "$http://$host:$port/$path", "DataStax OpsCenter", $user, $password, \&curl_opscenter_err_handler;
+    $json = curl_json "$http://$host:$port/$path", "DataStax OpsCenter", $user, $password, \&curl_opscenter_err_handler, $type;
 }
 
 sub list_clusters(){
@@ -156,7 +157,9 @@ sub list_nodes(){
 sub validate_cluster(){
     unless($list_clusters){
         $cluster or usage "must specify cluster, use --list-clusters to show clusters managed by DataStax OpsCenter";
-        $cluster = validate_alnum($cluster, "cluster");
+        $cluster =~ /^([\w-]+)$/ or usage "invalid cluster defined: must be alphanumeric, may contain dashes and underscores";
+        $cluster = $1;
+        vlog_options "cluster", $cluster;
     }
 }
 
