@@ -98,7 +98,7 @@ sub curl_opscenter_err_handler($){
         quit("CRITICAL", $response->code . " " . $response->message . $additional_information);
     }
     if($content =~ /^null$/i) {
-        quit "UNKNOWN", $response->code. " ". $response->message . " - 'null' returned by DataStax OpsCenter - invalid parameter or combination of parameters?";
+        quit "UNKNOWN", $response->code. " ". $response->message . " - 'null' returned by DataStax OpsCenter - invalid parameter or combination of parameters or OpsCenter recently restarted?";
     }
     unless($content){
         quit("CRITICAL", "blank content returned from DataStax OpsCenter");
