@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.8.10";
+our $VERSION = "1.8.11";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1291,30 +1291,31 @@ sub expand_units ($;$$) {
 }
 
 
-sub get_field($){
-    get_field2($json, $_[0]);
+sub get_field($;$){
+    get_field2($json, $_[0], $_[1]);
 }
 
-sub get_field_array($){
-    get_field2_array($json, $_[0]);
+sub get_field_array($;$){
+    get_field2_array($json, $_[0], $_[1]);
 }
 
-sub get_field_float($){
-    get_field2_float($json, $_[0]);
+sub get_field_float($;$){
+    get_field2_float($json, $_[0], $_[1]);
 }
 
-sub get_field_hash($){
-    get_field2_hash($json, $_[0]);
+sub get_field_hash($;$){
+    get_field2_hash($json, $_[0], $_[1]);
 }
 
-sub get_field_int($){
-    get_field2_int($json, $_[0]);
+sub get_field_int($;$){
+    get_field2_int($json, $_[0], $_[1]);
 }
 
-sub get_field2($$){
+sub get_field2($$;$){
     my $hash_ref  = shift;
-    isHash($hash_ref) or code_error "non-hash ref passed to get_field2()";
     my $field     = shift || code_error "field not passed to get_field2()";
+    my $noquit    = shift;
+    isHash($hash_ref) or code_error "non-hash ref passed to get_field2()";
     # negative lookbehind allows for escaping dot in the field name
     my @parts     = split(/(?<!\\)\./, $field);
     $field =~ s/\\\././g;
@@ -1322,13 +1323,24 @@ sub get_field2($$){
         my $ref = $hash_ref;
         foreach(@parts){
             s/\\\././g;
-            defined($ref->{$_}) or quit "UNKNOWN", "'$_' field not found. $nagios_plugins_support_msg_api";
-            $ref = $ref->{$_};
+            # XXX: this returns field not found where field exists but value is 'undef'
+            if(defined($ref->{$_})){
+                $ref = $ref->{$_};
+            } else {
+                quit "UNKNOWN", "'$_' field not found. $nagios_plugins_support_msg_api" unless $noquit;
+                $ref = undef;
+                last;
+            }
         }
         return $ref;
     } else {
-        defined($hash_ref->{$field}) or quit "UNKNOWN", "'$field' field not found. $nagios_plugins_support_msg_api";
-        return $hash_ref->{$field};
+        # XXX: this returns field not found where field exists but value is 'undef'
+        if(defined($hash_ref->{$field})){
+            return $hash_ref->{$field};
+        } else {
+            quit "UNKNOWN", "'$field' field not found. $nagios_plugins_support_msg_api" unless $noquit;
+            return undef;
+        }
     }
     code_error "hit end of get_field2 sub";
 }
