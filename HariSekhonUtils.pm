@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.8.11";
+our $VERSION = "1.8.12";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -307,6 +307,8 @@ our %EXPORT_TAGS = (
     'vars' =>   [   qw(
                         $critical
                         $debug
+                        $default_warning
+                        $default_critical
                         $email
                         $expected_version
                         $host
@@ -493,7 +495,7 @@ my  $domain_component   = '\b[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\b';
 # this matches everything except the XN--\w{6,10} TLDs as of 8/10/2012
 our $tld_regex          = '\b(?:[A-Za-z]{2,4}|london|museum|travel|local|localdomain|intra)\b';
 our $domain_regex       = '(?:' . $domain_component . '\.)*' . $tld_regex;
-our $hostname_component = '\b[A-Za-z](?:[A-Za-z0-9_\-]{1,61}[a-zA-Z0-9])?\b';
+our $hostname_component = '\b[A-Za-z](?:[A-Za-z0-9_\-]{0,61}[a-zA-Z0-9])?\b';
 our $hostname_regex     = "$hostname_component(?:\.$domain_regex)?";
 our $filename_regex     = '[\/\w\s_\.:,\*\(\)\=\%\?\+-]+';
 our $rwxt_regex         = '[r-][w-][x-][r-][w-][x-][r-][w-][xt-]';
@@ -547,7 +549,7 @@ our $usage_line      = "usage: $progname [ options ]";
 our $user;
 our %thresholds;
 # Standard ordering of usage options for help. Exported and overridable inside plugin to customize usage()
-our @usage_order = qw/host port user users groups password database query field regex warning critical ssl tls ssl-CA-path ssl-noverify/;
+our @usage_order = qw/host port user users groups password database query field regex warning critical ssl tls ssl-CA-path ssl-noverify tls-noverify/;
 # Not sure if I can relax the case sensitivity on these according to the Nagios Developer guidelines
 my  @valid_units = qw/% s ms us B KB MB GB TB c/;
 our $verbose = 0;
@@ -659,8 +661,8 @@ sub set_port_default($){
 }
 
 sub set_threshold_defaults($$){
-    my $default_warning  = shift;
-    my $default_critical = shift;
+    our $default_warning  = shift;
+    our $default_critical = shift;
     isThreshold($default_warning)  or code_error("invalid warning threshold passed as first arg to set_threshold_defaults()");
     isThreshold($default_critical) or code_error("invalid critical threshold passed as second arg to set_threshold_defaults()");
     $warning  = $default_warning;
@@ -1230,8 +1232,10 @@ sub curl_json ($;$$$$$) {
     my $err_handler = shift;
     my $type        = shift() || 'GET';
     my $content = curl $url, $name, $user, $password, $err_handler, $type;
+    vlog2("parsing output from" . ( $name ? $name : $url ) . "\n");
     $json = isJson($content) or quit "CRITICAL", "invalid json returned " . ( $name ? "by $name at $url" : "from $url");
 }
+
 
 sub debug (@) {
     return undef unless $debug;
@@ -1324,7 +1328,7 @@ sub get_field2($$;$){
         foreach(@parts){
             s/\\\././g;
             # XXX: this returns field not found where field exists but value is 'undef'
-            if(defined($ref->{$_})){
+            if(isHash($ref) and defined($ref->{$_})){
                 $ref = $ref->{$_};
             } else {
                 quit "UNKNOWN", "'$_' field not found. $nagios_plugins_support_msg_api" unless $noquit;
