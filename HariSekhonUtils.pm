@@ -2941,7 +2941,7 @@ sub validate_program_path ($$;$) {
     if($path !~ /^[\.\/]/){
         $path = which($path);
         unless(defined($path)){
-            usage "$path not found in \$PATH ($ENV{PATH})";
+            usage "$name program not found in \$PATH ($ENV{PATH})";
         }
     }
     validate_regex($regex, "program path regex", 1) or code_error "invalid regex given to validate_program_path()";
