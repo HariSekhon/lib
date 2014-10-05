@@ -9,7 +9,7 @@
 
 package HariSekhon::MapR;
 
-$VERSION = "0.1";
+$VERSION = "0.2";
 
 use strict;
 use warnings;
@@ -28,18 +28,22 @@ our @ISA = qw(Exporter);
 
 our @EXPORT = ( qw (
                     $cluster
-                    curl_mapr
                     $list_clusters
+                    $list_nodes
+                    $node
+                    $protocol
                     $ssl
                     $ssl_ca_path
                     $ssl_noverify
-                    %mapr_options
+                    $ua
                     %mapr_option_cluster
+                    %mapr_option_node
+                    %mapr_options
+                    curl_mapr
                     list_clusters
+                    list_nodes
                     validate_cluster
                     validate_mapr_options
-                    $ua
-                    $protocol
                 )
 );
 our @EXPORT_OK = ( @EXPORT );
@@ -49,7 +53,9 @@ set_port_default(8443);
 env_creds("MAPR", "MapR Control System");
 
 our $cluster;
+our $node;
 our $list_clusters;
+our $list_nodes;
 
 our %mapr_options = (
     %hostoptions,
@@ -58,11 +64,16 @@ our %mapr_options = (
 );
 
 our %mapr_option_cluster = (
-    "C|cluster=s"      => [ \$cluster,       "Cluster Name as shown in MapR Control System (eg. \"my.cluster.com\", see --list-clusters)" ],
-    "list-clusters"    => [ \$list_clusters, "Lists clusters managed by MapR Control System" ],
+    "C|cluster=s"   => [ \$cluster,       "Cluster Name as shown in MapR Control System (eg. \"my.cluster.com\", see --list-clusters)" ],
+    "list-clusters" => [ \$list_clusters, "Lists clusters managed by MapR Control System" ],
 );
 
-splice @usage_order, 6, 0, qw/cluster list-clusters ssl ssl-CA-path ssl-noverify/;
+our %mapr_option_node = (
+    "N|node=s"      => [ \$node,        "Node to check" ],
+    "list-nodes"    => [ \$list_nodes,  "Lists nodes managed by MapR Control System" ],
+);
+
+splice @usage_order, 6, 0, qw/cluster node list-clusters list-nodes ssl ssl-CA-path ssl-noverify/;
 
 
 sub validate_mapr_options(){
@@ -119,6 +130,9 @@ sub curl_mapr_err_handler($){
             my $err = "";
             foreach(get_field2_array($json, "errors")){
                 $err .= ". " . get_field2($_, "desc");
+                if($err =~ /Obtaining rlimit for resource disk failed with error - Unknown cluster parameter provided/){
+                    $err .= ". You have supplied an invalid cluster name, see --list-clusters for the right cluster name";
+                }
             }
             quit "CRITICAL", "MapR Control System returned status='$status'$err";
         }
@@ -136,6 +150,19 @@ sub list_clusters(){
         print "MapR Control System Clusters:\n\n";
         foreach(@data){
             print get_field2($_, "cluster.name") . "\n";
+        }
+        exit $ERRORS{"UNKNOWN"};
+    }
+}
+
+
+sub list_nodes(){
+    if($list_nodes){
+        $json = curl_mapr("/node/list?columns=hostname", $user, $password);
+        my @data = get_field_array("data");
+        print "MapR Control System nodes:\n\n";
+        foreach(@data){
+            print get_field2($_, "hostname") . "\n";
         }
         exit $ERRORS{"UNKNOWN"};
     }
