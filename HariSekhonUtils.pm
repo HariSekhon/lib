@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.8.12";
+our $VERSION = "1.8.13";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1330,8 +1330,16 @@ sub get_field2($$;$){
             # XXX: this returns field not found where field exists but value is 'undef'
             if(isHash($ref) and defined($ref->{$_})){
                 $ref = $ref->{$_};
+            } elsif(isArray($ref) and $_ =~ /^(\d+)$/){
+                if(defined(${$ref}[$1])){
+                    $ref = ${$ref}[$1];
+                } else {
+                    quit "UNKNOWN", "array has no $1 item for field '$field'. $nagios_plugins_support_msg_api" unless $noquit;
+                    $ref = undef;
+                    last;
+                }
             } else {
-                quit "UNKNOWN", "'$_' field not found. $nagios_plugins_support_msg_api" unless $noquit;
+                quit "UNKNOWN", "'$field' '$_' field not found. $nagios_plugins_support_msg_api" unless $noquit;
                 $ref = undef;
                 last;
             }
@@ -2930,9 +2938,17 @@ sub validate_program_path ($$;$) {
     my $regex = shift() || $name;
     defined($path) or usage "$name program path not defined";
     defined($name) or usage "$path program name not defined";
+    if($path !~ /^[\.\/]/){
+        $path = which($path);
+        unless(defined($path)){
+            usage "$path not found in \$PATH ($ENV{PATH})";
+        }
+    }
     validate_regex($regex, "program path regex", 1) or code_error "invalid regex given to validate_program_path()";
     $path = validate_filename($path, undef, undef, "no vlog") or usage "invalid path given for $name, failed filename regex";
     $path =~ /(?:^|\/)$regex$/ || usage "invalid path given for $name, is not a path to the $name command";
+    ( -f $path ) or usage "$path not found";
+    ( -x $path ) or usage "$path not executable";
     vlog_options("${name} program path", $path);
     return $path;
 }
