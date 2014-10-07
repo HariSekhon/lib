@@ -9,7 +9,7 @@
 
 package HariSekhon::MapR;
 
-$VERSION = "0.2";
+$VERSION = "0.2.1";
 
 use strict;
 use warnings;
@@ -57,6 +57,8 @@ our $node;
 our $list_clusters;
 our $list_nodes;
 
+env_vars(["MAPR_CLUSTER", "CLUSTER"], \$cluster);
+
 our %mapr_options = (
     %hostoptions,
     %useroptions,
@@ -64,7 +66,7 @@ our %mapr_options = (
 );
 
 our %mapr_option_cluster = (
-    "C|cluster=s"   => [ \$cluster,       "Cluster Name as shown in MapR Control System (eg. \"my.cluster.com\", see --list-clusters)" ],
+    "C|cluster=s"   => [ \$cluster,       "Cluster Name as shown in MapR Control System (eg. \"my.cluster.com\", see --list-clusters, \$MAPR_CLUSTER, \$CLUSTER)" ],
     "list-clusters" => [ \$list_clusters, "Lists clusters managed by MapR Control System" ],
 );
 
