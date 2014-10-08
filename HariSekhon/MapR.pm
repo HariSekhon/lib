@@ -9,7 +9,7 @@
 
 package HariSekhon::MapR;
 
-$VERSION = "0.2.1";
+$VERSION = "0.2.2";
 
 use strict;
 use warnings;
@@ -71,7 +71,7 @@ our %mapr_option_cluster = (
 );
 
 our %mapr_option_node = (
-    "N|node=s"      => [ \$node,        "Node to check" ],
+    "N|node=s"      => [ \$node,        "Node to check (see --list-nodes)" ],
     "list-nodes"    => [ \$list_nodes,  "Lists nodes managed by MapR Control System" ],
 );
 
