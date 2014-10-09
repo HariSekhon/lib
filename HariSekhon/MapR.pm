@@ -9,7 +9,7 @@
 
 package HariSekhon::MapR;
 
-$VERSION = "0.2.2";
+$VERSION = "0.3";
 
 use strict;
 use warnings;
@@ -59,11 +59,15 @@ our $list_nodes;
 
 env_vars(["MAPR_CLUSTER", "CLUSTER"], \$cluster);
 
+my $no_ssl;
+
 our %mapr_options = (
     %hostoptions,
     %useroptions,
     %ssloptions,
+    "no-ssl"   =>  [ \$no_ssl,  "Don't use SSL, newer versions of MCS seem to only use SSL, use this only on older versions of MCS if you don't have SSL (you may need to also change the port to 8080 instead of 8443)" ],
 );
+delete $mapr_options{"S|ssl"};
 
 our %mapr_option_cluster = (
     "C|cluster=s"   => [ \$cluster,       "Cluster Name as shown in MapR Control System (eg. \"my.cluster.com\", see --list-clusters, \$MAPR_CLUSTER, \$CLUSTER)" ],
@@ -75,7 +79,7 @@ our %mapr_option_node = (
     "list-nodes"    => [ \$list_nodes,  "Lists nodes managed by MapR Control System" ],
 );
 
-splice @usage_order, 6, 0, qw/cluster node list-clusters list-nodes ssl ssl-CA-path ssl-noverify/;
+splice @usage_order, 6, 0, qw/cluster node list-clusters list-nodes ssl ssl-CA-path ssl-noverify no-ssl/;
 
 
 sub validate_mapr_options(){
@@ -86,7 +90,7 @@ sub validate_mapr_options(){
     validate_ssl();
 }
 
-our $protocol = "http";
+our $protocol = "https";
 
 sub curl_mapr($$$;$){
     ($host and $port) or code_error "host and port not defined before calling curl_mapr()";
@@ -96,12 +100,13 @@ sub curl_mapr($$$;$){
     my $err_sub  = shift() || \&curl_mapr_err_handler;
     $url =~ s/^\/*//;
     $url or code_error "invalid url passed to curl_mapr()";
+    $protocol = "http" if $no_ssl;
     my $url_prefix = "$protocol://$host:$port";
     $url = "$url_prefix/rest/$url";
     isUrl($url) or code_error "invalid URL '$url' supplied to curl_mapr()";
     my $content = curl $url, "MapR Control System", $user, $password, $err_sub;
     vlog2("parsing output from MapR Control System");
-    $json = isJson($content) or quit "CRITICAL", "invalid json returned by MapR Control System, perhaps you need try with --ssl?";
+    $json = isJson($content) or quit "CRITICAL", "invalid json returned by MapR Control System, perhaps you tried --no-ssl and SSL was used on that port?";
     vlog3 Dumper($json);
     return $json;
 }
