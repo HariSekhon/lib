@@ -2030,7 +2030,6 @@ sub minimum_value ($$) {
 }
 
 
-# TODO: upper/lower perf threshold flag
 sub msg_perf_thresholds (;$$) {
     my $return = shift;
     my $type   = shift() ? "lower" : "upper";
