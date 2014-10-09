@@ -9,7 +9,7 @@
 
 package HariSekhon::MapR;
 
-$VERSION = "0.3";
+$VERSION = "0.4";
 
 use strict;
 use warnings;
@@ -30,20 +30,25 @@ our @EXPORT = ( qw (
                     $cluster
                     $list_clusters
                     $list_nodes
+                    $list_services
                     $node
                     $protocol
+                    $service
                     $ssl
                     $ssl_ca_path
                     $ssl_noverify
                     $ua
                     %mapr_option_cluster
                     %mapr_option_node
+                    %mapr_option_service
                     %mapr_options
                     curl_mapr
                     list_clusters
                     list_nodes
+                    list_services
                     validate_cluster
                     validate_mapr_options
+                    validate_service
                 )
 );
 our @EXPORT_OK = ( @EXPORT );
@@ -54,8 +59,10 @@ env_creds("MAPR", "MapR Control System");
 
 our $cluster;
 our $node;
+our $service;
 our $list_clusters;
 our $list_nodes;
+our $list_services;
 
 env_vars(["MAPR_CLUSTER", "CLUSTER"], \$cluster);
 
@@ -79,7 +86,12 @@ our %mapr_option_node = (
     "list-nodes"    => [ \$list_nodes,  "Lists nodes managed by MapR Control System" ],
 );
 
-splice @usage_order, 6, 0, qw/cluster node list-clusters list-nodes ssl ssl-CA-path ssl-noverify no-ssl/;
+our %mapr_option_service = (
+    "s|service=s"   => [ \$service,         "Check the specified service (see --list-services)" ],
+    "list-services" => [ \$list_services,   "List services" ],
+);
+
+splice @usage_order, 6, 0, qw/cluster node service list-clusters list-nodes list-services ssl ssl-CA-path ssl-noverify no-ssl/;
 
 
 sub validate_mapr_options(){
@@ -105,7 +117,7 @@ sub curl_mapr($$$;$){
     $url = "$url_prefix/rest/$url";
     isUrl($url) or code_error "invalid URL '$url' supplied to curl_mapr()";
     my $content = curl $url, "MapR Control System", $user, $password, $err_sub;
-    vlog2("parsing output from MapR Control System");
+    vlog2("parsing output from MapR Control System\n");
     $json = isJson($content) or quit "CRITICAL", "invalid json returned by MapR Control System, perhaps you tried --no-ssl and SSL was used on that port?";
     vlog3 Dumper($json);
     return $json;
@@ -175,13 +187,57 @@ sub list_nodes(){
     }
 }
 
+sub list_services(){
+    if($list_services){
+        if($node){
+            $json = curl_mapr("/service/list?node=$node", $user, $password);
+        } else {
+            my $url = "/dashboard/info";
+            $url .= "?cluster=$cluster" if $cluster;
+            $json = curl_mapr($url, $user, $password);
+        }
+        print "MapR Services";
+        print " on node '$node'" if $node;
+        print " on cluster '$cluster'" if $cluster;
+        print ":\n\n";
+        my %services;
+        if($node){
+            foreach(get_field_array("data")){
+                $services{get_field2($_, "displayname")} = 1;
+            }
+        } else {
+            foreach(get_field_array("data")){
+                my %services2 = get_field2_hash($_, "services");
+                foreach(keys %services2){
+                    $services{$_} = 1;
+                }
+            }
+        }
+        foreach(sort keys %services){
+            print "$_\n";
+        }
+        exit $ERRORS{"UNKNOWN"};
+    }
+}
+
 
 sub validate_cluster($){
     my $cluster = shift;
     defined($cluster) or usage "cluster not specified";
     $cluster =~ /^([\w\.]+)$/ or usage "invalid cluster name given, must be alphanumeric with dots and underscores permitted";
     $cluster = $1;
+    vlog_options "cluster", $cluster;
     return $cluster;
+}
+
+
+sub validate_service($){
+    my $service = shift;
+    defined($service) or usage "service not specified";
+    $service =~ /^(\w[\w\s-]+\w)$/ or usage "invalid service name, must be alphanumeric, may contain spaces/dashes";
+    $service = $1;
+    vlog_options "service", $service;
+    return $service;
 }
 
 
