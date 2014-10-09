@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.8.14";
+our $VERSION = "1.8.15";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -445,6 +445,7 @@ BEGIN {
                 }
             }
             $prefix = "CRITICAL" unless $prefix;
+            $status_prefix = "" unless $status_prefix;
             $str = "${status_prefix}${prefix}: $str";
         #}
         # mimic original die behaviour by only showing code line when there is no newline at end of string
@@ -1359,27 +1360,47 @@ sub get_field2($$;$){
     code_error "hit end of get_field2 sub";
 }
 
-sub get_field2_array($$){
-    my $value = get_field2($_[0], $_[1]);
-    require_array($value, $_[1]);
+sub get_field2_array($$;$){
+    my $hash_ref = shift;
+    my $field    = shift;
+    my $noquit   = shift;
+    my $value = get_field2($hash_ref, $field, $noquit);
+    unless($noquit and not defined($value)){
+        require_array($value, $field);
+    }
     return @{$value};
 }
 
-sub get_field2_float($$){
-    my $value = get_field2($_[0], $_[1]);
-    require_float($value, $_[1]);
+sub get_field2_float($$;$){
+    my $hash_ref = shift;
+    my $field    = shift;
+    my $noquit   = shift;
+    my $value = get_field2($hash_ref, $field, $noquit);
+    unless($noquit and not defined($value)){
+        require_float($value, $field);
+    }
     return $value;
 }
 
-sub get_field2_hash($$){
-    my $value = get_field2($_[0], $_[1]);
-    require_hash($value, $_[1]);
+sub get_field2_hash($$;$){
+    my $hash_ref = shift;
+    my $field    = shift;
+    my $noquit   = shift;
+    my $value = get_field2($hash_ref, $field, $noquit);
+    unless($noquit and not defined($value)){
+        require_hash($value, $field);
+    }
     return %{$value};
 }
 
-sub get_field2_int($$){
-    my $value = get_field2($_[0], $_[1]);
-    require_int($value, $_[1]);
+sub get_field2_int($$;$){
+    my $hash_ref = shift;
+    my $field    = shift;
+    my $noquit   = shift;
+    my $value = get_field2($hash_ref, $field, $noquit);
+    unless($noquit and not defined($value)){
+        require_int($value, $field);
+    }
     return $value;
 }
 
