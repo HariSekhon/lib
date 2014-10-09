@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.8.13";
+our $VERSION = "1.8.14";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1021,6 +1021,8 @@ sub check_threshold ($$) {
         }
         # $threshold_ok false
         return 0;
+    } else {
+        undef $thresholds{$threshold}{"error"};
     }
     # $threshold_ok true
     return 1;
