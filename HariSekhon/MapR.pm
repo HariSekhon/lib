@@ -9,7 +9,7 @@
 
 package HariSekhon::MapR;
 
-$VERSION = "0.4";
+$VERSION = "0.4.1";
 
 use strict;
 use warnings;
@@ -139,7 +139,8 @@ sub curl_mapr_err_handler($){
         if($response->code eq 404 and $response->request->{"_uri"} =~ /blacklist\/listusers/){
             $err .= ". Blacklist users API endpoint is not implemented as of MCS 3.1. This has been confirmed with MapR, trying updating to a newer version of MCS";
         }
-        if($response->message =~ /Can't verify SSL peers without knowing which Certificate Authorities to trust/){
+        if($response->message =~ /Can't verify SSL peers without knowing which Certificate Authorities to trust/ or
+           $response->message =~ /certificate verify failed/){
             $err .= ". Do you need to use --ssl-CA-path or --ssl-noverify?";
         }
         quit "CRITICAL", $err;
