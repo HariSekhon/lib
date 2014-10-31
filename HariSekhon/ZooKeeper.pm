@@ -11,7 +11,7 @@
 
 package HariSekhon::ZooKeeper;
 
-$VERSION = "0.3.1";
+$VERSION = "0.3.2";
 
 use strict;
 use warnings;
@@ -29,7 +29,6 @@ our @ISA = qw(Exporter);
 our @EXPORT = ( qw (
                     $ZK_DEFAULT_PORT
                     $zk_conn
-                    $zk_port
                     @zk_valid_states
                     zoo_cmd
                 )
@@ -38,7 +37,7 @@ our @EXPORT_OK = ( @EXPORT );
 
 # ZooKeeper Client Port
 our $ZK_DEFAULT_PORT = 2181;
-our $zk_port         = $ZK_DEFAULT_PORT;
+$port = $ZK_DEFAULT_PORT;
 our @zk_valid_states = qw/leader follower standalone/;
 
 env_creds("ZOOKEEPER");
@@ -59,13 +58,13 @@ sub zoo_cmd ($;$) {
         }
     }
     validate_resolvable($host);
-    vlog3 "connecting to $host:$zk_port";
+    vlog3 "connecting to $host:$port";
     $zk_conn = IO::Socket::INET->new (
                                         Proto    => "tcp",
                                         PeerAddr => $host,
-                                        PeerPort => $zk_port,
+                                        PeerPort => $port,
                                         Timeout  => $timeout,
-                                     ) or quit "CRITICAL", sprintf("Failed to connect to '%s:%s'%s: $!", $host, $zk_port, (defined($timeout) and ($debug or $verbose > 2)) ? " within $timeout secs" : "");
+                                     ) or quit "CRITICAL", sprintf("Failed to connect to '%s:%s'%s: $!", $host, $port, (defined($timeout) and ($debug or $verbose > 2)) ? " within $timeout secs" : "");
     vlog3 "OK connected";
     vlog3 "sending request: '$cmd'";
     print $zk_conn $cmd or quit "CRITICAL", "Failed to send request '$cmd': $!";
