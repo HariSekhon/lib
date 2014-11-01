@@ -1823,7 +1823,7 @@ sub isJson($){
 sub isKrb5Princ ($) {
     my $principal = shift;
     defined($principal) or return undef;
-    $principal =~ /^($krb5_principal_regex)$/ or return undef;
+    $principal =~ m%^($krb5_principal_regex(:?/[-\.a-zA-Z0-9]+))$% or return undef;
     return $1;
 }
 
