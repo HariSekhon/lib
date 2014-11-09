@@ -220,8 +220,8 @@ ok(isHost("harisekhon"),        'isHost("harisekhon")');
 ok(isHost("10.10.10.1"),        'isHost("10.10.10.1")');
 is(isHost("10.10.10.10"),       "10.10.10.10",      'isHost("10.10.10.10") eq 10.10.10.10');
 ok(isHost("10.10.10.100"),      'isHost("10.10.10.100")');
-ok(!isHost("10.10.10.0"),       '!isHost("10.10.10.0")');
-ok(!isHost("10.10.10.255"),     '!isHost("10.10.10.255")');
+ok(isHost("10.10.10.0"),        'isHost("10.10.10.0")');
+ok(isHost("10.10.10.255"),      'isHost("10.10.10.255")');
 ok(!isHost("10.10.10.300"),     '!isHost("10.10.10.300")');
 ok(!isHost("a"x256),            '!isHost("a"x256)');
 
@@ -241,15 +241,15 @@ is(isInterface("bond3"),    "bond3",    'isInterface("bond3")');
 is(isInterface("lo"),       "lo",       'isInterface("lo")');
 ok(!isInterface('b@interface'),         '!isInterface(\'b@dinterface\'');
 
-is(isIP("10.10.10.1"),        "10.10.10.1",       'isIP("10.10.10.1") eq 10.10.10.1');
-is(isIP("10.10.10.10"),       "10.10.10.10",      'isIP("10.10.10.10") eq 10.10.10.10');
-is(isIP("10.10.10.100"),      "10.10.10.100",     'isIP("10.10.10.100") eq 10.10.10.100');
-is(isIP("254.0.0.254"),       "254.0.0.254",      'isIP("254.0.0.254") eq 254.0.0.254');
-is(isIP("255.255.255.254"),   "255.255.255.254",  'isIP("255.255.255.254") eq 255.255.255.254');
-is(isIP("10.10.10.0"),       undef,               'isIP("10.10.10.0") eq undef');
-is(isIP("10.10.10.255"),     undef,               'isIP("10.10.10.255") eq undef');
-is(isIP("10.10.10.300"),     undef,               'isIP("10.10.10.300") eq undef');
-is(isIP("x.x.x.x"),          undef,               'isIP("x.x.x.x") eq undef');
+is(isIP("10.10.10.1"),      "10.10.10.1",       'isIP("10.10.10.1") eq 10.10.10.1');
+is(isIP("10.10.10.10"),     "10.10.10.10",      'isIP("10.10.10.10") eq 10.10.10.10');
+is(isIP("10.10.10.100"),    "10.10.10.100",     'isIP("10.10.10.100") eq 10.10.10.100');
+is(isIP("254.0.0.254"),     "254.0.0.254",      'isIP("254.0.0.254") eq 254.0.0.254');
+is(isIP("255.255.255.254"), "255.255.255.254",  'isIP("255.255.255.254") eq 255.255.255.254');
+is(isIP("10.10.10.0"),      "10.10.10.0",       'isIP("10.10.10.0") eq undef');
+is(isIP("10.10.10.255"),    "10.10.10.255",     'isIP("10.10.10.255") eq undef');
+is(isIP("10.10.10.300"),     undef,             'isIP("10.10.10.300") eq undef');
+is(isIP("x.x.x.x"),          undef,             'isIP("x.x.x.x") eq undef');
 
 #ok(isJson('{ "test": "data" }'),   'isJson({ "test": "data" })');
 #ok(!isJson(' { "test": }'),        '!isJson({ "test": })');
@@ -307,7 +307,7 @@ is(isUrl("http://cdh43:50070/dfsnodelist.jsp?whatNodes=LIVE"),  'http://cdh43:50
 is(isUrlPathSuffix("/"),                "/",                        'isUrlPathSuffix("/")');
 is(isUrlPathSuffix("/?var=something"),  "/?var=something",          'isUrlPathSuffix("/?var=something")');
 is(isUrlPathSuffix("/dir1/file.php?var=something+else&var2=more%20stuff"), "/dir1/file.php?var=something+else&var2=more%20stuff", 'isUrlPathSuffix("/dir1/file.php?var=something+else&var2=more%20stuff")');
-is(isUrlPathSuffix("/*"),               undef,                      'isUrlPathSuffix("/*") eq undef');
+is(isUrlPathSuffix("/*"),               "/*",                      'isUrlPathSuffix("/*") eq "/*"');
 
 is(isUser("hadoop"),    "hadoop",   'isUser("hadoop")');
 is(isUser("hari1983"),  "hari1983", 'isUser("hari1983")');
