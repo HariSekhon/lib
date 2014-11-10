@@ -9,7 +9,7 @@
 
 package HariSekhon::MapR;
 
-$VERSION = "0.4.1";
+$VERSION = "0.4.2";
 
 use strict;
 use warnings;
@@ -112,13 +112,19 @@ sub curl_mapr($$$;$){
     my $err_sub  = shift() || \&curl_mapr_err_handler;
     $url =~ s/^\/*//;
     $url or code_error "invalid url passed to curl_mapr()";
-    $protocol = "http" if $no_ssl;
+    if($no_ssl){
+        $protocol = "http";
+        if($port == 8443){
+            vlog2 "detected port still set to 8443 but using --no-ssl, switching to port 8080";
+            $port = 8080;
+        }
+    }
     my $url_prefix = "$protocol://$host:$port";
     $url = "$url_prefix/rest/$url";
     isUrl($url) or code_error "invalid URL '$url' supplied to curl_mapr()";
     my $content = curl $url, "MapR Control System", $user, $password, $err_sub;
     vlog2("parsing output from MapR Control System\n");
-    $json = isJson($content) or quit "CRITICAL", "invalid json returned by MapR Control System, perhaps you tried --no-ssl and SSL was used on that port?";
+    $json = isJson($content) or quit "CRITICAL", "invalid json returned by MapR Control System, perhaps you tried --no-ssl and SSL was used on that port? Try running with -vvv to debug and file as ticket if neccessary to https://github.com/harisekhon/nagios-plugins/issues";
     vlog3 Dumper($json);
     return $json;
 }
