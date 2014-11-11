@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.8.18";
+our $VERSION = "1.8.19";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -130,6 +130,7 @@ our %EXPORT_TAGS = (
                         isKrb5Princ
                         isJson
                         isLabel
+                        isLdapDn
                         isLinux
                         isMac
                         isNagiosUnit
@@ -205,6 +206,7 @@ our %EXPORT_TAGS = (
                         $hostname_regex
                         $ip_regex
                         $krb5_principal_regex
+                        $ldap_dn_regex
                         $mac_regex
                         $process_name_regex
                         $rwxt_regex
@@ -286,6 +288,7 @@ our %EXPORT_TAGS = (
                         validate_krb5_princ
                         validate_krb5_realm
                         validate_label
+                        validate_ldap_dn
                         validate_node_list
                         validate_nosql_key
                         validate_password
@@ -511,9 +514,10 @@ our $host_regex         = "\\b(?:$hostname_regex|$ip_regex)\\b";
 # I did a scan of registered running process names across several hundred linux servers of a diverse group of enterprise applications with 500 unique process names (58k individual processes) to determine that there are cases with spaces, slashes, dashes, underscores, chevrons (<defunct>), dots (script.p[ly], in.tftpd etc) to determine what this regex should be. Incidentally it appears that Linux truncates registered process names to 15 chars.
 # This is not from ps -ef etc it is the actual process registered name, hence init not [init] as it appears in ps output
 our $process_name_regex = '[\w\s_\.\/\<\>-]+';
-our $url_path_suffix_regex = '/(?:[\w\.,:\/\%\&\?\!\=\*\|\+-]+)?';
+our $url_path_suffix_regex = '/(?:[\w\.,:\/\%\&\?\!\=\*\|\[\]\+-]+)?';
 our $url_regex          = '\b(?i:https?://' . $host_regex . '(?::\d{1,5})?(?:' . $url_path_suffix_regex . ')?)';
 our $user_regex         = '\b[A-Za-z][A-Za-z0-9-]*[A-Za-z0-9]\b';
+our $ldap_dn_regex      = '\b\w+=[\w\s]+(?:,\w+=[\w\s]+)*\b';
 our $krb5_principal_regex = "$user_regex(?:\/$hostname_regex)?(?:\@$domain_regex)?";
 our $threshold_range_regex  = qr/^(\@)?(-?\d+(?:\.\d+)?)(:)(-?\d+(?:\.\d+)?)?$/;
 our $threshold_simple_regex = qr/^(-?\d+(?:\.\d+)?)$/;
@@ -1517,9 +1521,13 @@ sub hr() {
 }
 
 
-sub human_units ($) {
-    my $num = shift;
-    my $units;
+sub human_units ($;$$) {
+    my $num   = shift;
+    my $units = shift;
+    my $terse = shift;
+    if($units){
+        $num = expand_units($num, $units);
+    }
     defined($num) or code_error "no arg passed to human_units()";
     isFloat($num) or isScientific($num) or code_error "non-float passed to human_units()";
     if(     $num >= (1024**7)){
@@ -1543,7 +1551,11 @@ sub human_units ($) {
         $num = sprintf("%.2f", $num / (1024**1));
         $units = "KB";
     } elsif($num < 1024){
-        return "$num bytes";
+        if($terse){
+            return "${num}B";
+        } else {
+            return "$num bytes";
+        }
     } else {
         code_error "unable to determine units for number $num";
     }
@@ -1836,6 +1848,15 @@ sub isLabel ($) {
     defined($label) or return undef;
     $label =~ /^[\%\(\)\/\*\w\s-]+$/ or return undef;
     return $label;
+}
+
+
+sub isLdapDn ($) {
+    #subtrace(@_);
+    my $dn = shift;
+    defined($dn) or return undef;
+    $dn =~ /^($ldap_dn_regex)$/ || return undef;
+    return $1;
 }
 
 
@@ -2902,6 +2923,17 @@ sub validate_krb5_realm ($;$) {
     return $realm;
 }
 
+
+sub validate_ldap_dn ($;$) {
+    #subtrace(@_);
+    my $dn   = shift;
+    my $name = shift || "";
+    $name .= " " if $name;
+    defined($dn) or usage "ldap ${name}dn not defined";
+    $dn = isLdapDn($dn) || usage "invalid ldap ${name}dn defined";
+    vlog_options("ldap ${name}dn", $dn);
+    return $dn;
+}
 
 
 sub validate_node_list (@) {
