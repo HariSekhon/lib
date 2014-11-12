@@ -9,7 +9,7 @@
 
 package HariSekhon::MapR;
 
-$VERSION = "0.4.2";
+$VERSION = "0.5";
 
 use strict;
 use warnings;
@@ -31,6 +31,7 @@ our @EXPORT = ( qw (
                     $list_clusters
                     $list_nodes
                     $list_services
+                    $list_volumes
                     $node
                     $protocol
                     $service
@@ -38,17 +39,21 @@ our @EXPORT = ( qw (
                     $ssl_ca_path
                     $ssl_noverify
                     $ua
+                    $volume
                     %mapr_option_cluster
                     %mapr_option_node
                     %mapr_option_service
+                    %mapr_option_volume
                     %mapr_options
                     curl_mapr
                     list_clusters
                     list_nodes
                     list_services
+                    list_volumes
                     validate_cluster
                     validate_mapr_options
                     validate_service
+                    validate_volume
                 )
 );
 our @EXPORT_OK = ( @EXPORT );
@@ -60,9 +65,11 @@ env_creds("MAPR", "MapR Control System");
 our $cluster;
 our $node;
 our $service;
+our $volume;
 our $list_clusters;
 our $list_nodes;
 our $list_services;
+our $list_volumes;
 
 env_vars(["MAPR_CLUSTER", "CLUSTER"], \$cluster);
 
@@ -82,16 +89,21 @@ our %mapr_option_cluster = (
 );
 
 our %mapr_option_node = (
-    "N|node=s"      => [ \$node,        "Node to check (see --list-nodes)" ],
-    "list-nodes"    => [ \$list_nodes,  "Lists nodes managed by MapR Control System" ],
+    "N|node=s"      => [ \$node,          "Node to check (see --list-nodes)" ],
+    "list-nodes"    => [ \$list_nodes,    "Lists nodes managed by MapR Control System" ],
 );
 
 our %mapr_option_service = (
-    "s|service=s"   => [ \$service,         "Check the specified service (see --list-services)" ],
-    "list-services" => [ \$list_services,   "List services" ],
+    "s|service=s"   => [ \$service,       "Check the specified service (see --list-services)" ],
+    "list-services" => [ \$list_services, "Lists services" ],
 );
 
-splice @usage_order, 6, 0, qw/cluster node service list-clusters list-nodes list-services ssl ssl-CA-path ssl-noverify no-ssl/;
+our %mapr_option_volume = (
+    "L|volume=s"    => [ \$volume,        "Volume to check (see --list-volumes)" ],
+    "list-volumes"  => [ \$list_volumes,  "Lists volumes and their mount points" ],
+);
+
+splice @usage_order, 6, 0, qw/cluster node service volume list-clusters list-nodes list-services list-volumes ssl ssl-CA-path ssl-noverify no-ssl/;
 
 
 sub validate_mapr_options(){
@@ -227,6 +239,23 @@ sub list_services(){
     }
 }
 
+sub list_volumes(){
+    my %vols;
+    if($list_volumes){
+        my $url = "/volume/list";
+        $url .= "cluster=$cluster&" if $cluster;
+        $json = curl_mapr($url, $user, $password);
+        foreach(get_field_array("data")){
+            $vols{get_field2($_, "volumename")}{"mount"} = get_field2($_, "mountdir");
+        }
+        print "MapR-FS volumes:\n\n";
+        printf("%-30s %s\n\n", "Name", "Mount Point");
+        foreach my $vol (sort keys %vols){
+            printf("%-30s %s\n", $vol, $vols{$vol}{"mount"});
+        }
+        exit $ERRORS{"UNKNOWN"};
+    }
+} 
 
 sub validate_cluster($){
     my $cluster = shift;
@@ -235,6 +264,17 @@ sub validate_cluster($){
     $cluster = $1;
     vlog_options "cluster", $cluster;
     return $cluster;
+}
+
+
+sub validate_volume($){
+    my $volume = shift;
+    defined($volume) or usage "volume not specffied";
+    if($volume){
+        $volume =~ /^([A-Za-z0-9\._-]+)$/ or usage "invalid volume specified";
+        $volume = $1;
+    }
+    return $volume;
 }
 
 
