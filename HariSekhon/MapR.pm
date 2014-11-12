@@ -260,7 +260,7 @@ sub list_volumes(){
 sub validate_cluster($){
     my $cluster = shift;
     defined($cluster) or usage "cluster not specified";
-    $cluster =~ /^([\w\.]+)$/ or usage "invalid cluster name given, must be alphanumeric with dots and underscores permitted";
+    $cluster =~ /^([\w\.-]+)$/ or usage "invalid cluster name given, must be alphanumeric with dots and underscores permitted";
     $cluster = $1;
     vlog_options "cluster", $cluster;
     return $cluster;
