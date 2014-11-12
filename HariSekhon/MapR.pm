@@ -243,7 +243,7 @@ sub list_volumes(){
     my %vols;
     if($list_volumes){
         my $url = "/volume/list";
-        $url .= "cluster=$cluster&" if $cluster;
+        $url .= "?cluster=$cluster" if $cluster;
         $json = curl_mapr($url, $user, $password);
         foreach(get_field_array("data")){
             $vols{get_field2($_, "volumename")}{"mount"} = get_field2($_, "mountdir");
