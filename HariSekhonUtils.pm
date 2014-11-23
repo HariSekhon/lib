@@ -315,6 +315,7 @@ our %EXPORT_TAGS = (
                         $email
                         $expected_version
                         $host
+                        $github_repo
                         $json
                         $msg
                         $msg_err
@@ -530,6 +531,7 @@ our $email;
 our $expected_version;
 our $help;
 our $host;
+our $github_repo;
 our $json;
 our $msg = "";
 our $msg_err = "";
@@ -2525,7 +2527,7 @@ sub uniq_array2(@){
 sub usage (;@) {
     print STDERR "@_\n\n" if (@_);
     if(not @_ and $main::DESCRIPTION){
-        print STDERR "Hari Sekhon - https://github.com/harisekhon";
+        print STDERR "Hari Sekhon - https://github.com/harisekhon" . ( $github_repo ? "/$github_repo" : "" );
         if($main::DESCRIPTION =~ /Nagios/i){
             print STDERR "/nagios-plugins";
         }
