@@ -1128,7 +1128,7 @@ sub cmd ($;$$$) {
         } else {
             $err = join("\n", @output);
         }
-        quit("CRITICAL", "'$cmd' returned $exitcode -$err");
+        quit("CRITICAL", "'$cmd' returned $exitcode - $err");
     }
     if($return_exitcode){
         return ($exitcode, @output);
