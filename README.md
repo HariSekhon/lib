@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.org/harisekhon/lib.svg?branch=master)](https://travis-ci.org/harisekhon/lib)
-Hari Sekhon Libraries
+Hari Sekhon Libraries [![Build Status](https://travis-ci.org/harisekhon/lib.svg?branch=master)](https://travis-ci.org/harisekhon/lib)
 =====================
 
 My personal libraries, full of lots of validation code and utility functions.
