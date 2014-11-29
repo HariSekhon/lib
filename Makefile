@@ -5,6 +5,14 @@
 
 # Library dependencies are handled in one place in calling project
 
+.PHONY: make
+make:
+	@echo 'Nothing to make :)'
+
 .PHONY: test
 test:
 	prove t --timer -v	
+
+.PHONY: install
+install:
+	@echo "No installation needed, just add '$(PWD)' to your \$$PATH"
