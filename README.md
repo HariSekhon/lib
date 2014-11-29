@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/harisekhon/lib.svg?branch=master)](https://travis-ci.org/harisekhon/lib)
 Hari Sekhon Libraries
 =====================
 
