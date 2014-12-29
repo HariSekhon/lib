@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.8.19";
+our $VERSION = "1.8.20";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -199,6 +199,7 @@ our %EXPORT_TAGS = (
     'regex' =>  [   qw(
                         escape_regex
                         $domain_regex
+                        $domain_regex2
                         $email_regex
                         $filename_regex
                         $fqdn_regex
@@ -500,6 +501,7 @@ my  $domain_component   = '\b[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\b';
 # this matches everything except the XN--\w{6,10} TLDs as of 8/10/2012
 our $tld_regex          = '\b(?:[A-Za-z]{2,4}|london|museum|travel|local|localdomain|intra)\b';
 our $domain_regex       = '(?:' . $domain_component . '\.)*' . $tld_regex;
+our $domain_regex2      = '(?:' . $domain_component . '\.)+' . $tld_regex;
 our $hostname_component = '\b[A-Za-z](?:[A-Za-z0-9_\-]{0,61}[a-zA-Z0-9])?\b';
 our $hostname_regex     = "$hostname_component(?:\.$domain_regex)?";
 our $filename_regex     = '[\/\w\s_\.:,\*\(\)\=\%\?\+-]+';
