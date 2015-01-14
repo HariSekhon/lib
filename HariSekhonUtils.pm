@@ -2287,6 +2287,7 @@ sub quit (@) {
     } elsif(@_ eq 2) {
         $status = $_[0];
         $msg    = $_[1];
+        $msg or $msg = "msg not defined";
         chomp $msg;
         grep(/^$status$/, keys %ERRORS) or die "Code error: unrecognized exit code '$status' specified on quit call, not found in %ERRORS hash\n";
         $? = $ERRORS{$status};
