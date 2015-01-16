@@ -435,13 +435,14 @@ BEGIN {
     sub die_sub {
         # this is auto-translated in to equivalent system error string, we're not interested in system interpretation
         # so explicitly cast back to int so we can compare with std error codes
-        my $exit_code = $?;
-        $exit_code = (defined($exit_code) and $exit_code ne "" ? int($exit_code) : $ERRORS{"CRITICAL"});
+        # XXX: $? can't be trusted because die calls leave this as zero, especially bad from Perl modules, which then prefixes "OK:" and returns zero exit code!!! Therefore no longer unifying quit() to use die, since this dual behaviour cannot be determined inside this sub. Now only call die for real errors, if UNKNOWN is set for code_error then leave UNKNOWN, otherwise force CRITICAL
+        my $exit_code = ( $? == $ERRORS{"UNKNOWN"} ? $ERRORS{"UNKNOWN"} : $ERRORS{"CRITICAL"} );
+        #$exit_code = (defined($exit_code) and $exit_code ne "" ? int($exit_code) : $ERRORS{"CRITICAL"});
         my $str   = "@_" || "Died";
         # better to add the status prefix in here instead of in quit calls
         #my $status_prefixes = join("|", keys %ERRORS);
         #$str =~ s/:\s+(?:$status_prefixes):/:/g;
-        #if(substr(basename($0), 0, 6) eq "check_"){
+        if(substr(basename($0), 0, 6) eq "check_"){
             my $prefix = "";
             foreach(keys %ERRORS){
                 if($exit_code == $ERRORS{$_}){
@@ -452,7 +453,7 @@ BEGIN {
             $prefix = "CRITICAL" unless $prefix;
             $status_prefix = "" unless $status_prefix;
             $str = "${status_prefix}${prefix}: $str";
-        #}
+        }
         # mimic original die behaviour by only showing code line when there is no newline at end of string
         if(substr($str, -1, 1) eq "\n"){
             print STDERR $str;
@@ -2271,30 +2272,31 @@ sub quit (@) {
         chomp $msg;
         # This ends up bit shifting to 255 instead of 0
         grep(/^$status$/, keys %ERRORS) or die "Code error: unrecognized exit code '$status' specified on quit call, not found in %ERRORS hash\n";
-        $? = $ERRORS{$status};
+        # XXX: do not use die function, some modules call die without setting $? to something other than zero, causing an OK: prefix and zero exit code :-/
+        #$? = $ERRORS{$status};
         #die "${status_prefix}$status: $msg\n";
-        die "$msg\n";
-        #print "${status_prefix}$status: $msg\n";
-        #exit $ERRORS{$status};
+        #die "$msg\n";
+        print "${status_prefix}$status: $msg\n";
+        exit $ERRORS{$status};
     } elsif(@_ eq 1){
         $msg = $_[0];
         chomp $msg;
-        $? = $ERRORS{"CRITICAL"};
+        #$? = $ERRORS{"CRITICAL"};
         #die "${status_prefix}CRITICAL: $msg\n";
-        die "$msg\n";
-        #print "${status_prefix}CRITICAL: $msg\n";
-        #exit $ERRORS{"CRITICAL"};
+        #die "$msg\n";
+        print "${status_prefix}CRITICAL: $msg\n";
+        exit $ERRORS{"CRITICAL"};
     } elsif(@_ eq 2) {
         $status = $_[0];
         $msg    = $_[1];
         $msg or $msg = "msg not defined";
         chomp $msg;
         grep(/^$status$/, keys %ERRORS) or die "Code error: unrecognized exit code '$status' specified on quit call, not found in %ERRORS hash\n";
-        $? = $ERRORS{$status};
+        #$? = $ERRORS{$status};
         #die "${status_prefix}$status: $msg\n";
-        die "$msg\n";
-        #print "${status_prefix}$status: $msg\n";
-        #exit $ERRORS{$status};
+        #die "$msg\n";
+        print "${status_prefix}$status: $msg\n";
+        exit $ERRORS{$status};
     } else {
         #print "UNKNOWN: Code Error - Invalid number of arguments passed to quit function (" . scalar(@_). ", should be 0 - 2)\n";
         #exit $ERRORS{"UNKNOWN"};
