@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.8.20";
+our $VERSION = "1.8.21";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1302,7 +1302,7 @@ sub expand_units ($;$$) {
     elsif($units =~ /^GB?$/i){ $power = 3; }
     elsif($units =~ /^TB?$/i){ $power = 4; }
     elsif($units =~ /^PB?$/i){ $power = 5; }
-    else { code_error "unrecognized units " . ($name ? "for $name" : "passed to expand_units()" ) . ". $nagios_plugins_support_msg"; }
+    else { code_error "unrecognized units '$units' " . ($name ? "for $name " : "") . "passed to expand_units(). $nagios_plugins_support_msg"; }
     return $num * (1024**$power);
 }
 
