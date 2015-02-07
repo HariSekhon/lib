@@ -23,6 +23,10 @@ make:
 		Sub::Exporter \
 		Test::CleanNamespaces \
 		Package::DeprecationManager \
+		Moose \
+		Expect \
+		Mixin::Linewise::Readers \
+		Pod::Eventual::Simple \
 		Data::Dumper \
 		JSON \
 		JSON:XS \
