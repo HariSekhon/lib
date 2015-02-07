@@ -10,7 +10,7 @@ make:
 	[ -x /usr/bin/apt-get ] && make apt-packages || :
 	[ -x /usr/bin/yum ]     && make yum-packages || :
 
-	yes | sudo cpan \
+	yes "" | sudo cpan \
 		Data::Dumper \
 		JSON \
 		JSON:XS \
@@ -32,19 +32,17 @@ make:
 
 .PHONY: apt-packages
 apt-packages:
-	apt-get install -y gcc || :
+	sudo apt-get install -y gcc || :
 	# needed to fetch the library submodule at end of build
-	apt-get install -y build-essential libwww-perl git || :
+	sudo apt-get install -y build-essential libwww-perl git || :
 	# for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
-	apt-get install -y libdbd-mysql-perl libmysqlclient-dev || :
+	sudo apt-get install -y libdbd-mysql-perl libmysqlclient-dev || :
 
 .PHONY: yum-packages
 yum-packages:
-	yum install -y gcc || :
-	# needed to fetch the library submodule at end of build
-	yum install -y perl-CPAN perl-libwww-perl git || :
+	rpm -q gcc perl-CPAN perl-libwww-perl git || sudo yum install -y gcc perl-CPAN perl-libwww-perl git || :
 	# for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
-	yum install -y perl-DBD-MySQL mysql-devel || :
+	rpm -q erl-DBD-MySQL mysql-devel || sudo yum install -y perl-DBD-MySQL mysql-devel || :
 
 .PHONY: test
 test:
