@@ -11,6 +11,17 @@ make:
 	[ -x /usr/bin/yum ]     && make yum-packages || :
 
 	yes "" | sudo cpan \
+		B::Hooks::EndOfScope \
+		Class::Load \
+		Data::OptList \
+		DateTime::Locale \
+		Moo \
+		Package::DeprecationManager \
+		Package::Stash \
+		Sub::Exporter \
+		Test::CleanNamespaces \
+		Types::Serialiser \
+		strictures \
 		Data::Dumper \
 		JSON \
 		JSON:XS \
