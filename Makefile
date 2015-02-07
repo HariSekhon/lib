@@ -12,20 +12,20 @@ make:
 
 	# order here is important, in Travis and some stripped down client some deps are not pulled in automatically but are required for subsequent module builds
 	yes "" | sudo cpan \
+		strictures \
 		Package::Stash \
 		B::Hooks::EndOfScope \
-		strictures \
 		Data::OptList \
-		Types::Serialiser \
-		DateTime::Locale \
-		Moo \
 		Class::Load \
 		Sub::Exporter \
 		Test::CleanNamespaces \
 		Package::DeprecationManager \
+		Mixin::Linewise::Readers \
+		Types::Serialiser \
+		DateTime::Locale \
+		Moo \
 		Moose \
 		Expect \
-		Mixin::Linewise::Readers \
 		Pod::Eventual::Simple \
 		Data::Dumper \
 		JSON \
