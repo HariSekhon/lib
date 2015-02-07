@@ -10,18 +10,19 @@ make:
 	[ -x /usr/bin/apt-get ] && make apt-packages || :
 	[ -x /usr/bin/yum ]     && make yum-packages || :
 
+	# order here is important, in Travis and some stripped down client some deps are not pulled in automatically but are required for subsequent module builds
 	yes "" | sudo cpan \
+		Package::Stash \
 		B::Hooks::EndOfScope \
-		Class::Load \
+		strictures \
 		Data::OptList \
+		Types::Serialiser \
 		DateTime::Locale \
 		Moo \
-		Package::DeprecationManager \
-		Package::Stash \
+		Class::Load \
 		Sub::Exporter \
 		Test::CleanNamespaces \
-		Types::Serialiser \
-		strictures \
+		Package::DeprecationManager \
 		Data::Dumper \
 		JSON \
 		JSON:XS \
