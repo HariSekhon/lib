@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.8.21";
+our $VERSION = "1.8.22";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -249,6 +249,7 @@ our %EXPORT_TAGS = (
                     ) ],
     'time'    => [  qw(
                         sec2min
+                        sec2human
                     ) ],
     'timeout' => [  qw(
                         set_http_timeout
@@ -436,7 +437,7 @@ BEGIN {
         # this is auto-translated in to equivalent system error string, we're not interested in system interpretation
         # so explicitly cast back to int so we can compare with std error codes
         # XXX: $? can't be trusted because die calls leave this as zero, especially bad from Perl modules, which then prefixes "OK:" and returns zero exit code!!! Therefore no longer unifying quit() to use die, since this dual behaviour cannot be determined inside this sub. Now only call die for real errors, if UNKNOWN is set for code_error then leave UNKNOWN, otherwise force CRITICAL
-        my $exit_code = ( $? == $ERRORS{"UNKNOWN"} ? $ERRORS{"UNKNOWN"} : $ERRORS{"CRITICAL"} );
+        my $exit_code = ( defined($?) and $? == $ERRORS{"UNKNOWN"} ? $ERRORS{"UNKNOWN"} : $ERRORS{"CRITICAL"} );
         #$exit_code = (defined($exit_code) and $exit_code ne "" ? int($exit_code) : $ERRORS{"CRITICAL"});
         my $str   = "@_" || "Died";
         # better to add the status prefix in here instead of in quit calls
@@ -1244,7 +1245,7 @@ sub curl_json ($;$$$$$) {
     my $err_handler = shift;
     my $type        = shift() || 'GET';
     my $content = curl $url, $name, $user, $password, $err_handler, $type;
-    vlog2("parsing output from" . ( $name ? $name : $url ) . "\n");
+    vlog2("parsing output from " . ( $name ? $name : $url ) . "\n");
     $json = isJson($content) or quit "CRITICAL", "invalid json returned " . ( $name ? "by $name at $url" : "from $url");
 }
 
@@ -2374,6 +2375,28 @@ sub sec2min ($){
     my $secs = shift;
     isFloat($secs) or return undef;
     return sprintf("%d:%.2d", int($secs / 60), $secs % 60);
+}
+
+
+# Time::Seconds and Time::Piece are available from Perl v5.9.5 but CentOS 5 is v5.8
+sub sec2human ($){
+    my $secs = shift;
+    isFloat($secs) or code_error "invalid non-float argument passed to sec2human";
+    my $human_time = "";
+    if($secs >= 86400){
+        $human_time .= sprinf("%d days ", int($secs / 86400));
+        $secs /= 86400;
+    }
+    if($secs >= 3600){
+        $human_time .= sprintf("%d hours ", int($secs / 3600));
+        $secs /= 3600;
+    }
+    if($secs >= 60){
+        $human_time .= sprintf("%d mins ", int($secs / 60));
+        $secs /= 60;
+    }
+    $human_time .= sprintf("%d secs", int($secs));
+    return $human_time;
 }
 
 
