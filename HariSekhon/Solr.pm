@@ -167,6 +167,7 @@ sub validate_solr_collection($){
     my $collection = shift;
     defined($collection) or quit "CRITICAL", "collection not specified";
     isSolrCollection($collection) or quit "CRITICAL", "invalid Solr collection specified";
+    vlog_options "collection", $collection;
 }
 
 1;
