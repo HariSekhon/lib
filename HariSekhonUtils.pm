@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.8.22";
+our $VERSION = "1.9.0";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -777,7 +777,9 @@ sub env_creds($;$){
 sub env_var($$){
     my $name    = shift;
     my $var_ref = shift;
-    if($ENV{$name} and not $$var_ref){
+    $name = uc $name;
+    $name =~ s/[^A-Za-z0-9]/_/g;
+    if($ENV{$name} and not defined($$var_ref)){
         $$var_ref = $ENV{$name};
     }
 }
@@ -1160,13 +1162,14 @@ sub compact_array (@) {
 }
 
 
-sub curl ($;$$$$$) {
+sub curl ($;$$$$$$) {
     my $url      = shift;
     my $name     = shift;
     my $user     = shift;
     my $password = shift;
     my $err_sub  = shift;
     my $type     = shift() || 'GET';
+    my $req_content = shift;
     $type eq "GET" or $type eq "POST" or code_error "unsupported type passed to curl() as sixth argument";
     #debug("url passed to curl: $url");
     defined($url)      or code_error "no url passed to curl()";
@@ -1179,10 +1182,14 @@ sub curl ($;$$$$$) {
     # Don't replace $host with resolved host as this changes the vlog output and also affects proxy exceptions
     validate_resolvable($host);
     if($name){
-        vlog2("querying $name");
-        vlog3("HTTP GET $url" . ( $auth ? " (basic authentication)" : "") );
+        if($type eq "POST"){
+            vlog2("POSTing to $name");
+        } else {
+            vlog2("querying $name");
+        }
+        vlog3("HTTP $type $url" . ( $auth ? " (basic authentication)" : "") );
     } else {
-        vlog2("HTTP GET $url" . ( $auth ? " (basic authentication)" : "") );
+        vlog2("HTTP $type $url" . ( $auth ? " (basic authentication)" : "") );
     }
     #unless(defined(&main::get)){
         # inefficient, it'll import for each curl call, instead force top level author to 
@@ -1205,6 +1212,7 @@ sub curl ($;$$$$$) {
     # Doesn't work
     #$ua->credentials($host, '', $user, $password);
     $req->authorization_basic($user, $password) if (defined($user) and defined($password));
+    $req->content($req_content) if $req_content;
     my $response = $main::ua->request($req);
     my $content  = $response->content;
     vlog3("returned HTML:\n\n" . ( $content ? $content : "<blank>" ) . "\n");
@@ -1237,14 +1245,15 @@ sub curl ($;$$$$$) {
 }
 
 
-sub curl_json ($;$$$$$) {
+sub curl_json ($;$$$$$$) {
     my $url         = shift;
     my $name        = shift;
     my $user        = shift;
     my $password    = shift;
     my $err_handler = shift;
     my $type        = shift() || 'GET';
-    my $content = curl $url, $name, $user, $password, $err_handler, $type;
+    my $req_content = shift;
+    my $content     = curl $url, $name, $user, $password, $err_handler, $type, $req_content;
     vlog2("parsing output from " . ( $name ? $name : $url ) . "\n");
     $json = isJson($content) or quit "CRITICAL", "invalid json returned " . ( $name ? "by $name at $url" : "from $url");
 }
