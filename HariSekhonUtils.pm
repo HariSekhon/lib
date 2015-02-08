@@ -2080,13 +2080,15 @@ sub minimum_value ($$) {
 }
 
 
-sub msg_perf_thresholds (;$$) {
+sub msg_perf_thresholds (;$$$) {
     my $return = shift;
     my $type   = shift() ? "lower" : "upper";
+    my $name   = shift() || "";
+    $name .= " " if $name and $name !~ / $/;
     my $tmp = ";";
-    $tmp .= $thresholds{"warning"}{$type}  if defined($thresholds{"warning"}{$type});
+    $tmp .= $thresholds{"${name}warning"}{$type}  if defined($thresholds{"${name}warning"}{$type});
     $tmp .= ";";
-    $tmp .= $thresholds{"critical"}{$type} if defined($thresholds{"critical"}{$type});
+    $tmp .= $thresholds{"${name}critical"}{$type} if defined($thresholds{"${name}critical"}{$type});
     $tmp .= ";";
     if(defined($return) and $return){
         return $tmp;
@@ -3266,7 +3268,7 @@ sub validate_thresholds (;$$$$$) {
             }
         } else {
             if($require_warning or $require_critical){
-                usage "no threshold given for $name";
+                code_error "no threshold given for $name";
             }
         }
     }
