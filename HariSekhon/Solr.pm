@@ -78,7 +78,7 @@ env_vars("SOLR_COLLECTION", \$collection);
 
 our %solroptions_collection = (
     "C|collection=s"    => [ \$collection,          "Solr Collection name (\$SOLR_COLLECTION)" ],
-    "list-collections"  => [ \$list_collections,    "List Collections for which there are loaded cores on the given Solr instance and exit" ],
+    "list-collections"  => [ \$list_collections,    "List Collections for which there are loaded cores on given instance of Solr 4 onwards and exit" ],
 );
 
 sub curl_solr_err_handler($){
