@@ -95,7 +95,7 @@ sub curl_solr_err_handler($){
     unless($response->code eq "200"){
         #<title>Error 500 {msg=SolrCore 'collection1_shard1_replica2' is not available due to init failure: Index locked for write for core collection1_shard1_replica2,trace=org.apache.solr.common.SolrException: SolrCore 'collection1_shard1_replica2' is not available due to init failure: Index locked for write for core collection1_shard1_replica2
         if(not $additional_information and $response->message =~ /<title>(Error\s[^\n]+)/){
-            $additional_information = $1;
+            $additional_information = ". $1";
         }
         quit "CRITICAL", $response->code . " " . $response->message . $additional_information;
     }
