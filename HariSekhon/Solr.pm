@@ -103,7 +103,10 @@ sub curl_solr_err_handler($){
                 $additional_information = ". $additional_information";
             }
         }
-        quit "CRITICAL", $response->code . " " . $response->message . $additional_information;
+        my $response_msg = $response->message;
+        $response_msg =~ s/^{//;
+        $response_msg =~ s/\s+at org\.apache\.solr\..*// unless $verbose;
+        quit "CRITICAL", $response->code . " " . $response_msg . $additional_information;
     }
     unless($content){
         quit "CRITICAL", "blank content returned by Solr";
