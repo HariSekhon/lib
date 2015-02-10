@@ -10,4 +10,6 @@ perl:
   - "5.8"
 
 install:
-  - cpanm --notest .
+  # causes: No output has been received in the last 10 minutes, this potentially indicates a stalled build or something wrong with the build itself.
+  #- cpanm --notest .
+  - make
