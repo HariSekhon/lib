@@ -29,6 +29,7 @@ make:
 		Readonly::XS \
 		Thrift \
 		Time::HiRes \
+		: \
 		;
 
 .PHONY: apt-packages
