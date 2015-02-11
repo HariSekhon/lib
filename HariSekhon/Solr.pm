@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.3";
+$VERSION = "0.3.1";
 
 use strict;
 use warnings;
@@ -94,8 +94,9 @@ sub curl_solr_err_handler($){
     }
     unless($response->code eq "200"){
         #<title>Error 500 {msg=SolrCore 'collection1_shard1_replica2' is not available due to init failure: Index locked for write for core collection1_shard1_replica2,trace=org.apache.solr.common.SolrException: SolrCore 'collection1_shard1_replica2' is not available due to init failure: Index locked for write for core collection1_shard1_replica2
-        if(not $additional_information and $response->content =~ /<title>Error\s\d+\s*\{?([^\n]+)/){
+        if(not $additional_information and $response->content =~ /<title>Error\s+\d+\s*\{?([^\n]+)/){
             $additional_information = $1;
+            $additional_information =~ s/<\/title>.*//;
             # Solr's responses change weirdly, sometimes it returns the error in server message as well as body instead of a normal 500 Server Error. In these cases ignore the additional info since it's simply a duplication of information and adds volume without value
             if($response->message =~ /\Q$additional_information/){
                 $additional_information = "";
