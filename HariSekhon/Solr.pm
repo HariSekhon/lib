@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.3.1";
+$VERSION = "0.5";
 
 use strict;
 use warnings;
@@ -21,6 +21,8 @@ use HariSekhonUtils;
 use URI::Escape;
 use Carp;
 use Data::Dumper;
+use Math::Round;
+use Time::HiRes 'time';
 use LWP::UserAgent;
 
 use Exporter;
@@ -30,8 +32,9 @@ our @EXPORT = ( qw (
                     $collection
                     $list_collections
                     $num_found
-                    $query_status
                     $query_time
+                    $query_qtime
+                    $query_status
                     $rows
                     $solr_admin
                     $start
@@ -64,8 +67,9 @@ our $list_collections;
 our $start = 0;
 our $rows  = 3;
 
-our $query_status;
 our $query_time;
+our $query_qtime;
+our $query_status;
 our $num_found;
 
 our %solroptions = (
@@ -128,13 +132,19 @@ sub curl_solr($;$$){
     $url .= "&start=$start&rows=$rows";
     $url .= "&indent=true" if $verbose > 2;
     $url .= "&debugQuery=true" if $debug;
+    my $start = time;
     my $json = curl_json $url, "Solr", undef, undef, \&curl_solr_err_handler, $type, $content;
+    $query_time   = round((time - $start) * 1000); # secs => ms
+    # just use NTP check, if doing this logic in every plugin then everything would alarm at the same time drowning out the real problem
+    #$query_time < 0 and quit "UNKNOWN", "Solr query time < 0 ms - NTP problem?";
+    $query_qtime  = get_field_int("responseHeader.QTime");
     $query_status = get_field("responseHeader.status");
-    $query_time   = get_field_int("responseHeader.QTime");
-    $num_found    = get_field("responseHeader.response.numFound", 1);
+    $num_found    = get_field_int("response.numFound", 1);
     if($query_status ne 0){
-        critical;
-        vlog2 "critical - query status from header was '$query_status' (expected 0)";
+        #critical;
+        #vlog2 "critical - query status from header was '$query_status' (expected 0)";
+        $type = ( $type ? "POST" : "query" );
+        quit "CRITICAL", "$type status from header was '$query_status' (expected 0)";
     }
     return $json;
 }
