@@ -17,6 +17,7 @@ make:
 		JSON:XS \
 		LWP::Simple \
 		LWP::UserAgent \
+		Math::Round \
 		MongoDB \
 		MongoDB::MongoClient \
 		Net::LDAP \
