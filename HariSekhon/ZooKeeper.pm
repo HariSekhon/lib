@@ -11,7 +11,7 @@
 
 package HariSekhon::ZooKeeper;
 
-$VERSION = "0.3.2";
+$VERSION = "0.5";
 
 use strict;
 use warnings;
@@ -22,18 +22,32 @@ BEGIN {
 use HariSekhonUtils;
 use Carp;
 use IO::Socket;
+# This would prevent check_zookeeper_config.pl and similar programs only requiring 4lw support from running without full ZooKeeper C to Perl module build
+#use Net::ZooKeeper qw/:DEFAULT :errors :log_levels/;
 
 use Exporter;
 our @ISA = qw(Exporter);
 
 our @EXPORT = ( qw (
-                    $ZK_DEFAULT_PORT
+                    $DATA_READ_LEN
+                    $default_zk_timeout
+                    $random_conn_order
                     $zk_conn
+                    $ZK_DEFAULT_PORT
+                    $zk_timeout
+                    %zookeeper_options
                     @zk_valid_states
+                    connect_zookeepers
+                    translate_zoo_error
+                    zookeeper_random_conn_order
                     zoo_cmd
+                    zoo_debug
                 )
 );
 our @EXPORT_OK = ( @EXPORT );
+
+# Max num of chars to read from znode contents
+our $DATA_READ_LEN = 500;
 
 # ZooKeeper Client Port
 our $ZK_DEFAULT_PORT = 2181;
@@ -41,6 +55,118 @@ $port = $ZK_DEFAULT_PORT;
 our @zk_valid_states = qw/leader follower standalone/;
 
 env_creds("ZOOKEEPER");
+
+our $default_zk_timeout = 2;
+our $zk_timeout = $default_zk_timeout;
+our $random_conn_order = 0;
+
+our %zookeeper_options = (
+    "H|host=s"          => [ \$host,                  "ZooKeeper node(s) to connect to (\$ZOOKEEPER_HOST, \$HOST), should be a comma separated list of ZooKeepers the same as are configured on the ZooKeeper servers themselves with optional individual ports per server (node1:$ZK_DEFAULT_PORT,node2:$ZK_DEFAULT_PORT,node3:$ZK_DEFAULT_PORT). It takes longer to connect to 3 ZooKeepers than just one of them (around 5 secs per ZooKeeper specified + (session-timeout x any offline ZooKeepers) so you will need to increase --timeout). Connection order is deterministic and will be tried in the order specified unless --random-conn-order" ],
+    "P|port=s"          => [ \$port,                  "Port to connect to on ZooKeepers for any nodes not suffixed with :<port> (defaults to $ZK_DEFAULT_PORT, set to 5181 for MapR, \$ZOOKEEPER_PORT, \$PORT)" ],
+    # %useroptions,
+    "u|user=s"          => [ \$user,                  "User to connect with (\$ZOOKEEPER_USER environment variable. Not tested. YMMV. optional)" ],
+    "p|password=s"      => [ \$password,              "Password to connect with (\$ZOOKEEPER_PASSWORD environment variable. Not tested. YMMV. optional)" ],
+    "random-conn-order" => [ \$random_conn_order,     "Randomize connection order" ],
+    "session-timeout=s" => [ \$zk_timeout,            "ZooKeeper session timeout in secs (default: $default_zk_timeout). This determines how long to wait for connection to downed ZooKeepers and affects total execution time" ],
+);
+@usage_order = qw/host port user password random-conn-order session-timeout/;
+
+sub zookeeper_random_conn_order(){
+    require Net::ZooKeeper;
+    if($random_conn_order){
+        vlog2 "using random connection order";
+        Net::ZooKeeper::set_deterministic_conn_order(0); # default
+    } else {
+        vlog2 "setting deterministic connection order";
+        Net::ZooKeeper::set_deterministic_conn_order(1);
+    }
+}
+
+sub zoo_debug(){
+    require Net::ZooKeeper;
+    if($debug){
+        # Tricky syntax workaround having to fully qualify since runtime require doesn't import
+        Net::ZooKeeper::set_log_level(&Net::ZooKeeper::ZOO_LOG_LEVEL_DEBUG);
+    } elsif($verbose > 3){
+        Net::ZooKeeper::set_log_level(&Net::ZooKeeper::ZOO_LOG_LEVEL_INFO);
+    } elsif($verbose > 1){
+        Net::ZooKeeper::set_log_level(&Net::ZooKeeper::ZOO_LOG_LEVEL_WARN);
+    }
+}
+
+sub connect_zookeepers(@){
+    require Net::ZooKeeper;
+    my @hosts = shift;
+    vlog2 "connecting to ZooKeeper nodes: @hosts";
+    my $zkh = Net::ZooKeeper->new(  join(",", @hosts),
+                                    "session_timeout" => $zk_timeout
+                                 )
+        || quit "CRITICAL", "failed to create connection object to ZooKeepers within $zk_timeout secs: $!";
+    vlog2 "ZooKeeper connection object created, won't be connected until we issue a call";
+    # Not tested auth yet
+    if(defined($user) and defined($password)){
+        $zkh->add_auth('digest', "$user:$password");
+    }
+    my $session_timeout = ($zkh->{session_timeout} / 1000) or quit "UNKNOWN", "invalid session timeout determined from ZooKeeper handle, possibly not connected to ZooKeeper?";
+    vlog2 sprintf("session timeout is %.2f secs\n", $zk_timeout / 1000);
+
+    vlog2 "checking znode '/' exists to determine if we're properly connected to ZooKeeper";
+    my $connection_succeeded = 0;
+# the last attempt will retry all zookeepers two more times if that zookeeper fails to connect
+# to see this use -vv --session-timeout 0.001
+    for(my $i=0; $i < scalar @hosts; $i++){
+        $zkh->exists("/") and $connection_succeeded = 1 and last;
+    }
+    $connection_succeeded or quit "CRITICAL", "connection error, failed to find znode '/': " . translate_zoo_error($zkh->get_error());
+    vlog2 "found znode '/', connection to zookeeper succeeded\n";
+
+    return $zkh;
+}
+
+sub translate_zoo_error($){
+    require Net::ZooKeeper;
+    my $errno = shift;
+    isInt($errno, 1) or code_error "non int passed to translate_zoo_error()";
+    # this makes me want to cry, if anybody knows a better way of getting some sort of error translation out of this API please let me know!
+    no strict 'refs';
+    foreach(qw(
+        ZOK
+        ZSYSTEMERROR
+        ZRUNTIMEINCONSISTENCY
+        ZDATAINCONSISTENCY
+        ZCONNECTIONLOSS
+        ZMARSHALLINGERROR
+        ZUNIMPLEMENTED
+        ZOPERATIONTIMEOUT
+        ZBADARGUMENTS
+        ZINVALIDSTATE
+        ZAPIERROR
+        ZNONODE
+        ZNOAUTH
+        ZBADVERSION
+        ZNOCHILDRENFOREPHEMERALS
+        ZNODEEXISTS
+        ZNOTEMPTY
+        ZSESSIONEXPIRED
+        ZINVALIDCALLBACK
+        ZINVALIDACL
+        ZAUTHFAILED
+        ZCLOSING
+        ZNOTHING
+    )){
+        # This is a tricky workaround to runtime require to avoid forcing the annoying Net::ZooKeeper dependency where client code only needs 4lw support
+        if(eval "Net::ZooKeeper::$_" == $errno){
+            use strict 'refs';
+            return "$errno $_";
+        }
+    }
+    use strict 'refs';
+    return "<failed to translate zookeeper error for error code: $errno>";
+}
+
+# ============================================================================ #
+#                               Zoo 4lw support
+# ============================================================================ #
 
 our $zk_conn;
 # TODO: ZooKeeper closes connection after 1 cmd, see if I can work around this, as having to use several TCP connections is inefficient
