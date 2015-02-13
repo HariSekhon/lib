@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.9.0";
+our $VERSION = "1.9.1";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -281,6 +281,7 @@ our %EXPORT_TAGS = (
                         validate_fqdn
                         validate_host_port_user_password
                         validate_host
+                        validate_hosts
                         validate_hostname
                         validate_hostport
                         validate_int
@@ -2868,6 +2869,30 @@ sub validate_host ($;$) {
     $host = isHost($host) || usage "invalid ${name}host defined: not a validate hostname or IP address";
     vlog_options("${name}host", $host);
     return $host;
+}
+
+
+sub validate_hosts($$){
+    my $hosts = shift;
+    my $port  = shift;
+    $port = isPort($port) or usage "invalid port given";
+    defined($host) or usage "hosts not defined";
+    my @hosts = split(/\s*,\s*/, $host);
+    @hosts or usage "no hosts defined";
+    my $node_port;
+    foreach(my $i = 0; $i < scalar @hosts; $i++){
+        undef $node_port;
+        if($hosts[$i] =~ /:(\d+)$/){
+            $node_port = isPort($1) or usage "invalid port given for host " . $i+1;
+            $hosts[$i] =~ s/:$node_port$//;
+        }
+        $hosts[$i]  = validate_host($hosts[$i]);
+        $hosts[$i]  = validate_resolvable($hosts[$i]);
+        $node_port  = $port unless defined($node_port);
+        $hosts[$i] .= ":$node_port";
+        vlog_options("port", $node_port);
+    }
+    return @hosts;
 }
 
 
