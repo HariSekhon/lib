@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.9.1";
+our $VERSION = "1.9.2";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2231,8 +2231,8 @@ sub pkill ($;$) {
 }
 
 
+our $plural;
 sub plural ($) {
-    our $plural;
     my $var = $_[0];
     #print "var = $var\n";
     #print "var ref = " . ref($var) . "\n";
@@ -2396,18 +2396,25 @@ sub sec2human ($){
     isFloat($secs) or code_error "invalid non-float argument passed to sec2human";
     my $human_time = "";
     if($secs >= 86400){
-        $human_time .= sprinf("%d days ", int($secs / 86400));
-        $secs /= 86400;
+        my $days = int($secs / 86400);
+        plural $days;
+        $human_time .= sprinf("%d day$plural ", $days);
+        $secs %= 86400;
     }
     if($secs >= 3600){
-        $human_time .= sprintf("%d hours ", int($secs / 3600));
-        $secs /= 3600;
+        my $hours = int($secs / 3600);
+        plural $hours;
+        $human_time .= sprintf("%d hour$plural ", $hours);
+        $secs %= 3600;
     }
     if($secs >= 60){
-        $human_time .= sprintf("%d mins ", int($secs / 60));
-        $secs /= 60;
+        my $mins = int($secs / 60);
+        plural $mins;
+        $human_time .= sprintf("%d min$plural ", $mins);
+        $secs %= 60;
     }
-    $human_time .= sprintf("%d secs", int($secs));
+    plural $secs;
+    $human_time .= sprintf("%d sec$plural", int($secs));
     return $human_time;
 }
 
