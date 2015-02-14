@@ -2398,7 +2398,7 @@ sub sec2human ($){
     if($secs >= 86400){
         my $days = int($secs / 86400);
         plural $days;
-        $human_time .= sprinf("%d day$plural ", $days);
+        $human_time .= sprintf("%d day$plural ", $days);
         $secs %= 86400;
     }
     if($secs >= 3600){
