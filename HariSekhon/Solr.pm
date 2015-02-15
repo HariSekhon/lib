@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.5";
+$VERSION = "0.5.1";
 
 use strict;
 use warnings;
@@ -173,8 +173,14 @@ sub list_solr_collections(){
         # more concise
         #print join("\n", get_field_array("collections")) . "\n";
         my %cores = get_field_hash("status");
+        my %collections;
         foreach(sort keys %cores){
-            print get_field2($cores{$_}, "name") . "\n";
+            my $collection = get_field2($cores{$_}, "name");
+            $collection =~ s/_shard\d+_replica\d+$//;
+            $collections{$collection} = 1;
+        }
+        foreach(sort keys %collections){
+            print "$_\n";
         }
         exit $ERRORS{"UNKNOWN"};
     }
