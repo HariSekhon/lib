@@ -11,7 +11,7 @@
 
 package HariSekhon::ZooKeeper;
 
-$VERSION = "0.5";
+$VERSION = "0.6";
 
 use strict;
 use warnings;
@@ -19,7 +19,7 @@ BEGIN {
     use File::Basename;
     use lib dirname(__FILE__) . "..";
 }
-use HariSekhonUtils;
+use HariSekhonUtils qw/:DEFAULT :time/;
 use Carp;
 use IO::Socket;
 # This would prevent check_zookeeper_config.pl and similar programs only requiring 4lw support from running without full ZooKeeper C to Perl module build
@@ -30,20 +30,26 @@ our @ISA = qw(Exporter);
 
 our @EXPORT = ( qw (
                     $DATA_READ_LEN
+                    $ZK_DEFAULT_PORT
                     $default_zk_timeout
                     $random_conn_order
                     $zk_conn
-                    $ZK_DEFAULT_PORT
-                    $zk_timeout
+                    $zkh
                     $zk_stat
+                    $zk_timeout
+                    $znode_age_secs
                     %zookeeper_options
                     @zk_valid_states
+                    check_znode_age_positive
                     check_znode_exists
                     connect_zookeepers
+                    get_znode_age
+                    get_znode_contents
+                    get_znode_contents_json
                     translate_zoo_error
-                    zookeeper_random_conn_order
                     zoo_cmd
                     zoo_debug
+                    zookeeper_random_conn_order
                 )
 );
 our @EXPORT_OK = ( @EXPORT );
@@ -61,7 +67,11 @@ env_creds("ZOOKEEPER");
 our $default_zk_timeout = 2;
 our $zk_timeout = $default_zk_timeout;
 our $random_conn_order = 0;
+our $zkh;
 our $zk_stat;
+our $znode_age_secs;
+my $zookeepers;
+my @zookeepers;
 
 our %zookeeper_options = (
     "H|host=s"          => [ \$host,                  "ZooKeeper node(s) to connect to (\$ZOOKEEPER_HOST, \$HOST), should be a comma separated list of ZooKeepers the same as are configured on the ZooKeeper servers themselves with optional individual ports per server (node1:$ZK_DEFAULT_PORT,node2:$ZK_DEFAULT_PORT,node3:$ZK_DEFAULT_PORT). It takes longer to connect to 3 ZooKeepers than just one of them (around 5 secs per ZooKeeper specified + (session-timeout x any offline ZooKeepers) so you will need to increase --timeout). Connection order is deterministic and will be tried in the order specified unless --random-conn-order" ],
@@ -103,8 +113,54 @@ sub zoo_debug(){
     }
 }
 
-sub check_znode_exists($$){
-    my $zkh   = shift;
+sub check_znode_age_positive(){
+    if($znode_age_secs < 0){
+        my $clock_mismatch_msg = "clock synchronization problem, modified timestamp on znode is in the future!";
+        if($status eq "OK"){
+            $msg = "$clock_mismatch_msg $msg";
+        } else {
+            $msg .= ". Also, $clock_mismatch_msg";
+        }
+        warning;
+    }
+}
+
+sub get_znode_age($){
+    my $znode = shift;
+    if(defined($zk_stat)){
+        my $mtime = $zk_stat->{mtime} / 1000;
+        isFloat($mtime) or quit "UNKNOWN", "invalid mtime returned for znode '$znode', got '$mtime'";
+        vlog3 sprintf("znode '%s' mtime = %s", $znode, $mtime);
+        $znode_age_secs = time - int($mtime);
+        vlog2 "znode last modified $znode_age_secs secs ago";
+        check_znode_age_positive();
+    } else {
+        quit "UNKNOWN", "no stat object returned by ZooKeeper exists call for znode '$znode', try re-running with -vvvvD to see full debug output";
+    }
+}
+
+sub get_znode_contents($){
+    my $znode = shift;
+    my $data = $zkh->get($znode, 'data_read_len' => $DATA_READ_LEN);
+                               # 'stat' => $zk_stat, 'watch' => $watch)
+                               # || quit "CRITICAL", "failed to read data from znode $znode: $!";
+    plural @zookeepers;
+    defined($data) or quit "CRITICAL", "no data returned for znode '$znode' from zookeeper$plural '$zookeepers': " . $zkh->get_error();
+    # /hadoop-ha/logicaljt/ActiveStandbyElectorLock contains carriage returns which messes up the output in terminal by causing the second line to overwrite the first
+    $data =~ s/\r//g;
+    $data = trim($data);
+    vlog3 "znode '$znode' data:\n\n$data\n";
+    return $data;
+}
+
+sub get_znode_contents_json($){
+    my $znode = shift;
+    my $data = get_znode_contents($znode);
+    $data    = isJson($data) or quit "CRITICAL", "znode '$znode' data is not json as expected, got '$data'";
+    return $data;
+}
+
+sub check_znode_exists($){
     my $znode = shift;
     vlog2 "checking znode '$znode' exists";
     $zkh->exists($znode, 'stat' => $zk_stat) or quit "CRITICAL", "znode '$znode' does not exist! ZooKeeper returned: " . translate_zoo_error($zkh->get_error());
@@ -114,22 +170,23 @@ sub check_znode_exists($$){
 
 sub connect_zookeepers(@){
     require Net::ZooKeeper;
-    my @hosts = shift;
+    @zookeepers = @_;
+    plural @zookeepers;
+    $zookeepers = join(", ", @zookeepers);
 
     vlog2 "trapping SIGPIPE in case of lost zookeeper connection";
     # API may raise SIG PIPE on connection failure
-    local $SIG{'PIPE'} = sub { quit "UNKNOWN", "lost connection to ZooKeeper$plural '" . join(",", @hosts) . "'"; };
+    local $SIG{'PIPE'} = sub { quit "UNKNOWN", "lost connection to ZooKeeper$plural '$zookeepers'"; };
 
     zoo_debug();
     zookeeper_random_conn_order();
 
     $zk_timeout = validate_float($zk_timeout, "zookeeper session timeout", 0.001, 100);
 
-    plural @hosts;
-    vlog2 "connecting to ZooKeeper nodes: @hosts";
-    my $zkh = Net::ZooKeeper->new(  join(",", @hosts),
-                                    "session_timeout" => $zk_timeout * 1000
-                                 )
+    vlog2 "connecting to ZooKeeper node$plural: $zookeepers";
+    $zkh = Net::ZooKeeper->new( $zookeepers,
+                                "session_timeout" => $zk_timeout * 1000
+                              )
         || quit "CRITICAL", "failed to create connection object to ZooKeepers within $zk_timeout secs: $!";
     vlog2 "ZooKeeper connection object created, won't be connected until we issue a call";
     # Not tested auth yet
@@ -143,7 +200,7 @@ sub connect_zookeepers(@){
     my $connection_succeeded = 0;
 # the last attempt will retry all zookeepers two more times if that zookeeper fails to connect
 # to see this use -vv --session-timeout 0.001
-    for(my $i=0; $i < scalar @hosts; $i++){
+    for(my $i=0; $i < scalar @zookeepers; $i++){
         $zkh->exists("/") and $connection_succeeded = 1 and last;
     }
     $connection_succeeded or quit "CRITICAL", "connection error, failed to find znode '/': " . translate_zoo_error($zkh->get_error());
