@@ -1049,6 +1049,7 @@ sub check_thresholds ($;$$) {
     my $no_msg_thresholds = shift || 0;
     my $name              = shift() || "";
     $name .= " " if $name;
+    vlog2("checking ${name}thresholds");
     defined($result) or code_error("no result passed to check_thresholds()");
     my $status_ok = check_threshold("${name}critical", $result) and
                     check_threshold("${name}warning",  $result);
