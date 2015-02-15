@@ -2874,7 +2874,7 @@ sub validate_host ($;$) {
     my $name = shift || "";
     $name = "$name " if $name;
     defined($host) || usage "${name}host not defined";
-    $host = isHost($host) || usage "invalid ${name}host defined: not a validate hostname or IP address";
+    $host = isHost($host) || usage "invalid ${name}host '$host' defined: not a validate hostname or IP address";
     vlog_options("${name}host", $host);
     return $host;
 }
