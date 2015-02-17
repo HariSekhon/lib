@@ -35,11 +35,11 @@ make:
 
 .PHONY: apt-packages
 apt-packages:
-	dpkg -l gcc &>/dev/null || sudo apt-get install -y gcc || :
+	sudo apt-get install -y gcc || :
 	# needed to fetch the library submodule at end of build
-	dpkg -l build-essential libwww-perl git &>/dev/null || sudo apt-get install -y build-essential libwww-perl git || :
+	sudo apt-get install -y build-essential libwww-perl git || :
 	# for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
-	dpkg -l libdbd-mysql-perl libmysqlclient-dev &>/dev/null || sudo apt-get install -y libdbd-mysql-perl libmysqlclient-dev || :
+	sudo apt-get install -y libdbd-mysql-perl libmysqlclient-dev || :
 
 .PHONY: yum-packages
 yum-packages:
