@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.6";
+$VERSION = "0.6.1";
 
 use strict;
 use warnings;
@@ -250,7 +250,7 @@ sub check_collection($){
     $facts{$collection}{"maxShardsPerNode"}  = get_field_int("$collection.maxShardsPerNode");
     $facts{$collection}{"router"}            = get_field("$collection.router.name");
     $facts{$collection}{"replicationFactor"} = get_field_int("$collection.replicationFactor");
-    $facts{$collection}{"autoAddReplicas"}   = get_field("$collection.autoAddReplicas");
+    $facts{$collection}{"autoAddReplicas"}   = get_field("$collection.autoAddReplicas", 1);
     vlog2;
 }
 
@@ -350,8 +350,9 @@ sub msg_shard_status(){
         $msg .= ". Replication Settings: ";
         foreach my $collection (sort keys %facts){
             $msg .= "collection '$collection'";
-            foreach(qw/maxShardsPerNode router replicationFactor autoAddReplicas/){
-                $msg .= " $_=" . $facts{$collection}{$_};
+            # made autoAddReplicas optional since it wasn't found on my SolrCloud 4.7.2 cluster, must have been added after since it was on another cluster of mine
+            foreach(qw/maxShardsPerNode replicationFactor router autoAddReplicas/){
+                $msg .= " $_=" . $facts{$collection}{$_} if $facts{$collection}{$_};
             }
             $msg .= ", ";
         }
