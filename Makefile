@@ -5,14 +5,19 @@
 
 # Library dependencies are handled in one place in calling project
 
+ifdef TRAVIS
+	SUDO =
+else
+	SUDO = sudo
+endif
+
 .PHONY: make
 make:
 	[ -x /usr/bin/apt-get ] && make apt-packages || :
 	[ -x /usr/bin/yum ]     && make yum-packages || :
 
 	# order here is important, in Travis and some stripped down client some deps are not pulled in automatically but are required for subsequent module builds
-	yes "" | sudo cpan \
-		local::lib \
+	yes "" | $(SUDO) cpan \
 		Data::Dumper \
 		JSON \
 		JSON:XS \
