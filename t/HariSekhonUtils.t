@@ -16,6 +16,7 @@ use Test::More;
 use File::Basename;
 note("Testing on perl $]");
 BEGIN {
+    use local::lib;
     use lib dirname(__FILE__) . "/..";
     use_ok('HariSekhonUtils', qw/:DEFAULT :time/);
 }
