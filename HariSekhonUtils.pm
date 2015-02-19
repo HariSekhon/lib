@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.9.2";
+our $VERSION = "1.9.3";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1172,14 +1172,15 @@ sub curl ($;$$$$$$) {
     my $err_sub  = shift;
     my $type     = shift() || 'GET';
     my $req_content = shift;
-    $type eq "GET" or $type eq "POST" or code_error "unsupported type passed to curl() as sixth argument";
+    $type eq "GET" or $type eq "POST" or code_error "unsupported type '$type' passed to curl() as sixth argument";
     #debug("url passed to curl: $url");
-    defined($url)      or code_error "no url passed to curl()";
-    $url = isUrl($url) or code_error "invalid url supplied to curl()";
+    defined($url) or code_error "no URL passed to curl()";
+    my $url2 = isUrl($url) or code_error "invalid URL '$url' supplied to curl()";
+    $url = $url2;
     my $host = $url;
     $host =~ s/^https?:\/\///;
     $host =~ s/(?::\d+)?(?:\/.*)?$//;
-    isHost($host) or die "Invalid host determined from URL in curl()";
+    isHost($host) or die "invalid host determined from URL '$url' in curl()";
     my $auth = (defined($user) and defined($password));
     # Don't replace $host with resolved host as this changes the vlog output and also affects proxy exceptions
     validate_resolvable($host);
