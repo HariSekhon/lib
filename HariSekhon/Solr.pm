@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.6.1";
+$VERSION = "0.6.2";
 
 use strict;
 use warnings;
@@ -30,6 +30,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT = ( qw (
                     $collection
+                    $http_context
                     $list_collections
                     $no_warn_replicas
                     $num_found
@@ -44,6 +45,7 @@ our @EXPORT = ( qw (
                     $url
                     %solroptions
                     %solroptions_collection
+                    %solroptions_context
                     Dumper
                     check_collections
                     curl_solr
@@ -53,6 +55,7 @@ our @EXPORT = ( qw (
                     query_solr
                     validate_base_and_znode
                     validate_solr_collection
+                    validate_solr_context
                 )
 );
 our @EXPORT_OK = ( @EXPORT );
@@ -63,7 +66,11 @@ env_creds("Solr");
 
 our $ua = LWP::UserAgent->new;
 
-our $solr_admin = "solr/admin";
+my  $default_http_context = "/solr";
+our $http_context = $default_http_context;
+
+my  $default_solr_admin = "$http_context/admin";
+our $solr_admin = $default_solr_admin;
 
 our $url;
 
@@ -88,6 +95,10 @@ env_vars("SOLR_COLLECTION", \$collection);
 our %solroptions_collection = (
     "C|collection=s"    => [ \$collection,          "Solr Collection name (\$SOLR_COLLECTION)" ],
     "list-collections"  => [ \$list_collections,    "List Collections for which there are loaded cores on given Solr instance (Solr 4 onwards)" ],
+);
+
+our %solroptions_context = (
+    "http-context=s"    => [ \$http_context,        "Solr http context handler prefix for REST API url (defaults to $default_http_context)" ],
 );
 
 sub curl_solr_err_handler($){
@@ -130,7 +141,7 @@ sub curl_solr($;$$){
     my $content = shift;
     my $protocol = "http";
     $protocol .= "s" if($ssl);
-    $url = "$protocol://$host:$port/$url";
+    $url = "$protocol://$host:$port$url";
     $url =~ /\?/ and $url .= "&" or $url .= "?";
     $url .= "omitHeader=off"; # we need the response header for query time, status and num found
     $url .= "&wt=json"; # xml is lame
@@ -162,7 +173,7 @@ sub query_solr($$){
     # must be URL encoded before passing to Solr
     # XXX: is this uri escaped later?
     $query = uri_escape($query);
-    curl_solr "solr/$collection/select?q=$query";
+    curl_solr "$http_context/$collection/select?q=$query";
 }
 
 sub list_solr_collections(){
@@ -373,6 +384,19 @@ sub validate_solr_collection($){
     $collection = isSolrCollection($collection) or quit "CRITICAL", "invalid Solr collection specified";
     vlog_options "collection", $collection;
     return $collection;
+}
+
+sub validate_solr_context($){
+    my $context = shift;
+    defined($context) or quit "CRITICAL", "context not defined";
+    $context =~ /^\/*([\/\w]+)$/ or quit "CRITICAL", "invalid Solr http context, must be alphanumeric";
+    $context = "/$1";
+    if($solr_admin eq $default_solr_admin){
+        $solr_admin = "$context/admin";
+    }
+
+    vlog_options "http context", $context;
+    return $context;
 }
 
 1;
