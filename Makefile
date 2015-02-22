@@ -36,7 +36,8 @@ make:
 		Readonly::XS \
 		Thrift \
 		Time::HiRes \
-		|| : \
+		XML::SAX \
+		XML::Simple
 		;
 
 .PHONY: apt-packages
