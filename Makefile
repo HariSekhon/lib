@@ -37,7 +37,7 @@ make:
 		Thrift \
 		Time::HiRes \
 		XML::SAX \
-		XML::Simple
+		XML::Simple \
 		;
 
 .PHONY: apt-packages
