@@ -11,7 +11,7 @@
 
 package HariSekhon::ZooKeeper;
 
-$VERSION = "0.6";
+$VERSION = "0.7";
 
 use strict;
 use warnings;
@@ -46,6 +46,7 @@ our @EXPORT = ( qw (
                     get_znode_age
                     get_znode_contents
                     get_znode_contents_json
+                    get_znode_contents_xml
                     translate_zoo_error
                     zoo_cmd
                     zoo_debug
@@ -82,7 +83,7 @@ our %zookeeper_options = (
     "random-conn-order" => [ \$random_conn_order,     "Randomize connection order to provided zookeepers (otherwise tries in order given)" ],
     "session-timeout=s" => [ \$zk_timeout,            "ZooKeeper session timeout in secs (default: $default_zk_timeout). This determines how long to wait for connection to downed ZooKeepers and affects total execution time" ],
 );
-@usage_order = qw/host port user password random-conn-order session-timeout/;
+splice @usage_order, 6, 0, qw/random-conn-order session-timeout/;
 
 sub zookeeper_random_conn_order(){
     require Net::ZooKeeper;
@@ -134,6 +135,7 @@ sub get_znode_age($){
         $znode_age_secs = time - int($mtime);
         vlog2 "znode last modified $znode_age_secs secs ago";
         check_znode_age_positive();
+        return $znode_age_secs;
     } else {
         quit "UNKNOWN", "no stat object returned by ZooKeeper exists call for znode '$znode', try re-running with -vvvvD to see full debug output";
     }
@@ -155,8 +157,15 @@ sub get_znode_contents($){
 
 sub get_znode_contents_json($){
     my $znode = shift;
-    my $data = get_znode_contents($znode);
-    $data    = isJson($data) or quit "CRITICAL", "znode '$znode' data is not json as expected, got '$data'";
+    my $data  = get_znode_contents($znode);
+    $data     = isJson($data) or quit "CRITICAL", "znode '$znode' data is not JSON as expected, got '$data'";
+    return $data;
+}
+
+sub get_znode_contents_xml($){
+    my $znode = shift;
+    my $data  = get_znode_contents($znode);
+    $data     = isXml($data) or quit "CRITICAL", "znode '$znode' data is not XML as expected, got '$data'";
     return $data;
 }
 
