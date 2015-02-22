@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.9.3";
+our $VERSION = "1.9.4";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -958,6 +958,31 @@ sub autoflush () {
 }
 
 
+sub assert_array($$) {
+    my $array = shift;
+    my $name  = shift;
+    isArray($array) or quit "UNKNOWN", "$name is not an array! $nagios_plugins_support_msg_api";
+}
+
+sub assert_float($$) {
+    my $float = shift;
+    my $name  = shift;
+    isFloat($float) or quit "UNKNOWN", "$name is not a float! $nagios_plugins_support_msg_api";
+}
+
+sub assert_hash($$) {
+    my $hash = shift;
+    my $name = shift;
+    isHash($hash) or quit "UNKNOWN", "$name is not a hash! $nagios_plugins_support_msg_api";
+}
+
+sub assert_int($$) {
+    my $int  = shift;
+    my $name = shift;
+    isInt($int) or quit "UNKNOWN", "$name is not an integer! $nagios_plugins_support_msg_api";
+}
+
+
 sub check_regex ($$;$) {
     my $string = shift;
     my $regex  = shift;
@@ -1387,9 +1412,10 @@ sub get_field2_array($$;$){
     my $field    = shift;
     my $noquit   = shift;
     my $value = get_field2($hash_ref, $field, $noquit);
-    unless($noquit and not defined($value)){
-        require_array($value, $field);
+    if($noquit){
+        return undef unless $value;
     }
+    assert_array($value, $field);
     return @{$value};
 }
 
@@ -1398,9 +1424,10 @@ sub get_field2_float($$;$){
     my $field    = shift;
     my $noquit   = shift;
     my $value = get_field2($hash_ref, $field, $noquit);
-    unless($noquit and not defined($value)){
-        require_float($value, $field);
+    if($noquit){
+        return undef unless $value;
     }
+    assert_float($value, $field);
     return $value;
 }
 
@@ -1409,10 +1436,15 @@ sub get_field2_hash($$;$){
     my $field    = shift;
     my $noquit   = shift;
     my $value = get_field2($hash_ref, $field, $noquit);
-    unless($noquit and not defined($value)){
-        require_hash($value, $field);
+    if($noquit){
+        return undef unless $value;
     }
-    return %{$value};
+    assert_hash($value, $field);
+    if($value){
+        return %{$value};
+    } else {
+        return {};
+    }
 }
 
 sub get_field2_int($$;$){
@@ -1420,9 +1452,10 @@ sub get_field2_int($$;$){
     my $field    = shift;
     my $noquit   = shift;
     my $value = get_field2($hash_ref, $field, $noquit);
-    unless($noquit and not defined($value)){
-        require_int($value, $field);
+    if($noquit){
+        return undef unless $value;
     }
+    assert_int($value, $field);
     return $value;
 }
 
@@ -1604,8 +1637,10 @@ sub isAlNum ($) {
 
 
 sub isArray ($) {
-    #defined($_[0]) or code_error "no arg passed to isArray()";
-    my $isArray = ref $_[0] eq "ARRAY";
+    my $isArray;
+    if(defined($_[0])){
+        $isArray = ref $_[0] eq "ARRAY";
+    }
     if($_[1]){
         unless($isArray){
             code_error "non array reference passed to isArray()";
@@ -1730,7 +1765,10 @@ sub isFqdn ($) {
 
 
 sub isHash ($) {
-    my $isHash = ref $_[0] eq "HASH";
+    my $isHash;
+    if(defined($_[0])){
+        $isHash = ref $_[0] eq "HASH";
+    }
     if($_[1]){
         unless($isHash){
             code_error "non hash reference passed";
@@ -1774,9 +1812,7 @@ sub isInt ($;$) {
     my $number = shift;
     my $signed = shift() ? "-?" : "";
     defined($number) or return undef; # code_error("no number passed to isInt()");
-    $number =~ /^($signed\d+)$/ or return undef;
-    # can't return zero here as it would fail boolean tests for 0 which may be a valid int for purpose
-    return 1;
+    $number =~ /^($signed\d+)$/;
 }
 
 
@@ -2332,31 +2368,6 @@ sub random_alnum($){
 
 sub remove_timeout(){
     delete $HariSekhonUtils::default_options{"t|timeout=i"};
-}
-
-
-sub require_array($$) {
-    my $array = shift;
-    my $name  = shift;
-    isArray($array) or quit "UNKNOWN", "$name is not an array! $nagios_plugins_support_msg";
-}
-
-sub require_float($$) {
-    my $float = shift;
-    my $name  = shift;
-    isFloat($float) or quit "UNKNOWN", "$name is not a float! $nagios_plugins_support_msg";
-}
-
-sub require_hash($$) {
-    my $hash = shift;
-    my $name = shift;
-    isHash($hash) or quit "UNKNOWN", "$name is not a hash! $nagios_plugins_support_msg";
-}
-
-sub require_int($$) {
-    my $int  = shift;
-    my $name = shift;
-    isInt($int) or quit "UNKNOWN", "$name is not an integer! $nagios_plugins_support_msg";
 }
 
 
