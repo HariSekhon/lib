@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.9.4";
+our $VERSION = "1.9.5";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -146,6 +146,7 @@ our %EXPORT_TAGS = (
                         isUrlPathSuffix
                         isUser
                         isVersion
+                        isXml
                         user_exists
                     ) ],
     'lock'  =>  [   qw(
@@ -1885,6 +1886,19 @@ sub isJson($){
         $json = decode_json($string);
     };
     return $json;
+}
+
+
+sub isXml($){
+    require XML::Simple;
+    import XML::Simple;
+    my $string = shift;
+    defined($string) or return undef;
+    my $xml = undef;
+    try {
+        $xml = XMLin($string, forcearray => 1, keyattr => []);
+    };
+    return $xml;
 }
 
 
