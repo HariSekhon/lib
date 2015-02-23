@@ -11,7 +11,7 @@
 
 package HariSekhon::ZooKeeper;
 
-$VERSION = "0.7";
+$VERSION = "0.7.1";
 
 use strict;
 use warnings;
@@ -170,11 +170,17 @@ sub get_znode_contents_xml($){
 }
 
 sub check_znode_exists($){
-    my $znode = shift;
+    my $znode  = shift;
+    my $noquit = shift;
     vlog2 "checking znode '$znode' exists";
-    $zkh->exists($znode, 'stat' => $zk_stat) or quit "CRITICAL", "znode '$znode' does not exist! ZooKeeper returned: " . translate_zoo_error($zkh->get_error());
-    $zk_stat or quit "UNKNOWN", "failed to get stats from znode $znode";
-    vlog2 "znode '$znode' exists\n";
+    if($noquit){
+        $zkh->exists($znode, 'stat' => $zk_stat) or return 0;
+    } else {
+        $zkh->exists($znode, 'stat' => $zk_stat) or quit "CRITICAL", "znode '$znode' does not exist! ZooKeeper returned: " . translate_zoo_error($zkh->get_error());
+        $zk_stat or quit "UNKNOWN", "failed to get stats from znode $znode";
+    }
+    vlog2 "znode '$znode' exists";
+    return 1;
 }
 
 sub connect_zookeepers(@){
