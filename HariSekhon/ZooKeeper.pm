@@ -11,7 +11,7 @@
 
 package HariSekhon::ZooKeeper;
 
-$VERSION = "0.7.1";
+$VERSION = "0.7.2";
 
 use strict;
 use warnings;
@@ -169,7 +169,7 @@ sub get_znode_contents_xml($){
     return $data;
 }
 
-sub check_znode_exists($){
+sub check_znode_exists($;$){
     my $znode  = shift;
     my $noquit = shift;
     vlog2 "checking znode '$znode' exists";
