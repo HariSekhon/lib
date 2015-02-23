@@ -2813,7 +2813,7 @@ sub validate_directory ($;$$$) {
     my $no_vlog = shift;
     $name .= " " if $name;
     if($noquit){
-        return validate_filename($dir, 1);
+        return validate_filename($dir, 1, "${name}directory");
     }
     defined($dir) || usage "${name}directory not defined";
     $dir = validate_filename($dir, "noquit", "${name}directory", $no_vlog) || usage "invalid ${name}directory (does not match regex criteria): '$dir'";
