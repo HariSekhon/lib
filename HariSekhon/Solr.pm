@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.7";
+$VERSION = "0.8";
 
 use strict;
 use warnings;
@@ -126,11 +126,18 @@ sub curl_solr_err_handler($){
     my $additional_information = "";
     if($json = isJson($content)){
         if(defined($json->{"error"})){
-            $additional_information = ". " . get_field2($json, "error.msg");
+            $additional_information .= ". " . get_field2($json, "error.msg");
             $additional_information =~ s/\n/,/g;
         }
+        # collection creation returns HTTP 200 and status 0 with only this error message :-/
+        if(defined($json->{"failure"})){
+            local $Data::Dumper::Terse = 1;
+            local $Data::Dumper::Indent = 0;
+            $additional_information .= ". Failure " . Dumper($json->{"failure"});
+        }
     }
-    unless($response->code eq "200"){
+    # must check for additional error or failure information having been collected since Solr collection creation returns HTTP 200 with header status 0 and only "failure" hash key message to detect the problem :-/
+    if($response->code ne "200" or $additional_information){
         #<title>Error 500 {msg=SolrCore 'collection1_shard1_replica2' is not available due to init failure: Index locked for write for core collection1_shard1_replica2,trace=org.apache.solr.common.SolrException: SolrCore 'collection1_shard1_replica2' is not available due to init failure: Index locked for write for core collection1_shard1_replica2
         if(not $additional_information and $response->content =~ /<title>Error\s+\d+\s*\{?([^\n]+)/){
             $additional_information = $1;
