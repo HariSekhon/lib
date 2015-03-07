@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.8.2";
+$VERSION = "0.8.3";
 
 use strict;
 use warnings;
@@ -34,16 +34,20 @@ our @EXPORT = ( qw (
                     $http_context
                     $list_collections
                     $list_cores
+                    $list_nodes
                     $list_shards
+                    $list_replicas
                     $no_warn_replicas
                     $num_found
                     $query_qtime
                     $query_status
                     $query_time
+                    $replica
                     $rows
                     $shard
                     $show_settings
                     $solr_admin
+                    $solr_node
                     $start
                     $ua
                     $url
@@ -51,19 +55,25 @@ our @EXPORT = ( qw (
                     %solroptions_collection
                     %solroptions_context
                     %solroptions_core
+                    %solroptions_node
                     %solroptions_list_cores
                     %solroptions_shard
+                    %solroptions_replica
                     check_collections
                     curl_solr
                     Dumper
                     get_solr_collections
                     get_solr_cores
+                    get_solr_nodes
+                    get_solr_replicas
                     get_solr_shards
                     isSolrCollection
                     isSolrCore
                     isSolrShard
                     list_solr_collections
                     list_solr_cores
+                    list_solr_nodes
+                    list_solr_replicas
                     list_solr_shards
                     msg_shard_status
                     query_solr
@@ -93,9 +103,13 @@ our $url;
 our $collection;
 our $core;
 our $shard;
+our $replica,
+our $solr_node;
 our $list_collections = 0;
 our $list_shards      = 0;
+our $list_replicas    = 0;
 our $list_cores       = 0;
+our $list_nodes       = 0;
 our $start = 0;
 our $rows  = 3;
 
@@ -115,12 +129,17 @@ env_vars("SOLR_CORE",       \$core);
 
 our %solroptions_collection = (
     "C|collection=s"    => [ \$collection,          "Solr Collection name (\$SOLR_COLLECTION)" ],
-    "list-collections"  => [ \$list_collections,    "List Collections for which there are loaded cores on given Solr instance (Solr 4 onwards)" ],
+    "list-collections"  => [ \$list_collections,    "List Collections (Solr 4 onwards)" ],
 );
 
 our %solroptions_shard = (
-        "s|shard=s"                 => [ \$shard,                       "Shard name, requires --collection" ],
-        "list-shards"               => [ \$list_shards,                 "List shards, requires --collection" ],
+    "s|shard=s"         => [ \$shard,               "Shard name, requires --collection" ],
+    "list-shards"       => [ \$list_shards,         "List shards, requires --collection" ],
+);
+
+our %solroptions_replica = (
+    "r|replica=s"       => [ \$replica,             "Replica name, requires --collection and --shard" ],
+    "list-replicas"     => [ \$list_replicas,       "List replicas, requires --collection" ],
 );
 
 our %solroptions_list_cores = (
@@ -130,6 +149,11 @@ our %solroptions_list_cores = (
 our %solroptions_core = (
     "C|core=s"          => [ \$core,                "Solr Core name (\$SOLR_CORE)" ],
     %solroptions_list_cores,
+);
+
+our %solroptions_node = (
+    "N|node=s"          => [ \$solr_node,           "Solr node name" ],
+    "list-nodes"        => [ \$list_nodes,          "List Solr nodes" ],
 );
 
 our %solroptions_context = (
@@ -258,6 +282,20 @@ sub list_solr_cores(){
     }
 }
 
+sub get_solr_nodes(){
+    $json = curl_solr "$solr_admin/collections?action=CLUSTERSTATUS";
+    return get_field_array("cluster.live_nodes");
+}
+
+sub list_solr_nodes(){
+    if($list_nodes){
+        my @nodes = get_solr_nodes();
+        print "Solr nodes:\n\n";
+        print join("\n", @nodes) . "\n";
+        exit $ERRORS{"UNKNOWN"};
+    }
+}
+
 sub get_solr_shards($){
     my $collection = shift;
     isSolrCollection($collection) or code_error "invalid collection passed to get_solr_shards()";
@@ -277,6 +315,37 @@ sub list_solr_shards($){
         my @shards = get_solr_shards($collection);
         print "Solr shards in Solr collection '$collection':\n\n";
         print join("\n", @shards) . "\n";
+        exit $ERRORS{"UNKNOWN"};
+    }
+}
+
+sub get_solr_replicas($){
+    my $collection = shift;
+    isSolrCollection($collection) or code_error "invalid collection passed to get_solr_replicas()";
+    $json = curl_solr "$solr_admin/collections?action=CLUSTERSTATUS";
+    my %collections = get_field_hash("cluster.collections");
+    unless(grep { $_ eq $collection } keys %collections){
+        quit "UNKNOWN", "couldn't find collection '$collection' for which to get replicas";
+    }
+    my %shards = get_field2_hash($collections{$collection}, "shards");
+    return %shards;
+}
+
+sub list_solr_replicas($){
+    if($list_replicas){
+        my $collection = shift;
+        isSolrCollection($collection) or code_error "invalid collection passed to list_solr_replicas()";
+        my %shards = get_solr_replicas($collection);
+        print "Solr replicas in Solr collection '$collection':\n\n";
+        foreach my $shard (sort keys %shards){
+            my %replicas = get_field2_hash($shards{$shard}, "replicas");
+            foreach my $replica (sort keys %replicas){
+                my $core  = get_field2($replicas{$replica}, "core");
+                my $node  = get_field2($replicas{$replica}, "node_name");
+                my $state = get_field2($replicas{$replica}, "state");
+                print "shard '$shard' replica '$replica' core '$core' node: '$node' state '$state'\n";
+            }
+        }
         exit $ERRORS{"UNKNOWN"};
     }
 }
