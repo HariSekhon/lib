@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.8.1";
+$VERSION = "0.8.2";
 
 use strict;
 use warnings;
@@ -142,8 +142,12 @@ sub curl_solr_err_handler($){
     my $json;
     my $additional_information = "";
     if($json = isJson($content)){
-        if(defined($json->{"error"})){
-            $additional_information .= ". " . get_field2($json, "error.msg");
+        if(defined($json->{"error"}->{"msg"})){
+            $additional_information .= ". Error msg: " . $json->{"error"}->{"msg"};
+            $additional_information =~ s/\n/,/g;
+        }
+        if(defined($json->{"error"}->{"trace"})){
+            $additional_information .= ". Error trace: " . $json->{"error"}->{"trace"};
             $additional_information =~ s/\n/,/g;
         }
         # collection creation returns HTTP 200 and status 0 with only this error message :-/
