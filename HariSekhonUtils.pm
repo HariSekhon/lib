@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.9.5";
+our $VERSION = "1.9.6";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -118,6 +118,7 @@ our %EXPORT_TAGS = (
                         isDnsShortname
                         isEmail
                         isFilename
+                        isDirname
                         isFloat
                         isFqdn
                         isHash
@@ -273,6 +274,7 @@ our %EXPORT_TAGS = (
                         validate_database_tablename
                         validate_dir
                         validate_directory
+                        validate_dirname
                         validate_domain
                         validate_domainname
                         validate_email
@@ -1746,6 +1748,7 @@ sub isFilename($){
     return undef unless($filename =~ /^($filename_regex)$/);
     return $1;
 }
+*isDirname = \&isFilename;
 
 
 sub isFloat ($;$) {
@@ -2864,6 +2867,26 @@ sub validate_filename ($;$$$) {
     }
     vlog_options($name, $filename2) unless $no_vlog;
     return $filename2;
+}
+
+
+sub validate_dirname ($;$$$) {
+    my $dirname = shift;
+    my $name     = shift || "";
+    my $noquit   = shift;
+    my $no_vlog  = shift;
+    $name .= " " if $name;
+    if(not defined($dirname) or $dirname =~ /^\s*$/){
+        usage "${name}directory not defined";
+        return undef;
+    }
+    my $dirname2;
+    unless($dirname2 = isDirname($dirname)){
+        usage "invalid ${name}directory (does not match regex critera): '$dirname'" unless $noquit;
+        return undef;
+    }
+    vlog_options("${name}directory", $dirname2) unless $no_vlog;
+    return $dirname2;
 }
 
 
