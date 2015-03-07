@@ -11,7 +11,7 @@
 
 package HariSekhon::ZooKeeper;
 
-$VERSION = "0.7.2";
+$VERSION = "0.8";
 
 use strict;
 use warnings;
@@ -51,6 +51,10 @@ our @EXPORT = ( qw (
                     zoo_cmd
                     zoo_debug
                     zookeeper_random_conn_order
+                    isZnode
+                    validate_znode
+                    isZookeeperEnsemble
+                    validate_zookeeper_ensemble
                 )
 );
 our @EXPORT_OK = ( @EXPORT );
@@ -271,6 +275,49 @@ sub translate_zoo_error($){
     use strict 'refs';
     return "<failed to translate zookeeper error for error code: $errno>";
 }
+
+sub isZnode($){
+    my $znode = shift;
+    defined($znode) or undef;
+    $znode =~ /^(\/(?:(?:[\w-]+\/)*[\w-]+)?)$/ or undef;
+    $znode = $1;
+    return $znode;
+}
+
+sub validate_znode($;$){
+    my $znode = shift;
+    my $name  = shift() || "";
+    $name .= " " if $name;
+    defined($znode) or usage "${name}znode not defined";
+    $znode = isZnode($znode) or usage "invalid ${name}znode";
+    return $znode;
+}
+
+sub isZookeeperEnsemble($){
+    my $zookeeper_ensemble = shift;
+    my $znode_chroot = $zookeeper_ensemble;
+    $znode_chroot =~ s/[^\/]+//;
+    $zookeeper_ensemble =~ s/\/.*$//;
+    #my @zookeeper_ensemble = validate_hosts($zookeeper_ensemble, $port);
+    my @zookeeper_ensemble = split(/\s*,\s*/, $zookeeper_ensemble);
+    foreach(my $i=0; $i < scalar @zookeeper_ensemble; $i++){
+        $zookeeper_ensemble[$i] = validate_hostport($zookeeper_ensemble[$i], "zookeeper index $i");
+    }
+    $zookeeper_ensemble = join(",", @zookeeper_ensemble);
+    if($znode_chroot){
+        $znode_chroot = isZnode($znode_chroot) or return undef;
+        $zookeeper_ensemble .= $znode_chroot;
+    }
+    return $zookeeper_ensemble;
+}
+
+sub validate_zookeeper_ensemble($){
+    my $zookeeper_ensemble = shift;
+    defined($zookeeper_ensemble) or usage "zookeeper ensemble not defined";
+    $zookeeper_ensemble = isZookeeperEnsemble($zookeeper_ensemble) or usage "invalid zookeeper ensemble";
+    return $zookeeper_ensemble;
+}
+
 
 # ============================================================================ #
 #                               Zoo 4lw support
