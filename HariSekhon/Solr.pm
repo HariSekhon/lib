@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.8";
+$VERSION = "0.8.1";
 
 use strict;
 use warnings;
@@ -34,12 +34,14 @@ our @EXPORT = ( qw (
                     $http_context
                     $list_collections
                     $list_cores
+                    $list_shards
                     $no_warn_replicas
                     $num_found
                     $query_qtime
                     $query_status
                     $query_time
                     $rows
+                    $shard
                     $show_settings
                     $solr_admin
                     $start
@@ -47,21 +49,29 @@ our @EXPORT = ( qw (
                     $url
                     %solroptions
                     %solroptions_collection
+                    %solroptions_context
                     %solroptions_core
                     %solroptions_list_cores
-                    %solroptions_context
-                    Dumper
+                    %solroptions_shard
                     check_collections
                     curl_solr
+                    Dumper
+                    get_solr_collections
+                    get_solr_cores
+                    get_solr_shards
                     isSolrCollection
+                    isSolrCore
+                    isSolrShard
                     list_solr_collections
                     list_solr_cores
+                    list_solr_shards
                     msg_shard_status
                     query_solr
                     validate_base_and_znode
                     validate_solr_collection
-                    validate_solr_core
                     validate_solr_context
+                    validate_solr_core
+                    validate_solr_shard
                 )
 );
 our @EXPORT_OK = ( @EXPORT );
@@ -82,8 +92,10 @@ our $url;
 
 our $collection;
 our $core;
-our $list_collections;
-our $list_cores;
+our $shard;
+our $list_collections = 0;
+our $list_shards      = 0;
+our $list_cores       = 0;
 our $start = 0;
 our $rows  = 3;
 
@@ -104,6 +116,11 @@ env_vars("SOLR_CORE",       \$core);
 our %solroptions_collection = (
     "C|collection=s"    => [ \$collection,          "Solr Collection name (\$SOLR_COLLECTION)" ],
     "list-collections"  => [ \$list_collections,    "List Collections for which there are loaded cores on given Solr instance (Solr 4 onwards)" ],
+);
+
+our %solroptions_shard = (
+        "s|shard=s"                 => [ \$shard,                       "Shard name, requires --collection" ],
+        "list-shards"               => [ \$list_shards,                 "List shards, requires --collection" ],
 );
 
 our %solroptions_list_cores = (
@@ -201,35 +218,61 @@ sub query_solr($$){
     curl_solr "$http_context/$collection/select?q=$query";
 }
 
+sub get_solr_collections(){
+    $json = curl_solr "$solr_admin/collections?action=LIST";
+    return get_field_array("collections");
+}
+
 sub list_solr_collections(){
     if($list_collections){
-        $json = curl_solr "$solr_admin/collections?action=LIST&distrib=false";
-        print "Solr Collections loaded on this Solr instance:\n\n";
-        #my @collections = get_field_array("collections");
-        #foreach(sort @collections){
-        #    print "$_\n";
-        #}
-        # more concise
-        print join("\n", get_field_array("collections")) . "\n";
+        my @collections = get_solr_collections();
+        print "Solr Collections:\n\n";
+        print join("\n", @collections) . "\n";
         exit $ERRORS{"UNKNOWN"};
     }
 }
 
+sub get_solr_cores(){
+    # not using this as it lists all cores, whereas it's more useful to only list cores for which there are cores on the given Solr server
+    #$json = curl_solr "$solr_admin/cores?action=LIST&distrib=false";
+    $json = curl_solr "$solr_admin/cores?distrib=false";
+    my %results = get_field_hash("status");
+    my %cores;
+    foreach(sort keys %results){
+        my $core = get_field2($results{$_}, "name");
+        $cores{$core} = 1;
+    }
+    return sort keys %cores;
+}
+
 sub list_solr_cores(){
     if($list_cores){
-        # not using this as it lists all cores, whereas it's more useful to only list cores for which there are cores on the given Solr server
-        #$json = curl_solr "$solr_admin/cores?action=LIST&distrib=false";
-        $json = curl_solr "$solr_admin/cores?distrib=false";
+        my @cores = get_solr_cores();
         print "Solr cores loaded on this Solr instance:\n\n";
-        my %results = get_field_hash("status");
-        my %cores;
-        foreach(sort keys %results){
-            my $core = get_field2($results{$_}, "name");
-            $cores{$core} = 1;
-        }
-        foreach(sort keys %cores){
-            print "$_\n";
-        }
+        print join("\n", @cores) . "\n";
+        exit $ERRORS{"UNKNOWN"};
+    }
+}
+
+sub get_solr_shards($){
+    my $collection = shift;
+    isSolrCollection($collection) or code_error "invalid collection passed to get_solr_shards()";
+    $json = curl_solr "$solr_admin/collections?action=CLUSTERSTATUS";
+    my %collections = get_field_hash("cluster.collections");
+    unless(grep { $_ eq $collection } keys %collections){
+        quit "UNKNOWN", "couldn't find collection '$collection' for which to get shards";
+    }
+    my %shards = get_field2_hash($collections{$collection}, "shards");
+    return sort keys %shards;
+}
+
+sub list_solr_shards($){
+    if($list_shards){
+        my $collection = shift;
+        isSolrCollection($collection) or code_error "invalid collection passed to list_solr_shards()";
+        my @shards = get_solr_shards($collection);
+        print "Solr shards in Solr collection '$collection':\n\n";
+        print join("\n", @shards) . "\n";
         exit $ERRORS{"UNKNOWN"};
     }
 }
@@ -409,7 +452,8 @@ sub isSolrCollection($){
     $collection =~ /^(\w+)$/ or return undef;
     return $1;
 }
-*isSolrCore = \&isSolrCollection;
+*isSolrCore  = \&isSolrCollection;
+*isSolrShard = \&isSolrCollection;
 
 sub validate_solr_collection($){
     my $collection = shift;
@@ -425,6 +469,14 @@ sub validate_solr_core($){
     $core = isSolrCore($core) or quit "CRITICAL", "invalid Solr core specified";
     vlog_options "core", $core;
     return $core;
+}
+
+sub validate_solr_shard($){
+    my $shard = shift;
+    defined($shard) or quit "CRITICAL", "Solr shard not specified";
+    $shard = isSolrShard($shard) or quit "CRITICAL", "invalid Solr shard specified";
+    vlog_options "shard", $shard;
+    return $shard;
 }
 
 sub validate_solr_context($){
