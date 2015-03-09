@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.8.3";
+$VERSION = "0.8.4";
 
 use strict;
 use warnings;
@@ -331,19 +331,38 @@ sub get_solr_replicas($){
     return %shards;
 }
 
-sub list_solr_replicas($){
+sub print_shard_replicas($$){
+    my $shard_ref = shift;
+    my $shard     = shift;
+    isHash($shard_ref) or code_error "non-hashref passed to print_shard_replicas";
+    my %shards = %{$shard_ref};
+    my %replicas = get_field2_hash($shards{$shard}, "replicas");
+    my $core;
+    my $node;
+    my $state;
+    foreach my $replica (sort keys %replicas){
+        $core  = get_field2($replicas{$replica}, "core");
+        $node  = get_field2($replicas{$replica}, "node_name");
+        $state = get_field2($replicas{$replica}, "state");
+        printf "shard %-10s\treplica %-20s\tcore %-20s\tnode: %-20s\tstate %s\n", "'$shard'", "'$replica'", "'$core'", "'$node'", "'$state'";
+    }
+}
+
+sub list_solr_replicas($;$){
     if($list_replicas){
         my $collection = shift;
+        my $shard      = shift;
         isSolrCollection($collection) or code_error "invalid collection passed to list_solr_replicas()";
         my %shards = get_solr_replicas($collection);
-        print "Solr replicas in Solr collection '$collection':\n\n";
-        foreach my $shard (sort keys %shards){
+        if($shard){
+            defined($shards{$shard}) or quit "UNKNOWN", "no replicas found for shard '$shard'. Did you specify the correct shard name? See --list-shards\n";
+            print "Solr replicas in Solr collection '$collection' shard '$shard':\n\n";
             my %replicas = get_field2_hash($shards{$shard}, "replicas");
-            foreach my $replica (sort keys %replicas){
-                my $core  = get_field2($replicas{$replica}, "core");
-                my $node  = get_field2($replicas{$replica}, "node_name");
-                my $state = get_field2($replicas{$replica}, "state");
-                print "shard '$shard' replica '$replica' core '$core' node: '$node' state '$state'\n";
+            print_shard_replicas(\%shards, $shard);
+        } else {
+            print "Solr replicas in Solr collection '$collection':\n\n";
+            foreach my $shard (sort keys %shards){
+                print_shard_replicas(\%shards, $shard);
             }
         }
         exit $ERRORS{"UNKNOWN"};
