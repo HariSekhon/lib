@@ -11,7 +11,7 @@
 
 package HariSekhon::ZooKeeper;
 
-$VERSION = "0.8";
+$VERSION = "0.8.1";
 
 use strict;
 use warnings;
@@ -64,7 +64,7 @@ our $DATA_READ_LEN = 500;
 
 # ZooKeeper Client Port
 our $ZK_DEFAULT_PORT = 2181;
-$port = $ZK_DEFAULT_PORT;
+set_port_default($ZK_DEFAULT_PORT);
 our @zk_valid_states = qw/leader follower standalone/;
 
 env_creds("ZOOKEEPER");
