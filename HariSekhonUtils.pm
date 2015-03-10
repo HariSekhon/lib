@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.9.6";
+our $VERSION = "1.9.7";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -667,8 +667,10 @@ sub add_user_options($){
 }
 
 my $default_port;
-sub set_port_default($){
-    defined($default_port) and code_error("default port cannot be set twice");
+sub set_port_default($;$){
+    #defined($default_port) and code_error("default port cannot be set twice");
+    # already defined, first one wins
+    defined($default_port) and not defined($_[1]) and return undef;
     $default_port = shift;
     isPort($default_port) or code_error("invalid port passed as first arg to set_port_default");
     $port = $default_port;
