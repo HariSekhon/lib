@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.9.7";
+our $VERSION = "1.9.8";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1430,7 +1430,7 @@ sub get_field2_float($$;$){
     my $noquit   = shift;
     my $value = get_field2($hash_ref, $field, $noquit);
     if($noquit){
-        return undef unless $value;
+        return undef unless defined($value);
     }
     assert_float($value, $field);
     return $value;
@@ -1458,7 +1458,7 @@ sub get_field2_int($$;$){
     my $noquit   = shift;
     my $value = get_field2($hash_ref, $field, $noquit);
     if($noquit){
-        return undef unless $value;
+        return undef unless defined($value);
     }
     assert_int($value, $field);
     return $value;
