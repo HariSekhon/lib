@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.8.5";
+$VERSION = "0.8.6";
 
 use strict;
 use warnings;
@@ -487,8 +487,8 @@ sub msg_shards($){
                 $msg .= "$shard,";
             }
             $msg =~ s/,$//;
+            $msg .= "), ";
         }
-        $msg .= "), ";
     }
     $msg =~ s/, $//;
 }
