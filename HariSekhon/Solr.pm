@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.8.7";
+$VERSION = "0.8.8";
 
 use strict;
 use warnings;
@@ -67,6 +67,7 @@ our @EXPORT = ( qw (
                     get_solr_nodes
                     get_solr_replicas
                     get_solr_shards
+                    find_solr_core
                     isSolrCollection
                     isSolrCore
                     isSolrShard
@@ -280,6 +281,21 @@ sub list_solr_cores(){
         print join("\n", @cores) . "\n";
         exit $ERRORS{"UNKNOWN"};
     }
+}
+
+sub find_solr_core($){
+    my $core = shift;
+    my @cores = get_solr_cores;
+    if(grep { $_ eq $core } @cores){
+        return $core;
+    } else {
+        foreach(@cores){
+            if($_ =~ /^${core}_shard\d+_replica\d+$/){
+                return $_;
+            }
+        }
+    }
+    return undef;
 }
 
 sub get_solr_nodes(){
