@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.8.6";
+$VERSION = "0.8.7";
 
 use strict;
 use warnings;
@@ -276,7 +276,7 @@ sub get_solr_cores(){
 sub list_solr_cores(){
     if($list_cores){
         my @cores = get_solr_cores();
-        print "Solr cores loaded on this Solr instance:\n\n";
+        print "Solr cores loaded on Solr instance '$host:$port':\n\n";
         print join("\n", @cores) . "\n";
         exit $ERRORS{"UNKNOWN"};
     }
