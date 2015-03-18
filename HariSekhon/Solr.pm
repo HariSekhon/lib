@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.8.8";
+$VERSION = "0.8.9";
 
 use strict;
 use warnings;
@@ -30,8 +30,11 @@ our @ISA = qw(Exporter);
 
 our @EXPORT = ( qw (
                     $collection
+                    $collections
+                    $collection_alias
                     $core
                     $http_context
+                    $list_collection_aliases
                     $list_collections
                     $list_cores
                     $list_nodes
@@ -53,6 +56,8 @@ our @EXPORT = ( qw (
                     $url
                     %solroptions
                     %solroptions_collection
+                    %solroptions_collections
+                    %solroptions_collection_aliases
                     %solroptions_context
                     %solroptions_core
                     %solroptions_node
@@ -72,6 +77,7 @@ our @EXPORT = ( qw (
                     isSolrCore
                     isSolrShard
                     list_solr_collections
+                    list_solr_collection_aliases
                     list_solr_cores
                     list_solr_nodes
                     list_solr_replicas
@@ -80,6 +86,8 @@ our @EXPORT = ( qw (
                     query_solr
                     validate_base_and_znode
                     validate_solr_collection
+                    validate_solr_collections
+                    validate_solr_collection_alias
                     validate_solr_context
                     validate_solr_core
                     validate_solr_shard
@@ -102,10 +110,13 @@ our $solr_admin = $default_solr_admin;
 our $url;
 
 our $collection;
+our $collections;
+our $collection_alias;
 our $core;
 our $shard;
 our $replica,
 our $solr_node;
+our $list_collection_aliases = 0;
 our $list_collections = 0;
 our $list_shards      = 0;
 our $list_replicas    = 0;
@@ -131,6 +142,14 @@ env_vars("SOLR_CORE",       \$core);
 our %solroptions_collection = (
     "C|collection=s"    => [ \$collection,          "Solr Collection name (\$SOLR_COLLECTION)" ],
     "list-collections"  => [ \$list_collections,    "List Collections (Solr 4 onwards)" ],
+);
+
+our %solroptions_collection_aliases = (
+    "A|collection-alias=s"    => [ \$collection_alias,        "Collection Alias" ],
+    "list-collection-aliases" => [ \$list_collection_aliases, "List Collection Aliases (Solr 4.9 onwards)" ],
+);
+our %solroptions_collections = (
+    "E|collections=s"   => [ \$collections,         "Collections, comma separated" ],
 );
 
 our %solroptions_shard = (
@@ -245,6 +264,26 @@ sub query_solr($$){
     # XXX: is this uri escaped later?
     $query = uri_escape($query);
     curl_solr "$http_context/$collection/select?q=$query";
+}
+
+sub get_solr_collection_aliases(){
+    $json = curl_solr "$solr_admin/collections?action=CLUSTERSTATUS";
+    return get_field("cluster.aliases", 1);
+}
+
+sub list_solr_collection_aliases(){
+    if($list_collection_aliases){
+        my $collection_aliases = get_solr_collection_aliases();
+        print "Solr Collection Aliases:\n\n";
+        if($collection_aliases){
+            foreach(sort keys %{$collection_aliases}){
+                print "$_ => $$collection_aliases{$_}\n";
+            }
+        } else {
+            print "<none>\n";
+        }
+        exit $ERRORS{"UNKNOWN"};
+    }
 }
 
 sub get_solr_collections(){
@@ -569,6 +608,27 @@ sub validate_solr_collection($){
     $collection = isSolrCollection($collection) or quit "CRITICAL", "invalid Solr collection specified";
     vlog_options "collection", $collection;
     return $collection;
+}
+
+sub validate_solr_collections($){
+    my $collections = shift;
+    defined($collections) or quit "CRITICAL", "Solr collections not specified";
+    my @collections;
+    foreach my $collection (split(/\s*,\s*/, $collections)){
+        $collection = isSolrCollection($collection) or quit "CRITICAL", "invalid Solr collection '$collection' specified";
+        push(@collections, $collection);
+    }
+    $collections = join(",", @collections);
+    vlog_options "collections", $collections;
+    return $collections;
+}
+
+sub validate_solr_collection_alias($){
+    my $collection_alias = shift;
+    defined($collection_alias) or quit "CRITICAL", "Solr collection alias not specified";
+    $collection_alias = isSolrCollection($collection_alias) or quit "CRITICAL", "invalid Solr collection alias specified";
+    vlog_options "collection alias", $collection_alias;
+    return $collection_alias;
 }
 
 sub validate_solr_core($){
