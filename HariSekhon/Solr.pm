@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.8.9";
+$VERSION = "0.8.10";
 
 use strict;
 use warnings;
@@ -138,6 +138,8 @@ our %solroptions = (
 
 env_vars("SOLR_COLLECTION", \$collection);
 env_vars("SOLR_CORE",       \$core);
+env_vars("SOLR_COLLECTION_ALIAS", \$collection_alias);
+env_vars("SOLR_COLLECTIONS",      \$collections);
 
 our %solroptions_collection = (
     "C|collection=s"    => [ \$collection,          "Solr Collection name (\$SOLR_COLLECTION)" ],
@@ -145,11 +147,11 @@ our %solroptions_collection = (
 );
 
 our %solroptions_collection_aliases = (
-    "A|collection-alias=s"    => [ \$collection_alias,        "Collection Alias" ],
+    "A|collection-alias=s"    => [ \$collection_alias,        "Collection Alias (\$SOLR_COLLECTION_ALIAS)" ],
     "list-collection-aliases" => [ \$list_collection_aliases, "List Collection Aliases (Solr 4.9 onwards)" ],
 );
 our %solroptions_collections = (
-    "E|collections=s"   => [ \$collections,         "Collections, comma separated" ],
+    "E|collections=s"   => [ \$collections,         "Collections, comma separated (\$SOLR_COLLECTIONS)" ],
 );
 
 our %solroptions_shard = (
