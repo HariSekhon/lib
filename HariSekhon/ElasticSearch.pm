@@ -30,18 +30,23 @@ our @ISA = qw(Exporter);
 
 our @EXPORT = ( qw (
                     $ua
+                    %es_status_map
+                    check_elasticsearch_status
+                    check_es_status
                     curl_elasticsearch
-                    isElasticSearchCluster
-                    isElasticSearchIndex
-                    isESCluster
-                    isESIndex
+                    isElasticsearchCluster
+                    isElasticsearchIndex
                     validate_elasticsearch_cluster
                     validate_elasticsearch_index
-                    validate_es_cluster
-                    validate_es_index
                 )
 );
 our @EXPORT_OK = ( @EXPORT );
+
+our %es_status_map = (
+    "green"  => "all primary and replica shards are active",
+    "yellow" => "all primary shards are active but not all replica shards are online",
+    "red"    => "not all primary shards are active! Some data will be missing from search queries!!",
+);
 
 sub curl_elasticsearch($){
     my $url = shift;
@@ -55,8 +60,31 @@ sub curl_elasticsearch($){
     $url .= "&pretty=true" if $verbose >= 3 or $debug;
     my $content = curl "http://$host:$port/$url";
     $json = isJson($content) or quit "CRITICAL", "non-json returned by ElasticSearch!";
+    # probably not a good idea - lacks flexibility, may still be able to get partial information from returned json
+    #if(get_field("timed_out")){
+    #    quit "CRITICAL", "timed_out: true";
+    #}
     return $json;
 }
+
+sub check_elasticsearch_status($;$){
+    my $es_status = shift;
+    my $msg .= ", status: '$es_status'";
+    if($es_status eq "green"){
+        # ok
+    } elsif($es_status eq "yellow"){
+        warning;
+    } else {
+        critical;
+    }
+    if($verbose){
+        if(grep { $_ eq $es_status } keys %es_status_map){
+            $msg .= " (" . $es_status_map{$es_status} . ")";
+        }
+    }
+    return $msg;
+}
+#*check_es_status = \&check_elasticsearch_status;
 
 sub isElasticSearchCluster($){
     my $cluster = shift;
@@ -67,7 +95,7 @@ sub isElasticSearchCluster($){
     #$cluster = $1;
     #return $cluster;
 }
-*isESCluster = \&isElasticSearchCluster;
+#*isESCluster = \&isElasticSearchCluster;
 
 sub isElasticSearchIndex($){
     my $index = shift;
@@ -77,7 +105,7 @@ sub isElasticSearchIndex($){
     $index = $1;
     return $index;
 }
-*isESIndex = \&isElasticSearchIndex;
+#*isESIndex = \&isElasticSearchIndex;
 
 sub validate_elasticsearch_cluster($){
     my $cluster = shift;
@@ -85,7 +113,7 @@ sub validate_elasticsearch_cluster($){
     vlog_options "cluster", $cluster;
     return $cluster;
 }
-*validate_es_cluster = \&validate_elasticsearch_cluster;
+#*validate_es_cluster = \&validate_elasticsearch_cluster;
 
 sub validate_elasticsearch_index($){
     my $index = shift;
@@ -93,4 +121,4 @@ sub validate_elasticsearch_index($){
     vlog_options "index", $index;
     return $index;
 }
-*validate_es_index = \&validate_elasticsearch_index;
+#*validate_es_index = \&validate_elasticsearch_index;
