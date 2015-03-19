@@ -7,7 +7,7 @@
 #  License: see accompanying LICENSE file
 #  
 
-package HariSekhon::ElasticSearch;
+package HariSekhon::Elasticsearch;
 
 $VERSION = "0.2";
 
