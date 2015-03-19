@@ -9,7 +9,7 @@
 
 package HariSekhon::ElasticSearch;
 
-$VERSION = "0.1";
+$VERSION = "0.2";
 
 use strict;
 use warnings;
@@ -31,6 +31,14 @@ our @ISA = qw(Exporter);
 our @EXPORT = ( qw (
                     $ua
                     curl_elasticsearch
+                    isElasticSearchCluster
+                    isElasticSearchIndex
+                    isESCluster
+                    isESIndex
+                    validate_elasticsearch_cluster
+                    validate_elasticsearch_index
+                    validate_es_cluster
+                    validate_es_index
                 )
 );
 our @EXPORT_OK = ( @EXPORT );
@@ -49,3 +57,40 @@ sub curl_elasticsearch($){
     $json = isJson($content) or quit "CRITICAL", "non-json returned by ElasticSearch!";
     return $json;
 }
+
+sub isElasticSearchCluster($){
+    my $cluster = shift;
+    return isAlNum($cluster);
+    #defined($cluster) or return undef;
+    ## must be lowercase
+    #$cluster =~ /^([a-z0-9]+)$/ or return undef;
+    #$cluster = $1;
+    #return $cluster;
+}
+*isESCluster = \&isElasticSearchCluster;
+
+sub isElasticSearchIndex($){
+    my $index = shift;
+    defined($index) or return undef;
+    # must be lowercase
+    $index =~ /^([a-z0-9]+)$/ or return undef;
+    $index = $1;
+    return $index;
+}
+*isESIndex = \&isElasticSearchIndex;
+
+sub validate_elasticsearch_cluster($){
+    my $cluster = shift;
+    $cluster = isESCluster($cluster) or usage "invalid ElasticSearch cluster name given, must be lowercase alphanumeric";
+    vlog_options "cluster", $cluster;
+    return $cluster;
+}
+*validate_es_cluster = \&validate_elasticsearch_cluster;
+
+sub validate_elasticsearch_index($){
+    my $index = shift;
+    $index = isESIndex($index) or usage "invalid ElasticSearch index name given, must be lowercase alphanumeric";
+    vlog_options "index", $index;
+    return $index;
+}
+*validate_es_index = \&validate_elasticsearch_index;
