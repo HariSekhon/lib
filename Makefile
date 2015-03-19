@@ -19,6 +19,8 @@ make:
 	# order here is important, in Travis and some stripped down client some deps are not pulled in automatically but are required for subsequent module builds
 	yes "" | $(SUDO) cpan \
 		Data::Dumper \
+		ExtUtils::Constant \
+		IO::Socket::IP \
 		JSON \
 		JSON:XS \
 		LWP::Simple \
