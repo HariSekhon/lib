@@ -9,7 +9,7 @@
 
 package HariSekhon::Elasticsearch;
 
-$VERSION = "0.2";
+$VERSION = "0.2.1";
 
 use strict;
 use warnings;
@@ -101,7 +101,7 @@ sub isElasticSearchIndex($){
     my $index = shift;
     defined($index) or return undef;
     # must be lowercase
-    $index =~ /^([a-z0-9]+)$/ or return undef;
+    $index =~ /^([a-z0-9][a-z0-9_-]+)$/ or return undef;
     $index = $1;
     return $index;
 }
