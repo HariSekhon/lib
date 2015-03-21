@@ -64,7 +64,7 @@ use Scalar::Util 'blessed';
 #use Sys::Hostname;
 use Time::Local;
 
-our $VERSION = "1.9.8";
+our $VERSION = "1.9.9";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -172,6 +172,7 @@ our %EXPORT_TAGS = (
                         check_threshold
                         check_thresholds
                         env_creds
+                        env_var
                         env_vars
                         expand_units
                         human_units
@@ -992,7 +993,9 @@ sub check_regex ($$;$) {
     my $string = shift;
     my $regex  = shift;
     my $no_msg = shift;
-    if($regex and $string !~ /$regex/){
+    defined($string) or code_error("undefined string passed to check_string()");
+    defined($regex)  or code_error("undefined regex passed to check_regex()");
+    if($string !~ /$regex/){
         critical;
         $msg .= " (expected regex: '$regex')" unless $no_msg;
         return undef;
@@ -1003,9 +1006,10 @@ sub check_regex ($$;$) {
 
 sub check_string ($$;$) {
     my $string           = shift;
+    defined($string) or code_error("undefined string passed to check_string()");
     my $expected_string  = shift;
     my $no_msg           = shift;
-    if($expected_string and $string ne $expected_string){
+    if(defined($expected_string) and $string ne $expected_string){
         critical;
         $msg .= " (expected: '$expected_string')" unless $no_msg;
         return undef;
@@ -1201,8 +1205,8 @@ sub curl ($;$$$$$$) {
     my $password = shift;
     my $err_sub  = shift;
     my $type     = shift() || 'GET';
-    my $req_content = shift;
-    $type eq "GET" or $type eq "POST" or code_error "unsupported type '$type' passed to curl() as sixth argument";
+    my $body     = shift;
+    grep { $type eq $_ } qw/GET POST DELETE HEAD/ or code_error "unsupported type '$type' passed to curl() as sixth argument";
     #debug("url passed to curl: $url");
     defined($url) or code_error "no URL passed to curl()";
     my $url2 = isUrl($url) or code_error "invalid URL '$url' supplied to curl()";
@@ -1245,7 +1249,7 @@ sub curl ($;$$$$$$) {
     # Doesn't work
     #$ua->credentials($host, '', $user, $password);
     $req->authorization_basic($user, $password) if (defined($user) and defined($password));
-    $req->content($req_content) if $req_content;
+    $req->content($body) if $body;
     my $response = $main::ua->request($req);
     my $content  = $response->content;
     vlog3("returned HTML:\n\n" . ( $content ? $content : "<blank>" ) . "\n");
@@ -1259,13 +1263,11 @@ sub curl ($;$$$$$$) {
             my $additional_information = "";
             my $json;
             if($json = isJson($content)){
-                if(defined($json->{"status"})){
-                    $additional_information .= ". Status: " . $json->{"status"};
-                }
-                if(defined($json->{"reason"})){
-                    $additional_information .= ". Reason: " . $json->{"reason"};
-                } elsif(defined($json->{"message"})){
-                    $additional_information .= ". Message: " . $json->{"message"};
+                foreach(qw/status error message reason/){
+                    if(defined($json->{$_})){
+                        $_ eq "status" and $json->{$_} eq $response->code and next;
+                        $additional_information .= ". " . ucfirst($_) . ": " . $json->{$_};
+                    }
                 }
             }
             quit("CRITICAL", $response->code . " " . $response->message . $additional_information);
@@ -1285,8 +1287,8 @@ sub curl_json ($;$$$$$$) {
     my $password    = shift;
     my $err_handler = shift;
     my $type        = shift() || 'GET';
-    my $req_content = shift;
-    my $content     = curl $url, $name, $user, $password, $err_handler, $type, $req_content;
+    my $body        = shift;
+    my $content     = curl $url, $name, $user, $password, $err_handler, $type, $body;
     vlog2("parsing output from " . ( $name ? $name : $url ) . "\n");
     $json = isJson($content) or quit "CRITICAL", "invalid json returned " . ( $name ? "by $name at $url" : "from $url");
 }
