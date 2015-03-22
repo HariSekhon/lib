@@ -9,7 +9,7 @@
 
 package HariSekhon::Elasticsearch;
 
-$VERSION = "0.3.1";
+$VERSION = "0.3.2";
 
 use strict;
 use warnings;
@@ -169,7 +169,7 @@ sub isElasticSearchIndex($){
 
 sub list_elasticsearch_indices {
     if($list_indices){
-        my $content = curl "http://$host:$port/_cat/indices?h=index", "Elasticsearch", undef, undef, sub {}, "GET";
+        my $content = curl_elasticsearch_raw "/_cat/indices?h=index";
         print "Elasticsearch Indices:\n\n";
         print "<none>\n" unless $content;
         foreach(split(/\n/, $content)){
