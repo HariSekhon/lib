@@ -74,7 +74,7 @@ our %elasticsearch_type = (
     "list-types"    =>  [ \$list_types,     "List Elasticsearch types in given index" ],
 );
 
-splice @usage_order, 6, 0, qw/index type list-indices list-types/;
+splice @usage_order, 6, 0, qw/index type shards replicas keys key value list-indices list-types/;
 
 sub elasticsearch_err_handler($){
     my $response = shift;
