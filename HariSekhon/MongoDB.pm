@@ -9,7 +9,7 @@
 
 package HariSekhon::MongoDB;
 
-$VERSION = "0.1";
+$VERSION = "0.1.1";
 
 use strict;
 use warnings;
@@ -20,6 +20,7 @@ BEGIN {
 use HariSekhonUtils;
 use Carp;
 use JSON;
+use MongoDB;
 use MongoDB::MongoClient;
 
 use Exporter;
