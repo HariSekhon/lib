@@ -9,7 +9,7 @@
 
 package HariSekhon::Elasticsearch;
 
-$VERSION = "0.3.2";
+$VERSION = "0.3.3";
 
 use strict;
 use warnings;
@@ -160,8 +160,8 @@ sub isElasticSearchCluster($){
 sub isElasticSearchIndex($){
     my $index = shift;
     defined($index) or return undef;
-    # must be lowercase, can't start with an underscore but can start with numbers
-    $index =~ /^([a-z0-9][a-z0-9\._-]+)$/ or return undef;
+    # must be lowercase, can't start with an underscore
+    $index =~ /^([a-z0-9\.][a-z0-9\._-]+)$/ or return undef;
     $index = $1;
     return $index;
 }
