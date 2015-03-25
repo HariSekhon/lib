@@ -9,7 +9,7 @@
 
 package HariSekhon::Elasticsearch;
 
-$VERSION = "0.3.3";
+$VERSION = "0.3.4";
 
 use strict;
 use warnings;
@@ -41,8 +41,8 @@ our @EXPORT = ( qw (
                     check_es_status
                     curl_elasticsearch
                     curl_elasticsearch_raw
-                    isElasticsearchCluster
-                    isElasticsearchIndex
+                    isElasticSearchCluster
+                    isElasticSearchIndex
                     list_elasticsearch_indices
                     validate_elasticsearch_cluster
                     validate_elasticsearch_index
