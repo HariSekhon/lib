@@ -9,7 +9,7 @@
 
 package HariSekhon::HBase;
 
-$VERSION = "0.1";
+$VERSION = "0.2";
 
 use strict;
 use warnings;
@@ -26,8 +26,10 @@ our @ISA = qw(Exporter);
 our @EXPORT = ( qw (
                         isHBaseColumnQualifier
                         isHBaseRowKey
+                        isHBaseTable
                         validate_hbase_column_qualifier
                         validate_hbase_rowkey
+                        validate_hbase_table
                 )
 );
 our @EXPORT_OK = ( @EXPORT );
@@ -36,7 +38,7 @@ our @EXPORT_OK = ( @EXPORT );
 
 sub isHBaseColumnQualifier ($) {
     my $column = shift;
-    defined($column) or code_error "no column passed to isHBaseColumnQualifier()";
+    defined($column) or return undef;
     if($column =~ /^([\w\s\(\)\:#]+)$/){
         return $1;
     }
@@ -45,8 +47,17 @@ sub isHBaseColumnQualifier ($) {
 
 sub isHBaseRowKey ($) {
     my $rowkey = shift;
-    defined($rowkey) or code_error "no row key passed to isHBaseRowKey()";
+    defined($rowkey) or return undef;
     if($rowkey =~ /^([\w\:#]+)$/){
+        return $1;
+    }
+    return undef;
+}
+
+sub isHBaseTable ($) {
+    my $table = shift;
+    defined($table) or return undef;
+    if($table =~ /^([\w\:]+)$/){
         return $1;
     }
     return undef;
@@ -54,18 +65,26 @@ sub isHBaseRowKey ($) {
 
 sub validate_hbase_column_qualifier ($) {
     my $column = shift;
-    defined($column) || usage "column not defined";
-    $column = isHBaseColumnQualifier($column) || usage "invalid column qualifier defined";
+    defined($column) || usage "hbase column not defined";
+    $column = isHBaseColumnQualifier($column) || usage "invalid hbase column qualifier defined";
     vlog_options("column qualifier", $column);
     return $column;
 }
 
 sub validate_hbase_rowkey ($) {
     my $rowkey = shift;
-    defined($rowkey) || usage "rowkey not defined";
-    $rowkey = isHBaseRowKey($rowkey) || usage "invalid rowkey defined: must be alphanumeric, colons and # are allowed for compound keys";
+    defined($rowkey) || usage "hbase rowkey not defined";
+    $rowkey = isHBaseRowKey($rowkey) || usage "invalid hbase rowkey defined: must be alphanumeric, colons and # are allowed for compound keys";
     vlog_options("rowkey", $rowkey);
     return $rowkey;
+}
+
+sub validate_hbase_table ($) {
+    my $table = shift;
+    defined($table) || usage "hbase table not defined";
+    $table = isHBasetable($table) || usage "invalid hbase table defined: must be alphanumeric, colons and # are allowed for compound keys";
+    vlog_options("table", $table);
+    return $table;
 }
 
 1;
