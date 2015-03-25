@@ -34,12 +34,12 @@ our @EXPORT = ( qw (
 );
 our @EXPORT_OK = ( @EXPORT );
 
-# copied from my std lib from isDatabase* and validate_database_*
+# based off my std lib from isDatabase* and validate_database_*
 
 sub isHBaseColumnQualifier ($) {
     my $column = shift;
     defined($column) or return undef;
-    if($column =~ /^([\w\s\(\)\:#]+)$/){
+    if($column =~ /^([A-Za-z][\w\s\(\)\:#]+)$/){
         return $1;
     }
     return undef;
@@ -48,7 +48,7 @@ sub isHBaseColumnQualifier ($) {
 sub isHBaseRowKey ($) {
     my $rowkey = shift;
     defined($rowkey) or return undef;
-    if($rowkey =~ /^([\w\:#]+)$/){
+    if($rowkey =~ /^([A-Za-z][\w\:#]+)$/){
         return $1;
     }
     return undef;
@@ -57,7 +57,7 @@ sub isHBaseRowKey ($) {
 sub isHBaseTable ($) {
     my $table = shift;
     defined($table) or return undef;
-    if($table =~ /^([\w\:]+)$/){
+    if($table =~ /^([A-Za-z][\w\:]+)$/){
         return $1;
     }
     return undef;
