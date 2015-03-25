@@ -15,8 +15,8 @@ BEGIN {
 }
 require_ok('HariSekhon::HBase');
 
-is(isHBaseColumnQualifier('cf1:q1'), 'cf1:q1', "isHBaseColumnQualifier('cf1')");
-is(isHBaseColumnQualifier('?'), undef, "isHBaseColumnQualifier('cf1')");
+is(isHBaseColumnQualifier('cf1:q1'), 'cf1:q1', "isHBaseColumnQualifier('cf1') eq cf1:q1");
+is(isHBaseColumnQualifier('?'), undef, "isHBaseColumnQualifier('cf1') eq undef");
 
 is(isHBaseRowKey('one#two'), 'one#two', "isHBaseRowKey('one#two') eq one#two");
 is(isHBaseRowKey('?'), undef, "isHBaseRowKey('?') eq undef");
