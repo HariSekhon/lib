@@ -62,9 +62,10 @@ use POSIX;
 use JSON 'decode_json';
 use Scalar::Util 'blessed';
 #use Sys::Hostname;
+use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.9.10";
+our $VERSION = "1.10.0";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2310,8 +2311,11 @@ sub plural ($) {
 }
 
 
+my ($wchar, $hchar, $wpixels, $hpixels);
 sub print_options (@) {
     #subtrace(@_);
+    my $switch_width = $short_options_len + 2 + $long_options_len + 4 - 1;
+    my $desc_width   = $wchar - $switch_width;
     foreach my $option (@_){
         my $option_regex = $option;
         $option_regex  =~ s/^\w\|//;
@@ -2328,7 +2332,23 @@ sub print_options (@) {
             #debug $options{$_};
             #debug "options long value is $options{$_}{desc}";
             if($options{$_}{"long"} =~ /^.*--(?:$option_regex)\s*$/ or $options{$_}{"short"} =~ /^-(?:$option_regex)\s*$/){
-                printf STDERR "%-${short_options_len}s  %-${long_options_len}s \t%s\n", $options{$_}{"short"}, $options{$_}{"long"}, $options{$_}{"desc"};
+                # This format string must match the length of $switch_width at top of sub
+                printf STDERR "%-${short_options_len}s  %-${long_options_len}s    ", $options{$_}{"short"}, $options{$_}{"long"};
+                my $option_desc_len = length($options{$_}{"desc"});
+                for(my $start=0; $start < $option_desc_len; ){
+                    my ($len, $end);
+                    if($option_desc_len - $start < $desc_width){
+                        $end = $option_desc_len;
+                    } else {
+                        $end = rindex($options{$_}{"desc"}, " ", $start + $desc_width - 1);
+                    }
+                    $len = $end - $start;
+                    if($start > 0){ # and $end <= $option_desc_len){
+                        printf STDERR "%${switch_width}s", "";
+                    }
+                    printf STDERR "%s\n", substr($options{$_}{"desc"}, $start, $len);
+                    $start += $len;
+                }
                 delete $options{$_};
                 last;
             }
@@ -2608,6 +2628,7 @@ sub uniq_array2(@){
 }
 
 sub usage (;@) {
+    ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize();
     print STDERR "@_\n\n" if (@_);
     if(not @_ and $main::DESCRIPTION){
         print STDERR "Hari Sekhon - https://github.com/harisekhon" . ( $github_repo ? "/$github_repo" : "" );
