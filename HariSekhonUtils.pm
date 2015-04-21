@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.10.1";
+our $VERSION = "1.10.2";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2639,6 +2639,8 @@ sub usage (;@) {
         #print STDERR "$main::DESCRIPTION\n\n";
         my $desc_len = length($main::DESCRIPTION);
         for(my $start=0; $start < $desc_len; ){
+            #print "desc len $desc_len\n";
+            #print "start $start\n";
             my ($len, $end);
             # reset the start to after newlines
             # the problem is that the start is taken across newlines
@@ -2646,13 +2648,24 @@ sub usage (;@) {
                 $end = $desc_len;
             } else {
                 my $newline_index = rindex($main::DESCRIPTION, "\n", $start + $wchar - 1);
-                if($newline_index > 0 and $newline_index > $start){
+                my $space_index   = rindex($main::DESCRIPTION, " ",  $start + $wchar - 1);
+                if($newline_index >= $start){
+                    #print "newline index $newline_index\n";
                     $end = $newline_index;
-                } else {
-                    $end = rindex($main::DESCRIPTION, " ", $start + $wchar - 1);
+                } elsif($space_index > $start){
+                    $end = $space_index;
+                } else{
+                    $newline_index = index($main::DESCRIPTION, "\n", $start);
+                    if($newline_index >= $start){
+                        $end = $newline_index;
+                    } else {
+                        $end = $desc_len;
+                    }
                 }
             }
+            #print "end $end\n";
             $len = $end - $start;
+            #print "len $len\n";
             printf STDERR "%s\n", substr($main::DESCRIPTION, $start, $len);
             $start = $end + 1;
         }
