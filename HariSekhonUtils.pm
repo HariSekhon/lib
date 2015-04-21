@@ -2634,9 +2634,9 @@ sub usage (;@) {
         print STDERR "Hari Sekhon - https://github.com/harisekhon";
         if($github_repo){
             print STDERR "/$github_repo";
-        } elsif(dirname(__FILE__) =~ /toolbox/i){
+        } elsif(dirname(abs_path(__FILE__)) =~ /toolbox/i){
             print STDERR "/toolbox";
-        } elsif(dirname(__FILE__) =~ /nagios-plugins/i or $main::DESCRIPTION =~ /Nagios/i){
+        } elsif(dirname(abs_path(__FILE__)) =~ /nagios-plugins/i or $main::DESCRIPTION =~ /Nagios/i){
             print STDERR "/nagios-plugins";
         }
         print STDERR "\n\n$progname\n\n";
