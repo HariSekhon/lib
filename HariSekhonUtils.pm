@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.10.0";
+our $VERSION = "1.10.1";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2347,7 +2347,7 @@ sub print_options (@) {
                         printf STDERR "%${switch_width}s", "";
                     }
                     printf STDERR "%s\n", substr($options{$_}{"desc"}, $start, $len);
-                    $start += $len;
+                    $start = $end;
                 }
                 delete $options{$_};
                 last;
@@ -2636,7 +2636,27 @@ sub usage (;@) {
             print STDERR "/nagios-plugins";
         }
         print STDERR "\n\n$progname\n\n";
-        print STDERR "$main::DESCRIPTION\n\n";
+        #print STDERR "$main::DESCRIPTION\n\n";
+        my $desc_len = length($main::DESCRIPTION);
+        for(my $start=0; $start < $desc_len; ){
+            my ($len, $end);
+            # reset the start to after newlines
+            # the problem is that the start is taken across newlines
+            if(($desc_len - $start) < $wchar){
+                $end = $desc_len;
+            } else {
+                my $newline_index = rindex($main::DESCRIPTION, "\n", $start + $wchar - 1);
+                if($newline_index > 0 and $newline_index > $start){
+                    $end = $newline_index;
+                } else {
+                    $end = rindex($main::DESCRIPTION, " ", $start + $wchar - 1);
+                }
+            }
+            $len = $end - $start;
+            printf STDERR "%s\n", substr($main::DESCRIPTION, $start, $len);
+            $start = $end + 1;
+        }
+        print STDERR "\n";
     }
     print STDERR "$usage_line\n\n";
     foreach my $key_orig (sort keys %options){
