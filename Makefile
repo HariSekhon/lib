@@ -36,6 +36,7 @@ make:
 		Redis \
 		Readonly \
 		Readonly::XS \
+		Term::ReadKey \
 		Thrift \
 		Time::HiRes \
 		XML::SAX \
