@@ -2340,8 +2340,19 @@ sub print_options (@) {
                     if($option_desc_len - $start < $desc_width){
                         $end = $option_desc_len;
                     } else {
-                        $end = rindex($options{$_}{"desc"}, " ", $start + $desc_width - 1);
+                        my $space_index   = rindex($options{$_}{"desc"}, " ",  $start + $desc_width - 1);
+                        if($space_index > $start){
+                            $end = $space_index;
+                        } else{
+                            $space_index = index($options{$_}{"desc"}, " ", $start);
+                            if($space_index > $start){
+                                $end = $space_index;
+                            } else {
+                                $end = $option_desc_len;
+                            }
+                        }
                     }
+                    $end > $start or $end = $option_desc_len;
                     $len = $end - $start;
                     if($start > 0){ # and $end <= $option_desc_len){
                         printf STDERR "%${switch_width}s", "";
@@ -2653,14 +2664,14 @@ sub usage (;@) {
             } else {
                 my $newline_index = rindex($main::DESCRIPTION, "\n", $start + $wchar - 1);
                 my $space_index   = rindex($main::DESCRIPTION, " ",  $start + $wchar - 1);
-                if($newline_index >= $start){
+                if($newline_index > $start){
                     #print "newline index $newline_index\n";
                     $end = $newline_index;
                 } elsif($space_index > $start){
                     $end = $space_index;
                 } else{
                     $newline_index = index($main::DESCRIPTION, "\n", $start);
-                    if($newline_index >= $start){
+                    if($newline_index > $start){
                         $end = $newline_index;
                     } else {
                         $end = $desc_len;
@@ -2668,6 +2679,7 @@ sub usage (;@) {
                 }
             }
             #print "end $end\n";
+            $end > $start or $end = $desc_len;
             $len = $end - $start;
             #print "len $len\n";
             printf STDERR "%s\n", substr($main::DESCRIPTION, $start, $len);
