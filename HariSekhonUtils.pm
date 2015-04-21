@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.10.2";
+our $VERSION = "1.10.3";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2631,8 +2631,12 @@ sub usage (;@) {
     ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize();
     print STDERR "@_\n\n" if (@_);
     if(not @_ and $main::DESCRIPTION){
-        print STDERR "Hari Sekhon - https://github.com/harisekhon" . ( $github_repo ? "/$github_repo" : "" );
-        if($main::DESCRIPTION =~ /Nagios/i){
+        print STDERR "Hari Sekhon - https://github.com/harisekhon";
+        if($github_repo){
+            print STDERR "/$github_repo";
+        } elsif(dirname(__FILE__) =~ /toolbox/i){
+            print STDERR "/toolbox";
+        } elsif(dirname(__FILE__) =~ /nagios-plugins/i or $main::DESCRIPTION =~ /Nagios/i){
             print STDERR "/nagios-plugins";
         }
         print STDERR "\n\n$progname\n\n";
