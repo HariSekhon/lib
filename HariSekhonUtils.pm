@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.10.3";
+our $VERSION = "1.10.4";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -360,6 +360,7 @@ our %EXPORT_TAGS = (
                         %thresholdoptions
                         %thresholds
                         %tlsoptions
+                        %useroption
                         %useroptions
                         @usage_order
                     ) ],
@@ -619,7 +620,7 @@ our %hostoptions = (
     "P|port=s"      => [ \$port, "Port to connect to" ],
 );
 our %useroptions = (
-    "u|user=s"      => [ \$user,     "User     to connect with" ],
+    "u|user=s"      => [ \$user,     "User to connect with" ],
     "p|password=s"  => [ \$password, "Password to connect with" ],
 );
 our %thresholdoptions = (
@@ -780,7 +781,7 @@ sub env_creds($;$){
 
     $hostoptions{"H|host=s"}[1]     = "$longname host (" . join(", ", @host_envs) . ")";
     $hostoptions{"P|port=s"}[1]     = "$longname port (" . join(", ", @port_envs) . ( defined($port) ? ", default: $port)" : ")");
-    $useroptions{"u|user=s"}[1]     = "$longname user     (" . join(", ", @user_envs) . ")";
+    $useroptions{"u|user=s"}[1]     = "$longname user (" . join(", ", @user_envs) . ")";
     $useroptions{"p|password=s"}[1] = "$longname password (" . join(", ", @password_envs) . ")";
 }
 
