@@ -6,9 +6,17 @@
 # Library dependencies are handled in one place in calling project
 
 ifdef TRAVIS
-	SUDO =
+    SUDO2 =
 else
-	SUDO = sudo
+    SUDO2 = sudo
+endif
+
+# EUID /  UID not exported in Make
+ifeq '$(USER)' 'root'
+    SUDO =
+    SUDO2 =
+else
+    SUDO = sudo
 endif
 
 .PHONY: make
@@ -17,7 +25,7 @@ make:
 	[ -x /usr/bin/yum ]     && make yum-packages || :
 
 	# order here is important, in Travis and some stripped down client some deps are not pulled in automatically but are required for subsequent module builds
-	yes "" | $(SUDO) cpan \
+	yes "" | $(SUDO2) cpan \
 		Data::Dumper \
 		ExtUtils::Constant \
 		IO::Socket::IP \
@@ -45,17 +53,17 @@ make:
 
 .PHONY: apt-packages
 apt-packages:
-	sudo apt-get install -y gcc || :
+	$(SUDO) apt-get install -y gcc || :
 	# needed to fetch the library submodule at end of build
-	sudo apt-get install -y build-essential libwww-perl git || :
+	$(SUDO) apt-get install -y build-essential libwww-perl git || :
 	# for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
-	sudo apt-get install -y libdbd-mysql-perl libmysqlclient-dev || :
+	$(SUDO) apt-get install -y libdbd-mysql-perl libmysqlclient-dev || :
 
 .PHONY: yum-packages
 yum-packages:
-	rpm -q gcc perl-CPAN perl-libwww-perl git || sudo yum install -y gcc perl-CPAN perl-libwww-perl git || :
+	rpm -q gcc perl-CPAN perl-libwww-perl git || $(SUDO) yum install -y gcc perl-CPAN perl-libwww-perl git || :
 	# for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
-	rpm -q erl-DBD-MySQL mysql-devel || sudo yum install -y perl-DBD-MySQL mysql-devel || :
+	rpm -q erl-DBD-MySQL mysql-devel || $(SUDO) yum install -y perl-DBD-MySQL mysql-devel || :
 
 .PHONY: test
 test:
