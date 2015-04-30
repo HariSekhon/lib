@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.10.4";
+our $VERSION = "1.10.5";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -329,6 +329,7 @@ our %EXPORT_TAGS = (
                         $msg
                         $msg_err
                         $msg_threshold
+                        $multiline
                         $nagios_plugins_support_msg
                         $nagios_plugins_support_msg_api
                         $password
@@ -355,6 +356,7 @@ our %EXPORT_TAGS = (
                         %emailoptions
                         %expected_version_option
                         %hostoptions
+                        %multilineoption
                         %options
                         %ssloptions
                         %thresholdoptions
@@ -549,6 +551,7 @@ our $json;
 our $msg = "";
 our $msg_err = "";
 our $msg_threshold = "";
+our $multiline;
 my  @options;
 our %options;
 our $password;
@@ -569,7 +572,7 @@ our $usage_line      = "usage: $progname [ options ]";
 our $user;
 our %thresholds;
 # Standard ordering of usage options for help. Exported and overridable inside plugin to customize usage()
-our @usage_order = qw/host port user users groups password database query field regex warning critical ssl tls ssl-CA-path ssl-noverify tls-noverify/;
+our @usage_order = qw/host port user users groups password database query field regex warning critical ssl tls ssl-CA-path ssl-noverify tls-noverify multiline/;
 # Not sure if I can relax the case sensitivity on these according to the Nagios Developer guidelines
 my  @valid_units = qw/% s ms us B KB MB GB TB c/;
 our $verbose = 0;
@@ -622,6 +625,9 @@ our %hostoptions = (
 our %useroptions = (
     "u|user=s"      => [ \$user,     "User to connect with" ],
     "p|password=s"  => [ \$password, "Password to connect with" ],
+);
+our %multilineoption = (
+    "m|multiline"   => [ \$multiline,  "Multiline output for easier viewing" ],
 );
 our %thresholdoptions = (
     "w|warning=s"   => [ \$warning,  "Warning  threshold or ran:ge (inclusive)" ],
