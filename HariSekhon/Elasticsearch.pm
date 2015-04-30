@@ -9,7 +9,7 @@
 
 package HariSekhon::Elasticsearch;
 
-$VERSION = "0.3.4";
+$VERSION = "0.3.5";
 
 use strict;
 use warnings;
@@ -43,6 +43,7 @@ our @EXPORT = ( qw (
                     curl_elasticsearch_raw
                     isElasticSearchCluster
                     isElasticSearchIndex
+                    get_elasticsearch_indices
                     list_elasticsearch_indices
                     validate_elasticsearch_cluster
                     validate_elasticsearch_index
@@ -167,12 +168,17 @@ sub isElasticSearchIndex($){
 }
 *isESIndex = \&isElasticSearchIndex;
 
+sub get_elasticsearch_indices {
+    my $content = curl_elasticsearch_raw "/_cat/indices?h=index";
+    return sort split(/\n/, $content);
+}
+
 sub list_elasticsearch_indices {
     if($list_indices){
-        my $content = curl_elasticsearch_raw "/_cat/indices?h=index";
+        my @indices = get_elasticsearch_indices();
         print "Elasticsearch Indices:\n\n";
-        print "<none>\n" unless $content;
-        foreach(split(/\n/, $content)){
+        print "<none>\n" unless @indices;
+        foreach(@indices){
             #my @parts = split(/\s+/, $_);
             #print "$parts[1]\n";
             print "$_\n";
