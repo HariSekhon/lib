@@ -77,3 +77,6 @@ install:
 update:
 	git pull
 	make
+
+update-tlds:
+	wget -O tlds-alpha-by-domain.txt http://data.iana.org/TLD/tlds-alpha-by-domain.txt
