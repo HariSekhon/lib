@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.10.5";
+our $VERSION = "1.11.0";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -505,40 +505,6 @@ our $nagios_plugins_support_msg = "Please try latest version from https://github
 our $nagios_plugins_support_msg_api = "API may have changed. $nagios_plugins_support_msg";
 
 # ============================================================================ #
-# Validation Regex - maybe should qr// here but it makes the vlog option output messy
-# ============================================================================ #
-# tried reversing these to be in $regex_blah format and not auto exporting but this turned out to be less intuitive from the perspective of a module caller and it was convenient to just use the regex in pieces of code without having to import them specially. This also breaks some code such as check_hadoop_jobtracker.pl which uses $domain_regex
-my  $domain_component   = '\b[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\b';
-# validated against http://data.iana.org/TLD/tlds-alpha-by-domain.txt which lists all possible TLDs assigned by IANA
-# this matches everything except the XN--\w{6,10} TLDs as of 8/10/2012
-our $tld_regex          = '\b(?:[A-Za-z]{2,4}|london|museum|travel|local|localdomain|intra)\b';
-our $domain_regex       = '(?:' . $domain_component . '\.)*' . $tld_regex;
-our $domain_regex2      = '(?:' . $domain_component . '\.)+' . $tld_regex;
-our $hostname_component = '\b[A-Za-z](?:[A-Za-z0-9_\-]{0,61}[a-zA-Z0-9])?\b';
-our $hostname_regex     = "$hostname_component(?:\.$domain_regex)?";
-our $filename_regex     = '[\/\w\s_\.:,\*\(\)\=\%\?\+-]+';
-our $rwxt_regex         = '[r-][w-][x-][r-][w-][x-][r-][w-][xt-]';
-our $fqdn_regex         = $hostname_component . '\.' . $domain_regex;
-# SECURITY NOTE: I'm allowing single quote through as it's found in Irish email addresses. This makes the $email_regex non-safe without further validation. This regex only tests whether it's a valid email address, nothing more. DO NOT UNTAINT EMAIL or pass to cmd to SQL without further validation!!!
-our $email_regex        = '\b[A-Za-z0-9](?:[A-Za-z0-9\._\%\'\+-]{0,62}[A-Za-z0-9\._\%\+-])?@[A-Za-z0-9\.-]{2,251}\.[A-Za-z]{2,4}\b';
-# TODO: review this IP regex again
-our $ip_prefix_regex    = '\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}';
-our $ip_regex           = $ip_prefix_regex . '(?:25[0-5]|2[0-4][0-9]|[01]?[1-9][0-9]|[01]?0[1-9]|[12]00|[0-9])\b'; # now allowing 0 or 255 as the final octet due to CIDR
-our $subnet_mask_regex  = '\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[1-9][0-9]|[01]?0[1-9]|[12]00|[0-9])\b';
-our $mac_regex          = '\b[0-9A-F-af]{1,2}[:-](?:[0-9A-Fa-f]{1,2}[:-]){4}[0-9A-Fa-f]{1,2}\b';
-our $host_regex         = "\\b(?:$hostname_regex|$ip_regex)\\b";
-# I did a scan of registered running process names across several hundred linux servers of a diverse group of enterprise applications with 500 unique process names (58k individual processes) to determine that there are cases with spaces, slashes, dashes, underscores, chevrons (<defunct>), dots (script.p[ly], in.tftpd etc) to determine what this regex should be. Incidentally it appears that Linux truncates registered process names to 15 chars.
-# This is not from ps -ef etc it is the actual process registered name, hence init not [init] as it appears in ps output
-our $process_name_regex = '[\w\s_\.\/\<\>-]+';
-our $url_path_suffix_regex = '/(?:[\w\.,:\/\%\&\?\!\=\*\|\[\]\+-]+)?';
-our $url_regex          = '\b(?i:https?://' . $host_regex . '(?::\d{1,5})?(?:' . $url_path_suffix_regex . ')?)';
-our $user_regex         = '\b[A-Za-z][A-Za-z0-9-]*[A-Za-z0-9]\b';
-our $ldap_dn_regex      = '\b\w+=[\w\s]+(?:,\w+=[\w\s]+)*\b';
-our $krb5_principal_regex = "$user_regex(?:\/$hostname_regex)?(?:\@$domain_regex)?";
-our $threshold_range_regex  = qr/^(\@)?(-?\d+(?:\.\d+)?)(:)(-?\d+(?:\.\d+)?)?$/;
-our $threshold_simple_regex = qr/^(-?\d+(?:\.\d+)?)$/;
-our $version_regex      = '\d(\.\d+)*';
-# ============================================================================ #
 
 our $critical;
 our $debug = 0;
@@ -578,6 +544,62 @@ my  @valid_units = qw/% s ms us B KB MB GB TB c/;
 our $verbose = 0;
 our $version;
 our $warning;
+
+# ============================================================================ #
+# Validation Regex - maybe should qr// here but it makes the vlog option output messy
+# ============================================================================ #
+# tried reversing these to be in $regex_blah format and not auto exporting but this turned out to be less intuitive from the perspective of a module caller and it was convenient to just use the regex in pieces of code without having to import them specially. This also breaks some code such as check_hadoop_jobtracker.pl which uses $domain_regex
+my  $domain_component   = '\b[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\b';
+# validated against http://data.iana.org/TLD/tlds-alpha-by-domain.txt which lists all possible TLDs assigned by IANA
+# this matches everything except the XN--\w{6,10} TLDs as of 8/10/2012
+#our $tld_regex          = '\b(?:[A-Za-z]{2,4}|london|museum|travel|local|localdomain|intra)\b';
+# Using the official list now to be tighter and avoid matching things like node.role in elasticsearch
+# to allow the prototype to be checked
+sub open_file ($;$);
+sub code_error (@);
+# downloaded from IANA 'wget -O tlds-alpha-by-domain.txt http://data.iana.org/TLD/tlds-alpha-by-domain.txt'
+my $fh = open_file(dirname(__FILE__) . "/tlds-alpha-by-domain.txt");
+our $tld_regex = "\\b(?:";
+my $tld_count = 0;
+while(<$fh>){
+    s/#.*//;
+    next if /^\s*$/;
+    next unless /^[A-Za-z-]+/;
+    $tld_regex .= "$_|";
+    $tld_count += 1;
+}
+# debug isn't set by this point
+#print "$tld_count tlds loaded\n";
+$tld_count > 900 or code_error("only $tld_count tlds loaded, expected > 900");
+#$tld_regex =~ s/\|$//;
+# some custom ones I've come across or used myself
+$tld_regex .= "local|localdomain|intra)\\b";
+our $domain_regex       = '(?:' . $domain_component . '\.)*' . $tld_regex;
+our $domain_regex2      = '(?:' . $domain_component . '\.)+' . $tld_regex;
+our $hostname_component = '\b[A-Za-z](?:[A-Za-z0-9_\-]{0,61}[a-zA-Z0-9])?\b';
+our $hostname_regex     = "$hostname_component(?:\.$domain_regex)?";
+our $filename_regex     = '[\/\w\s_\.:,\*\(\)\=\%\?\+-]+';
+our $rwxt_regex         = '[r-][w-][x-][r-][w-][x-][r-][w-][xt-]';
+our $fqdn_regex         = $hostname_component . '\.' . $domain_regex;
+# SECURITY NOTE: I'm allowing single quote through as it's found in Irish email addresses. This makes the $email_regex non-safe without further validation. This regex only tests whether it's a valid email address, nothing more. DO NOT UNTAINT EMAIL or pass to cmd to SQL without further validation!!!
+our $email_regex        = '\b[A-Za-z0-9](?:[A-Za-z0-9\._\%\'\+-]{0,62}[A-Za-z0-9\._\%\+-])?@[A-Za-z0-9\.-]{2,251}\.[A-Za-z]{2,4}\b';
+# TODO: review this IP regex again
+our $ip_prefix_regex    = '\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}';
+our $ip_regex           = $ip_prefix_regex . '(?:25[0-5]|2[0-4][0-9]|[01]?[1-9][0-9]|[01]?0[1-9]|[12]00|[0-9])\b'; # now allowing 0 or 255 as the final octet due to CIDR
+our $subnet_mask_regex  = '\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[1-9][0-9]|[01]?0[1-9]|[12]00|[0-9])\b';
+our $mac_regex          = '\b[0-9A-F-af]{1,2}[:-](?:[0-9A-Fa-f]{1,2}[:-]){4}[0-9A-Fa-f]{1,2}\b';
+our $host_regex         = "\\b(?:$hostname_regex|$ip_regex)\\b";
+# I did a scan of registered running process names across several hundred linux servers of a diverse group of enterprise applications with 500 unique process names (58k individual processes) to determine that there are cases with spaces, slashes, dashes, underscores, chevrons (<defunct>), dots (script.p[ly], in.tftpd etc) to determine what this regex should be. Incidentally it appears that Linux truncates registered process names to 15 chars.
+# This is not from ps -ef etc it is the actual process registered name, hence init not [init] as it appears in ps output
+our $process_name_regex = '[\w\s_\.\/\<\>-]+';
+our $url_path_suffix_regex = '/(?:[\w\.,:\/\%\&\?\!\=\*\|\[\]\+-]+)?';
+our $url_regex          = '\b(?i:https?://' . $host_regex . '(?::\d{1,5})?(?:' . $url_path_suffix_regex . ')?)';
+our $user_regex         = '\b[A-Za-z][A-Za-z0-9-]*[A-Za-z0-9]\b';
+our $ldap_dn_regex      = '\b\w+=[\w\s]+(?:,\w+=[\w\s]+)*\b';
+our $krb5_principal_regex = "$user_regex(?:\/$hostname_regex)?(?:\@$domain_regex)?";
+our $threshold_range_regex  = qr/^(\@)?(-?\d+(?:\.\d+)?)(:)(-?\d+(?:\.\d+)?)?$/;
+our $threshold_simple_regex = qr/^(-?\d+(?:\.\d+)?)$/;
+our $version_regex      = '\d(\.\d+)*';
 
 # ============================================================================ #
 #                                   Options
