@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.11.1";
+our $VERSION = "1.11.2";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -570,12 +570,12 @@ while(<$fh>){
     $tld_count += 1;
 }
 # debug isn't set by this point
-print "$tld_count tlds loaded\n";
+#print "$tld_count tlds loaded\n";
 $tld_count > 900 or code_error("only $tld_count tlds loaded, expected > 900");
 #$tld_regex =~ s/\|$//;
 # some custom ones I've come across or used myself
 $tld_regex .= "local|localdomain|intra)\\b";
-print "tld_regex = $tld_regex\n";
+#print "tld_regex = $tld_regex\n";
 our $domain_regex       = '(?:' . $domain_component . '\.)*' . $tld_regex;
 our $domain_regex2      = '(?:' . $domain_component . '\.)+' . $tld_regex;
 our $hostname_component = '\b[A-Za-z](?:[A-Za-z0-9_\-]{0,61}[a-zA-Z0-9])?\b';
