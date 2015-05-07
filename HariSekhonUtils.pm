@@ -257,6 +257,7 @@ our %EXPORT_TAGS = (
                         sec2human
                     ) ],
     'timeout' => [  qw(
+                        $timeout_current_action
                         set_http_timeout
                         set_timeout
                         set_timeout_default
@@ -530,6 +531,7 @@ our $ssl;
 our $ssl_ca_path;
 our $ssl_noverify;
 our $tls;
+our $timeout_current_action;
 our $timeout_default = 10;
 our $timeout_max     = 60;
 our $timeout_min     = 1;
@@ -2555,7 +2557,7 @@ sub set_timeout (;$$) {
 
     $SIG{ALRM} = sub {
         &$sub_ref if defined($sub_ref);
-        quit("UNKNOWN", "self timed out after $timeout seconds");
+        quit("UNKNOWN", "self timed out after $timeout seconds" . ($timeout_current_action ? " while $timeout_current_action" : ""));
     };
     #verbose_mode() unless $_[1];
     vlog2("setting timeout to $timeout secs\n");
