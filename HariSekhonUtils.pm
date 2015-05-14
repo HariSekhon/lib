@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.11.2";
+our $VERSION = "1.11.3";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -141,6 +141,7 @@ our %EXPORT_TAGS = (
                         isPort
                         isProcessName
                         isRef
+                        isRegex
                         isScalar
                         isScientific
                         isThreshold
@@ -257,7 +258,6 @@ our %EXPORT_TAGS = (
                         sec2human
                     ) ],
     'timeout' => [  qw(
-                        $timeout_current_action
                         set_http_timeout
                         set_timeout
                         set_timeout_default
@@ -531,7 +531,6 @@ our $ssl;
 our $ssl_ca_path;
 our $ssl_noverify;
 our $tls;
-our $timeout_current_action;
 our $timeout_default = 10;
 our $timeout_max     = 60;
 our $timeout_min     = 1;
@@ -2007,18 +2006,18 @@ sub isProcessName ($) {
 }
 
 
-# TODO FIXME: doesn't catch error before Perl errors out right now, not using it yet
-#sub isRegex ($) {
-#    my $regex = shift;
-#    defined($regex) || code_error "no regex arg passed to isRegex()";
-#    #defined($regex) || return undef;
-#    vlog3("testing regex '$regex'");
-#    if(eval { qr/$regex/ }){
-#        return $regex;
-#    } else {
-#        return undef;
-#    }
-#}
+# XXX: doesn't catch error before Perl errors out, only using for late loading of regex from files, not in validate_regex()
+sub isRegex ($) {
+    my $regex = shift;
+    defined($regex) || code_error "no regex arg passed to isRegex()";
+    #defined($regex) || return undef;
+    vlog3("testing regex '$regex'");
+    if(eval { qr/$regex/ }){
+        return $regex;
+    } else {
+        return undef;
+    }
+}
 
 
 sub isRef ($;$) {
