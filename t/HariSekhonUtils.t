@@ -280,6 +280,10 @@ ok(isProcessName("sh <defunct>"),   'isProcessName("sh <defunct>")');
 ok(!isProcessName("./b\@dfile"),    '!isProcessName("./b@dfile")');
 ok(!isProcessName("[init] 3"),      '!isProcessName("[init] 3")');
 
+is(isRegex(".*"),   ".*",   'isRegex(".*") eq ".*"');
+is(isRegex("(.*)"), "(.*)", 'isRegex("(.*)") eq "(.*)"');
+is(isRegex("(.*"),  undef,  'isRegex("(.*") eq undef');
+
 ok(isScalar(\$status),          'isScalar(\$status)');
 ok(!isScalar(\@usage_order),    '!isScalar(\@usage_order)');
 ok(!isScalar(\%ERRORS),         '!isScalar(\%ERRORS)');
