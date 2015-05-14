@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.11.3";
+our $VERSION = "1.11.4";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -258,6 +258,7 @@ our %EXPORT_TAGS = (
                         sec2human
                     ) ],
     'timeout' => [  qw(
+                        $timeout_current_action
                         set_http_timeout
                         set_timeout
                         set_timeout_default
@@ -345,6 +346,7 @@ our %EXPORT_TAGS = (
                         $tls
                         $ssl_noverify
                         $timeout
+                        $timeout_current_action
                         $timeout_default
                         $timeout_max
                         $timeout_min
@@ -531,6 +533,7 @@ our $ssl;
 our $ssl_ca_path;
 our $ssl_noverify;
 our $tls;
+our $timeout_current_action = "";
 our $timeout_default = 10;
 our $timeout_max     = 60;
 our $timeout_min     = 1;
