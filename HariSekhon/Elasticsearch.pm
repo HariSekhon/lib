@@ -9,7 +9,7 @@
 
 package HariSekhon::Elasticsearch;
 
-$VERSION = "0.3.5";
+$VERSION = "0.4.0";
 
 use strict;
 use warnings;
@@ -100,10 +100,11 @@ sub elasticsearch_err_handler($){
     }
 }
 
-sub curl_elasticsearch_raw($;$$){
+sub curl_elasticsearch_raw($;$$$){
     my $url  = shift;
     my $type = shift() || "GET";
     my $body = shift;
+    my $err_handler = shift;
     $url =~ s/^\///;
     if($url =~ /\?/){
         $url .= "&";
@@ -117,8 +118,18 @@ sub curl_elasticsearch_raw($;$$){
     return $content;
 }
 
-sub curl_elasticsearch($;$$){
-    my $content = curl_elasticsearch_raw $_[0], $_[1], $_[2];
+sub curl_elasticsearch($;$$$){
+    my $url  = shift;
+    my $type = shift() || "GET";
+    my $body = shift;
+    # allow user specified error handler, set to no error handler if 0, otherwise use default error handler
+    my $err_handler = shift;
+    if(not defined($err_handler)){
+        $err_handler = \&elasticsearch_err_handler;
+    } elsif($err_handler eq 0 or not $err_handler){
+        $err_handler = undef;
+    }
+    my $content = curl_elasticsearch_raw $url, $type, $body, $err_handler;
     # _cat doesn't return json
     $json = isJson($content) or quit "CRITICAL", "non-json returned by ElasticSearch!";
     # probably not a good idea - lacks flexibility, may still be able to get partial information from returned json
