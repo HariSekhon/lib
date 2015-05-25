@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.8.10";
+$VERSION = "0.8.11";
 
 use strict;
 use warnings;
@@ -257,15 +257,17 @@ sub curl_solr($;$$){
     return $json;
 }
 
-sub query_solr($$){
+sub query_solr($$;$){
     my $collection = shift() || code_error "no collection argument passed to query_solr()";
     my $query      = shift() || code_error "no query argument passed to query_solr()";
+    my $filter     = shift;
     # should be validated before this function call
     #$collection = validate_solr_collection($collection);
     # must be URL encoded before passing to Solr
     # XXX: is this uri escaped later?
-    $query = uri_escape($query);
-    curl_solr "$http_context/$collection/select?q=$query";
+    $query  = uri_escape($query);
+    $filter = uri_escape($filter);
+    curl_solr "$http_context/$collection/select?q=$query" . ( $filter ? "&fq=$filter" : "");
 }
 
 sub get_solr_collection_aliases(){
