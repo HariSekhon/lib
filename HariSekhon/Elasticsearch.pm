@@ -32,7 +32,7 @@ our @EXPORT = ( qw (
                     $index
                     $list_indices
                     $list_types
-                    $types
+                    $type
                     $ua
                     %elasticsearch_index
                     %elasticsearch_type
@@ -41,12 +41,24 @@ our @EXPORT = ( qw (
                     check_es_status
                     curl_elasticsearch
                     curl_elasticsearch_raw
+                    delete_elasticsearch_index
+                    ESIndexExists
                     isElasticSearchCluster
+                    isESCluster
                     isElasticSearchIndex
+                    isESIndex
                     get_elasticsearch_indices
+                    get_ES_indices
                     list_elasticsearch_indices
+                    list_es_indices
+                    validate_elasticsearch_alias
+                    validate_es_alias
                     validate_elasticsearch_cluster
+                    validate_es_cluster
                     validate_elasticsearch_index
+                    validate_es_index
+                    validate_elasticsearch_type
+                    validate_es_type
                 )
 );
 our @EXPORT_OK = ( @EXPORT );
@@ -75,7 +87,7 @@ our %elasticsearch_type = (
     "list-types"    =>  [ \$list_types,     "List Elasticsearch types in given index" ],
 );
 
-splice @usage_order, 6, 0, qw/index type shards replicas keys key value list-indices list-types/;
+splice @usage_order, 7, 0, qw/index type shards replicas keys key value list-indices list-types/;
 
 sub elasticsearch_err_handler($){
     my $response = shift;
@@ -100,11 +112,10 @@ sub elasticsearch_err_handler($){
     }
 }
 
-sub curl_elasticsearch_raw($;$$$){
+sub curl_elasticsearch_raw($;$$){
     my $url  = shift;
     my $type = shift() || "GET";
     my $body = shift;
-    my $err_handler = shift;
     $url =~ s/^\///;
     if($url =~ /\?/){
         $url .= "&";
@@ -114,22 +125,12 @@ sub curl_elasticsearch_raw($;$$$){
     $url .= "timeout=" . minimum_value($timeout - 1, 1);
     $url .= "&pretty=true" if $verbose >= 3 or $debug;
     #my $content = curl "http://$host:$port/$url", "Elasticsearch", undef, undef, \&elasticsearch_err_handler, $type;
-    my $content = curl "http://$host:$port/$url", "Elasticsearch", undef, undef, undef, $type;
+    my $content = curl "http://$host:$port/$url", "Elasticsearch", undef, undef, undef, $type, $body;
     return $content;
 }
 
-sub curl_elasticsearch($;$$$){
-    my $url  = shift;
-    my $type = shift() || "GET";
-    my $body = shift;
-    # allow user specified error handler, set to no error handler if 0, otherwise use default error handler
-    my $err_handler = shift;
-    if(not defined($err_handler)){
-        $err_handler = \&elasticsearch_err_handler;
-    } elsif($err_handler eq 0 or not $err_handler){
-        $err_handler = undef;
-    }
-    my $content = curl_elasticsearch_raw $url, $type, $body, $err_handler;
+sub curl_elasticsearch($;$$){
+    my $content = curl_elasticsearch_raw $_[0], $_[1], $_[2];
     # _cat doesn't return json
     $json = isJson($content) or quit "CRITICAL", "non-json returned by ElasticSearch!";
     # probably not a good idea - lacks flexibility, may still be able to get partial information from returned json
@@ -158,6 +159,13 @@ sub check_elasticsearch_status($;$){
 }
 *check_es_status = \&check_elasticsearch_status;
 
+sub delete_elasticsearch_index($){
+    my $index = shift;
+    my $content = curl_elasticsearch_raw "/$index", "DELETE";
+    #tprint $content;
+    return $content;
+}
+
 sub isElasticSearchCluster($){
     my $cluster = shift;
     return isAlNum($cluster);
@@ -179,10 +187,32 @@ sub isElasticSearchIndex($){
 }
 *isESIndex = \&isElasticSearchIndex;
 
-sub get_elasticsearch_indices {
-    my $content = curl_elasticsearch_raw "/_cat/indices?h=index";
-    return sort split(/\n/, $content);
+#sub isElasticSearchType($){
+#    my $type = shift;
+#    defined($type) or return undef;
+#    # must be lowercase, can't start with an underscore
+#    $type =~ /^([a-z0-9\.][a-z0-9\._-]+)$/ or return undef;
+#    $type = $1;
+#    return $type;
+#}
+*isElasticSearchType = \&isElasticSearchIndex;
+*isESType = \&isElasticSearchType;
+
+sub ESIndexExists($) {
+    my $index = shift;
+    isESIndex($index) or code_error "passed invalid index name to doesESIndexExist";
+    # This rest API call doesn't seem to be available in 1.2.1, but works in 1.4.1
+    # TODO: test this on newer elasticsearch
+    #my $content = curl_elasticsearch_raw("/$index");
+    #return $content =~ /^\A$index\Z$/m;
+    return grep { $index eq $_ } get_ES_indices();
 }
+
+sub get_elasticsearch_indices {
+    my $content = curl_elasticsearch_raw("/_cat/indices?h=index");
+    return map { strip($_) } sort split(/\n/, $content);
+}
+*get_ES_indices = \&get_elasticsearch_indices;
 
 sub list_elasticsearch_indices {
     if($list_indices){
@@ -197,6 +227,15 @@ sub list_elasticsearch_indices {
         exit $ERRORS{"UNKNOWN"};
     }
 }
+
+sub validate_elasticsearch_alias($){
+    my $alias = shift;
+    defined($alias) or usage "Elasticsearch alias not defined";
+    $alias = isESIndex($alias) or usage "invalid ElasticSearch alias name given, must be lowercase alphanumeric";
+    vlog_options "alias", $alias;
+    return $alias;
+}
+*validate_es_alias = \&validate_elasticsearch_alias;
 
 sub validate_elasticsearch_cluster($){
     my $cluster = shift;
@@ -215,5 +254,14 @@ sub validate_elasticsearch_index($){
     return $index;
 }
 *validate_es_index = \&validate_elasticsearch_index;
+
+sub validate_elasticsearch_type($){
+    my $type = shift;
+    defined($type) or usage "Elasticsearch type not defined";
+    $type = isESType($type) or usage "invalid ElasticSearch type name given, must be lowercase alphanumeric";
+    vlog_options "type", $type;
+    return $type;
+}
+*validate_es_type = \&validate_elasticsearch_type;
 
 1;
