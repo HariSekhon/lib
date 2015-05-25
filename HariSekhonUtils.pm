@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.11.4";
+our $VERSION = "1.12.0";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -96,6 +96,8 @@ our %EXPORT_TAGS = (
     'cmd'   =>  [   qw(
                         cmd
                         pkill
+                        prompt
+                        isYes
                         set_sudo
                         which
                     ) ],
@@ -178,10 +180,12 @@ our %EXPORT_TAGS = (
                         env_vars
                         expand_units
                         human_units
+                        isYes
                         msg_perf_thresholds
                         minimum_value
                         month2int
                         parse_file_option
+                        prompt
                         plural
                         remove_timeout
                         set_port_default
@@ -234,6 +238,7 @@ our %EXPORT_TAGS = (
                         is_warning
                         is_unknown
                         is_ok
+                        isYes
                         get_status_code
                         get_upper_threshold
                         get_upper_thresholds
@@ -256,6 +261,8 @@ our %EXPORT_TAGS = (
     'time'    => [  qw(
                         sec2min
                         sec2human
+                        tprint
+                        tstamp
                     ) ],
     'timeout' => [  qw(
                         $timeout_current_action
@@ -271,6 +278,7 @@ our %EXPORT_TAGS = (
                         validate_aws_access_key
                         validate_aws_bucket
                         validate_aws_secret_key
+                        validate_chars
                         validate_collection
                         validate_database
                         validate_database_columnname
@@ -301,6 +309,7 @@ our %EXPORT_TAGS = (
                         validate_label
                         validate_ldap_dn
                         validate_node_list
+                        validate_nodeport_list
                         validate_nosql_key
                         validate_password
                         validate_port
@@ -334,6 +343,7 @@ our %EXPORT_TAGS = (
                         $multiline
                         $nagios_plugins_support_msg
                         $nagios_plugins_support_msg_api
+                        $nodes
                         $password
                         $plural
                         $port
@@ -360,6 +370,7 @@ our %EXPORT_TAGS = (
                         %expected_version_option
                         %hostoptions
                         %multilineoption
+                        %nodeoptions
                         %options
                         %ssloptions
                         %thresholdoptions
@@ -374,10 +385,14 @@ our %EXPORT_TAGS = (
                         debug
                         hr
                         tprint
+                        tstamp
                         verbose_mode
                         vlog
                         vlog2
                         vlog3
+                        vlogt
+                        vlog2t
+                        vlog3t
                         vlog_options
                     ) ],
     'web'   =>  [   qw(
@@ -435,7 +450,7 @@ our $status_prefix = "";
 
 BEGIN {
     delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
-    $ENV{'PATH'} = '/bin:/usr/bin';
+    $ENV{'PATH'} = '/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin';
 
     # If we're a Nagios plugin check_* then make stderr go to stdout
     if(substr(basename($0), 0, 6) eq "check_"){
@@ -521,6 +536,7 @@ our $msg = "";
 our $msg_err = "";
 our $msg_threshold = "";
 our $multiline;
+our $nodes;
 my  @options;
 our %options;
 our $password;
@@ -542,7 +558,7 @@ our $usage_line      = "usage: $progname [ options ]";
 our $user;
 our %thresholds;
 # Standard ordering of usage options for help. Exported and overridable inside plugin to customize usage()
-our @usage_order = qw/host port user users groups password database query field regex warning critical ssl tls ssl-CA-path ssl-noverify tls-noverify multiline/;
+our @usage_order  = qw/host port user users groups password database table query field regex warning critical ssl tls ssl-CA-path ssl-noverify tls-noverify multiline/;
 # Not sure if I can relax the case sensitivity on these according to the Nagios Developer guidelines
 my  @valid_units = qw/% s ms us B KB MB GB TB c/;
 our $verbose = 0;
@@ -649,6 +665,10 @@ sub set_timeout_range($$){
 our %hostoptions = (
     "H|host=s"      => [ \$host, "Host to connect to" ],
     "P|port=s"      => [ \$port, "Port to connect to" ],
+);
+our %nodeoptions = (
+    "N|nodes=s"     => [ \$nodes, "Nodes to connect to" ],
+    "P|port=s"      => [ \$port,  "Port to connect to if not appended to each node in the node list in the form 'host:port'"  ],
 );
 our %useroptions = (
     "u|user=s"      => [ \$user,     "User to connect with" ],
@@ -815,6 +835,8 @@ sub env_creds($;$){
 
     $hostoptions{"H|host=s"}[1]     = "$longname host (" . join(", ", @host_envs) . ")";
     $hostoptions{"P|port=s"}[1]     = "$longname port (" . join(", ", @port_envs) . ( defined($port) ? ", default: $port)" : ")");
+    #$nodeoptions{"N|node=s"}[1]     = "$longname node (" . join(", ", @host_envs) . ")";
+    #$nodeoptions{"P|port=s"}[1]     = "$longname port (" . join(", ", @port_envs) . ( defined($port) ? ", default: $port)" : ")");
     $useroptions{"u|user=s"}[1]     = "$longname user (" . join(", ", @user_envs) . ")";
     $useroptions{"p|password=s"}[1] = "$longname password (" . join(", ", @password_envs) . ")";
 }
@@ -1244,7 +1266,7 @@ sub curl ($;$$$$$$) {
     my $err_sub  = shift;
     my $type     = shift() || 'GET';
     my $body     = shift;
-    grep { $type eq $_ } qw/GET POST DELETE HEAD/ or code_error "unsupported type '$type' passed to curl() as sixth argument";
+    grep { $type eq $_ } qw/GET POST PUT DELETE HEAD/ or code_error "unsupported type '$type' passed to curl() as sixth argument";
     #debug("url passed to curl: $url");
     defined($url) or code_error "no URL passed to curl()";
     my $url2 = isUrl($url) or code_error "invalid URL '$url' supplied to curl()";
@@ -1259,12 +1281,17 @@ sub curl ($;$$$$$$) {
     if($name){
         if($type eq "POST"){
             vlog2("POSTing to $name");
+        } elsif($type eq "PUT"){
+            vlog2("PUTing to $name");
         } else {
             vlog2("querying $name");
         }
         vlog3("HTTP $type $url" . ( $auth ? " (basic authentication)" : "") );
     } else {
         vlog2("HTTP $type $url" . ( $auth ? " (basic authentication)" : "") );
+    }
+    if($type eq "POST" or $type eq "PUT"){
+        vlog3($body);
     }
     #unless(defined(&main::get)){
         # inefficient, it'll import for each curl call, instead force top level author to 
@@ -1726,8 +1753,9 @@ sub isCode ($) {
 sub isDatabaseColumnName ($) {
     my $column = shift;
     defined($column) || return undef;
-    $column =~ /^([\w:]+)$/ or return undef;
-    return $1;
+    $column =~ /^([\w\:]+)$/ or return undef;
+    $column = $1;
+    return $column;
 }
 
 
@@ -1837,9 +1865,13 @@ sub isHost ($) {
     defined($host) or return undef;
     if(length($host) > 255){ # Can't be a hostname
         return isIP($host);
-    } else {
-        $host =~ /^($host_regex)$/ or return undef;
-        return $1;
+    } elsif($host =~ /^($host_regex)$/){
+        # There is something wrong with the host regex now, for a long time I've depended on Perl untainting this but the regex might have grown too complex for the Perl interpreter, so manually untainting it now
+        # TODO: XXX: figure out why this host regex isn't being captured and untainted by the outer regex capture
+        $host =~ /^(.*)$/;
+        $host = $1;
+        #system("echo '<$host>'");
+        return $host;
     }
     return undef;
 }
@@ -2402,6 +2434,26 @@ sub print_options (@) {
     }
 }
 
+sub prompt($){
+    my $question = shift;
+    print "\n$question ";
+    my $response = <STDIN>;
+    chomp $response;
+    vlog();
+    return $response;
+}
+
+sub isYes($;$){
+    my $val  = shift;
+    my $name = shift() || "";
+    $name = " for $name";
+    $val  =~ /^\s*(?:y(?:es)?|n(?:o)?)?\s*$/i or die "invalid response$name, must be 'yes' or 'no'\n";
+    if($val =~ /^\s*y(?:es)?\s*$/i){
+        return 1;
+    } else {
+        return 0;
+    }
+}
 
 # Also prototyped at top to allow me to call it earlier
 sub quit (@) {
@@ -2624,10 +2676,14 @@ sub timecomponents2days($$$$$$){
 }
 
 
+sub tstamp () {
+    return strftime("%F %T %z  ", localtime);
+}
+
 sub tprint ($) {
     my $msg = shift;
     defined($msg) or code_error "tprint msg arg not defined";
-    print strftime("%F %T %z  ", localtime) . "$msg\n";
+    print tstamp() . "$msg\n";
 }
 
 
@@ -2764,7 +2820,9 @@ sub usage (;@) {
         $short_options_len = length($options{$_}{"short"}) if($short_options_len < length($options{$_}{"short"}));
         $long_options_len  = length($options{$_}{"long"} ) if($long_options_len  < length($options{$_}{"long"} ));
     }
+    # First print options in the order specified in @usage_order
     print_options(@usage_order);
+    # Now print any unspecified order options in alphabetical order
     foreach my $option (sort keys %options){
         #debug "iterating over general options $option";
         # TODO: improve this matching for more than one long opt
@@ -2776,6 +2834,7 @@ sub usage (;@) {
         print_options($option);
         #printf "%-${short_options_len}s  %-${long_options_len}s \t%s\n", $options{$option}{"short"}, $options{$option}{"long"}, $options{$option}{"desc"};
     }
+    # Finally print base common options, verbosity, timeout etc
     print_options(sort { lc($a) cmp lc($b) } keys %default_options);
     exit $ERRORS{"UNKNOWN"};
 }
@@ -2802,6 +2861,20 @@ sub validate_alnum($$){
     my $name = shift || croak "second argument (name) not defined when calling validate_alnum()";
     defined($arg) or usage "$name not defined";
     $arg =~ /^([A-Za-z0-9]+)$/ or usage "invalid $name defined: must be alphanumeric";
+    $arg = $1;
+    vlog_options($name, $arg);
+    return $arg;
+}
+
+
+# Takes a 3rd arg as a regex char range
+sub validate_chars($$$){
+    my $arg   = shift;
+    my $name  = shift || croak "second argument (name) not defined when calling validate_chars()";
+    my $chars = shift;
+    defined($arg) or usage "$name not defined";
+    $chars = isRegex("[$chars]") or code_error "invalid regex char range passed to validate_chars()";
+    $arg =~ /^($chars+)$/ or usage "invalid $name defined: must be one of the following chars - $chars";
     $arg = $1;
     vlog_options($name, $arg);
     return $arg;
@@ -3170,8 +3243,10 @@ sub validate_ldap_dn ($;$) {
 }
 
 
+# Takes an array and for any items separated by spaces or commas also splits them into array components to be able to conveniently pass a string and/or arrays mixed together and do the right thing
 sub validate_node_list (@) {
     my @nodes = @_;
+    @nodes or usage "node(s) not defined";
     my @nodes2;
     foreach(@nodes){
         push(@nodes2, split(/[,\s]+/, $_));
@@ -3180,8 +3255,28 @@ sub validate_node_list (@) {
     #push(@nodes, @ARGV);
     scalar @nodes2 or usage "node list empty";
     @nodes = uniq_array(@nodes2);
-    foreach my $node (@nodes){
-        $node = isHost($node) || usage "invalid node name '$node': must be hostname/FQDN or IP address";
+    my $node_count = scalar @nodes;
+    foreach (my $i = 0; $i < $node_count; $i++){
+        $nodes[$i] = isHost($nodes[$i]) || usage "invalid node name '$nodes[$i]': must be hostname/FQDN or IP address";
+    }
+    vlog_options("node list", "[ '" . join("', '", @nodes) . "' ]");
+    return @nodes;
+}
+
+
+# Takes an array and for any items separated by spaces or commas also splits them into array components to be able to conveniently pass a string and/or arrays mixed together and do the right thing
+sub validate_nodeport_list (@) {
+    my @nodes = @_;
+    @nodes or usage "node(s) not defined";
+    my @nodes2;
+    foreach(@nodes){
+        push(@nodes2, split(/[,\s]+/, $_));
+    }
+    scalar @nodes2 or usage "node list empty";
+    @nodes = uniq_array2(@nodes2);
+    my $node_count = scalar @nodes;
+    foreach(my $i = 0; $i < $node_count; $i++){
+        $nodes[$i] = validate_hostport($nodes[$i]);
     }
     vlog_options("node list", "[ '" . join("', '", @nodes) . "' ]");
     return @nodes;
@@ -3560,13 +3655,24 @@ sub vlog (@) {
     }
     print STDERR "@_\n" if $verbose;
 }
-
 sub vlog2 (@) {
     vlog @_ if ($verbose >= 2);
 }
 
 sub vlog3 (@) {
     vlog @_ if ($verbose >= 3);
+}
+
+sub vlogt (@) {
+    vlog tstamp() . "@_";
+}
+
+sub vlog2t (@) {
+    vlog2 tstamp . "@_";
+}
+
+sub vlog3t (@) {
+    vlog3 tstamp . "@_";
 }
 
 # TODO: check this
