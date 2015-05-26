@@ -2938,9 +2938,9 @@ sub validate_database_tablename ($;$$) {
     my $name            = shift;
     my $allow_qualified = shift;
     $name .= " " if $name;
-    defined($table) || usage "table not defined";
-    $table = isDatabaseTableName($table, $allow_qualified) || usage "invalid table defined: must be alphanumeric";
-    vlog_options("table", $table);
+    defined($table) || usage "${name}table not defined";
+    $table = isDatabaseTableName($table, $allow_qualified) || usage "invalid ${name}table defined: must be alphanumeric";
+    vlog_options("${name}table", $table);
     return $table;
 }
 
