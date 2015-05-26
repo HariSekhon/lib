@@ -433,6 +433,8 @@ is(validate_collection("students.grades"),      "students.grades",  'validate_co
 is(validate_database("mysql", "MySQL"),         "mysql",        'validate_database("mysql")');
 is(validate_database_fieldname(10),             10,             'validate_database_fieldname(10)');
 is(validate_database_fieldname("count(*)"),     "count(*)",     'validate_database_fieldname("count(*)")');
+is(validate_database_tablename("myTable", "Hive"),     "myTable",     'validate_database_tablename("myTable", "Hive")');
+is(validate_database_tablename("default.myTable", "Hive", "allow qualified"), "default.myTable",     'validate_database_tablename("default.myTable", "Hive", "allow qualified")');
 
 is(validate_database_query_select_show("SELECT count(*) from database.field"),  "SELECT count(*) from database.field", 'validate_database_query_select_show("SELECT count(*) from database.field")');
 # This should error out with invalid query msg. if it shows DML statement detected then it's fallen through to DML keyword match

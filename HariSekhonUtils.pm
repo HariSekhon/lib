@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.12.0";
+our $VERSION = "1.12.1";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2933,9 +2933,11 @@ sub validate_database ($;$) {
 }
 
 
-sub validate_database_tablename ($;$) {
+sub validate_database_tablename ($;$$) {
     my $table           = shift;
+    my $name            = shift;
     my $allow_qualified = shift;
+    $name .= " " if $name;
     defined($table) || usage "table not defined";
     $table = isDatabaseTableName($table, $allow_qualified) || usage "invalid table defined: must be alphanumeric";
     vlog_options("table", $table);
