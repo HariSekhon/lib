@@ -181,6 +181,7 @@ is(isDatabaseTableName("default.myTable_1", 1),     "default.myTable_1",    'isD
 is(isDatabaseTableName("default.myTable_1", 0),     undef,                  'isDatabaseTableName("default.myTable_1", 0) eq undef');
 is(isDatabaseTableName("default.myTable_1"),        undef,                  'isDatabaseTableName("default.myTable_1")    eq undef');
 
+is(isDomain("localDomain"),     "localDomain",      'isDomain("localDomain") eq localDomain');
 is(isDomain("harisekhon.com"),  "harisekhon.com",   'isDomain("harisekhon.com") eq harisekhon.com');
 is(isDomain("harisekhon"),      undef,              '!isDomain("harisekhon") eq undef');
 is(isDomain("a"x256),           undef,              '!isDomain("a"x256) eq undef');

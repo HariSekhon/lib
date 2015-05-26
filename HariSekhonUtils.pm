@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.12.1";
+our $VERSION = "1.12.2";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -596,8 +596,8 @@ $tld_count > 900 or code_error("only $tld_count tlds loaded, expected > 900");
 # some custom ones I've come across or used myself
 $tld_regex .= "local|localdomain|intra)\\b";
 #print "tld_regex = $tld_regex\n";
-our $domain_regex       = '(?:' . $domain_component . '\.)*' . $tld_regex;
-our $domain_regex2      = '(?:' . $domain_component . '\.)+' . $tld_regex;
+our $domain_regex       = '(?:(?:' . $domain_component . '\.)*' . $tld_regex . "|local|localdomain|intra)";
+our $domain_regex2      = '(?:(?:' . $domain_component . '\.)+' . $tld_regex . "|local|localdomain|intra)";
 our $hostname_component = '\b[A-Za-z](?:[A-Za-z0-9_\-]{0,61}[a-zA-Z0-9])?\b';
 our $hostname_regex     = "$hostname_component(?:\.$domain_regex)?";
 our $filename_regex     = '[\/\w\s_\.:,\*\(\)\=\%\?\+-]+';
