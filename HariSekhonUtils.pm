@@ -3272,6 +3272,7 @@ sub validate_nodeport_list (@) {
     @nodes or usage "node(s) not defined";
     my @nodes2;
     foreach(@nodes){
+        defined($_) or next;
         push(@nodes2, split(/[,\s]+/, $_));
     }
     scalar @nodes2 or usage "node list empty";
