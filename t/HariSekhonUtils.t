@@ -183,8 +183,12 @@ is(isDatabaseTableName("default.myTable_1"),        undef,                  'isD
 
 is(isDomain("localDomain"),     "localDomain",      'isDomain("localDomain") eq localDomain');
 is(isDomain("harisekhon.com"),  "harisekhon.com",   'isDomain("harisekhon.com") eq harisekhon.com');
-is(isDomain("harisekhon"),      undef,              '!isDomain("harisekhon") eq undef');
-is(isDomain("a"x256),           undef,              '!isDomain("a"x256) eq undef');
+is(isDomain("harisekhon"),      undef,              'isDomain("harisekhon") eq undef');
+is(isDomain("a"x256),           undef,              'isDomain("a"x256) eq undef');
+is(isDomain("com"),             "com",              'isDomain("com") eq "com"');
+is(isDomain2("com"),            undef,              'isDomain2("com") eq undef');
+is(isDomain2("domain.com"),     "domain.com",       'isDomain2("domain.com") eq domain.com');
+is(isDomain2("domain.local"),   "domain.local",     'isDomain2("domain.local") eq domain.local');
 
 is(isDnsShortname("AMm4q122309asd"),    "AMm4q122309asd",   'isDnsShortname("AMm4q122309asd") eq "AMm4q122309asd"');
 
