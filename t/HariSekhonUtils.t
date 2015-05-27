@@ -169,8 +169,8 @@ is(isAwsSecretKey("A1"x20),            "A1"x20,        'isAwsSecretKey("A1"x20) 
 is(isAwsSecretKey("@"x40),             undef,          'isAwsSecretKey("@"x40)  eq undef');
 is(isAwsSecretKey("A"x20),             undef,          'isAwsSecretKey("A"x20)  eq undef');
 
-is(isDatabaseColumnName("myColumn_1"),  "myColumn_1",   'isDatabaseColumnName("myColumn_1")');
-is(isDatabaseColumnName("'column'"),    undef,          'isDatabaseColumnName("\'column\'")');
+is(isDatabaseColumnName("myColumn_1"),  "myColumn_1",   'isDatabaseColumnName("myColumn_1") eq myColumn_1');
+is(isDatabaseColumnName("'column'"),    undef,          'isDatabaseColumnName("\'column\'") eq undef');
 
 is(isDatabaseFieldName("count(*)"),     "count(*)",     'isDatabaseFieldName("count(*)")');
 is(isDatabaseFieldName("\@something"),  undef,          'isDatabaseFieldName("@something")');
