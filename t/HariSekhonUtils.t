@@ -193,6 +193,7 @@ is(isDomain2("domain.local"),   "domain.local",     'isDomain2("domain.local") e
 is(isDnsShortname("AMm4q122309asd"),    "AMm4q122309asd",   'isDnsShortname("AMm4q122309asd") eq "AMm4q122309asd"');
 
 is(isEmail('hari\'sekhon@gmail.com'),   'hari\'sekhon@gmail.com',   'isEmail("hari\'sekhon@gmail.com") eq hari\'sekhon@gmail.com');
+is(isEmail('hari@LOCALDOMAIN'),         'hari@LOCALDOMAIN',         'isEmail("hari@LOCALDOMAIN") eq hari@LOCALDOMAIN');
 is(isEmail("harisekhon"),               undef,                      '!isEmail("harisekhon") eq undef');
 
 is(isFilename("/tmp/test"), "/tmp/test", "isFilename(/tmp/test");

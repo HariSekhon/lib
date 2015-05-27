@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.12.3";
+our $VERSION = "1.12.4";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -605,7 +605,7 @@ our $filename_regex     = '[\/\w\s_\.:,\*\(\)\=\%\?\+-]+';
 our $rwxt_regex         = '[r-][w-][x-][r-][w-][x-][r-][w-][xt-]';
 our $fqdn_regex         = $hostname_component . '\.' . $domain_regex;
 # SECURITY NOTE: I'm allowing single quote through as it's found in Irish email addresses. This makes the $email_regex non-safe without further validation. This regex only tests whether it's a valid email address, nothing more. DO NOT UNTAINT EMAIL or pass to cmd to SQL without further validation!!!
-our $email_regex        = '\b[A-Za-z0-9](?:[A-Za-z0-9\._\%\'\+-]{0,62}[A-Za-z0-9\._\%\+-])?@[A-Za-z0-9\.-]{2,251}\.[A-Za-z]{2,4}\b';
+our $email_regex        = '\b[A-Za-z0-9](?:[A-Za-z0-9\._\%\'\+-]{0,62}[A-Za-z0-9\._\%\+-])?@' . $domain_regex . '\b';
 # TODO: review this IP regex again
 our $ip_prefix_regex    = '\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}';
 our $ip_regex           = $ip_prefix_regex . '(?:25[0-5]|2[0-4][0-9]|[01]?[1-9][0-9]|[01]?0[1-9]|[12]00|[0-9])\b'; # now allowing 0 or 255 as the final octet due to CIDR
