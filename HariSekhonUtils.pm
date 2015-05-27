@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.12.4";
+our $VERSION = "1.12.5";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -208,6 +208,7 @@ our %EXPORT_TAGS = (
                     ) ],
     'regex' =>  [   qw(
                         escape_regex
+                        $column_regex
                         $domain_regex
                         $domain_regex2
                         $email_regex
@@ -618,6 +619,7 @@ our $process_name_regex = '[\w\s_\.\/\<\>-]+';
 our $url_path_suffix_regex = '/(?:[\w\.,:\/\%\&\?\!\=\*\|\[\]\+-]+)?';
 our $url_regex          = '\b(?i:https?://' . $host_regex . '(?::\d{1,5})?(?:' . $url_path_suffix_regex . ')?)';
 our $user_regex         = '\b[A-Za-z][A-Za-z0-9-]*[A-Za-z0-9]\b';
+our $column_regex       = '\b[\w\:]+\b';
 our $ldap_dn_regex      = '\b\w+=[\w\s]+(?:,\w+=[\w\s]+)*\b';
 our $krb5_principal_regex = "$user_regex(?:\/$hostname_regex)?(?:\@$domain_regex)?";
 our $threshold_range_regex  = qr/^(\@)?(-?\d+(?:\.\d+)?)(:)(-?\d+(?:\.\d+)?)?$/;
@@ -1754,7 +1756,7 @@ sub isCode ($) {
 sub isDatabaseColumnName ($) {
     my $column = shift;
     defined($column) || return undef;
-    $column =~ /^([\w\:]+)$/ or return undef;
+    $column =~ /^($column_regex)$/ or return undef;
     $column = $1;
     return $column;
 }
