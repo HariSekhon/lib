@@ -169,6 +169,9 @@ is(isAwsSecretKey("A1"x20),            "A1"x20,        'isAwsSecretKey("A1"x20) 
 is(isAwsSecretKey("@"x40),             undef,          'isAwsSecretKey("@"x40)  eq undef');
 is(isAwsSecretKey("A"x20),             undef,          'isAwsSecretKey("A"x20)  eq undef');
 
+is(isChars("Alpha-01_", "A-Za-z0-9_-"), "Alpha-01_", 'isChars("Alpha-01_", "A-Za-z0-9_-"), eq Alpha-01_');
+is(isChars("Alpha-01_*", "A-Za-z0-9_-"), undef,      'isChars("Alpha-01_", "A-Za-z0-9_-*"), eq undef');
+
 is(isDatabaseColumnName("myColumn_1"),  "myColumn_1",   'isDatabaseColumnName("myColumn_1") eq myColumn_1');
 is(isDatabaseColumnName("'column'"),    undef,          'isDatabaseColumnName("\'column\'") eq undef');
 
@@ -180,6 +183,12 @@ is(isDatabaseTableName("'table'"),                  undef,                  'isD
 is(isDatabaseTableName("default.myTable_1", 1),     "default.myTable_1",    'isDatabaseTableName("default.myTable_1", 1) eq default.myTable_1');
 is(isDatabaseTableName("default.myTable_1", 0),     undef,                  'isDatabaseTableName("default.myTable_1", 0) eq undef');
 is(isDatabaseTableName("default.myTable_1"),        undef,                  'isDatabaseTableName("default.myTable_1")    eq undef');
+
+is(isDatabaseViewName("myView_1"),                "myView_1",            'isDatabaseViewName("myView_1") eq myView_1');
+is(isDatabaseViewName("'view'"),                  undef,                  'isDatabaseViewName("\'view\'") eq undef');
+is(isDatabaseViewName("default.myView_1", 1),     "default.myView_1",    'isDatabaseViewName("default.myView_1", 1) eq default.myView_1');
+is(isDatabaseViewName("default.myView_1", 0),     undef,                  'isDatabaseViewName("default.myView_1", 0) eq undef');
+is(isDatabaseViewName("default.myView_1"),        undef,                  'isDatabaseViewName("default.myView_1")    eq undef');
 
 is(isDomain("localDomain"),     "localDomain",      'isDomain("localDomain") eq localDomain');
 is(isDomain("harisekhon.com"),  "harisekhon.com",   'isDomain("harisekhon.com") eq harisekhon.com');
@@ -439,8 +448,10 @@ is(validate_collection("students.grades"),      "students.grades",  'validate_co
 is(validate_database("mysql", "MySQL"),         "mysql",        'validate_database("mysql")');
 is(validate_database_fieldname(10),             10,             'validate_database_fieldname(10)');
 is(validate_database_fieldname("count(*)"),     "count(*)",     'validate_database_fieldname("count(*)")');
-is(validate_database_tablename("myTable", "Hive"),     "myTable",     'validate_database_tablename("myTable", "Hive")');
-is(validate_database_tablename("default.myTable", "Hive", "allow qualified"), "default.myTable",     'validate_database_tablename("default.myTable", "Hive", "allow qualified")');
+is(validate_database_tablename("myTable", "Hive"), "myTable",   'validate_database_tablename("myTable", "Hive") eq myTable');
+is(validate_database_tablename("default.myTable", "Hive", "allow qualified"), "default.myTable",     'validate_database_tablename("default.myTable", "Hive", "allow qualified") eq default.myTable');
+is(validate_database_viewname("myView", "Hive"), "myView",      'validate_database_viewname("myView", "Hive") eq View');
+is(validate_database_viewname("default.myTable", "Hive", "allow qualified"), "default.myTable",     'validate_database_viewname("default.myTable", "Hive", "allow qualified") eq default.myTable');
 
 is(validate_database_query_select_show("SELECT count(*) from database.field"),  "SELECT count(*) from database.field", 'validate_database_query_select_show("SELECT count(*) from database.field")');
 # This should error out with invalid query msg. if it shows DML statement detected then it's fallen through to DML keyword match

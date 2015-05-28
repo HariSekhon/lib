@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.12.5";
+our $VERSION = "1.12.6";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -113,9 +113,11 @@ our %EXPORT_TAGS = (
                         isAlNum
                         isAwsAccessKey
                         isAwsSecretKey
+                        isChars
                         isDatabaseColumnName
                         isDatabaseFieldName
                         isDatabaseTableName
+                        isDatabaseViewName
                         isDigit
                         isDomain
                         isDomain2
@@ -287,6 +289,7 @@ our %EXPORT_TAGS = (
                         validate_database_fieldname
                         validate_database_query_select_show
                         validate_database_tablename
+                        validate_database_viewname
                         validate_dir
                         validate_directory
                         validate_dirname
@@ -1739,6 +1742,15 @@ sub isAwsSecretKey($){
     return $1;
 }
 
+sub isChars($$){
+    my $string = shift;
+    my $chars  = shift;
+    defined($string) or return undef;
+    defined($chars) or code_error "no chars passed to isChars";
+    $chars = isRegex("[$chars]") or code_error "invalid regex char range passed to isChars()";
+    $string =~ /^($chars+)$/ or return undef;
+    return $1;
+}
 
 # isSub/isCode is used by set_timeout() to determine if we were passed a valid function for the ALRM sub
 sub isCode ($) {
@@ -1783,6 +1795,7 @@ sub isDatabaseTableName ($;$) {
     }
     return undef;
 }
+*isDatabaseViewName = \&isDatabaseTableName;
 
 
 sub isDomain ($) {
@@ -2057,7 +2070,7 @@ sub isRegex ($) {
     my $regex = shift;
     defined($regex) || code_error "no regex arg passed to isRegex()";
     #defined($regex) || return undef;
-    vlog3("testing regex '$regex'");
+    #vlog3("testing regex '$regex'");
     if(eval { qr/$regex/ }){
         return $regex;
     } else {
@@ -2880,15 +2893,13 @@ sub validate_alnum($$){
 
 # Takes a 3rd arg as a regex char range
 sub validate_chars($$$){
-    my $arg   = shift;
+    my $string   = shift;
     my $name  = shift || croak "second argument (name) not defined when calling validate_chars()";
     my $chars = shift;
-    defined($arg) or usage "$name not defined";
-    $chars = isRegex("[$chars]") or code_error "invalid regex char range passed to validate_chars()";
-    $arg =~ /^($chars+)$/ or usage "invalid $name defined: must be one of the following chars - $chars";
-    $arg = $1;
-    vlog_options($name, $arg);
-    return $arg;
+    defined($string) or usage "$name not defined";
+    $string = isChars($string, $chars) or usage "invalid $name defined: must be one of the following chars - $chars";
+    vlog_options($name, $string);
+    return $string;
 }
 
 
@@ -2953,6 +2964,18 @@ sub validate_database_tablename ($;$$) {
     $table = isDatabaseTableName($table, $allow_qualified) || usage "invalid ${name}table defined: must be alphanumeric";
     vlog_options("${name}table", $table);
     return $table;
+}
+
+
+sub validate_database_viewname ($;$$) {
+    my $view           = shift;
+    my $name            = shift;
+    my $allow_qualified = shift;
+    $name .= " " if $name;
+    defined($view) || usage "${name}view not defined";
+    $view = isDatabaseViewName($view, $allow_qualified) || usage "invalid ${name}view defined: must be alphanumeric";
+    vlog_options("${name}view", $view);
+    return $view;
 }
 
 
