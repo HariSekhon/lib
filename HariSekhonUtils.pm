@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.12.6";
+our $VERSION = "1.12.7";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2755,6 +2755,13 @@ sub uniq_array2(@){
 
 sub usage (;@) {
     ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize();
+    unless(defined($wchar) and defined($hchar) and defined($wpixels) and defined($hpixels)){
+        warn "\nTerm::ReadKey GetTerminalSize() failed to return values! Ignore this warning if you are teeing to a logfile (otherwise your terminal is messed up...)\n\n\n";
+        $wchar   = 99999999;
+        $hchar   = 99999999;
+        $wpixels = 99999999;
+        $hpixels = 99999999;
+    }
     print STDERR "@_\n\n" if (@_);
     if(not @_ and $main::DESCRIPTION){
         print STDERR "Hari Sekhon - https://github.com/harisekhon";
