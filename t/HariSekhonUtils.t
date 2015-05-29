@@ -601,8 +601,10 @@ ok(HariSekhonUtils::vlog4("test1\ntest2"),   'vlog4("test1\ntest2")');
 
 $verbose = 1;
 ok(!vlog_options("option", "value"),         '!vlog_options("option", "value") in $verbose 1');
+ok(!vlog_options_bool("option", "value"),    '!vlog_options_bool("option", "value") in $verbose 1');
 $verbose = 2;
 ok(vlog_options("option", "value"),         'vlog_options("option", "value") in $verbose 2');
+ok(vlog_options_bool("option", "value"),    'vlog_options_bool("option", "value") in $verbose 2');
 
 # XXX: not testing which("/explicit/nonexistent/path", 1) since it would error out
 is(which("sh"),                             "/bin/sh",      'which("sh") eq /bin/sh');

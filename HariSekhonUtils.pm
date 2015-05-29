@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.12.7";
+our $VERSION = "1.12.8";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -399,6 +399,7 @@ our %EXPORT_TAGS = (
                         vlog2t
                         vlog3t
                         vlog_options
+                        vlog_options_bool
                     ) ],
     'web'   =>  [   qw(
                         curl
@@ -3736,6 +3737,10 @@ sub vlog4 (@){
 sub vlog_options ($$) {
     #scalar @_ eq 2 or code_error "incorrect number of args passed to vlog_options()";
     vlog2 sprintf("%-25s %s", "$_[0]:", $_[1]);
+}
+
+sub vlog_options_bool ($$) {
+    vlog_options $_[0], ( $_[1] ? "true" : "false" );
 }
 
 
