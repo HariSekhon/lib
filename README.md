@@ -8,7 +8,7 @@ Needed for a lot of the programs I've written over the years. In fact my current
 #### Build + Unit Tests ####
 
 ```
-make
+make &&
 make test
 ```
 
