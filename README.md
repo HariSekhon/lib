@@ -15,4 +15,4 @@ make test
 #### See Repos ####
 
 * Advanced Nagios Plugins Collection: https://github.com/harisekhon/nagios-plugins
-* Toolbox: https://github.com/harisekhon/toolbox
+* Toolbox (Hadoop, NoSQL, Web, Linux CLI): https://github.com/harisekhon/toolbox
