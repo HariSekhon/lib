@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.12.8";
+our $VERSION = "1.12.9";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -584,16 +584,20 @@ my  $domain_component   = '\b[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\b';
 sub open_file ($;$);
 sub code_error (@);
 # downloaded from IANA 'wget -O tlds-alpha-by-domain.txt http://data.iana.org/TLD/tlds-alpha-by-domain.txt'
-my $fh = open_file(dirname(__FILE__) . "/tlds-alpha-by-domain.txt");
+my $tld_file = dirname(__FILE__) . "/tlds-alpha-by-domain.txt";
+my $fh = open_file($tld_file);
 our $tld_regex = "\\b(?i:";
 my $tld_count = 0;
 while(<$fh>){
+    chomp;
     s/#.*//;
     next if /^\s*$/;
-    next unless /^[A-Za-z-]+/;
-    chomp;
-    $tld_regex .= "$_|";
-    $tld_count += 1;
+    if(/^([A-Za-z0-9-]+)$/){
+        $tld_regex .= "$1|";
+        $tld_count += 1;
+    } else {
+        warn "TLD: '$_' from tld file '$tld_file' not validated, skipping that domain";
+    }
 }
 # debug isn't set by this point
 #print "$tld_count tlds loaded\n";
@@ -3026,7 +3030,7 @@ sub validate_domain ($;$) {
     my $name   = shift || "";
     $name .= " " if $name;
     defined($domain) || usage "${name}domain name not defined";
-    $domain = isDomain($domain) || usage "invalid ${name}domain name defined ('$domain')";
+    $domain = isDomain($domain) or usage "invalid ${name}domain name defined ('$domain')";
     vlog_options("${name}domain", $domain);
     return $domain;
 }
