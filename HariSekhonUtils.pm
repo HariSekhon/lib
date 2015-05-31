@@ -3193,9 +3193,9 @@ sub validate_hostport ($;$) {
     $name .= " " if $name;
     defined($hostport) || usage "${name}host:port option not defined";
     my ($host, $port) = split(":", $hostport, 2);
-    $host = isHost($host) || usage "invalid ${name}host defined: not a valid hostname or IP address";
+    $host = isHost($host) || usage "invalid ${name}host '$host' defined for host:port: not a valid hostname or IP address";
     if($port){
-        $port = isPort($port) || usage "invalid ${name}port defined: must be a positive integer";
+        $port = isPort($port) || usage "invalid ${name}port '$port' defined for host:port: must be a positive integer";
     } elsif($port_required){
         usage "':port' is required for ${name}host:port option";
     }
