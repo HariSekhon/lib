@@ -18,9 +18,15 @@ require_ok('HariSekhon::Elasticsearch');
 is(isElasticSearchCluster('HDP'), 'HDP', "isElasticSearchCluster('HDP') eq HDP");
 is(isElasticSearchCluster('?'), undef, "isElasticSearchCluster('?') eq undef");
 
-is(isElasticSearchIndex('.kibana'), '.kibana', "isElasticSearchIndex('.kibana') eq .kibana");
-is(isElasticSearchIndex('kibana-int'), 'kibana-int', "isElasticSearchIndex('kibana-int') eq kibana-int");
-is(isElasticSearchIndex('HDP'), undef, "isElasticSearchIndex('HDP') eq undef");
-is(isElasticSearchIndex('?'), undef, "isElasticSearchIndex('?') eq undef");
+is(isElasticSearchIndex('.kibana'),     '.kibana',      "isElasticSearchIndex('.kibana') eq .kibana");
+is(isESIndex('.kibana'),                '.kibana',      "isESIndex('.kibana') eq .kibana");
+is(isElasticSearchIndex('kibana-int'),  'kibana-int',   "isElasticSearchIndex('kibana-int') eq kibana-int");
+is(isElasticSearchIndex('HDP'),         undef,          "isElasticSearchIndex('HDP') eq undef");
+is(isElasticSearchIndex('?'),           undef,          "isElasticSearchIndex('?') eq undef");
+is(isElasticSearchType('.kibana'),      '.kibana',      "isElasticSearchType('.kibana') eq .kibana");
+is(isESType('.kibana'),                 '.kibana',      "isESType('.kibana') eq .kibana");
+is(isElasticSearchType('kibana-int'),   'kibana-int',   "isElasticSearchType('kibana-int') eq kibana-int");
+is(isElasticSearchType('myType'),       'myType',       "isElasticSearchType('myType') eq myType");
+is(isElasticSearchType('?'),            undef,          "isElasticSearchType('?') eq undef");
 
 done_testing();

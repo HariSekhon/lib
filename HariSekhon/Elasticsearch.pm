@@ -9,7 +9,7 @@
 
 package HariSekhon::Elasticsearch;
 
-$VERSION = "0.4.0";
+$VERSION = "0.4.1";
 
 use strict;
 use warnings;
@@ -46,7 +46,9 @@ our @EXPORT = ( qw (
                     isElasticSearchCluster
                     isESCluster
                     isElasticSearchIndex
+                    isElasticSearchType
                     isESIndex
+                    isESType
                     get_elasticsearch_indices
                     get_ES_indices
                     list_elasticsearch_indices
@@ -187,15 +189,16 @@ sub isElasticSearchIndex($){
 }
 *isESIndex = \&isElasticSearchIndex;
 
-#sub isElasticSearchType($){
-#    my $type = shift;
-#    defined($type) or return undef;
-#    # must be lowercase, can't start with an underscore
-#    $type =~ /^([a-z0-9\.][a-z0-9\._-]+)$/ or return undef;
-#    $type = $1;
-#    return $type;
-#}
-*isElasticSearchType = \&isElasticSearchIndex;
+# check but I think Elasticsearch types can have uppercase
+#*isElasticSearchType = \&isElasticSearchIndex;
+sub isElasticSearchType($){
+    my $type = shift;
+    defined($type) or return undef;
+    # must be lowercase, can't start with an underscore
+    $type =~ /^([A-Za-z0-9\.][A-Za-z0-9\._-]+)$/ or return undef;
+    $type = $1;
+    return $type;
+}
 *isESType = \&isElasticSearchType;
 
 sub ESIndexExists($) {
@@ -231,7 +234,7 @@ sub list_elasticsearch_indices {
 sub validate_elasticsearch_alias($){
     my $alias = shift;
     defined($alias) or usage "Elasticsearch alias not defined";
-    $alias = isESIndex($alias) or usage "invalid ElasticSearch alias name given, must be lowercase alphanumeric";
+    $alias = isESType($alias) or usage "invalid ElasticSearch alias name given, must be lowercase alphanumeric";
     vlog_options "alias", $alias;
     return $alias;
 }
