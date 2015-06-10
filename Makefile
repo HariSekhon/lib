@@ -69,7 +69,7 @@ yum-packages:
 
 .PHONY: test
 test:
-	PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -lrsv --timer t
+	PERL5LIB=$(PERLBREW_ROOT) PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -lrsv --timer t
 
 .PHONY: install
 install:
