@@ -33,7 +33,7 @@ make:
 		IO::Socket::IP \
 		IO::Socket::Timeout \
 		JSON \
-		JSON:XS \
+		JSON::XS \
 		LWP::Simple \
 		LWP::UserAgent \
 		Math::Round \
