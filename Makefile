@@ -31,6 +31,7 @@ make:
 		Devel::Cover::Report::Coveralls \
 		ExtUtils::Constant \
 		IO::Socket::IP \
+		IO::Socket::Timeout \
 		JSON \
 		JSON:XS \
 		LWP::Simple \
