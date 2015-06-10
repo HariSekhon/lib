@@ -10,9 +10,9 @@ perl:
   - "5.8"
 
 install:
-  # causes: No output has been received in the last 10 minutes, this potentially indicates a stalled build or something wrong with the build itself.
-  - cpanm --installdeps --notest . || echo CPANM FAILED
-  - cpanm --verbose --notest . || echo CPANM FAILED
+  # "cpanm ." causes: No output has been received in the last 10 minutes, this potentially indicates a stalled build or something wrong with the build itself.
+  #- cpanm --installdeps --notest . || echo CPANM FAILED
+  # --installdeps only does dep modules, leaving others to be fully tested and compiled by make's regular cpan, which is slow and doing only "cpan --verbose --notest ." results in calling Makefile.PL and then make, again falling back to the slow original cpan, so now changed core Makefile to get cpanm and then use that for all modules
   - make
 
 script:
