@@ -27,6 +27,7 @@ make:
 	# order here is important, in Travis and some stripped down client some deps are not pulled in automatically but are required for subsequent module builds
 	yes "" | $(SUDO2) cpan \
 		Data::Dumper \
+		Devel::Cover::Report::Coveralls \
 		ExtUtils::Constant \
 		IO::Socket::IP \
 		JSON \
@@ -67,7 +68,7 @@ yum-packages:
 
 .PHONY: test
 test:
-	prove t --timer -v	
+	PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -lrsv --timer t
 
 .PHONY: install
 install:

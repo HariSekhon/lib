@@ -13,3 +13,10 @@ install:
   # causes: No output has been received in the last 10 minutes, this potentially indicates a stalled build or something wrong with the build itself.
   #- cpanm --notest .
   - make
+
+script:
+  #- PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -lrsv t 
+  - make test
+
+after_success:
+  - cover -report coveralls
