@@ -12,7 +12,7 @@ perl:
 install:
   # causes: No output has been received in the last 10 minutes, this potentially indicates a stalled build or something wrong with the build itself.
   - cpanm --installdeps --notest . || echo CPANM FAILED
-  - cpanm --notest . || echo CPANM FAILED
+  - cpanm --verbose --notest . || echo CPANM FAILED
   - make
 
 script:
