@@ -90,7 +90,7 @@ sub validate_nodetool_options($$$$$){
 
                                 #You must set the CASSANDRA_CONF and CLASSPATH vars
 our $nodetool_errors_regex = qr/
-                                You must set
+                                You\s+must\s+set |
                                 Cannot\s+resolve |
                                 unknown\s+host   |
                                 connection\s+refused  |
