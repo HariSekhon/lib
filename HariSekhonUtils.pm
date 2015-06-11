@@ -1158,7 +1158,7 @@ sub check_thresholds ($;$$) {
     defined($result) or code_error("no result passed to check_thresholds()");
     my $status_ok = check_threshold("${name}critical", $result) and
                     check_threshold("${name}warning",  $result);
-    #msg_thresholds() unless $no_msg_thresholds;
+    msg_thresholds() unless $no_msg_thresholds;
     return ($status_ok, msg_thresholds($no_msg_thresholds, $name));
 }
 
