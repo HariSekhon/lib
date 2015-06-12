@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.12.9";
+our $VERSION = "1.12.10";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1158,7 +1158,8 @@ sub check_thresholds ($;$$) {
     defined($result) or code_error("no result passed to check_thresholds()");
     my $status_ok = check_threshold("${name}critical", $result) and
                     check_threshold("${name}warning",  $result);
-    msg_thresholds() unless $no_msg_thresholds;
+    # this is switched off because it's done via msg_thresholds chaining in to return below, do not re-enable this or you'll get double printing
+    #msg_thresholds() unless $no_msg_thresholds;
     return ($status_ok, msg_thresholds($no_msg_thresholds, $name));
 }
 
