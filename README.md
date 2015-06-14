@@ -12,6 +12,8 @@ make &&
 make test
 ```
 
+Continuous Integration is run on this repo to build and unit test it.
+
 #### See Repos ####
 
 * Advanced Nagios Plugins Collection: https://github.com/harisekhon/nagios-plugins
