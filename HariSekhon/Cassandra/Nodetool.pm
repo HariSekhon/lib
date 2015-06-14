@@ -9,7 +9,7 @@
 
 package HariSekhon::Cassandra::Nodetool;
 
-$VERSION = "0.2.7";
+$VERSION = "0.2.8";
 
 use strict;
 use warnings;
@@ -88,7 +88,9 @@ sub validate_nodetool_options($$$$$){
     return ($nodetool, $host, $port, $user, $password);
 }
 
+                                #You must set the CASSANDRA_CONF and CLASSPATH vars
 our $nodetool_errors_regex = qr/
+                                You\s+must\s+set |
                                 Cannot\s+resolve |
                                 unknown\s+host   |
                                 connection\s+refused  |
