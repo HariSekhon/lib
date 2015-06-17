@@ -22,4 +22,4 @@ Repos using this library:
 
 * [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins) - the largest repo of monitoring code for Hadoop & NoSQL technologies, every Hadoop vendor's management API and every major NoSQL technology (HBase, Cassandra, MongoDB, Elasticsearch, Solr, Riak, Redis etc.) as well as traditional Linux and infrastructure
 * [Toolbox](https://github.com/harisekhon/toolbox) - Hadoop, NoSQL, Solr, Elasticsearch, Pig, Hive, Web, Linux CLI tools
-* [Spotify Lookup & Cmd](https://github.com/harisekhon/spotify)
+* [Spotify Lookup & Command Line Controller](https://github.com/harisekhon/spotify) - converts Spotify URIs to 'Artist - Track' form by querying the Spotify Metadata API. Spotify Cmd - command line control of Spotify on Mac via AppleScript calls. Useful for automation.
