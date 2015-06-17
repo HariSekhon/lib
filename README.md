@@ -14,7 +14,12 @@ make test
 
 Continuous Integration is run on this repo to build and unit test it.
 
-#### See Repos ####
+#### See Also ####
 
-* Advanced Nagios Plugins Collection: https://github.com/harisekhon/nagios-plugins
-* Toolbox (Hadoop, NoSQL, Web, Linux CLI): https://github.com/harisekhon/toolbox
+* [Java version of this library](https://github.com/harisekhon/lib-java)
+
+Repos using this library:
+
+* The [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins)
+* [My Toolbox repo (Hadoop, NoSQL, Web, Linux CLI)](https://github.com/harisekhon/toolbox)
+* [Spotify Lookup & Cmd](https://github.com/harisekhon/spotify)
