@@ -157,6 +157,8 @@ ok(!HariSekhonUtils::isSub(1), '!HariSekhonUtils::isSub(1)');
 
 is(isAlNum("ABC123efg"),    "ABC123efg",    'isAlNum("ABC123efg") eq "ABC123efg"');
 is(isAlNum("1.2"),          undef,          'isAlNum("1.2") eq undef');
+is(isAlNum("0"),            0,              'isAlNum("0") eq 0');
+is(isAlNum(""),             undef,          'isAlNum("") eq undef');
 
 is(isAwsAccessKey("A"x20),             "A"x20,         'isAwsAccessKey("A"x20)  eq "A"  x20');
 is(isAwsAccessKey("1"x20),             "1"x20,         'isAwsAccessKey("1"x20)  eq "1"  x20');
@@ -171,6 +173,12 @@ is(isAwsSecretKey("A"x20),             undef,          'isAwsSecretKey("A"x20)  
 
 is(isChars("Alpha-01_", "A-Za-z0-9_-"), "Alpha-01_", 'isChars("Alpha-01_", "A-Za-z0-9_-"), eq Alpha-01_');
 is(isChars("Alpha-01_*", "A-Za-z0-9_-"), undef,      'isChars("Alpha-01_", "A-Za-z0-9_-*"), eq undef');
+
+is(isCollection("students.grades"),    "students.grades",  'isCollection("students.grades") eq students.grades');
+is(isCollection("wrong\@.grades"),     undef,              'isCollection("wrong@.grades") eq undef');
+
+is(isDatabaseName("mysql1"),   "mysql1",       'isDatabaseName("mysql1") eq mysql1');
+is(isDatabaseName("my\@sql"),  undef,          'isDatabaseName("my@sql") eq undef');
 
 is(isDatabaseColumnName("myColumn_1"),  "myColumn_1",   'isDatabaseColumnName("myColumn_1") eq myColumn_1');
 is(isDatabaseColumnName("'column'"),    undef,          'isDatabaseColumnName("\'column\'") eq undef');
@@ -198,6 +206,9 @@ is(isDomain("com"),             "com",              'isDomain("com") eq "com"');
 is(isDomain2("com"),            undef,              'isDomain2("com") eq undef');
 is(isDomain2("domain.com"),     "domain.com",       'isDomain2("domain.com") eq domain.com');
 is(isDomain2("domain.local"),   "domain.local",     'isDomain2("domain.local") eq domain.local');
+is(isDomainStrict("com"),            undef,              'isDomainStrict("com") eq undef');
+is(isDomainStrict("domain.com"),     "domain.com",       'isDomainStrict("domain.com") eq domain.com');
+is(isDomainStrict("domain.local"),   "domain.local",     'isDomainStrict("domain.local") eq domain.local');
 
 is(isDnsShortname("AMm4q122309asd"),    "AMm4q122309asd",   'isDnsShortname("AMm4q122309asd") eq "AMm4q122309asd"');
 
@@ -281,6 +292,9 @@ is(isNagiosUnit("ms"),  "ms",   'isNagiosUnit(s) eq ms');
 is(isNagiosUnit("%"),   "%",    'isNagiosUnit(%) eq %');
 is(isNagiosUnit("Kb"),  "KB",   'isNagiosUnit(Kb) eq KB');
 is(isNagiosUnit("Kbps"), undef, 'isNagiosUnit(Kbps) eq undef');
+
+is(isNoSqlKey("HariSekhon:check_riak_write.pl:riak1:1385226607.02182:20abc"), "HariSekhon:check_riak_write.pl:riak1:1385226607.02182:20abc", 'isNoSqlKey() eq $key');
+is(isNoSqlKey("HariSekhon\@check_riak_write.pl"), undef, 'isNoSqlKey("...@...") eq undef');
 
 is(isPort(80),          80,     'isPort(80)');
 ok(!isPort(65536),              '!isPort(65536)');
@@ -435,6 +449,7 @@ ok(user_exists("root"),                 'user_exists("root")');
 ok(!user_exists("nonexistentuser"),     '!user_exists("nonexistentuser")');
 
 is(validate_alnum("Alnum2Test99", "alnum test"),    "Alnum2Test99",   'validate_alnum("Alnum2Test99", "alnum test") eq "Alnum2Test99"');
+is(validate_alnum("0", "alnum zero"),    "0",   'validate_alnum("0", "alnum zero") eq "0"');
 
 is(validate_aws_access_key("A"x20),     "A"x20,         'validate_aws_access_key("A"x20) eq "A"x20');
 is(validate_aws_bucket("BucKeT63"),     "BucKeT63",     'validate_aws_bucket("BucKeT63") eq "BucKeT63"');
@@ -444,7 +459,6 @@ is(validate_chars("log_date=2015-05-23_10", "validate chars", "A-Za-z0-9_=-"), "
 
 is(validate_collection("students.grades"),      "students.grades",  'validate_collection("students.grades")');
 
-# TODO: can't actually test failure of these validation functions as they will error out
 is(validate_database("mysql", "MySQL"),         "mysql",        'validate_database("mysql")');
 is(validate_database_fieldname(10),             10,             'validate_database_fieldname(10)');
 is(validate_database_fieldname("count(*)"),     "count(*)",     'validate_database_fieldname("count(*)")');

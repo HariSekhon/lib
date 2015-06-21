@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.12.10";
+our $VERSION = "1.13.0";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -114,6 +114,8 @@ our %EXPORT_TAGS = (
                         isAwsAccessKey
                         isAwsSecretKey
                         isChars
+                        isCollection
+                        isDatabaseName
                         isDatabaseColumnName
                         isDatabaseFieldName
                         isDatabaseTableName
@@ -121,6 +123,7 @@ our %EXPORT_TAGS = (
                         isDigit
                         isDomain
                         isDomain2
+                        isDomainStrict
                         isDnsShortname
                         isEmail
                         isFilename
@@ -141,6 +144,7 @@ our %EXPORT_TAGS = (
                         isLinux
                         isMac
                         isNagiosUnit
+                        isNoSqlKey
                         isObject
                         isOS
                         isPort
@@ -1064,7 +1068,7 @@ sub check_regex ($$;$) {
     my $string = shift;
     my $regex  = shift;
     my $no_msg = shift;
-    defined($string) or code_error("undefined string passed to check_string()");
+    defined($string) or code_error("undefined string passed to check_regex()");
     defined($regex)  or code_error("undefined regex passed to check_regex()");
     if($string !~ /$regex/){
         critical;
@@ -1764,11 +1768,27 @@ sub isCode ($) {
     return $isCode;
 }
 
+sub isCollection($){
+    my $collection = shift;
+    defined($collection) or return undef;
+    $collection =~ /^(\w(?:[\w\.]*\w)?)$/  or return undef;
+    $collection = $1;
+    return $collection;
+}
 
 #sub isDigit {
 #    isInt(@_);
 #}
 *isDigit = \&isInt;
+
+
+sub isDatabaseName ($) {
+    my $database = shift;
+    defined($database) || return undef;
+    $database =~ /^(\w+)$/ or return undef;
+    $database = $1;
+    return $database;
+}
 
 
 sub isDatabaseColumnName ($) {
@@ -1783,7 +1803,7 @@ sub isDatabaseColumnName ($) {
 sub isDatabaseFieldName ($) {
     my $field = shift;
     defined($field) || return undef;
-    ( $field  =~ /^(\d+)$/ or $field =~/^([\w\(\)\*\,\._-]+)$/ ) or return undef;
+    ( $field  =~ /^(\d+)$/ or $field =~/^([\w()*,._-]+)$/ ) or return undef;
     return $1;
 }
 
@@ -1812,14 +1832,14 @@ sub isDomain ($) {
     return $1;
 }
 
-sub isDomain2 ($) {
+sub isDomainStrict ($) {
     my $domain = shift;
     defined($domain) or return undef;
     return undef if(length($domain) > 255);
     $domain =~ /^($domain_regex2)$/ or return undef;
     return $1;
 }
-
+*isDomain2 = \&isDomainStrict;
 
 sub isDnsShortname($){
     my $name = shift;
@@ -2044,6 +2064,15 @@ sub isNagiosUnit ($) {
         }
     }
     return undef;
+}
+
+
+sub isNoSqlKey ($) {
+    my $key = shift;
+    defined($key) or return undef;
+    $key =~ /^([\w\_\,\.\:\+\-]+)$/ or return undef;
+    $key = $1;
+    return $key;
 }
 
 
@@ -2897,8 +2926,9 @@ sub validate_alnum($$){
     my $arg  = shift;
     my $name = shift || croak "second argument (name) not defined when calling validate_alnum()";
     defined($arg) or usage "$name not defined";
-    $arg =~ /^([A-Za-z0-9]+)$/ or usage "invalid $name defined: must be alphanumeric";
-    $arg = $1;
+    $arg = isAlNum($arg);
+    # isAlNum returns zero as valid and undef when not valid so must check explicitly for undef and avoid 0 which is false in Perl
+    defined($arg) || usage "invalid $name defined: must be alphanumeric";
     vlog_options($name, $arg);
     return $arg;
 }
@@ -2910,7 +2940,7 @@ sub validate_chars($$$){
     my $name  = shift || croak "second argument (name) not defined when calling validate_chars()";
     my $chars = shift;
     defined($string) or usage "$name not defined";
-    $string = isChars($string, $chars) or usage "invalid $name defined: must be one of the following chars - $chars";
+    $string = isChars($string, $chars) || usage "invalid $name defined: must be one of the following chars - $chars";
     vlog_options($name, $string);
     return $string;
 }
@@ -2918,9 +2948,9 @@ sub validate_chars($$$){
 
 sub validate_aws_access_key($){
     my $aws_access_key = shift;
-    defined($aws_access_key) || usage "aws access key not defined";
+    defined($aws_access_key) or usage "aws access key not defined";
     $aws_access_key = isAwsAccessKey($aws_access_key) || usage "invalid aws access key defined: must be 20 alphanumeric characters";
-    vlog_options("aws_access_key", $aws_access_key);
+    vlog_options("aws_access_key", "X"x18 . substr($aws_access_key, 18, 2));
     return $aws_access_key;
 }
 
@@ -2930,16 +2960,16 @@ sub validate_aws_bucket($){
     defined($bucket) or usage "no aws bucket specified";
     $bucket = isDnsShortname($bucket) || usage "invalid aws bucket name defined: must be alphanumeric between 3 and 63 characters long";
     isIP($bucket) and usage "invalid aws bucket name defined: may not be formatted as an IP address";
-    vlog_options("bucket", $bucket);
+    vlog_options("aws bucket", $bucket);
     return $bucket;
 }
 
 
 sub validate_aws_secret_key($){
     my $aws_secret_key = shift;
-    defined($aws_secret_key) || usage "aws secret key not defined";
+    defined($aws_secret_key) or usage "aws secret key not defined";
     $aws_secret_key = isAwsSecretKey($aws_secret_key) || usage "invalid aws secret key defined: must be 40 alphanumeric characters";
-    vlog_options("aws_secret_key", $aws_secret_key);
+    vlog_options("aws secret key", "X"x38 . substr($aws_secret_key,38, 2));
     return $aws_secret_key;
 }
 
@@ -2948,9 +2978,8 @@ sub validate_collection ($;$) {
     my $collection = shift;
     my $name       = shift || "";
     $name .= " " if $name;
-    defined($collection) || usage "${name}collection not defined";
-    $collection =~ /^(\w(?:[\w\.]*\w)?)$/  || usage "invalid ${name}collection defined: must be alphanumeric, with optional periods in the middle";
-    $collection = $1;
+    defined($collection) or usage "${name}collection not defined";
+    $collection = isCollection($collection) || usage "invalid ${name}collection defined: must be alphanumeric, with optional periods in the middle";
     vlog_options("${name}collection", $collection);
     return $collection;
 }
@@ -2961,8 +2990,7 @@ sub validate_database ($;$) {
     my $name     = shift || "";
     $name .= " " if $name;
     defined($database)      || usage "${name}database not defined";
-    $database =~ /^(\w*)$/  || usage "invalid ${name}database defined: must be alphanumeric";
-    $database = $1;
+    $database = isDatabaseName($database) || usage "invalid ${name}database defined: must be alphanumeric";
     vlog_options("${name}database", $database);
     return $database;
 }
@@ -3156,8 +3184,7 @@ sub validate_host ($;$) {
     my $name = shift || "";
     $name = "$name " if $name;
     defined($host) || usage "${name}host not defined";
-    $host = isHost($host) || usage "invalid ${name}host '$host' defined: not a validate hostname or IP address";
-    vlog_options("${name}host", $host);
+    $host = isHost($host) || usage "invalid ${name}host '$host' defined: not a valid hostname or IP address";
     return $host;
 }
 
@@ -3242,7 +3269,7 @@ sub validate_int ($$;$$) {
 sub validate_interface ($) {
     my $interface = shift;
     defined($interface) || usage "interface not defined";
-    $interface = isInterface($interface) || usage "invalid interface defined: must be either ethN, bondN or loN";
+    $interface = isInterface($interface) || usage "invalid interface defined: must be either eth<N>, bond<N> or lo<N>";
     vlog_options("interface", $interface);
     return $interface;
 }
@@ -3263,6 +3290,7 @@ sub validate_krb5_princ ($;$) {
     my $principal = shift;
     my $name      = shift || "";
     $name .= " " if $name;
+    defined($principal) or usage "krb5 principal not defined";
     $principal = isKrb5Princ($principal) || usage "invalid ${name}krb5 principal defined";
     vlog_options("${name}krb5 principal", $principal);
     return $principal;
@@ -3338,8 +3366,7 @@ sub validate_nosql_key($;$){
     my $name = shift || "";
     $name .= " " if $name;
     defined($key) or usage "${name}key not defined";
-    $key =~ /^([\w\_\,\.\:\+\-]+)$/ or usage "invalid ${name}key name defined: may only contain characters: alphanumeric, commas, colons, underscores, pluses, dashes";
-    $key = $1;
+    $key = isNoSqlKey($key) || usage "invalid ${name}key name defined: may only contain characters: alphanumeric, commas, colons, underscores, pluses, dashes";
     vlog_options("${name}key", $key);
     return $key;
 }
@@ -3479,8 +3506,9 @@ sub validate_password ($;$$) {
         # intentionally not untaining
         $password =~ /^(.+)$/ || usage "invalid ${name}password defined";
     } else {
-        $password =~ /^([^'"`]+)$/ or usage "invalid ${name}password defined: may not contain quotes of backticks";
+        $password =~ /^([^'"`]+)$/ or usage "invalid ${name}password defined: may not contain quotes or backticks";
         $password = $1;
+        $password =~ /\$\(/ and usage "invalid ${name}password defined: may not contain \$( as this is a subshell escape and could be dangerous to pass through to programs on the command line";
     }
     vlog_options("${name}password", "<omitted>");
     return $password;
