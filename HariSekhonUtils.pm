@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.13.0";
+our $VERSION = "1.14.0";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -215,8 +215,10 @@ our %EXPORT_TAGS = (
     'regex' =>  [   qw(
                         escape_regex
                         $column_regex
+                        $dirname_regex
                         $domain_regex
                         $domain_regex2
+                        $domain_regex_strict
                         $email_regex
                         $filename_regex
                         $fqdn_regex
@@ -612,9 +614,11 @@ $tld_regex .= "local|localdomain|intra)\\b";
 #print "tld_regex = $tld_regex\n";
 our $domain_regex       = '(?:' . $domain_component . '\.)*' . $tld_regex;
 our $domain_regex2      = '(?:' . $domain_component . '\.)+' . $tld_regex;
+our $domain_regex_strict = $domain_regex2;
 our $hostname_component = '\b[A-Za-z](?:[A-Za-z0-9_\-]{0,61}[a-zA-Z0-9])?\b';
 our $hostname_regex     = "$hostname_component(?:\.$domain_regex)?";
-our $filename_regex     = '[\/\w\s_\.:,\*\(\)\=\%\?\+-]+';
+our $dirname_regex      = '[\/\w\s\\.,:*()=%?+-]+';
+our $filename_regex     = $dirname_regex . '[^\/]';
 our $rwxt_regex         = '[r-][w-][x-][r-][w-][x-][r-][w-][xt-]';
 our $fqdn_regex         = $hostname_component . '\.' . $domain_regex;
 # SECURITY NOTE: I'm allowing single quote through as it's found in Irish email addresses. This makes the $email_regex non-safe without further validation. This regex only tests whether it's a valid email address, nothing more. DO NOT UNTAINT EMAIL or pass to cmd to SQL without further validation!!!
@@ -628,7 +632,7 @@ our $host_regex         = "\\b(?:$hostname_regex|$ip_regex)\\b";
 # I did a scan of registered running process names across several hundred linux servers of a diverse group of enterprise applications with 500 unique process names (58k individual processes) to determine that there are cases with spaces, slashes, dashes, underscores, chevrons (<defunct>), dots (script.p[ly], in.tftpd etc) to determine what this regex should be. Incidentally it appears that Linux truncates registered process names to 15 chars.
 # This is not from ps -ef etc it is the actual process registered name, hence init not [init] as it appears in ps output
 our $process_name_regex = '[\w\s_\.\/\<\>-]+';
-our $url_path_suffix_regex = '/(?:[\w\.,:\/\%\&\?\!\=\*\|\[\]\+-]+)?';
+our $url_path_suffix_regex = '/(?:[\w.,:\/%&?!=*|\[\]~+-]+)?';
 our $url_regex          = '\b(?i:https?://' . $host_regex . '(?::\d{1,5})?(?:' . $url_path_suffix_regex . ')?)';
 our $user_regex         = '\b[A-Za-z][A-Za-z0-9-]*[A-Za-z0-9]\b';
 our $column_regex       = '\b[\w\:]+\b';
@@ -1865,10 +1869,18 @@ sub isFilename($){
     my $filename = shift;
     return undef unless defined($filename);
     return undef if $filename =~ /^\s*$/;
+    return undef if $filename =~ /\/$/;
     return undef unless($filename =~ /^($filename_regex)$/);
     return $1;
 }
-*isDirname = \&isFilename;
+
+sub isDirname($){
+    my $dirname = shift;
+    return undef unless defined($dirname);
+    return undef if $dirname =~ /^\s*$/;
+    return undef unless($dirname =~ /^($dirname_regex)$/);
+    return $1;
+}
 
 
 sub isFloat ($;$) {
@@ -3077,10 +3089,10 @@ sub validate_directory ($;$$$) {
     my $no_vlog = shift;
     $name .= " " if $name;
     if($noquit){
-        return validate_filename($dir, 1, "${name}directory");
+        return validate_dirname($dir, $name, 1);
     }
     defined($dir) || usage "${name}directory not defined";
-    $dir = validate_filename($dir, "noquit", "${name}directory", $no_vlog) || usage "invalid ${name}directory (does not match regex criteria): '$dir'";
+    $dir = validate_dirname($dir, "noquit", $name, "noquit", $no_vlog) || usage "invalid ${name}directory (does not match regex criteria): '$dir'";
     ( -d $dir) || usage "cannot find ${name}directory: '$dir'";
     return $dir;
 }
