@@ -156,9 +156,10 @@ ok(!HariSekhonUtils::isCode(1), '!HariSekhonUtils::isCode(1)');
 ok(!HariSekhonUtils::isSub(1), '!HariSekhonUtils::isSub(1)');
 
 is(isAlNum("ABC123efg"),    "ABC123efg",    'isAlNum("ABC123efg") eq "ABC123efg"');
-is(isAlNum("1.2"),          undef,          'isAlNum("1.2") eq undef');
 is(isAlNum("0"),            0,              'isAlNum("0") eq 0');
+is(isAlNum("1.2"),          undef,          'isAlNum("1.2") eq undef');
 is(isAlNum(""),             undef,          'isAlNum("") eq undef');
+is(isAlNum("hari\@domain.com"), undef,      'isAlNum("hari@domain.com") eq undef');
 
 is(isAwsAccessKey("A"x20),             "A"x20,         'isAwsAccessKey("A"x20)  eq "A"  x20');
 is(isAwsAccessKey("1"x20),             "1"x20,         'isAwsAccessKey("1"x20)  eq "1"  x20');
@@ -183,6 +184,9 @@ is(isDatabaseName("my\@sql"),  undef,          'isDatabaseName("my@sql") eq unde
 is(isDatabaseColumnName("myColumn_1"),  "myColumn_1",   'isDatabaseColumnName("myColumn_1") eq myColumn_1');
 is(isDatabaseColumnName("'column'"),    undef,          'isDatabaseColumnName("\'column\'") eq undef');
 
+# rely on this for MySQL field by position
+is(isDatabaseFieldName("age"),          "age",            'isDatabaseFieldName("age")');
+is(isDatabaseFieldName(2),              "2",            'isDatabaseFieldName(2)');
 is(isDatabaseFieldName("count(*)"),     "count(*)",     'isDatabaseFieldName("count(*)")');
 is(isDatabaseFieldName("\@something"),  undef,          'isDatabaseFieldName("@something")');
 
@@ -198,26 +202,36 @@ is(isDatabaseViewName("default.myView_1", 1),     "default.myView_1",    'isData
 is(isDatabaseViewName("default.myView_1", 0),     undef,                  'isDatabaseViewName("default.myView_1", 0) eq undef');
 is(isDatabaseViewName("default.myView_1"),        undef,                  'isDatabaseViewName("default.myView_1")    eq undef');
 
+is(isDirname("test_Dir"),  "test_Dir",  "isDirname(test_Dir)");
+is(isDirname("/tmp/test"), "/tmp/test", "isDirname(/tmp/test");
+is(isDirname("\@me"),      undef,       "isDirname(\@me)");
+
 is(isDomain("localDomain"),     "localDomain",      'isDomain("localDomain") eq localDomain');
 is(isDomain("harisekhon.com"),  "harisekhon.com",   'isDomain("harisekhon.com") eq harisekhon.com');
-is(isDomain("harisekhon"),      undef,              'isDomain("harisekhon") eq undef');
-is(isDomain("a"x256),           undef,              'isDomain("a"x256) eq undef');
+is(isDomain("1harisekhon.com"), "1harisekhon.com",  'isDomain("1harisekhon.com") eq 1harisekhon.com');
 is(isDomain("com"),             "com",              'isDomain("com") eq "com"');
+is(isDomain("a"x63 . ".com"),   "a"x63 . ".com",    'isDomain("a"x63 . ".com") eq "a"x63 . ".com"');
+is(isDomain("a"x64),            undef,              'isDomain("a"x64) eq undef');
+is(isDomain("harisekhon"),      undef,              'isDomain("harisekhon") eq undef'); # not a valid TLD
+# programs use isDomain2, keep until updating them
 is(isDomain2("com"),            undef,              'isDomain2("com") eq undef');
-is(isDomain2("domain.com"),     "domain.com",       'isDomain2("domain.com") eq domain.com');
+is(isDomain2("123domain.com"),  "123domain.com",    'isDomain2("123domain.com") eq 123domain.com');
 is(isDomain2("domain.local"),   "domain.local",     'isDomain2("domain.local") eq domain.local');
 is(isDomainStrict("com"),            undef,              'isDomainStrict("com") eq undef');
 is(isDomainStrict("domain.com"),     "domain.com",       'isDomainStrict("domain.com") eq domain.com');
 is(isDomainStrict("domain.local"),   "domain.local",     'isDomainStrict("domain.local") eq domain.local');
+is(isDomainStrict("domain.localDomain"), "domain.localDomain", 'isDomainStrict("domain.local") eq domain.localDomain');
 
-is(isDnsShortname("AMm4q122309asd"),    "AMm4q122309asd",   'isDnsShortname("AMm4q122309asd") eq "AMm4q122309asd"');
+is(isDnsShortname("myHost"),    "myHost",   'isDnsShortname("myHost") eq "myHost"');
+is(isDnsShortname("myHost.domain.com"),    undef,   'isDnsShortname("myHost.domain.com") eq undef');
 
 is(isEmail('hari\'sekhon@gmail.com'),   'hari\'sekhon@gmail.com',   'isEmail("hari\'sekhon@gmail.com") eq hari\'sekhon@gmail.com');
 is(isEmail('hari@LOCALDOMAIN'),         'hari@LOCALDOMAIN',         'isEmail("hari@LOCALDOMAIN") eq hari@LOCALDOMAIN');
 is(isEmail("harisekhon"),               undef,                      '!isEmail("harisekhon") eq undef');
 
-is(isFilename("/tmp/test"), "/tmp/test", "isFilename(/tmp/test");
-is(isFilename("\@me"),      undef,       "isFilename(\@me)");
+is(isFilename("some_File.txt"),  "some_File.txt",   "isFilename(some_File.txt");
+is(isFilename("/tmp/test"),      "/tmp/test",       "isFilename(/tmp/test");
+is(isFilename("\@me"),           undef,             "isFilename(\@me)");
 
 ok(isFloat(1),          'isFloat(1)');
 ok(!isFloat(-1),        '!isFloat(-1)');
@@ -232,7 +246,7 @@ ok(!isFloat("nan", 1),  '!isFloat("nan", 1)');
 
 is(isFqdn("hari.sekhon.com"),   "hari.sekhon.com",  'isFqdn("hari.sekhon.com") eq harisekhon.com');
 # denying this results in failing host.local as well
-#is(isFqdn("harisekhon.com"),    undef,              '!isFqdn("harisekhon.com") eq undef');
+is(isFqdn("hari\@harisekhon.com"),    undef,        'isFqdn("hari\@harisekhon.com") eq undef');
 
 # TODO:
 #ok(isHash(%{ ( "one" => 1 ) }), "isHash()");
@@ -248,13 +262,17 @@ is(isHost("10.10.10.10"),       "10.10.10.10",      'isHost("10.10.10.10") eq 10
 ok(isHost("10.10.10.100"),      'isHost("10.10.10.100")');
 ok(isHost("10.10.10.0"),        'isHost("10.10.10.0")');
 ok(isHost("10.10.10.255"),      'isHost("10.10.10.255")');
-ok(!isHost("10.10.10.300"),     '!isHost("10.10.10.300")');
+ok(!isHost("10.10.10.256"),     '!isHost("10.10.10.256")');
 ok(!isHost("a"x256),            '!isHost("a"x256)');
 
-is(isHostname("harisekhon.com"),    "harisekhon.com",   'isHostname("harisekhon.com") eq harisekon.com');
-ok(isHostname("harisekhon"),        'isHostname("harisekhon")');
-ok(!isHostname(1),                  '!isHostname(1)');
-ok(!isHostname("a"x256),            '!isHostname("a"x256)');
+is(isHostname("harisekhon.com"),  "harisekhon.com",   'isHostname("harisekhon.com") eq harisekhon.com');
+is(isHostname("harisekhon"),      "harisekhon",       'isHostname("harisekhon")');
+is(isHostname("a"),               "a", 'isHostname("a") eq a');
+is(isHostname("1"),               undef, 'isHostname("1") eq undef');
+is(isHostname("harisekhon1.com"), "harisekhon1.com", 'isHostname(harisekhon1.com) eq harisekhon1.com');
+is(isHostname("1harisekhon.com"), undef, 'isHostname(1harisekhon.com) eq undef');
+is(isHostname("a"x63),            "a"x63, 'isHostname("a"x63) eq "a"x63');
+is(isHostname("a"x64),            undef, 'isHostname("a"x64) eq undef');
 
 ok(isInt(0),    'isInt(0)');
 ok(isInt(1),    'isInt(1)');
@@ -286,6 +304,8 @@ is(isKrb5Princ('hari@HARI.COM'),                'hari@HARI.COM',                
 is(isKrb5Princ('hari/my.host.local@HARI.COM'),  'hari/my.host.local@HARI.COM',  'isKrb5Princ("hari/my.host.local@HARI.COM") eq "hari/my.host.local@HARI.COM"');
 is(isKrb5Princ('cloudera-scm/admin@REALM.COM'),  'cloudera-scm/admin@REALM.COM', 'isKrb5Princ("cloudera-scm/admin@REALM.COM")');
 is(isKrb5Princ('cloudera-scm/admin@SUB.REALM.COM'),  'cloudera-scm/admin@SUB.REALM.COM', 'isKrb5Princ("cloudera-scm/admin@SUB.REALM.COM")');
+is(isKrb5Princ('hari@hari.com'), 'hari@hari.com', 'isKrb5Princ("hari@hari.com")');
+is(isKrb5Princ('hari$HARI.COM'), undef, 'isKrb5Princ("hari$HARI.COM")');
 
 is(isNagiosUnit("s"),   "s",    'isNagiosUnit(s) eq s');
 is(isNagiosUnit("ms"),  "ms",   'isNagiosUnit(s) eq ms');
@@ -297,10 +317,12 @@ is(isNoSqlKey("HariSekhon:check_riak_write.pl:riak1:1385226607.02182:20abc"), "H
 is(isNoSqlKey("HariSekhon\@check_riak_write.pl"), undef, 'isNoSqlKey("...@...") eq undef');
 
 is(isPort(80),          80,     'isPort(80)');
+is(isPort(65535),       65535,  'isPort(65535)');
 ok(!isPort(65536),              '!isPort(65536)');
 ok(!isPort("a"),                'isPort("a")');
+ok(!isPort(-1),                 'isPort(-1)');
 
-is(isLabel("st4ts_used(%)"),    "st4ts_used(%)",    'isLabel("st4ts_used(%)")');
+is(isLabel("st4ts_used (%)"),    "st4ts_used (%)",    'isLabel("st4ts_used (%)")');
 ok(!isLabel('b@dlabel'),                            'isLabel(\'b@dlabel\')');
 
 is(isProcessName("../my_program"),      "../my_program",        'isProcessName("../my_program")');
@@ -331,9 +353,9 @@ ok(isThreshold("1:10"), 'isThreshold(1:10)');
 ok(isThreshold("-1:0"), 'isThreshold(-1:0)');
 ok(!isThreshold("a"),   '!isThreshold("a")');
 
+is(isUrl("www.google.com"),         "http://www.google.com",    'isUrl("www.google.com") eq http://www.google.com');
 is(isUrl("http://www.google.com"),  "http://www.google.com",    'isUrl("http://www.google.com")');
 is(isUrl("https://gmail.com"),      "https://gmail.com",        'isUrl("https://gmail.com")');
-is(isUrl("www.google.com"),         "http://www.google.com",    'isUrl("www.google.com") eq http://www.google.com');
 is(isUrl(1),                        undef,                      'isUrl(1) eq undef');
 is(isUrl("http://cdh43:50070/dfsnodelist.jsp?whatNodes=LIVE"),  'http://cdh43:50070/dfsnodelist.jsp?whatNodes=LIVE', 'isUrl(http://cdh43:50070/dfsnodelist.jsp?whatNodes=LIVE)');
 
@@ -341,6 +363,8 @@ is(isUrlPathSuffix("/"),                "/",                        'isUrlPathSu
 is(isUrlPathSuffix("/?var=something"),  "/?var=something",          'isUrlPathSuffix("/?var=something")');
 is(isUrlPathSuffix("/dir1/file.php?var=something+else&var2=more%20stuff"), "/dir1/file.php?var=something+else&var2=more%20stuff", 'isUrlPathSuffix("/dir1/file.php?var=something+else&var2=more%20stuff")');
 is(isUrlPathSuffix("/*"),               "/*",                      'isUrlPathSuffix("/*") eq "/*"');
+is(isUrlPathSuffix("/~hari"),           "/~hari",                  'isUrlPathSuffix("/~hari") eq "/~hari"');
+is(isUrlPathSuffix("hari"),             undef,                     'isUrlPathSuffix("hari") eq undef');
 
 is(isUser("hadoop"),    "hadoop",   'isUser("hadoop")');
 is(isUser("hari1983"),  "hari1983", 'isUser("hari1983")');
@@ -411,7 +435,7 @@ is(plural([qw/one two three/]),     "s",    'plural(qw/one two three/)');
 like(random_alnum(20),  qr/^[A-Za-z0-9]{20}$/,                      'random_alnum(20)');
 like(random_alnum(3),  qr/^[A-Za-z0-9][A-Za-z0-9][A-za-z0-9]$/,     'random_alnum(3)');
 
-is(resolve_ip("a.resolvers.level3.net"),    "4.2.2.1",      'resolve_ip("a.resolvers.level3.net") returns 4.2.2.1');
+#is(resolve_ip("a.resolvers.level3.net"),    "4.2.2.1",      'resolve_ip("a.resolvers.level3.net") returns 4.2.2.1');
 is(resolve_ip("4.2.2.2"),                   "4.2.2.2",      'resolve_ip("4.2.2.2") returns 4.2.2.2');
 
 is(rstrip(" \t \n ha ri \t \n"),     " \t \n ha ri",   'rstrip()');
@@ -441,6 +465,7 @@ is(trim_float("0.101"), "0.101", 'trim_float("0.101") eq "0.101"');
 #ok(subtrace("test"), 'subtrace("test")');
 
 is_deeply([uniq_array(("one", "two", "three", "", "one"))],     [ "", "one", "three", "two" ],    'uniq_array()');
+is_deeply([uniq_array2(("one", "two", "three", "", "one"))],     [ "one", "two", "three", "" ],    'uniq_array2()');
 
 # TODO:
 # usage
@@ -467,26 +492,33 @@ is(validate_database_tablename("default.myTable", "Hive", "allow qualified"), "d
 is(validate_database_viewname("myView", "Hive"), "myView",      'validate_database_viewname("myView", "Hive") eq View');
 is(validate_database_viewname("default.myTable", "Hive", "allow qualified"), "default.myTable",     'validate_database_viewname("default.myTable", "Hive", "allow qualified") eq default.myTable');
 
-is(validate_database_query_select_show("SELECT count(*) from database.field"),  "SELECT count(*) from database.field", 'validate_database_query_select_show("SELECT count(*) from database.field")');
+is(validate_database_query_select_show("SELECT count(*) from database.table"),  "SELECT count(*) from database.table", 'validate_database_query_select_show("SELECT count(*) from database.table")');
 # This should error out with invalid query msg. if it shows DML statement detected then it's fallen through to DML keyword match
 #ok(!validate_database_query_select_show("SELECT count(*) from (DELETE FROM database.field)"),  'validate_database_query_select_show("SELECT count(*) from (DELETE FROM database.field)")');
 
 is(validate_domain("harisekhon.com"),  "harisekhon.com",    'validate_domain("harisekhon.com") eq harisekhon.com');
 is(validate_krb5_realm("harisekhon.com"),  "harisekhon.com",    'validate_krb5_realm("harisekhon.com") eq harisekhon.com');
 
+is(validate_directory("./t"),       "./t",      'validate_directory("./t")');
+is(validate_directory("/etc"),      "/etc",     'validate_directory("/etc")');
 is(validate_directory("/etc/"),     "/etc/",    'validate_directory("/etc/")');
 is(validate_dir("/etc/"),           "/etc/",    'validate_dir("/etc/")');
-is(validate_directory("/nonexistentdir", 1),    "/nonexistentdir",  'validate_directory("/nonexistentdir", 1)');
-ok(!validate_directory('b@ddir', 1),            '!validate_directory(\'b@ddir\')');
-# TODO: cannot validate dir not existing here as it terminates program
+is(validate_directory('b@ddir', 1), undef,     'validate_directory(b@ddir)');
+# cannot validate dir not existing here as it terminates program
 
-is(validate_email('harisekhon@gmail.com'),      'harisekhon@gmail.com',     'validate_email(\'harisekhon@gmail.com\')');
+is(validate_dirname("/nonexistentdir", undef, 1),    "/nonexistentdir",  'validate_directory("/nonexistentdir", 1)');
 
-is(validate_file("/etc/passwd"),                "/etc/passwd",  'validate_file("/etc/passwd")');
+is(validate_email('harisekhon@domain.com'),      'harisekhon@domain.com',     'validate_email(\'harisekhon@domain.com\')');
+
+is(validate_file("HariSekhonUtils.pm"),        "HariSekhonUtils.pm",  'validate_file("HariSekhonUtils.pm")');
+if($^O eq "linux" or $^O eq "darwin"){
+    is(validate_file("/etc/passwd"),           "/etc/passwd",   'validate_file("/etc/passwd")');
+}
 is(validate_file("/etc/nonexistentfile", 1),    undef,          'validate_file("/etc/nonexistentfile", 1) eq undef');
 
 is(validate_filename("/etc/passwd"),                "/etc/passwd",              'validate_filename("/etc/passwd")');
 is(validate_filename("/etc/nonexistentfile", 1),    "/etc/nonexistentfile",     'validate_filename("/etc/nonexistentfile", 1)');
+is(validate_filename("/etc/passwd/", 1),            undef,                      'validate_filename("/etc/passwd/", 1)');
 
 is(validate_float(2,"two",0,10),            2,      'validate_float(2,"two",0,10)');
 is(validate_float(-2,"minus-two",-10,10),   -2,     'validate_float(-2,"minus-two",-10,10)');
