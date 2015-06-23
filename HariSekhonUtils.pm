@@ -3850,7 +3850,7 @@ sub which ($;$) {
     my $bin  = $_[0] || code_error "no arg supplied to which() subroutine";
     my $quit = $_[1] || 0;
     $bin = isFilename($bin) || quit "UNKNOWN", "invalid filename '$bin' supplied";
-    if($bin =~ /^[\.\/]/){
+    if($bin =~ /^(?:\/|\.\/)/){
         if(-f $bin){
             if(-x $bin){
                 return $bin;

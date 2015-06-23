@@ -316,11 +316,12 @@ is(isNagiosUnit("Kbps"), undef, 'isNagiosUnit(Kbps) eq undef');
 is(isNoSqlKey("HariSekhon:check_riak_write.pl:riak1:1385226607.02182:20abc"), "HariSekhon:check_riak_write.pl:riak1:1385226607.02182:20abc", 'isNoSqlKey() eq $key');
 is(isNoSqlKey("HariSekhon\@check_riak_write.pl"), undef, 'isNoSqlKey("...@...") eq undef');
 
-is(isPort(80),          80,     'isPort(80)');
-is(isPort(65535),       65535,  'isPort(65535)');
-ok(!isPort(65536),              '!isPort(65536)');
-ok(!isPort("a"),                'isPort("a")');
-ok(!isPort(-1),                 'isPort(-1)');
+is(isPort(80),      80,     'isPort(80)');
+is(isPort(65535),   65535,  'isPort(65535)');
+is(isPort(65536),   undef,  '!isPort(65536)');
+is(isPort("a"),     undef,  'isPort("a")');
+is(isPort(-1),      undef,  'isPort(-1)');
+is(isPort(0),       undef,  'isPort(0)');
 
 is(isLabel("st4ts_used (%)"),    "st4ts_used (%)",    'isLabel("st4ts_used (%)")');
 ok(!isLabel('b@dlabel'),                            'isLabel(\'b@dlabel\')');
@@ -552,6 +553,8 @@ is(validate_ip("10.10.10.10"),       "10.10.10.10",      'validate_ip("10.10.10.
 ok(validate_ip("10.10.10.100"),      'validate_ip("10.10.10.100")');
 ok(validate_ip("254.0.0.254"),       'validate_ip("254.0.0.254")');
 
+is(validate_label("st4ts_used (%)"),    "st4ts_used (%)",    'validate_label("st4ts_used (%)")');
+
 is_deeply([validate_node_list("node1, node2 ,node3 , node4,,\t\nnode5")], [qw/node1 node2 node3 node4 node5/],    'validate_node_list($)');
 # The , in node4, inside the qw array should be split out to just node4 and blank, blank shouldn't make it in to the array
 is_deeply([validate_node_list("node1", qw/node2 node3 node4, node5/)], [qw/node1 node2 node3 node4 node5/],    'validate_node_list($@)');
@@ -563,14 +566,13 @@ is_deeply([validate_nodeport_list("node1:9200", qw/node2 node3 node4, node5/)], 
 # should error out with "node list empty"
 is(validate_nosql_key("HariSekhon:check_riak_write.pl:riak1:1385226607.02182:20abc"), "HariSekhon:check_riak_write.pl:riak1:1385226607.02182:20abc", 'validate_nosql_key()');
 
+is(validate_port(1),           1,      'validate_port(1)');
 is(validate_port(80),          80,     'validate_port(80)');
 is(validate_port(65535),       65535,  'validate_port(65535)');
 
 is(validate_process_name("../my_program"),      "../my_program",        'validate_process_name("../my_program")');
 is(validate_process_name("ec2-run-instances"),  "ec2-run-instances",    'validate_process_name("ec2-run-instances")');
 is(validate_process_name("sh <defunct>"),       "sh <defunct>",         'validate_process_name("sh <defunct>")');
-
-is(validate_label("st4ts_used(%)"),    "st4ts_used(%)",    'validate_label("st4ts_used(%)")');
 
 #is(validate_regex("some[Rr]egex.*(capture)"),   "(?-xism:some[Rr]egex.*(capture))",  'validate_regex("some[Rr]egex.*(capture)")');
 #is(validate_regex("some[Rr]egex.*(capture)"),   "(?^:some[Rr]egex.*(capture))",  'validate_regex("some[Rr]egex.*(capture)")');
@@ -586,7 +588,7 @@ is(validate_regex('somePosix[Rr]egex.*`evilcmd`', undef, "noquit", "posix"),    
 is(validate_regex('somePosix[Rr]egex.*`evilcmd', undef, "noquit", "posix"),         undef,       'validate_regex("somePosix[Rr]egex.*`evilcmd", undef, 1, 1) eq undef');
 
 is(validate_user("hadoop"),    "hadoop",   'validate_user("hadoop")');
-is(validate_user("hari1983"),  "hari1983", 'validate_user("hari1983")');
+is(validate_user("hari1"),     "hari1",    'validate_user("hari1")');
 
 is(validate_user_exists("root"),  "root", 'validate_user_exists("root")');
 
@@ -603,14 +605,16 @@ is(validate_units("ms"),    "ms",   'validate_units("ms")');
 is(validate_units("us"),    "us",   'validate_units("us")');
 is(validate_units("B"),     "B",    'validate_units("B")');
 is(validate_units("KB"),    "KB",   'validate_units("KB")');
+is(validate_units("MB"),    "MB",   'validate_units("MB")');
 is(validate_units("GB"),    "GB",   'validate_units("GB")');
-is(validate_units("KB"),    "KB",   'validate_units("KB")');
+is(validate_units("TB"),    "TB",   'validate_units("TB")');
 is(validate_units("c"),     "c",    'validate_units("c")');
 # should error out
 #is(validate_units("a"),     "c",    'validate_units("c")');
 
-is(validate_url("http://www.google.com"),  "http://www.google.com",    'validate_url("http://www.google.com")');
-is(validate_url("https://gmail.com"),      "https://gmail.com",        'validate_url("https://gmail.com")');
+is(validate_url("www.google.com"),          "http://www.google.com",    'validate_url("www.google.com")');
+is(validate_url("http://www.google.com"),   "http://www.google.com",    'validate_url("http://www.google.com")');
+is(validate_url("https://gmail.com"),       "https://gmail.com",        'validate_url("https://gmail.com")');
 
 $verbose = 0;
 ok(!verbose_mode(),  '!verbose_mode()');
