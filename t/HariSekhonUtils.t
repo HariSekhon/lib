@@ -529,9 +529,8 @@ is(validate_float(-6,"minus-six",-6,0),     -6,     'validate_float(-6,"minus-si
 #is(validate_float(3,"three",4,10),  0,  'validate_float(3,"three",4,10)');
 
 is(validate_fqdn("www.harisekhon.com"),     "www.harisekhon.com",      'validate_fqdn("www.harisekhon.com")');
-# should error out
-#is(validate_fqdn("harisekhon.com"),     0,      'validate_fqdn("harisekhon.com")');
-
+# permissive because of short tld style internal domains
+is(validate_fqdn("myhost.local"),         "myhost.local",          'validate_fqdn("myhost.local")');
 
 is(validate_int(2,"two",0,10),    2,  'validate_int(2,"two",0,10)');
 is(validate_int(-2,"minus-two",-10,10),    -2,  'validate_int(-2,"minus-two",-10,10)');
