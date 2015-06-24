@@ -85,6 +85,30 @@ $verbose++;
 # TODO: This only checks the sub runs and returns success, should really check it outputs the right thing but not sure how to check the stdout from this sub
 ok(status(), "status()");
 
+ok(isOS($^O),    'isOS($^O)');
+
+if(isLinux()){
+    ok($^O eq "linux", 'isLinux()');
+}
+if(isMac()){
+    ok($^O eq "darwin", 'isMac()');
+}
+if(isLinuxOrMac()){
+    ok($^O eq "linux" or $^O eq "darwin", "isLinuxOrMac()");
+}
+
+if($^O eq "linux"){
+    ok(isLinux(), 'isLinux()');
+    ok(!isMac(),  'isMac()');
+}
+if($^O eq "darwin"){
+    ok(isMac(),     'isMac()');
+    ok(!isLinux(),  '!isLinux()');
+}
+if($^O eq "linux" or $^O eq "darwin"){
+    ok(isLinuxOrMac(), "isLinuxOrMac()");
+}
+
 # ============================================================================ #
 
 ok(cmd("ps"), 'cmd("ps");');
@@ -374,8 +398,6 @@ is(isUser('cloudera-scm'),  'cloudera-scm', 'isUser("cloudera-scm")');
 ok(!isUser("-hari"),                '!isUser("-hari")');
 ok(!isUser("1983hari"),             '!isUser("1983hari")');
 
-ok(isOS($^O),    'isOS($^O)');
-
 #ok(HariSekhonUtils::loginit(),   'HariSekhonUtils::loginit()');
 #ok(HariSekhonUtils::loginit(),   'HariSekhonUtils::loginit() again since it should be initialized by first one');
 #ok(&HariSekhonUtils::log("hari testing"), '&HariSekhonUtils::log("hari testing")');
@@ -655,7 +677,6 @@ $verbose = 2;
 ok(vlog_options("option", "value"),         'vlog_options("option", "value") in $verbose 2');
 ok(vlog_options_bool("option", "value"),    'vlog_options_bool("option", "value") in $verbose 2');
 
-# XXX: not testing which("/explicit/nonexistent/path", 1) since it would error out
 is(which("sh"),                             "/bin/sh",      'which("sh") eq /bin/sh');
 is(which("/bin/bash"),                      "/bin/bash",    'which("bash") eq /bin/bash');
 is(which("/explicit/nonexistent/path"),     undef,          'which("/explicit/nonexistent/path") eq undef');
