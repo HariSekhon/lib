@@ -142,6 +142,7 @@ our %EXPORT_TAGS = (
                         isLabel
                         isLdapDn
                         isLinux
+                        isLinuxOrMac
                         isMac
                         isNagiosUnit
                         isNoSqlKey
@@ -2221,6 +2222,10 @@ sub isMac () {
 
 sub isLinux () {
     isOS "linux";
+}
+
+sub isLinuxOrMac () {
+    isLinux() or isMac();
 }
 
 our $supported_os_msg = "this program is only supported on %s at this time";
