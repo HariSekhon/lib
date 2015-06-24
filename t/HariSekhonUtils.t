@@ -458,7 +458,13 @@ is(plural([qw/one two three/]),     "s",    'plural(qw/one two three/)');
 like(random_alnum(20),  qr/^[A-Za-z0-9]{20}$/,                      'random_alnum(20)');
 like(random_alnum(3),  qr/^[A-Za-z0-9][A-Za-z0-9][A-za-z0-9]$/,     'random_alnum(3)');
 
-#is(resolve_ip("a.resolvers.level3.net"),    "4.2.2.1",      'resolve_ip("a.resolvers.level3.net") returns 4.2.2.1');
+# if not on a decent OS assume I'm somewhere lame like a bank where internal resolvers don't resolve internet addresses
+# this way my continous integration tests still run this one
+# still applies to Hortonworks Sandbox running on a banking VM :-/
+#if(isLinuxOrMac()){
+if($ENV{"TRAVIS"} or `dmidecode | grep -i virtual` ne ""){
+    #is(resolve_ip("a.resolvers.level3.net"),    "4.2.2.1",      'resolve_ip("a.resolvers.level3.net") returns 4.2.2.1');
+}
 is(resolve_ip("4.2.2.2"),                   "4.2.2.2",      'resolve_ip("4.2.2.2") returns 4.2.2.2');
 
 is(rstrip(" \t \n ha ri \t \n"),     " \t \n ha ri",   'rstrip()');
