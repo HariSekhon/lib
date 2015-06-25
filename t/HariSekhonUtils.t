@@ -717,6 +717,19 @@ is(isRegex(".*"),   ".*",   'isRegex(".*") eq ".*"');
 is(isRegex("(.*)"), "(.*)", 'isRegex("(.*)") eq "(.*)"');
 is(isRegex("(.*"),  undef,  'isRegex("(.*") eq undef');
 
+#is(validate_regex("some[Rr]egex.*(capture)"),   "(?-xism:some[Rr]egex.*(capture))",  'validate_regex("some[Rr]egex.*(capture)")');
+#is(validate_regex("some[Rr]egex.*(capture)"),   "(?^:some[Rr]egex.*(capture))",  'validate_regex("some[Rr]egex.*(capture)")');
+# Satisfies different outputs on Linux and Mac OS X 10.9 Maverick
+like(validate_regex("some[Rr]egex.*(capture)"),   qr/\(\?(?:\^|-xism):some\[Rr\]egex\.\*\(capture\)\)/,  'validate_regex("some[Rr]egex.*(capture)")');
+# Errors out still, should detect and fail gracefully
+#is(validate_regex("some[Rr]egex.*(capture broken", 1),   undef,  'validate_regex("some[Rr]egex.*(capture broken", 1)');
+is(validate_regex("somePosix[Rr]egex.*(capture)", undef, 0, "posix"),   "somePosix[Rr]egex.*(capture)",      'validate_regex("somePosix[Rr]egex.*(capture)", undef, 0, 1)');
+is(validate_regex("somePosix[Rr]egex.*(capture broken", undef, "noquit", "posix"),  undef,       'validate_regex("somePosix[Rr]egex.*(capture broken", undef, 1, 1) eq undef');
+is(validate_regex('somePosix[Rr]egex.*$(evilcmd)', undef, "noquit", "posix"),       undef,       'validate_regex("somePosix[Rr]egex.*$(evilcmd)", undef, 1, 1) eq undef');
+is(validate_regex('somePosix[Rr]egex.*$(evilcmd', undef, "noquit", "posix"),        undef,       'validate_regex("somePosix[Rr]egex.*$(evilcmd", undef, 1, 1) eq undef');
+is(validate_regex('somePosix[Rr]egex.*`evilcmd`', undef, "noquit", "posix"),        undef,       'validate_regex("somePosix[Rr]egex.*`evilcmd`", undef, 1, 1) eq undef');
+is(validate_regex('somePosix[Rr]egex.*`evilcmd', undef, "noquit", "posix"),         undef,       'validate_regex("somePosix[Rr]egex.*`evilcmd", undef, 1, 1) eq undef');
+
 # ============================================================================ #
 ok(isScalar(\$status),          'isScalar(\$status)');
 ok(!isScalar(\@usage_order),    '!isScalar(\@usage_order)');
@@ -983,19 +996,6 @@ is_deeply([validate_nodeport_list("node1:9200", qw/node2 node3 node4, node5/)], 
 if(isLinuxOrMac()){
     is(validate_program_path("/bin/sh", "sh"), "/bin/sh", 'validate_program_path()');
 }
-
-#is(validate_regex("some[Rr]egex.*(capture)"),   "(?-xism:some[Rr]egex.*(capture))",  'validate_regex("some[Rr]egex.*(capture)")');
-#is(validate_regex("some[Rr]egex.*(capture)"),   "(?^:some[Rr]egex.*(capture))",  'validate_regex("some[Rr]egex.*(capture)")');
-# Satisfies different outputs on Linux and Mac OS X 10.9 Maverick
-like(validate_regex("some[Rr]egex.*(capture)"),   qr/\(\?(?:\^|-xism):some\[Rr\]egex\.\*\(capture\)\)/,  'validate_regex("some[Rr]egex.*(capture)")');
-# Errors out still, should detect and fail gracefully
-#is(validate_regex("some[Rr]egex.*(capture broken", 1),   undef,  'validate_regex("some[Rr]egex.*(capture broken", 1)');
-is(validate_regex("somePosix[Rr]egex.*(capture)", undef, 0, "posix"),   "somePosix[Rr]egex.*(capture)",      'validate_regex("somePosix[Rr]egex.*(capture)", undef, 0, 1)');
-is(validate_regex("somePosix[Rr]egex.*(capture broken", undef, "noquit", "posix"),  undef,       'validate_regex("somePosix[Rr]egex.*(capture broken", undef, 1, 1) eq undef');
-is(validate_regex('somePosix[Rr]egex.*$(evilcmd)', undef, "noquit", "posix"),       undef,       'validate_regex("somePosix[Rr]egex.*$(evilcmd)", undef, 1, 1) eq undef');
-is(validate_regex('somePosix[Rr]egex.*$(evilcmd', undef, "noquit", "posix"),        undef,       'validate_regex("somePosix[Rr]egex.*$(evilcmd", undef, 1, 1) eq undef');
-is(validate_regex('somePosix[Rr]egex.*`evilcmd`', undef, "noquit", "posix"),        undef,       'validate_regex("somePosix[Rr]egex.*`evilcmd`", undef, 1, 1) eq undef');
-is(validate_regex('somePosix[Rr]egex.*`evilcmd', undef, "noquit", "posix"),         undef,       'validate_regex("somePosix[Rr]egex.*`evilcmd", undef, 1, 1) eq undef');
 
 is(validate_password('wh@tev3r'),   'wh@tev3r',     'validate_password(\'wh@tev3r\')');
 
