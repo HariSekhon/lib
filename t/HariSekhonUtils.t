@@ -431,6 +431,7 @@ is(validate_database_viewname("default.myTable", "Hive", "allow qualified"), "de
 # ============================================================================ #
 is(isDirname("test_Dir"),  "test_Dir",  "isDirname(test_Dir)");
 is(isDirname("/tmp/test"), "/tmp/test", "isDirname(/tmp/test");
+is(isDirname("./test"),    "./test",    "isDirname(./test");
 is(isDirname("\@me"),      undef,       "isDirname(\@me)");
 
 is(validate_dirname("test_Dir"),    "test_Dir",      'validate_directory("test_Dir", 1)');

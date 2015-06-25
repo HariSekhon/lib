@@ -1953,13 +1953,8 @@ sub isHost ($) {
     defined($host) or return undef;
     if(length($host) > 255){ # Can't be a hostname
         return undef;
-        #return isIP($host);
     } elsif($host =~ /^($host_regex)$/){
-        # There is something wrong with the host regex now, for a long time I've depended on Perl untainting this but the regex might have grown too complex for the Perl interpreter, so manually untainting it now
-        # TODO: XXX: figure out why this host regex isn't being captured and untainted by the outer regex capture
-        $host =~ /^(.*)$/;
         $host = $1;
-        #system("echo '<$host>'");
         return $host;
     }
     return undef;
