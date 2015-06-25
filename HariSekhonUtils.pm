@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.14.0";
+our $VERSION = "1.15.0";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -78,6 +78,10 @@ our @ISA = qw(Exporter);
 #@ISA = qw(Exporter);
 our %EXPORT_TAGS = (
     'array' =>  [   qw(
+                        assert_array
+                        assert_hash
+                        assert_int
+                        assert_float
                         compact_array
                         get_field
                         get_field_array
@@ -183,6 +187,7 @@ our %EXPORT_TAGS = (
                         check_string
                         check_threshold
                         check_thresholds
+                        env_cred
                         env_creds
                         env_var
                         env_vars
@@ -242,6 +247,8 @@ our %EXPORT_TAGS = (
     'status' =>  [  qw(
                         $status
                         status
+                        status2
+                        status3
                         critical
                         warning
                         unknown
@@ -721,29 +728,29 @@ my $short_options_len = 0;
 my $long_options_len  = 0;
 
 
-sub add_host_options($){
-    my $name = shift;
-    defined($name) or code_error("no name arg passed to add_host_options()");
-    if(length($name) >= 4){
-        $name = join " ", map {ucfirst} split " ", lc $name;
-    }
-    foreach(keys %hostoptions){
-        $hostoptions{$_}[1] =~ s/^(.)/$name \L$1/;
-    }
-    %options = ( %options, %hostoptions );
-}
+#sub add_host_options($){
+#    my $name = shift;
+#    defined($name) or code_error("no name arg passed to add_host_options()");
+#    if(length($name) >= 4){
+#        $name = join " ", map {ucfirst} split " ", lc $name;
+#    }
+#    foreach(keys %hostoptions){
+#        $hostoptions{$_}[1] =~ s/^(.)/$name \L$1/;
+#    }
+#    %options = ( %options, %hostoptions );
+#}
 
-sub add_user_options($){
-    my $name = shift;
-    defined($name) or code_error("no name arg passed to add_user_options()");
-    if(length($name) >= 4){
-        $name = join " ", map {ucfirst} split " ", lc $name;
-    }
-    foreach(keys %useroptions){
-        $useroptions{$_}[1] =~ s/^(.)/$name \L$1/;
-    }
-    %options = ( %options, %useroptions );
-}
+#sub add_user_options($){
+#    my $name = shift;
+#    defined($name) or code_error("no name arg passed to add_user_options()");
+#    if(length($name) >= 4){
+#        $name = join " ", map {ucfirst} split " ", lc $name;
+#    }
+#    foreach(keys %useroptions){
+#        $useroptions{$_}[1] =~ s/^(.)/$name \L$1/;
+#    }
+#    %options = ( %options, %useroptions );
+#}
 
 my $default_port;
 sub set_port_default($;$){
@@ -754,6 +761,7 @@ sub set_port_default($;$){
     isPort($default_port) or code_error("invalid port passed as first arg to set_port_default");
     $port = $default_port;
     $hostoptions{"P|port=s"}[1] =~ s/\)$/, default: $default_port\)/;
+    return $port;
 }
 
 sub set_threshold_defaults($$){
@@ -808,6 +816,7 @@ sub env_cred($){
         #vlog2("reading password from \$${name}PASSWORD environment variable");
         $password = $ENV{"${name}PASSWORD"};
     }
+    return 1;
 }
 
 sub env_creds($;$){
@@ -859,6 +868,7 @@ sub env_creds($;$){
     #$nodeoptions{"P|port=s"}[1]     = "$longname port (" . join(", ", @port_envs) . ( defined($port) ? ", default: $port)" : ")");
     $useroptions{"u|user=s"}[1]     = "$longname user (" . join(", ", @user_envs) . ")";
     $useroptions{"p|password=s"}[1] = "$longname password (" . join(", ", @password_envs) . ")";
+    return 1;
 }
 
 sub env_var($$){
@@ -869,6 +879,7 @@ sub env_var($$){
     if($ENV{$name} and not defined($$var_ref)){
         $$var_ref = $ENV{$name};
     }
+    return 1;
 }
 
 sub env_vars($$){
@@ -883,6 +894,7 @@ sub env_vars($$){
     } else {
         code_error("non-scalar/non-array ref passed as first arg to env_vars()");
     }
+    return 1;
 }
 
 # ============================================================================ #
@@ -937,16 +949,22 @@ sub get_status_code (;$) {
 }
 
 sub status () {
+    my $status = get_status_code();
     vlog("status: $status");
+    return $status;
 }
 
 # status2/3 not exported/used at this time
 sub status2 () {
+    my $status = get_status_code();
     vlog2("status: $status");
+    return $status;
 }
 
 sub status3 () {
+    my $status = get_status_code();
     vlog3("status: $status");
+    return $status;
 }
 
 # requires that you 'use Data::Dumper' in calling program, since not all programs will need this
@@ -965,53 +983,54 @@ sub catch_quit ($) {
             chomp $my_errmsg;
         }
         quit "CRITICAL", $my_errmsg;
-    }
+    };
+    return 1;
 }
 
 # ============================================================================ #
 
 
-sub option_present ($) {
-    my $new_option = shift;
-    grep {
-        my @option_switches = split("|", $_);
-        my @new_option_switches = split("|", $new_option);
-    } (keys %options);
-}
+#sub option_present ($) {
+#    my $new_option = shift;
+#    grep {
+#        my @option_switches = split("|", $_);
+#        my @new_option_switches = split("|", $new_option);
+#    } (keys %options);
+#}
 
 
 # TODO: consider calling this from get_options and passing hashes we want options for straight to that sub
 
 # TODO: fix this to use option_present
-sub add_options ($) {
-    my $options_hash = shift;
-    isHash($options_hash, 1);
-    #@default_options{keys %options} = values %options;
-    #@default_options{keys %{$_[0]}} = values %{$options_hash};
-    foreach my $option (keys %{$options_hash}){
-        unless(option_present($option)){
-            print "want to add $option\n";
-            #$default_options{$option} = ${$options_hash{$option}};
-        }
-    }
-
-#    #my (%optionshash) = @_;
-#    # by ref is faster
-#    my $hashref = shift;
-#    unless(isHash($hashref)){
-#        #my ($package, $file, $line) = caller;
-#        code_error("non hash ref passed to add_options subroutine"); # at " . $file . " line " . $line);
+#sub add_options ($) {
+#    my $options_hash = shift;
+#    isHash($options_hash, 1);
+#    #@default_options{keys %options} = values %options;
+#    #@default_options{keys %{$_[0]}} = values %{$options_hash};
+#    foreach my $option (keys %{$options_hash}){
+#        unless(option_present($option)){
+#            print "want to add $option\n";
+#            #$default_options{$option} = ${$options_hash{$option}};
+#        }
 #    }
-#    # TODO: consider replacing this with first position insertion in array in get_options for efficiency
-#    foreach my $option (keys %options){
-#        unless grep { grep($options keys %{$_} } @options){
-#            push(@options, { $_ => $options{$_} }) 
-#        };
-#    }
-#    #foreach(keys %hashref){
-#    #    push(@options, { $_ => $hashref{$_} });
-#    #}
-}
+#
+##    #my (%optionshash) = @_;
+##    # by ref is faster
+##    my $hashref = shift;
+##    unless(isHash($hashref)){
+##        #my ($package, $file, $line) = caller;
+##        code_error("non hash ref passed to add_options subroutine"); # at " . $file . " line " . $line);
+##    }
+##    # TODO: consider replacing this with first position insertion in array in get_options for efficiency
+##    foreach my $option (keys %options){
+##        unless grep { grep($options keys %{$_} } @options){
+##            push(@options, { $_ => $options{$_} }) 
+##        };
+##    }
+##    #foreach(keys %hashref){
+##    #    push(@options, { $_ => $hashref{$_} });
+##    #}
+#}
 
 
 #sub update_option_description {
@@ -1041,6 +1060,7 @@ sub autoflush () {
     $| = 1;
     select(STDOUT);
     $| = 1;
+    return 1;
 }
 
 
@@ -1507,6 +1527,7 @@ sub get_field2_array($$;$){
     my $value = get_field2($hash_ref, $field, $noquit);
     if($noquit){
         return undef unless $value;
+        return undef unless isArray($value);
     }
     assert_array($value, $field);
     return @{$value};
@@ -1519,6 +1540,7 @@ sub get_field2_float($$;$){
     my $value = get_field2($hash_ref, $field, $noquit);
     if($noquit){
         return undef unless defined($value);
+        return undef unless isFloat($value);
     }
     assert_float($value, $field);
     return $value;
@@ -1531,6 +1553,7 @@ sub get_field2_hash($$;$){
     my $value = get_field2($hash_ref, $field, $noquit);
     if($noquit){
         return undef unless $value;
+        return undef unless isHash($value);
     }
     assert_hash($value, $field);
     if($value){
@@ -1547,6 +1570,7 @@ sub get_field2_int($$;$){
     my $value = get_field2($hash_ref, $field, $noquit);
     if($noquit){
         return undef unless defined($value);
+        return undef unless isInt($value);
     }
     assert_int($value, $field);
     return $value;
@@ -1597,6 +1621,7 @@ sub get_options {
     verbose_mode();
     #vlog2("options:\n");
     # validation is done on an option by option basis
+    1;
 }
 
 
@@ -2089,10 +2114,10 @@ sub isNoSqlKey ($) {
 }
 
 
-sub isObject ($) {
-    my $object = shift;
-    return blessed($object);
-}
+#sub isObject ($) {
+#    my $object = shift;
+#    return blessed($object);
+#}
 
 
 sub isPort ($) {
@@ -2456,6 +2481,7 @@ sub plural ($) {
 
 my ($wchar, $hchar, $wpixels, $hpixels);
 sub print_options (@) {
+    check_terminal_size();
     #subtrace(@_);
     my $switch_width = $short_options_len + 2 + $long_options_len + 4 - 1;
     my $desc_width   = $wchar - $switch_width;
@@ -2508,6 +2534,7 @@ sub print_options (@) {
             }
         }
     }
+    1;
 }
 
 sub prompt($){
@@ -2519,11 +2546,14 @@ sub prompt($){
     return $response;
 }
 
-sub isYes($;$){
+sub isYes($;$$){
     my $val  = shift;
     my $name = shift() || "";
+    my $noquit = shift;
     $name = " for $name";
-    $val  =~ /^\s*(?:y(?:es)?|n(?:o)?)?\s*$/i or die "invalid response$name, must be 'yes' or 'no'\n";
+    unless($val =~ /^\s*(?:y(?:es)?|n(?:o)?)?\s*$/i){
+        die "invalid response$name, must be 'yes' or 'no'\n" unless $noquit;
+    }
     if($val =~ /^\s*y(?:es)?\s*$/i){
         return 1;
     } else {
@@ -2805,8 +2835,12 @@ sub uniq_array2(@){
     return @array2;
 }
 
-sub usage (;@) {
+sub get_terminal_size(){
     ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize();
+    check_terminal_size();
+}
+
+sub check_terminal_size(){
     unless(defined($wchar) and defined($hchar) and defined($wpixels) and defined($hpixels)){
         warn "\nTerm::ReadKey GetTerminalSize() failed to return values! Ignore this warning if you are teeing to a logfile (otherwise your terminal is messed up...)\n\n\n";
         $wchar   = 99999999;
@@ -2814,6 +2848,11 @@ sub usage (;@) {
         $wpixels = 99999999;
         $hpixels = 99999999;
     }
+    1;
+}
+
+sub usage (;@) {
+    get_terminal_size();
     print STDERR "@_\n\n" if (@_);
     if(not @_ and $main::DESCRIPTION){
         print STDERR "Hari Sekhon - https://github.com/harisekhon";
@@ -3192,7 +3231,7 @@ sub validate_fqdn ($;$) {
 
 
 sub validate_host_port_user_password($$$$){
-    return (validate_host($host), validate_port($port), validate_user($user), validate_password($password));
+    return (validate_host($_[0]), validate_port($_[1]), validate_user($_[2]), validate_password($_[3]));
 }
 
 
@@ -3210,8 +3249,8 @@ sub validate_hosts($$){
     my $hosts = shift;
     my $port  = shift;
     $port = isPort($port) or usage "invalid port given";
-    defined($host) or usage "hosts not defined";
-    my @hosts = split(/\s*,\s*/, $host);
+    defined($hosts) or usage "hosts not defined";
+    my @hosts = split(/\s*,\s*/, $hosts);
     @hosts or usage "no hosts defined";
     my $node_port;
     foreach(my $i = 0; $i < scalar @hosts; $i++){
