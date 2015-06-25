@@ -1951,6 +1951,7 @@ sub isHex ($) {
 sub isHost ($) {
     my $host = shift;
     defined($host) or return undef;
+    # at casual glance this looks like it's duplicating isHostname but it's using a different unified regex of isHostname + isIP
     if(length($host) > 255){ # Can't be a hostname
         return undef;
     } elsif($host =~ /^($host_regex)$/){
