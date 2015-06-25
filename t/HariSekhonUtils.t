@@ -635,6 +635,18 @@ is(validate_krb5_princ('hari@hari.com'), 'hari@hari.com', 'validate_krb5_princ("
 is(validate_krb5_realm("harisekhon.com"),  "harisekhon.com",    'validate_krb5_realm("harisekhon.com") eq harisekhon.com');
 
 # ============================================================================ #
+is(isLabel("st4ts_used (%)"),    "st4ts_used (%)",    'isLabel("st4ts_used (%)")');
+ok(!isLabel('b@dlabel'),                            'isLabel(\'b@dlabel\')');
+
+is(validate_label("st4ts_used (%)"),    "st4ts_used (%)",    'validate_label("st4ts_used (%)")');
+
+# ============================================================================ #
+is(isLdapDn("uid=hari,cn=users,cn=accounts,dc=local"),   "uid=hari,cn=users,cn=accounts,dc=local", 'isLdapDn()');
+is(isLdapDn("hari\@LOCAL"), undef, '!isLdapDn()');
+
+is(validate_ldap_dn("uid=hari,cn=users,cn=accounts,dc=local"),   "uid=hari,cn=users,cn=accounts,dc=local", 'validate_ldap_dn()');
+
+# ============================================================================ #
 is(isNagiosUnit("s"),   "s",    'isNagiosUnit(s) eq s');
 is(isNagiosUnit("ms"),  "ms",   'isNagiosUnit(s) eq ms');
 is(isNagiosUnit("us"),  "us",   'isNagiosUnit(us) eq us');
@@ -680,18 +692,6 @@ is(isPort(0),       undef,  'isPort(0)');
 is(validate_port(1),           1,      'validate_port(1)');
 is(validate_port(80),          80,     'validate_port(80)');
 is(validate_port(65535),       65535,  'validate_port(65535)');
-
-# ============================================================================ #
-is(isLabel("st4ts_used (%)"),    "st4ts_used (%)",    'isLabel("st4ts_used (%)")');
-ok(!isLabel('b@dlabel'),                            'isLabel(\'b@dlabel\')');
-
-is(validate_label("st4ts_used (%)"),    "st4ts_used (%)",    'validate_label("st4ts_used (%)")');
-
-# ============================================================================ #
-is(isLdapDn("uid=hari,cn=users,cn=accounts,dc=local"),   "uid=hari,cn=users,cn=accounts,dc=local", 'isLdapDn()');
-is(isLdapDn("hari\@LOCAL"), undef, '!isLdapDn()');
-
-is(validate_ldap_dn("uid=hari,cn=users,cn=accounts,dc=local"),   "uid=hari,cn=users,cn=accounts,dc=local", 'validate_ldap_dn()');
 
 # ============================================================================ #
 my $obj = {};
