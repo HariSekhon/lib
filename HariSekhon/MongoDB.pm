@@ -70,7 +70,8 @@ our %mongo_sasl_options = (
 
 push(@usage_order, qw/ssl sasl sasl-mechanism/);
 
-sub connect_mongo(;$){
+sub connect_mongo($){
+    my $hosts = shift;
     my $mongo_connect_options_hashref = shift() || {};
     my $client;
     try {
