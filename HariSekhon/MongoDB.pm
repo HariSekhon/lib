@@ -2,14 +2,14 @@
 #  Author: Hari Sekhon
 #  Date: 2014-06-14 13:42:34 +0100 (Sat, 14 Jun 2014)
 #
-#  http://github.com/harisekhon
+#  http://github.com/harisekhon/lib
 #
 #  License: see accompanying LICENSE file
 #  
 
 package HariSekhon::MongoDB;
 
-$VERSION = "0.1.1";
+$VERSION = "0.1.2";
 
 use strict;
 use warnings;
@@ -131,7 +131,8 @@ sub curl_mongo_err_handler($){
 }
 
 
-sub validate_mongo_hosts(){
+sub validate_mongo_hosts($){
+    my $host = shift;
     defined($host) or usage "MongoDB host(s) not specified";
     @hosts = split(",", $host);
     for(my $i=0; $i < scalar @hosts; $i++){
@@ -140,6 +141,7 @@ sub validate_mongo_hosts(){
     $hosts  = "mongodb://" . join(",", @hosts);
 #my $hosts  = join(",", @hosts);
     vlog_options "Mongo host list", $hosts;
+    return $hosts;
 }
 
 
