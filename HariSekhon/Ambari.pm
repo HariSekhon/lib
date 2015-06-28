@@ -2,7 +2,7 @@
 #  Author: Hari Sekhon
 #  Date: 2014-07-27 15:20:09 +0100 (Sun, 27 Jul 2014)
 #
-#  http://github.com/harisekhon
+#  http://github.com/harisekhon/lib
 #
 #  License: see accompanying LICENSE file
 #  
@@ -370,7 +370,7 @@ sub validate_ambari_component($){
 }
 
 sub validate_ambari_node($){
-    my $host = shift;
+    my $node = shift;
     defined($node) or usage "node not defined";
     $node = isHostname($node) || usage "invalid node given";
     vlog_options "node", $node;
