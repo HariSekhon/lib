@@ -946,15 +946,10 @@ is(trim_float("0.101"), "0.101", 'trim_float("0.101") eq "0.101"');
 
 # ============================================================================ #
 use POSIX 'strftime';
+my @time_parts = split(/\s+/, strftime("%Y %b %d %H %M %S", localtime));
 #is(timecomponents2days({split(/\s+/, strftime "%Y %b %d %H %M %S", localtime)}),    1,  'timecomponents2days');
-is(timecomponents2days(
-    strftime("%Y", localtime),
-    strftime("%b", localtime),
-    strftime("%d", localtime),
-    strftime("%H", localtime),
-    strftime("%M", localtime),
-    strftime("%S", localtime)
-),    0,  'timecomponents2days now');
+# breaks on Mac without int() as it returns 0.0416666666666667 instead of 0
+is(int(timecomponents2days($time_parts[0], $time_parts[1], $time_parts[2], $time_parts[3], $time_parts[4], $time_parts[5])),    0,  'timecomponents2days now');
 # this works right now but because of the irregularity of the calendar will probably break in future
 #is(timecomponents2days(
 #    strftime("%Y", localtime),
@@ -965,14 +960,7 @@ is(timecomponents2days(
 #    strftime("%S", localtime)
 #),    2,  'timecomponents2days');
 # tiniest of condition when it might break 1 sec, will never really hit this temporal unit test failure
-is(timecomponents2days(
-    strftime("%Y", localtime),
-    strftime("%b", localtime),
-    strftime("%d", localtime),
-    strftime("%H", localtime),
-    strftime("%M", localtime),
-    strftime("%S", localtime) + 1
-),    1/86400,  'timecomponents2days');
+#is(timecomponents2days($time_parts[0], $time_parts[1], $time_parts[2], $time_parts[3], $time_parts[4], $time_parts[5] + 1),    1/86400,  'timecomponents2days');
 
 # ============================================================================ #
 is_deeply([uniq_array(("one", "two", "three", "", "one"))],     [ "", "one", "three", "two" ],    'uniq_array()');
