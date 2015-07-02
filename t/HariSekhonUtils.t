@@ -686,10 +686,11 @@ ok(isPathQualified("./blah"), 'isPathQualified("./blah")');
 ok(isPathQualified("/blah"),  'isPathQualified("/blah")');
 ok(isPathQualified("./path/to/blah.txt"), 'isPathQualified("./path/to/blah")');
 ok(isPathQualified("/path/to/blah.txt"),  'isPathQualified("/path/to/blah")');
+ok(isPathQualified("/tmp/.blah"),  'isPathQualified("/tmp/.blah")');
 ok(!isPathQualified("blah"),  'isPathQualified("blah")');
 ok(!isPathQualified(".blah"),  'isPathQualified(".blah")');
 ok(!isPathQualified("#tmpfile#"),  'isPathQualified("#tmpfile#")');
-ok(isPathQualified("/tmp/.blah"),  'isPathQualified("/tmp/.blah")');
+ok(!isPathQualified("Europe/London"),  'isPathQualified("Europe/London")');
 # not supporting tilda home dirs
 ok(!isPathQualified("~blah"),  'isPathQualified("~blah")');
 
