@@ -152,6 +152,7 @@ our %EXPORT_TAGS = (
                         isNoSqlKey
                         isObject
                         isOS
+                        isPathQualified
                         isPort
                         isProcessName
                         isRef
@@ -2115,6 +2116,12 @@ sub isNoSqlKey ($) {
 #    my $object = shift;
 #    return blessed($object);
 #}
+
+
+sub isPathQualified($){
+    my $path = shift;
+    $path =~ /^(?:\.?\/)/;
+}
 
 
 sub isPort ($) {

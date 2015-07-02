@@ -681,6 +681,19 @@ is(isNoSqlKey("HariSekhon\@check_riak_write.pl"), undef, 'isNoSqlKey("...@...") 
 is(validate_nosql_key("HariSekhon:check_riak_write.pl:riak1:1385226607.02182:20abc"), "HariSekhon:check_riak_write.pl:riak1:1385226607.02182:20abc", 'validate_nosql_key()');
 
 # ============================================================================ #
+
+ok(isPathQualified("./blah"), 'isPathQualified("./blah")');
+ok(isPathQualified("/blah"),  'isPathQualified("/blah")');
+ok(isPathQualified("./path/to/blah.txt"), 'isPathQualified("./path/to/blah")');
+ok(isPathQualified("/path/to/blah.txt"),  'isPathQualified("/path/to/blah")');
+ok(!isPathQualified("blah"),  'isPathQualified("blah")');
+ok(!isPathQualified(".blah"),  'isPathQualified(".blah")');
+ok(!isPathQualified("#tmpfile#"),  'isPathQualified("#tmpfile#")');
+ok(isPathQualified("/tmp/.blah"),  'isPathQualified("/tmp/.blah")');
+# not supporting tilda home dirs
+ok(!isPathQualified("~blah"),  'isPathQualified("~blah")');
+
+# ============================================================================ #
 is(isPort(1),       1,      'isPort(1)');
 is(isPort(80),      80,     'isPort(80)');
 is(isPort(65535),   65535,  'isPort(65535)');
