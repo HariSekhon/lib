@@ -974,6 +974,7 @@ is(int(timecomponents2days($time_parts[0], $time_parts[1], $time_parts[2], $time
 # ============================================================================ #
 is_deeply([uniq_array(("one", "two", "three", "", "one"))],     [ "", "one", "three", "two" ],    'uniq_array()');
 is_deeply([uniq_array2(("one", "two", "three", "", "one"))],     [ "one", "two", "three", "" ],    'uniq_array2()');
+is_deeply([uniq_array_ordered(("one", "two", "three", "", "one"))],     [ "one", "two", "three", "" ],    'uniq_array_ordered()');
 
 # TODO:
 # usage

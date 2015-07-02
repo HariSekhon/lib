@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.15.1";
+our $VERSION = "1.15.2";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -96,6 +96,7 @@ our %EXPORT_TAGS = (
                         inArray
                         uniq_array
                         uniq_array2
+                        uniq_array_ordered
                     ) ],
     'cmd'   =>  [   qw(
                         cmd
@@ -2851,6 +2852,7 @@ sub uniq_array2(@){
     }
     return @array2;
 }
+*uniq_array_ordered = \&uniq_array2;
 
 sub get_terminal_size(){
     ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize();
