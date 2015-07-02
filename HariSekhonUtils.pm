@@ -270,6 +270,7 @@ our %EXPORT_TAGS = (
     'string' => [   qw(
                         lstrip
                         ltrim
+                        perf_suffix
                         random_alnum
                         rstrip
                         rtrim
@@ -2451,6 +2452,18 @@ sub parse_file_option($;$){
     vlog_options("files", "[ '" . join("', '", @files) . "' ]");
 
     return @files;
+}
+
+
+sub perf_suffix($){
+    my $key = shift;
+    my $prefix = '[\b\s\._-]';
+    if($key =~ /${prefix}bytes$/){
+        return "b";
+    } elsif($key =~ /${prefix}millis$/){
+        return "ms";
+    }
+    return "";
 }
 
 

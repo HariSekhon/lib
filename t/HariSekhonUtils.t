@@ -319,6 +319,14 @@ ok(get_options());
 is(get_path_owner("/etc/passwd"), "root", 'get_path_owner("/etc/passwd") eq "root"');
 
 # ============================================================================ #
+
+is(perf_suffix("blah_in_bytes"),    "b",    'perf_suffix("blah_in_bytes")');
+is(perf_suffix("blah_in_millis"),   "ms",   'perf_suffix("blah_in_millis")');
+is(perf_suffix("blah.bytes"),       "b",    'perf_suffix("blah.bytes")');
+is(perf_suffix("blah.millis"),      "ms",   'perf_suffix("blah.millis")');
+is(perf_suffix("blah.blah2"),       "",     'perf_suffix("blah.blah2")');
+
+# ============================================================================ #
 is(get_upper_threshold("warning"),   "5",     'get_upper_threshold(warning)');
 is(get_upper_threshold("critical"),  "10",    'get_upper_threshold(critical)');
 is(get_upper_thresholds(),           "5;10",  'get_upper_thresholds()');
