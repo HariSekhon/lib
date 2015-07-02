@@ -9,7 +9,7 @@
 
 package HariSekhon::Elasticsearch;
 
-$VERSION = "0.4.1";
+$VERSION = "0.4.2";
 
 use strict;
 use warnings;
@@ -31,10 +31,13 @@ our @ISA = qw(Exporter);
 our @EXPORT = ( qw (
                     $index
                     $list_indices
+                    $list_nodes
                     $list_types
+                    $node
                     $type
                     $ua
                     %elasticsearch_index
+                    %elasticsearch_node
                     %elasticsearch_type
                     %es_status_map
                     check_elasticsearch_status
@@ -51,8 +54,12 @@ our @EXPORT = ( qw (
                     isESType
                     get_elasticsearch_indices
                     get_ES_indices
+                    get_elasticsearch_nodes
+                    get_ES_nodes
                     list_elasticsearch_indices
                     list_es_indices
+                    list_elasticsearch_nodes
+                    list_es_nodes
                     validate_elasticsearch_alias
                     validate_es_alias
                     validate_elasticsearch_cluster
@@ -66,8 +73,10 @@ our @EXPORT = ( qw (
 our @EXPORT_OK = ( @EXPORT );
 
 our $index;
-our $list_indices;
+our $node;
 our $type;
+our $list_indices;
+our $list_nodes;
 our $list_types;
 
 our %es_status_map = (
@@ -77,6 +86,7 @@ our %es_status_map = (
 );
 
 env_var("ELASTICSEARCH_INDEX", \$index);
+env_var("ELASTICSEARCH_NODE",  \$node);
 env_var("ELASTICSEARCH_TYPE",  \$type);
 
 our %elasticsearch_index = (
@@ -89,7 +99,12 @@ our %elasticsearch_type = (
     "list-types"    =>  [ \$list_types,     "List Elasticsearch types in given index" ],
 );
 
-splice @usage_order, 7, 0, qw/index type shards replicas keys key value list-indices list-types/;
+our %elasticsearch_node = (
+    "N|node=s"      =>  [ \$node,           "Elasticsearch node (\$ELASTICSEARCH_NODE)" ],
+    "list-nodes"    =>  [ \$list_nodes,     "List Elasticsearch nodes" ],
+);
+
+splice @usage_order, 7, 0, qw/node index type shards replicas keys key value list-nodes list-indices list-types/;
 
 sub elasticsearch_err_handler($){
     my $response = shift;
@@ -226,6 +241,48 @@ sub list_elasticsearch_indices {
             #my @parts = split(/\s+/, $_);
             #print "$parts[1]\n";
             print "$_\n";
+        }
+        exit $ERRORS{"UNKNOWN"};
+    }
+}
+
+sub get_elasticsearch_nodes {
+    # could use /_nodes instead but it's more cleanup of ip etc
+    #my $content = curl_elasticsearch_raw("/_cat/nodes?h=host,ip,name");
+    curl_elasticsearch("/_nodes");
+    my @node_array;
+    my %nodes = get_field_hash("nodes");
+    foreach my $node_random_id(sort keys %nodes){
+        my @node = (
+            get_field("nodes.$node_random_id.host"),
+            get_field("nodes.$node_random_id.ip"),
+            get_field("nodes.$node_random_id.name")
+        );
+        push(@node_array, [@node]);
+    }
+#    foreach my $line (split(/\n/, $content)){
+#        my @node_array = map { strip($_) } split(/\s+/, $line, 3);
+#        if(scalar @node_array == 3){
+#            push(@node_array, @node_array);
+#        } else {
+#            quit "UNKNOWN", "invalid node array length after parsing node list";
+#        }
+#    }
+    return sort @node_array;
+}
+*get_ES_nodes = \&get_elasticsearch_nodes;
+
+sub list_elasticsearch_nodes {
+    if($list_nodes){
+        my @nodes = get_elasticsearch_nodes();
+        print "Elasticsearch Nodes:\n\n";
+        if(@nodes){
+            printf "%-50s %-20s %s\n\n", "hostname", "ip", "name";
+            foreach my $arr_ref (@nodes){
+                printf "%-50s %-20s %s\n", $$arr_ref[0], $$arr_ref[1], $$arr_ref[2];
+            }
+        } else {
+            print "<none>\n"
         }
         exit $ERRORS{"UNKNOWN"};
     }
