@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.15.2";
+our $VERSION = "1.15.3";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -3121,9 +3121,11 @@ sub validate_database_query_select_show ($;$) {
     defined($query) || usage "${name}query not defined";
     #$query =~ /^\s*((?i:SHOW|SELECT)\s[\w\s;:,\.\?\(\)*='"-]+)$/ || usage "invalid query supplied";
     #debug("regex validating query: $query");
-    $query =~ /^\s*((?:SHOW|SELECT)\s+(?!.*(?:INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|TRUNCATE|;|--)).+)$/i || usage "invalid ${name}query defined: may only be a SELECT or SHOW statement";
+    $query =~ /^\s*((?:SHOW|SELECT)\s+(?!.*(?:INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|TRUNCATE)).+)$/i || usage "invalid ${name}query defined: may only be a SELECT or SHOW statement";
     $query = $1;
-    $query =~ /insert|update|delete|create|drop|alter|truncate|;|--/i and usage "invalid ${name}query defined: DML statement or suspect chars detected in query!";
+    $query =~ /insert|update|delete|create|drop|alter|truncate/i and usage "invalid ${name}query defined: found DML statement keywords!";
+    # this trips up users who put ; at the end of their query and doesn't offer that much protection anyway since DML is already checked for and it may be convenient to comment out end of query for testing
+    #$query =~ /;|--/i and usage "invalid ${name}query defined: suspect chars ';' or '--' detected in query!";
     vlog_options("${name}query", $query);
     return $query;
 }
