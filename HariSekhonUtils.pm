@@ -3126,6 +3126,7 @@ sub validate_database_query_select_show ($;$) {
     $query =~ /insert|update|delete|create|drop|alter|truncate/i and usage "invalid ${name}query defined: found DML statement keywords!";
     # this trips up users who put ; at the end of their query and doesn't offer that much protection anyway since DML is already checked for and it may be convenient to comment out end of query for testing
     #$query =~ /;|--/i and usage "invalid ${name}query defined: suspect chars ';' or '--' detected in query!";
+    $query =~ /;/ and usage "invalid ${name}query defined: you may not add semi-colons to your queries, while it works on the command line, Nagios ends up choking by prematurely terminating the check command resulting in a null shell error before this plugin executes so the error handlers in this code do not have any chance to catch it";
     vlog_options("${name}query", $query);
     return $query;
 }
