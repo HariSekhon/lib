@@ -3121,7 +3121,7 @@ sub validate_database_query_select_show ($;$) {
     defined($query) || usage "${name}query not defined";
     #$query =~ /^\s*((?i:SHOW|SELECT)\s[\w\s;:,\.\?\(\)*='"-]+)$/ || usage "invalid query supplied";
     #debug("regex validating query: $query");
-    $query =~ /^\s*((?:SHOW|SELECT)\s+(?!.*(?:INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|TRUNCATE)).+)$/i || usage "invalid ${name}query defined: may only be a SELECT or SHOW statement";
+    $query =~ /^\s*((?:SHOW|SELECT)\s+.+)$/i || usage "invalid ${name}query defined: may only be a SELECT or SHOW statement";
     $query = $1;
     $query =~ /insert|update|delete|create|drop|alter|truncate/i and usage "invalid ${name}query defined: found DML statement keywords!";
     # this trips up users who put ; at the end of their query and doesn't offer that much protection anyway since DML is already checked for and it may be convenient to comment out end of query for testing
