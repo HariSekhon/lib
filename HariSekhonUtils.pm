@@ -3465,7 +3465,7 @@ sub validate_metrics ($) {
     if($metrics){
         foreach(split(/\s*,\s*/, $metrics)){
             $_ = trim($_);
-            /^\s*([\w\._]+)\s*$/ or usage "invalid metric '$_' given, must be alphanumeric, may contain underscores and dots in the middle";
+            /^\s*([\w\.]+)\s*$/ or usage "invalid metric '$_' given, must be alphanumeric, may contain underscores and dots in the middle";
             push(@metrics, $1);
         }
         @metrics or usage "no valid metrics given";
