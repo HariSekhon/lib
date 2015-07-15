@@ -134,7 +134,7 @@ if(isMac()){
     ok($^O eq "darwin", 'isMac()');
 }
 if(isLinuxOrMac()){
-    ok($^O eq "linuxA" or $^O eq "darwinA", "isLinuxOrMac()");
+    ok(($^O eq "linux" or $^O eq "darwin"), "isLinuxOrMac()");
 }
 
 if($^O eq "linux"){
@@ -503,6 +503,26 @@ if($^O eq "linux" or $^O eq "darwin"){
 is(validate_file("/etc/nonexistentfile", 1),    undef,          'validate_file("/etc/nonexistentfile", 1) eq undef');
 
 # ============================================================================ #
+
+my $stats = {
+    "one" => 1,
+    "two" => "2",
+    "three" => "three",
+    "four" => {
+        "five" => 6
+    },
+    "six" => ["0", 1, "one", 2]
+};
+my %expectedFlattenedStats = ( "one" => 1, "two" => 2, "four.five" => 6, "six.0" => 0, "six.1" => 1, "six.3" => 2 );
+#my %flattenedStats = flattenStats( { "seven" => [qw/3 4 5/], "one" => "two", "three" => { "four" => "five" }, "six" => [0, 1, 2] } );
+my %flattenedStats = flattenStats($stats);
+#use Data::Dumper;
+#print "flattened stats:\n";
+#print Dumper(\%flattenedStats);
+#print Dumper($stats);
+is_deeply(\%flattenedStats, \%expectedFlattenedStats, 'flattenStats()');
+
+# ============================================================================ #
 ok(isFloat(1),          'isFloat(1)');
 ok(!isFloat(-1),        '!isFloat(-1)');
 ok(isFloat(-1, 1),      'isFloat(-1, 1)');
@@ -653,6 +673,9 @@ is(isLdapDn("uid=hari,cn=users,cn=accounts,dc=local"),   "uid=hari,cn=users,cn=a
 is(isLdapDn("hari\@LOCAL"), undef, '!isLdapDn()');
 
 is(validate_ldap_dn("uid=hari,cn=users,cn=accounts,dc=local"),   "uid=hari,cn=users,cn=accounts,dc=local", 'validate_ldap_dn()');
+
+# ============================================================================ #
+is_deeply([validate_metrics("gauges.waiting.count,gauges.total.used,gauges.waiting.count")], [ "gauges.total.used", "gauges.waiting.count" ], 'validate_metrics()');
 
 # ============================================================================ #
 is(isNagiosUnit("s"),   "s",    'isNagiosUnit(s) eq s');
@@ -992,7 +1015,7 @@ is(validate_database_query_select_show("SELECT count(*) from database.table"),  
 is(validate_hostport("myHost:8080"),              "myHost:8080",                    'validate_hostname(myHost:8080)');
 is(validate_hostport("myHost.myDomain.com:8080"), "myHost.myDomain.com:8080",       'validate_hostname(myHost.myDomain.com:8080)');
 
-is(validate_host_port_user_password("myHost.domain.com", 80, "myUser", "myPassword"),   ("myHost.domain.com", 80, "myUser", "myPassword"), 'validate_host_port_user_password()');
+is_deeply([validate_host_port_user_password("myHost.domain.com", 80, "myUser", "myPassword")],   ["myHost.domain.com", 80, "myUser", "myPassword"], 'validate_host_port_user_password()');
 
 is_deeply([validate_hosts("localhost,127.0.0.1:443", 80)],   ["127.0.0.1:80","127.0.0.1:443"], 'validate_hosts()');
 

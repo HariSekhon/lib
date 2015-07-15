@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.15.3";
+our $VERSION = "1.15.4";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -83,6 +83,7 @@ our %EXPORT_TAGS = (
                         assert_int
                         assert_float
                         compact_array
+                        flattenStats
                         get_field
                         get_field_array
                         get_field_float
@@ -330,6 +331,7 @@ our %EXPORT_TAGS = (
                         validate_krb5_realm
                         validate_label
                         validate_ldap_dn
+                        validate_metrics
                         validate_node_list
                         validate_nodeport_list
                         validate_nosql_key
@@ -1460,6 +1462,49 @@ sub expand_units ($;$$) {
     return $num * (1024**$power);
 }
 
+my %stats;
+
+# To check prototype before calling recursively
+sub processStat($$);
+sub processStat($$){
+    my $name = shift;
+    my $var  = shift;
+    vlog3("processing $name");
+    if(isArray($var)){
+        if(scalar @{$var} > 0){
+            foreach(my $i=0; $i < scalar @{$var}; $i++){
+                processStat("$name.$i", $$var[$i]);
+            }
+        } else {
+            processStat("$name.0", "");
+        }
+    } elsif(isHash($var)){
+        if(scalar keys %{$var} and defined($$var{"value"})){
+            processStat($name, $$var{"value"});
+            #vlog2 "$name='$$var{value}'";
+            #$stats{$name} = $$var{"value"};
+        } else {
+            foreach my $key (keys %{$var}){
+                processStat("$name.$key", $$var{$key});
+            }
+        }
+    } else {
+        return if $name =~ /\.version$/;
+        isFloat($var) or return;
+        vlog2("$name='$var'");
+        $stats{$name} = $var;
+    }
+}
+
+sub flattenStats($){
+    my $hashref = shift;
+    isHash($hashref) or code_error "invalid arg passed to flattenStats, not a hashref!";
+    foreach my $stat (sort keys %{$hashref}){
+        processStat($stat, $hashref->{$stat});
+    }
+    return %stats;
+}
+
 
 sub get_field($;$){
     get_field2($json, $_[0], $_[1]);
@@ -1578,6 +1623,22 @@ sub get_field2_int($$;$){
     assert_int($value, $field);
     return $value;
 }
+
+# get a field from a flattened hash
+#sub get_field3($$;$){
+#    my $hash_ref  = shift;
+#    my $field     = shift || code_error "field not passed to get_field3()";
+#    my $noquit    = shift;
+#    isHash($hash_ref) or code_error "non-hash ref passed to get_field3()";
+#    # XXX: this returns field not found where field exists but value is 'undef'
+#    if(defined($hash_ref->{$field})){
+#        return $hash_ref->{$field};
+#    } else {
+#        quit "UNKNOWN", "'$field' field not found. $nagios_plugins_support_msg_api" unless $noquit;
+#        return undef;
+#    }
+#    code_error "hit end of get_field3 sub";
+#}
 
 
 sub get_options {
@@ -3395,6 +3456,23 @@ sub validate_ldap_dn ($;$) {
     $dn = isLdapDn($dn) || usage "invalid ldap ${name}dn defined";
     vlog_options("ldap ${name}dn", $dn);
     return $dn;
+}
+
+
+sub validate_metrics ($) {
+    my $metrics = shift;
+    my @metrics;
+    if($metrics){
+        foreach(split(/\s*,\s*/, $metrics)){
+            $_ = trim($_);
+            /^\s*([\w\._]+)\s*$/ or usage "invalid metric '$_' given, must be alphanumeric, may contain underscores and dots in the middle";
+            push(@metrics, $1);
+        }
+        @metrics or usage "no valid metrics given";
+        @metrics = uniq_array @metrics;
+        vlog_options("metrics", "[ " . join(" ", @metrics) . " ]");
+    }
+    return @metrics;
 }
 
 
