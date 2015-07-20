@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.15.4";
+our $VERSION = "1.15.5";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -647,7 +647,7 @@ our $host_regex         = "\\b(?:$hostname_regex|$ip_regex)\\b";
 our $process_name_regex = '[\w\s_\.\/\<\>-]+';
 our $url_path_suffix_regex = '/(?:[\w.,:\/%&?!=*|\[\]~+-]+)?';
 our $url_regex          = '\b(?i:https?://' . $host_regex . '(?::\d{1,5})?(?:' . $url_path_suffix_regex . ')?)';
-our $user_regex         = '\b[A-Za-z][A-Za-z0-9-]*[A-Za-z0-9]\b';
+our $user_regex         = '\b[A-Za-z][A-Za-z0-9_-]*[A-Za-z0-9]\b';
 our $column_regex       = '\b[\w\:]+\b';
 our $ldap_dn_regex      = '\b\w+=[\w\s]+(?:,\w+=[\w\s]+)*\b';
 our $krb5_principal_regex = "$user_regex(?:\/$hostname_regex)?(?:\@$domain_regex)?";
