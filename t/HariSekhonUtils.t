@@ -825,6 +825,7 @@ is(validate_url_path_suffix("/~hari"),           "/~hari",                  'val
 # ============================================================================ #
 is(isUser("hadoop"),    "hadoop",   'isUser("hadoop")');
 is(isUser("hari1"),     "hari1",    'isUser("hari1")');
+is(isUser("mysql_test"), "mysql_test", 'isUser("mysql_test")');
 is(isUser('cloudera-scm'),  'cloudera-scm', 'isUser("cloudera-scm")');
 ok(!isUser("-hari"),                '!isUser("-hari")');
 ok(!isUser("1983hari"),             '!isUser("1983hari")');
