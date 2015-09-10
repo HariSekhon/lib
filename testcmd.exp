@@ -194,7 +194,7 @@ proc hr {} {
     puts "================================================================================"
 }
 hr
-puts "Hari Sekhon Nagios Utils and Plugins\n\nTest Suite version $version\n"
+puts "Hari Sekhon Utils and Nagios Plugins\n\nTest Suite version $version\n"
 puts "Starting run: [timestamp -gmt -format "%Y-%m-%d %H:%M:%S"]"
 hr
 
