@@ -463,6 +463,8 @@ is(isDomain("com"),             "com",              'isDomain("com") eq "com"');
 is(isDomain("a"x63 . ".com"),   "a"x63 . ".com",    'isDomain("a"x63 . ".com") eq "a"x63 . ".com"');
 is(isDomain("a"x64),            undef,              'isDomain("a"x64) eq undef');
 is(isDomain("harisekhon"),      undef,              'isDomain("harisekhon") eq undef'); # not a valid TLD
+is(isDomain("compute.internal"),            'compute.internal',             'isDomain("compute.internal")');
+is(isDomain("eu-west-1.compute.internal"),  'eu-west-1.compute.internal',   'isDomain("eu-west-1.compute.internal")');
 # programs use isDomain2, keep until updating them
 is(isDomain2("com"),            undef,              'isDomain2("com") eq undef');
 is(isDomain2("123domain.com"),  "123domain.com",    'isDomain2("123domain.com") eq 123domain.com');
@@ -564,6 +566,7 @@ ok(!isHex("0xhari"), '!isHex("hari")');
 # ============================================================================ #
 is(isHost("harisekhon.com"),    "harisekhon.com",   'isHost("harisekhon.com") eq harisekhon.com');
 ok(isHost("harisekhon"),        'isHost("harisekhon")');
+ok(isHost("ip-172-31-1-1"),     'isHost("ip-172-31-1-1")');
 ok(isHost("10.10.10.1"),        'isHost("10.10.10.1")');
 is(isHost("10.10.10.10"),       "10.10.10.10",      'isHost("10.10.10.10") eq 10.10.10.10');
 ok(isHost("10.10.10.100"),      'isHost("10.10.10.100")');
@@ -572,9 +575,17 @@ ok(isHost("10.10.10.255"),      'isHost("10.10.10.255")');
 ok(!isHost("10.10.10.256"),     '!isHost("10.10.10.256")');
 ok(!isHost("a"x256),            '!isHost("a"x256)');
 
-is(validate_host("10.10.10.10"), "10.10.10.10",  'validate_host(10.10.10.10)');
-is(validate_host("myHost"),      "myHost",       'validate_host(myHost)');
-is(validate_host("myHost.myDomain.com"),      "myHost.myDomain.com",       'validate_host(myHost.myDomain.com)');
+is(isAwsHostname("ip-172-31-1-1"),      "ip-172-31-1-1",    'isAwsHostname("ip-172-31-1-1")');
+is(isAwsHostname("ip-172-31-1-1.eu-west-1.compute.internal"), "ip-172-31-1-1.eu-west-1.compute.internal", 'isAwsHostname("ip-172-31-1-1.eu-west-1.compute.internal")');
+is(isAwsHostname("harisekhon"),        undef,              'isAwsHostname("harisekhon")');
+is(isAwsHostname("10.10.10.1"),        undef,              'isAwsHostname("10.10.10.1")');
+
+is(isAwsFqdn("ip-172-31-1-1.eu-west-1.compute.internal"),   "ip-172-31-1-1.eu-west-1.compute.internal", 'isAwsFqdn("ip-172-31-1-1.eu-west-1.compute.internal")');
+is(isAwsFqdn("ip-172-31-1-1"),          undef,              'isAwsFqdn("ip-172-31-1-1")');
+
+is(validate_host("10.10.10.10"),            "10.10.10.10",          'validate_host(10.10.10.10)');
+is(validate_host("myHost"),                 "myHost",               'validate_host(myHost)');
+is(validate_host("myHost.myDomain.com"),    "myHost.myDomain.com",  'validate_host(myHost.myDomain.com)');
 
 # ============================================================================ #
 is(isHostname("harisekhon.com"),  "harisekhon.com",   'isHostname("harisekhon.com") eq harisekhon.com');
