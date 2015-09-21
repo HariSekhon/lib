@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.15.6";
+our $VERSION = "1.15.7";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -146,6 +146,7 @@ our %EXPORT_TAGS = (
                         isInt
                         isInterface
                         isKrb5Princ
+                        isJavaException
                         isJson
                         isLabel
                         isLdapDn
@@ -159,6 +160,7 @@ our %EXPORT_TAGS = (
                         isPathQualified
                         isPort
                         isProcessName
+                        isPythonTraceback
                         isRef
                         isRegex
                         isScalar
@@ -2093,6 +2095,30 @@ sub isIP ($) {
 }
 
 
+sub isJavaException ($) {
+    my $string = shift;
+    if($string =~ /(?:^\s+at|^Caused by:)\s+\w+(?:\.\w+)+/){
+        #debug "skipping java exception \\s+at|^Caused by => '$string'";
+        return 1;
+    } elsif($string =~ /\(.+:[\w-]+\(\d+\)\)/){
+        #debug "skipping java exception (regex):\\w(\\d+) => '$string'";
+        return 1;
+    } elsif($string =~ /(\b|_).+\.\w+Exception:/){
+        #debug "skipping java exception regex\\.\\w+Exception: => '$string'";
+        return 1;
+    } elsif($string =~ /^(?:\w+\.)*\w+Exception:/){
+        #debug "skipping java exception (?:\\w+\\.)*\\w+Exception: => '$string'";
+        return 1;
+    } elsif($string =~ /\$\w+\(\w+:\d+\)/){
+        #debug "skipping java exception \$\\w+(regex) => '$string'";
+        return 1;
+    #} elsif($string =~ /\s\w+\s\[[\w-]+\]\s[A-Z][a-z]+(?:[A-Z][a-z]+)+:\d+\s/){
+        #debug "skipping java exception \\w+\\s\\[[\\w-]+\\]\\s[A-Z][a-z]+(?:[A-Z][a-z]+)+:\\d+\\s => '$string'";
+        #return 1;
+    }
+    return undef;
+}
+
 # wish there was a better way of validating the JSON returned but Test::JSON is_valid_json() also errored out badly from underlying JSON::Any module, similar to JSON's decode_json
 #sub isJson($){
 #    my $data = shift;
@@ -2227,6 +2253,15 @@ sub isProcessName ($) {
     return $1;
 }
 
+
+sub isPythonTraceback ($) {
+    my $string = shift;
+    if($string =~ /^\s+File "$filename_regex", line \d+, in (?:<module>|[A-Za-z]+)/){
+        #debug "skipping python traceback";
+        return 1;
+    }
+    return undef;
+}
 
 # XXX: doesn't catch error before Perl errors out, only using for late loading of regex from files, not in validate_regex()
 sub isRegex ($) {
