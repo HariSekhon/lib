@@ -2257,7 +2257,11 @@ sub isProcessName ($) {
 sub isPythonTraceback ($) {
     my $string = shift;
     if($string =~ /^\s+File "$filename_regex", line \d+, in (?:<module>|[A-Za-z]+)/){
-        #debug "skipping python traceback";
+        #debug "skipping python traceback 'File "...", line \\d+, in ...';
+        return 1;
+    }
+    if($string =~ /Traceback \(most recent call last\):/){
+        #debug "skipping python traceback 'Traceback \(most recent call last\)'";
         return 1;
     }
     return undef;

@@ -650,6 +650,10 @@ is(validate_ip("10.10.10.255"),      "10.10.10.255",     'validate_ip("10.10.10.
 is(validate_ip("255.255.255.254"),   "255.255.255.254",  'validate_ip("255.255.255.254")');
 
 # ============================================================================ #
+ok(isJavaException("        at org.apache.ambari.server.api.services.stackadvisor.StackAdvisorRunner.runScript(StackAdvisorRunner.java:96)"), 'isJavaException(" at org.apache.ambari.server...."');
+ok(!isJavaException("blah"), '!isJavaException("blah"');
+
+# ============================================================================ #
 ok(isJson('{ "test": "data" }'),   'isJson({ "test": "data" })');
 ok(!isJson(' { "test": }'),        '!isJson({ "test": })');
 
@@ -767,6 +771,11 @@ ok(!isProcessName("[init] 3"),      '!isProcessName("[init] 3")');
 is(validate_process_name("../my_program"),      "../my_program",        'validate_process_name("../my_program")');
 is(validate_process_name("ec2-run-instances"),  "ec2-run-instances",    'validate_process_name("ec2-run-instances")');
 is(validate_process_name("sh <defunct>"),       "sh <defunct>",         'validate_process_name("sh <defunct>")');
+
+# ============================================================================ #
+ok(isPythonTraceback('  File "/var/lib/ambari-server/resources/scripts/stack_advisor.py", line 154, in <module>'), 'isPythonTraceback(  File "/var/lib/ambari-server/resources/scripts/stack_advisor.py", line 154, in <module>)');
+ok(isPythonTraceback('... Traceback (most recent call last):'), 'isPythonTraceback("... Traceback (most recent call last):")');
+ok(!isPythonTraceback('blah'), 'isPythonTraceback("blah")');
 
 # ============================================================================ #
 is(isRegex(".*"),   ".*",   'isRegex(".*") eq ".*"');
