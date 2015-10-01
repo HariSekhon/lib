@@ -53,7 +53,7 @@ make:
 		Time::HiRes \
 		XML::SAX \
 		XML::Simple \
-		;
+		; echo
 
 .PHONY: apt-packages
 apt-packages:
