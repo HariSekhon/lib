@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.15.8";
+our $VERSION = "1.16.0";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -771,7 +771,7 @@ my $default_port;
 sub set_port_default($;$){
     #defined($default_port) and code_error("default port cannot be set twice");
     # already defined, first one wins
-    defined($default_port) and not defined($_[1]) and return undef;
+    defined($default_port) and not defined($_[1]) and return;
     $default_port = shift;
     isPort($default_port) or code_error("invalid port passed as first arg to set_port_default");
     $port = $default_port;
@@ -1113,7 +1113,7 @@ sub check_regex ($$;$) {
     if($string !~ /$regex/){
         critical;
         $msg .= " (expected regex: '$regex')" unless $no_msg;
-        return undef;
+        return;
     }
     return 1;
 }
@@ -1127,7 +1127,7 @@ sub check_string ($$;$) {
     if(defined($expected_string) and $string ne $expected_string){
         critical;
         $msg .= " (expected: '$expected_string')" unless $no_msg;
-        return undef;
+        return;
     }
     return 1;
 }
@@ -1215,7 +1215,7 @@ sub check_thresholds ($;$$) {
 #    my $fh;
 #    unless(open($fh, $file)){
 #        vlog "Failed to read file '$file': $!\n";
-#        return undef;
+#        return;
 #    }
 #    binmode($fh);
 #    my $checksum;
@@ -1416,7 +1416,7 @@ sub curl_json ($;$$$$$$) {
 
 
 sub debug (@) {
-    return undef unless $debug;
+    return unless $debug;
     my ( $package, $filename, $line ) = caller;
     my $debug_msg = "@_";
     $debug_msg =~ s/^(\n+)//;
@@ -1572,7 +1572,7 @@ sub get_field2($$;$){
             return $hash_ref->{$field};
         } else {
             quit "UNKNOWN", "'$field' field not found. $nagios_plugins_support_msg_api" unless $noquit;
-            return undef;
+            return;
         }
     }
     code_error "hit end of get_field2 sub";
@@ -1584,8 +1584,8 @@ sub get_field2_array($$;$){
     my $noquit   = shift;
     my $value = get_field2($hash_ref, $field, $noquit);
     if($noquit){
-        return undef unless $value;
-        return undef unless isArray($value);
+        return unless $value;
+        return unless isArray($value);
     }
     assert_array($value, $field);
     return @{$value};
@@ -1597,8 +1597,8 @@ sub get_field2_float($$;$){
     my $noquit   = shift;
     my $value = get_field2($hash_ref, $field, $noquit);
     if($noquit){
-        return undef unless defined($value);
-        return undef unless isFloat($value);
+        return unless defined($value);
+        return unless isFloat($value);
     }
     assert_float($value, $field);
     return $value;
@@ -1610,8 +1610,8 @@ sub get_field2_hash($$;$){
     my $noquit   = shift;
     my $value = get_field2($hash_ref, $field, $noquit);
     if($noquit){
-        return undef unless $value;
-        return undef unless isHash($value);
+        return unless $value;
+        return unless isHash($value);
     }
     assert_hash($value, $field);
     if($value){
@@ -1627,8 +1627,8 @@ sub get_field2_int($$;$){
     my $noquit   = shift;
     my $value = get_field2($hash_ref, $field, $noquit);
     if($noquit){
-        return undef unless defined($value);
-        return undef unless isInt($value);
+        return unless defined($value);
+        return unless isInt($value);
     }
     assert_int($value, $field);
     return $value;
@@ -1645,7 +1645,7 @@ sub get_field2_int($$;$){
 #        return $hash_ref->{$field};
 #    } else {
 #        quit "UNKNOWN", "'$field' field not found. $nagios_plugins_support_msg_api" unless $noquit;
-#        return undef;
+#        return;
 #    }
 #    code_error "hit end of get_field3 sub";
 #}
@@ -1702,10 +1702,10 @@ sub get_options {
 sub get_path_owner ($) {
     # defined($_[0]) || code_error "no path passed to get_path_owner()";
     my $path = shift;
-    open my $fh, $path || return undef;
+    open my $fh, $path || return;
     my @stats = stat($fh);
     close $fh;
-    defined($stats[4]) || return undef;
+    defined($stats[4]) || return;
     return getpwuid($stats[4]) || 0;
 }
 
@@ -1822,8 +1822,8 @@ sub inArray ($@) {
 
 sub isAlNum ($) {
     my $arg = shift;
-    defined($arg) or return undef; #code_error("no arg passed to isAlNum()");
-    $arg =~ /^([A-Za-z0-9]+)$/ or return undef;
+    defined($arg) or return; #code_error("no arg passed to isAlNum()");
+    $arg =~ /^([A-Za-z0-9]+)$/ or return;
     return $1;
 }
 
@@ -1844,29 +1844,29 @@ sub isArray ($) {
 
 sub isAwsAccessKey($){
     my $aws_access_key = shift;
-    defined($aws_access_key) or return undef;
-    $aws_access_key =~ /^([A-Za-z0-9]{20})$/ or return undef;
+    defined($aws_access_key) or return;
+    $aws_access_key =~ /^([A-Za-z0-9]{20})$/ or return;
     return $1;
 }
 
 sub isAwsHostname($){
     my $aws_hostname = shift;
-    defined($aws_hostname) or return undef;
-    $aws_hostname =~ /^($aws_hostname_regex)$/ or return undef;
+    defined($aws_hostname) or return;
+    $aws_hostname =~ /^($aws_hostname_regex)$/ or return;
     return $1;
 }
 
 sub isAwsFqdn($){
     my $aws_fqdn = shift;
-    defined($aws_fqdn) or return undef;
-    $aws_fqdn =~ /^($aws_fqdn_regex)$/ or return undef;
+    defined($aws_fqdn) or return;
+    $aws_fqdn =~ /^($aws_fqdn_regex)$/ or return;
     return $1;
 }
 
 sub isAwsSecretKey($){
     my $aws_secret_key = shift;
-    defined($aws_secret_key) or return undef;
-    $aws_secret_key =~ /^([A-Za-z0-9]{40})$/ or return undef;
+    defined($aws_secret_key) or return;
+    $aws_secret_key =~ /^([A-Za-z0-9]{40})$/ or return;
     return $1;
 }
 
@@ -1874,10 +1874,10 @@ sub isAwsSecretKey($){
 sub isChars($$){
     my $string = shift;
     my $chars  = shift;
-    defined($string) or return undef;
+    defined($string) or return;
     defined($chars) or code_error "no chars passed to isChars";
     $chars = isRegex("[$chars]") or code_error "invalid regex char range passed to isChars()";
-    $string =~ /^($chars+)$/ or return undef;
+    $string =~ /^($chars+)$/ or return;
     return $1;
 }
 
@@ -1889,8 +1889,8 @@ sub isCode ($) {
 
 sub isCollection($){
     my $collection = shift;
-    defined($collection) or return undef;
-    $collection =~ /^(\w(?:[\w\.]*\w)?)$/  or return undef;
+    defined($collection) or return;
+    $collection =~ /^(\w(?:[\w\.]*\w)?)$/  or return;
     $collection = $1;
     return $collection;
 }
@@ -1903,8 +1903,8 @@ sub isCollection($){
 
 sub isDatabaseName ($) {
     my $database = shift;
-    defined($database) || return undef;
-    $database =~ /^(\w+)$/ or return undef;
+    defined($database) || return;
+    $database =~ /^(\w+)$/ or return;
     $database = $1;
     return $database;
 }
@@ -1912,8 +1912,8 @@ sub isDatabaseName ($) {
 
 sub isDatabaseColumnName ($) {
     my $column = shift;
-    defined($column) || return undef;
-    $column =~ /^($column_regex)$/ or return undef;
+    defined($column) || return;
+    $column =~ /^($column_regex)$/ or return;
     $column = $1;
     return $column;
 }
@@ -1921,8 +1921,8 @@ sub isDatabaseColumnName ($) {
 
 sub isDatabaseFieldName ($) {
     my $field = shift;
-    defined($field) || return undef;
-    ( $field  =~ /^(\d+)$/ or $field =~/^([\w()*,._-]+)$/ ) or return undef;
+    defined($field) || return;
+    ( $field  =~ /^(\d+)$/ or $field =~/^([\w()*,._-]+)$/ ) or return;
     return $1;
 }
 
@@ -1930,41 +1930,41 @@ sub isDatabaseFieldName ($) {
 sub isDatabaseTableName ($;$) {
     my $table           = shift;
     my $allow_qualified = shift;
-    defined($table) || return undef;
+    defined($table) || return;
     if($allow_qualified){
-        $table =~ /^([A-Za-z0-9][\w\.]*[A-Za-z0-9])$/i or return undef;
+        $table =~ /^([A-Za-z0-9][\w\.]*[A-Za-z0-9])$/i or return;
         return $1;
     } else {
-        $table =~ /^([A-Za-z0-9]\w*[A-Za-z0-9])$/i or return undef;
+        $table =~ /^([A-Za-z0-9]\w*[A-Za-z0-9])$/i or return;
         return $1;
     }
-    return undef;
+    return;
 }
 *isDatabaseViewName = \&isDatabaseTableName;
 
 
 sub isDomain ($) {
     my $domain = shift;
-    defined($domain) or return undef;
-    return undef if(length($domain) > 255);
-    $domain =~ /^($domain_regex)$/ or return undef;
+    defined($domain) or return;
+    return if(length($domain) > 255);
+    $domain =~ /^($domain_regex)$/ or return;
     return $1;
 }
 
 sub isDomainStrict ($) {
     my $domain = shift;
-    defined($domain) or return undef;
-    return undef if(length($domain) > 255);
-    $domain =~ /^($domain_regex2)$/ or return undef;
+    defined($domain) or return;
+    return if(length($domain) > 255);
+    $domain =~ /^($domain_regex2)$/ or return;
     return $1;
 }
 *isDomain2 = \&isDomainStrict;
 
 sub isDnsShortname($){
     my $name = shift;
-    defined($name) or return undef;
-    return undef if(length($name) < 3 or length($name) > 63);
-    $name =~ /^($hostname_component)$/ or return undef;
+    defined($name) or return;
+    return if(length($name) < 3 or length($name) > 63);
+    $name =~ /^($hostname_component)$/ or return;
     return $1;
 }
 
@@ -1972,9 +1972,9 @@ sub isDnsShortname($){
 # SECURITY NOTE: this only checks if the email address is valid, it's doesn't make it safe to arbitrarily pass to commands or SQL etc!
 sub isEmail ($) {
     my $email = shift;
-    defined($email) or return undef;
-    return undef if(length($email) > 256);
-    $email =~ /^$email_regex$/ || return undef;
+    defined($email) or return;
+    return if(length($email) > 256);
+    $email =~ /^$email_regex$/ || return;
     # Intentionally not untainting this as it's not safe given the addition of ' to the $email_regex to support Irish email addresses
     return $email;
 }
@@ -1982,18 +1982,18 @@ sub isEmail ($) {
 
 sub isFilename($){
     my $filename = shift;
-    return undef unless defined($filename);
-    return undef if $filename =~ /^\s*$/;
-    return undef if $filename =~ /\/$/;
-    return undef unless($filename =~ /^($filename_regex)$/);
+    return unless defined($filename);
+    return if $filename =~ /^\s*$/;
+    return if $filename =~ /\/$/;
+    return unless($filename =~ /^($filename_regex)$/);
     return $1;
 }
 
 sub isDirname($){
     my $dirname = shift;
-    return undef unless defined($dirname);
-    return undef if $dirname =~ /^\s*$/;
-    return undef unless($dirname =~ /^($dirname_regex)$/);
+    return unless defined($dirname);
+    return if $dirname =~ /^\s*$/;
+    return unless($dirname =~ /^($dirname_regex)$/);
     return $1;
 }
 
@@ -2001,16 +2001,16 @@ sub isDirname($){
 sub isFloat ($;$) {
     my $number = shift;
     my $negative = shift() ? "-?" : "";
-    defined($number) or return undef;
+    defined($number) or return;
     $number =~ /^$negative\d+(?:\.\d+)?$/;
 }
 
 
 sub isFqdn ($) {
     my $fqdn = shift;
-    defined($fqdn) or return undef;
-    return undef if(length($fqdn) > 255);
-    $fqdn =~ /^($fqdn_regex)$/ or return undef;
+    defined($fqdn) or return;
+    return if(length($fqdn) > 255);
+    $fqdn =~ /^($fqdn_regex)$/ or return;
     return $1;
 }
 
@@ -2031,31 +2031,31 @@ sub isHash ($) {
 
 sub isHex ($) {
     my $hex = shift;
-    defined($hex) or return undef;
-    $hex =~ /^(0x[A-Fa-f\d]+)$/ or return undef;
+    defined($hex) or return;
+    $hex =~ /^(0x[A-Fa-f\d]+)$/ or return;
     return 1;
 }
 
 
 sub isHost ($) {
     my $host = shift;
-    defined($host) or return undef;
+    defined($host) or return;
     # at casual glance this looks like it's duplicating isHostname but it's using a different unified regex of isHostname + isIP
     if(length($host) > 255){ # Can't be a hostname
-        return undef;
+        return;
     } elsif($host =~ /^($host_regex)$/){
         $host = $1;
         return $host;
     }
-    return undef;
+    return;
 }
 
 
 sub isHostname ($) {
     my $hostname = shift;
-    defined($hostname) or return undef;
-    return undef if(length($hostname) > 255);
-    $hostname =~ /^($hostname_regex)$/ or return undef;
+    defined($hostname) or return;
+    return if(length($hostname) > 255);
+    $hostname =~ /^($hostname_regex)$/ or return;
     return $1;
 }
 
@@ -2063,34 +2063,34 @@ sub isHostname ($) {
 sub isInt ($;$) {
     my $number = shift;
     my $signed = shift() ? "-?" : "";
-    defined($number) or return undef; # code_error("no number passed to isInt()");
+    defined($number) or return; # code_error("no number passed to isInt()");
     $number =~ /^($signed\d+)$/;
 }
 
 
 sub isInterface ($) {
     my $interface = shift;
-    defined($interface) || return undef;
+    defined($interface) || return;
     # TODO: consider checking if the interface actually exists on the system
-    $interface =~ /^((?:em|eth|bond|lo)\d+|lo)$/ or return undef;
+    $interface =~ /^((?:em|eth|bond|lo)\d+|lo)$/ or return;
     return $1;
 }
 
 
 sub isIP ($) {
     my $ip = shift;
-    defined($ip) or return undef;
-    $ip =~ /^($ip_regex)$/ or return undef;
+    defined($ip) or return;
+    $ip =~ /^($ip_regex)$/ or return;
     $ip = $1;
     my @octets = split(/\./, $ip);
-    (@octets == 4) or return undef;
+    (@octets == 4) or return;
     foreach(@octets){
-        $_ < 0   and return undef;
-        $_ > 255 and return undef;
+        $_ < 0   and return;
+        $_ > 255 and return;
     }
     # not disallowing 0 or 255 in final octet any more due to CIDR
-    #$octets[3] eq 0  and return undef;
-    #$octets[3] > 254 and return undef;
+    #$octets[3] eq 0  and return;
+    #$octets[3] > 254 and return;
     return $ip;
 }
 
@@ -2115,13 +2115,13 @@ sub isJavaException ($) {
         #debug "skipping java exception \\w+\\s\\[[\\w-]+\\]\\s[A-Z][a-z]+(?:[A-Z][a-z]+)+:\\d+\\s => '$string'";
         #return 1;
     }
-    return undef;
+    return;
 }
 
 # wish there was a better way of validating the JSON returned but Test::JSON is_valid_json() also errored out badly from underlying JSON::Any module, similar to JSON's decode_json
 #sub isJson($){
 #    my $data = shift;
-#    defined($data) or return undef;
+#    defined($data) or return;
 #    # slightly modified from http://stackoverflow.com/questions/2583472/regex-to-validate-json
 #    # XXX: Unfortunately this only work on RHEL6's version of Perl and parse failure breaks all dependent code on RHEL5 now
 ##    my $json_regex = qr/
@@ -2154,7 +2154,7 @@ sub isJavaException ($) {
 
 sub isJson($){
     my $string = shift;
-    defined($string) or return undef;
+    defined($string) or return;
     my $json = undef;
     try {
         $json = decode_json($string);
@@ -2167,7 +2167,7 @@ sub isXml($){
     require XML::Simple;
     import XML::Simple;
     my $string = shift;
-    defined($string) or return undef;
+    defined($string) or return;
     my $xml = undef;
     try {
         $xml = XMLin($string, forcearray => 1, keyattr => []);
@@ -2178,8 +2178,8 @@ sub isXml($){
 
 sub isKrb5Princ ($) {
     my $principal = shift;
-    defined($principal) or return undef;
-    $principal =~ /^($krb5_principal_regex)$/ or return undef;
+    defined($principal) or return;
+    $principal =~ /^($krb5_principal_regex)$/ or return;
     return $1;
 }
 
@@ -2187,8 +2187,8 @@ sub isKrb5Princ ($) {
 # Primarily for Nagios perfdata labels
 sub isLabel ($) {
     my $label = shift;
-    defined($label) or return undef;
-    $label =~ /^[\%\(\)\/\*\w\s-]+$/ or return undef;
+    defined($label) or return;
+    $label =~ /^[\%\(\)\/\*\w\s-]+$/ or return;
     return $label;
 }
 
@@ -2196,28 +2196,28 @@ sub isLabel ($) {
 sub isLdapDn ($) {
     #subtrace(@_);
     my $dn = shift;
-    defined($dn) or return undef;
-    $dn =~ /^($ldap_dn_regex)$/ || return undef;
+    defined($dn) or return;
+    $dn =~ /^($ldap_dn_regex)$/ || return;
     return $1;
 }
 
 
 sub isNagiosUnit ($) {
     my $units = shift;
-    defined($units) or return undef;
+    defined($units) or return;
     foreach(@valid_units){
         if(lc $units eq lc $_){
             return $_;
         }
     }
-    return undef;
+    return;
 }
 
 
 sub isNoSqlKey ($) {
     my $key = shift;
-    defined($key) or return undef;
-    $key =~ /^([\w\_\,\.\:\+\-]+)$/ or return undef;
+    defined($key) or return;
+    $key =~ /^([\w\_\,\.\:\+\-]+)$/ or return;
     $key = $1;
     return $key;
 }
@@ -2237,18 +2237,18 @@ sub isPathQualified($){
 
 sub isPort ($) {
     my $port = shift;
-    defined($port) or return undef;
-    $port  =~ /^(\d+)$/ || return undef;
+    defined($port) or return;
+    $port  =~ /^(\d+)$/ || return;
     $port = $1;
-    ($port >= 1 && $port <= 65535) || return undef;
+    ($port >= 1 && $port <= 65535) || return;
     return $port;
 }
 
 
 sub isProcessName ($) {
     my $process = shift;
-    defined($process) or return undef;
-    $process =~ /^($process_name_regex)$/ or return undef;
+    defined($process) or return;
+    $process =~ /^($process_name_regex)$/ or return;
     return $1;
 }
 
@@ -2263,19 +2263,19 @@ sub isPythonTraceback ($) {
         #debug "skipping python traceback 'Traceback \(most recent call last\)'";
         return 1;
     }
-    return undef;
+    return;
 }
 
 # XXX: doesn't catch error before Perl errors out, only using for late loading of regex from files, not in validate_regex()
 sub isRegex ($) {
     my $regex = shift;
     defined($regex) || code_error "no regex arg passed to isRegex()";
-    #defined($regex) || return undef;
+    #defined($regex) || return;
     #vlog3("testing regex '$regex'");
     if(eval { qr/$regex/ }){
         return $regex;
     } else {
-        return undef;
+        return;
     }
 }
 
@@ -2306,7 +2306,7 @@ sub isScientific($;$){
     my $num      = shift;
     my $negative = shift() ? "-?" : "";
     defined($num) or code_error "no arg passed to isScientific()";
-    $num =~ /^$negative\d+(?:\.\d+)?e[+-]?\d+$/i or return undef;
+    $num =~ /^$negative\d+(?:\.\d+)?e[+-]?\d+$/i or return;
     return $num;
 }
 
@@ -2331,19 +2331,19 @@ sub isThreshold($){
 
 sub isUrl ($) {
     my $url = shift;
-    defined($url) or return undef;
+    defined($url) or return;
     #debug("url_regex: $url_regex");
     $url = trim($url);
     $url = "http://$url" unless $url =~ /:\/\//i;
-    $url =~ /^($url_regex)$/ or return undef;
+    $url =~ /^($url_regex)$/ or return;
     return $1;
 }
 
 
 sub isUrlPathSuffix ($) {
     my $url = shift;
-    defined($url) or return undef;
-    $url =~ /^($url_path_suffix_regex)$/ or return undef;
+    defined($url) or return;
+    $url =~ /^($url_path_suffix_regex)$/ or return;
     return $1;
 }
 
@@ -2351,16 +2351,16 @@ sub isUrlPathSuffix ($) {
 sub isUser ($) {
     #subtrace(@_);
     my $user = shift;
-    defined($user) or return undef; # code_error "user arg not passed to isUser()";
-    $user =~ /^($user_regex)$/ || return undef;
+    defined($user) or return; # code_error "user arg not passed to isUser()";
+    $user =~ /^($user_regex)$/ || return;
     return $1;
 }
 
 
 sub isVersion($){
     my $version = shift;
-    defined($version) or return undef;
-    $version =~ /^($version_regex)$/ || return undef;
+    defined($version) or return;
+    $version =~ /^($version_regex)$/ || return;
     return $1;
 }
 
@@ -2762,13 +2762,13 @@ sub resolve_ip ($) {
     require Socket;
     import Socket;
     my $ip;
-    defined($_[0]) or return undef;
+    defined($_[0]) or return;
     # returns packed binary address
-    $ip = inet_aton($_[0])  || return undef;
+    $ip = inet_aton($_[0])  || return;
     # returns human readable x.x.x.x - only supporting IPv4 for now
-    $ip = inet_ntoa($ip)    || return undef;
+    $ip = inet_ntoa($ip)    || return;
     # validate what we have is a correct IP address
-    $ip = isIP($ip)         || return undef;
+    $ip = isIP($ip)         || return;
     return $ip;
 }
 
@@ -2785,7 +2785,7 @@ sub rstrip ($) {
 
 sub sec2min ($){
     my $secs = shift;
-    isFloat($secs) or return undef;
+    isFloat($secs) or return;
     return sprintf("%d:%.2d", int($secs / 60), $secs % 60);
 }
 
@@ -2950,7 +2950,7 @@ sub trim_float ($) {
 #   `type $builtin`;
 #    return 1 if($? == 0);
 #    quit "UNKNOWN", "$builtin is not a shell built-in" if $quit;
-#    return undef;
+#    return;
 #}
 
 
@@ -3106,13 +3106,13 @@ sub usage (;@) {
 sub user_exists ($) {
     my $user = shift; # if $_[0];
     #defined($user) or code_error("no user passed to user_exists()");
-    #$user = isUser($user) || return undef;
+    #$user = isUser($user) || return;
 
     # using id command since this should exist on most unix systems
     #which("id", 1);
     #`id "$user" >/dev/null 2>&1`;
     #return 1 if ( $? eq 0 );
-    #return undef;
+    #return;
 
     # More efficient
     return defined(getpwnam($user));
@@ -3302,11 +3302,11 @@ sub validate_file ($;$$$) {
     my $noquit   = shift;
     my $name     = shift || "";
     my $no_vlog  = shift;
-    $filename = validate_filename($filename, $noquit, $name, $no_vlog) or return undef;
+    $filename = validate_filename($filename, $noquit, $name, $no_vlog) or return;
     unless( -f $filename ){
         $name .= " " if $name;
         usage "${name}file not found: '$filename' ($!)" unless $noquit;
-        return undef
+        return
     }
     return $filename;
 }
@@ -3319,12 +3319,12 @@ sub validate_filename ($;$$$) {
     my $no_vlog  = shift;
     if(not defined($filename) or $filename =~ /^\s*$/){
         usage "$name not defined";
-        return undef;
+        return;
     }
     my $filename2;
     unless($filename2 = isFilename($filename)){
         usage "invalid $name (does not match regex critera): '$filename'" unless $noquit;
-        return undef;
+        return;
     }
     vlog_options($name, $filename2) unless $no_vlog;
     return $filename2;
@@ -3339,12 +3339,12 @@ sub validate_dirname ($;$$$) {
     $name .= " " if $name;
     if(not defined($dirname) or $dirname =~ /^\s*$/){
         usage "${name}directory not defined";
-        return undef;
+        return;
     }
     my $dirname2;
     unless($dirname2 = isDirname($dirname)){
         usage "invalid ${name}directory (does not match regex critera): '$dirname'" unless $noquit;
-        return undef;
+        return;
     }
     vlog_options("${name}directory", $dirname2) unless $no_vlog;
     return $dirname2;
@@ -3652,21 +3652,21 @@ sub validate_regex ($;$$$) {
     $name = "${name} " if $name;
     my $regex2;
     if($noquit){
-        defined($regex) or return undef;
+        defined($regex) or return;
     } else {
         defined($regex) or usage "${name}regex not defined";
     }
     if($posix){
         if($regex =~ /\$\(|\`/){
             quit "UNKNOWN", "invalid ${name}posix regex supplied: contains sub shell metachars ( \$( / ` ) that would be dangerous to pass to shell" unless $noquit;
-            return undef;
+            return;
         } else {
             my @output = cmd("egrep '$regex' < /dev/null");
             #if(grep({$_ =~ "Unmatched"} @output)){
             if(@output){
                 #quit "UNKNOWN", "invalid posix regex supplied: contains unbalanced () or []" unless $noquit;
                 quit "UNKNOWN", "invalid ${name}posix regex defined: @output" unless $noquit;
-                return undef;
+                return;
             }
         }
     } else {
@@ -3677,7 +3677,7 @@ sub validate_regex ($;$$$) {
             $errstr =~ s/;.*?$//;
             $errstr =~ s/in regex m\/.*?$/in regex/;
             quit "UNKNOWN", "invalid ${name}regex defined: $errstr" unless $noquit;
-            return undef;
+            return;
         }
     }
     if($regex2){
@@ -4009,7 +4009,7 @@ sub vlog_options_bool ($$) {
 #        $lock_tries{$url}++;
 #        if($lock_tries{$url} > $LOCK_TRY_ATTEMPTS){
 #            vlog "Hit max lock attempts on url '$url' ($LOCK_TRY_ATTEMPTS attempts, $LOCK_TRY_INTERVAL secs apart) while waiting for download lock, aborting download...\n";
-#            return undef;
+#            return;
 #        }
 #        vlog "sleeping for $LOCK_TRY_INTERVAL secs before retrying download lock for url '$url'";
 #        sleep $LOCK_TRY_INTERVAL;
@@ -4027,13 +4027,13 @@ sub vlog_options_bool ($$) {
 #        flock_off;
 #        if($download_tries{$url} >= $DOWNLOAD_TRIES){
 #            vlog "failed to download url '$url' $DOWNLOAD_TRIES times";
-#            return undef;
+#            return;
 #        }
 #        vlog "sleeping for $DOWNLOAD_RETRY_INTERVAL secs before trying again";
 #        sleep $DOWNLOAD_RETRY_INTERVAL;
 #        return wget($url, $local_file);
 #    }
-#    return undef;
+#    return;
 #    #vlog "fetching $url.md5...";
 #    #getstore("$url.md5", "$local_file.md5");
 ##    if(open(my $fh, "$local_file.md5")){
@@ -4072,7 +4072,7 @@ sub which ($;$) {
         }
         quit "UNKNOWN", "couldn't find '$bin' in \$PATH ($ENV{PATH})" if $quit;
     }
-    return undef;
+    return;
 }
 
 
