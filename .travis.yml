@@ -7,7 +7,8 @@
 language: perl
 perl:
   - "5.20"
-  - "5.8"
+  # latest Redis cpan module requires Perl >= 5.10
+  - "5.10"
 
 install:
   # "cpanm ." causes: No output has been received in the last 10 minutes, this potentially indicates a stalled build or something wrong with the build itself.
