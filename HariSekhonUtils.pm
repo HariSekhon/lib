@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.15.7";
+our $VERSION = "1.15.8";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2094,7 +2094,6 @@ sub isIP ($) {
     return $ip;
 }
 
-
 sub isJavaException ($) {
     my $string = shift;
     if($string =~ /(?:^\s+at|^Caused by:)\s+\w+(?:\.\w+)+/){
@@ -3386,6 +3385,7 @@ sub validate_host ($;$) {
     $name = "$name " if $name;
     defined($host) || usage "${name}host not defined";
     $host = isHost($host) || usage "invalid ${name}host '$host' defined: not a valid hostname or IP address";
+    vlog_options("${name}host", $host);
     return $host;
 }
 
