@@ -591,9 +591,10 @@ is(validate_host("myHost.myDomain.com"),    "myHost.myDomain.com",  'validate_ho
 is(isHostname("harisekhon.com"),  "harisekhon.com",   'isHostname("harisekhon.com") eq harisekhon.com');
 is(isHostname("harisekhon"),      "harisekhon",       'isHostname("harisekhon")');
 is(isHostname("a"),               "a", 'isHostname("a") eq a');
-is(isHostname("1"),               undef, 'isHostname("1") eq undef');
+is(isHostname("1"),               "1", 'isHostname("1") eq 1');
 is(isHostname("harisekhon1.com"), "harisekhon1.com", 'isHostname(harisekhon1.com) eq harisekhon1.com');
-is(isHostname("1harisekhon.com"), undef, 'isHostname(1harisekhon.com) eq undef');
+is(isHostname("1harisekhon.com"), "1harisekhon.com", 'isHostname(1harisekhon.com) eq 1harisekhon.com');
+is(isHostname("-help"),           undef, 'isHostname(-help) eq undef');
 is(isHostname("a"x63),            "a"x63, 'isHostname("a"x63) eq "a"x63');
 is(isHostname("a"x64),            undef, 'isHostname("a"x64) eq undef');
 
@@ -820,7 +821,8 @@ ok(!isThreshold("a"),   '!isThreshold("a")');
 is(isUrl("www.google.com"),         "http://www.google.com",    'isUrl("www.google.com") eq http://www.google.com');
 is(isUrl("http://www.google.com"),  "http://www.google.com",    'isUrl("http://www.google.com")');
 is(isUrl("https://gmail.com"),      "https://gmail.com",        'isUrl("https://gmail.com")');
-is(isUrl(1),                        undef,                      'isUrl(1) eq undef');
+is(isUrl(1),                        "http://1",                 'isUrl(1) eq http://1');
+is(isUrl("-help"),                  undef,                      'isUrl(-help) eq undef');
 is(isUrl("http://cdh43:50070/dfsnodelist.jsp?whatNodes=LIVE"),  'http://cdh43:50070/dfsnodelist.jsp?whatNodes=LIVE', 'isUrl(http://cdh43:50070/dfsnodelist.jsp?whatNodes=LIVE)');
 
 is(validate_url("www.google.com"),          "http://www.google.com",    'validate_url("www.google.com")');
