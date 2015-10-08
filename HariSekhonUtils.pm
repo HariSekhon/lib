@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.16.0";
+our $VERSION = "1.16.1";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -227,9 +227,11 @@ our %EXPORT_TAGS = (
                     ) ],
     'regex' =>  [   qw(
                         escape_regex
+                        $aws_access_key_regex
                         $aws_host_component
                         $aws_hostname_regex
                         $aws_fqdn_regex
+                        $aws_secret_key_regex
                         $column_regex
                         $dirname_regex
                         $domain_regex
@@ -632,6 +634,10 @@ $tld_count > 900 or code_error("only $tld_count tlds loaded, expected > 900");
 # some custom ones I've come across or used myself
 $tld_regex .= "local|localdomain|intra|intranet|internal)\\b";
 #print "tld_regex = $tld_regex\n";
+
+# AWS regex from http://blogs.aws.amazon.com/security/blog/tag/key+rotation
+our $aws_access_key_regex = '(?<![A-Z0-9])[A-Z0-9]{20}(?![A-Z0-9])';
+our $aws_secret_key_regex = '(?<![A-Za-z0-9/+=])[A-Za-z0-9/+=]{40}(?![A-Za-z0-9/+=])';
 our $domain_regex       = '(?:' . $domain_component . '\.)*' . $tld_regex;
 our $domain_regex2      = '(?:' . $domain_component . '\.)+' . $tld_regex;
 our $domain_regex_strict = $domain_regex2;
@@ -1845,7 +1851,7 @@ sub isArray ($) {
 sub isAwsAccessKey($){
     my $aws_access_key = shift;
     defined($aws_access_key) or return;
-    $aws_access_key =~ /^([A-Za-z0-9]{20})$/ or return;
+    $aws_access_key =~ /^($aws_access_key_regex)$/ or return;
     return $1;
 }
 
@@ -1866,7 +1872,7 @@ sub isAwsFqdn($){
 sub isAwsSecretKey($){
     my $aws_secret_key = shift;
     defined($aws_secret_key) or return;
-    $aws_secret_key =~ /^([A-Za-z0-9]{40})$/ or return;
+    $aws_secret_key =~ /^($aws_secret_key_regex)$/ or return;
     return $1;
 }
 
