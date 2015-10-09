@@ -597,6 +597,7 @@ is(isHostname("1harisekhon.com"), "1harisekhon.com", 'isHostname(1harisekhon.com
 is(isHostname("-help"),           undef, 'isHostname(-help) eq undef');
 is(isHostname("a"x63),            "a"x63, 'isHostname("a"x63) eq "a"x63');
 is(isHostname("a"x64),            undef, 'isHostname("a"x64) eq undef');
+is(isHostname("hari~sekhon"),     undef, 'isHostname(hari~sekhon) eq undef');
 
 is(validate_hostname("myHost"),              "myHost",                    'validate_hostname(myHost)');
 is(validate_hostname("myHost.myDomain.com"), "myHost.myDomain.com",       'validate_hostname(myHost.myDomain.com)');
