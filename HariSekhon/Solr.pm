@@ -618,6 +618,8 @@ sub validate_solr_collections($){
     my $collections = shift;
     defined($collections) or quit "CRITICAL", "Solr collections not specified";
     my @collections;
+    $collections = trim($collections);
+    $collections or quit "CRITICAL", "Solr collections are blank!";
     foreach my $collection (split(/\s*,\s*/, $collections)){
         $collection = isSolrCollection($collection) or quit "CRITICAL", "invalid Solr collection '$collection' specified";
         push(@collections, $collection);
