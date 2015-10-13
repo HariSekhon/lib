@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.8.11";
+$VERSION = "0.8.12";
 
 use strict;
 use warnings;
@@ -654,7 +654,7 @@ sub validate_solr_shard($){
 sub validate_solr_context($){
     my $context = shift;
     defined($context) or quit "CRITICAL", "Solr http context not defined";
-    $context =~ /^\/*([\/\w]+)$/ or quit "CRITICAL", "invalid Solr http context, must be alphanumeric";
+    $context =~ /^\/*([\/\w-]+)$/ or quit "CRITICAL", "invalid Solr http context, must be alphanumeric";
     $context = "/$1";
     if($solr_admin eq $default_solr_admin){
         $solr_admin = "$context/admin";
