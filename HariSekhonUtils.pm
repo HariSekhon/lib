@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.16.1";
+our $VERSION = "1.16.2";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -3265,7 +3265,8 @@ sub validate_domain ($;$) {
     my $name   = shift || "";
     $name .= " " if $name;
     defined($domain) || usage "${name}domain name not defined";
-    $domain = isDomain($domain) or usage "invalid ${name}domain name defined ('$domain')";
+    # don't print the domain as it gets reset to undef and results in "Use of uninitialized value $domain in concatenation (.) or string"
+    $domain = isDomain($domain) or usage "invalid ${name}domain name defined";
     vlog_options("${name}domain", $domain);
     return $domain;
 }
