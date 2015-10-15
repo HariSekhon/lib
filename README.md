@@ -26,9 +26,9 @@ make tld
 
 If using bespoke internal domains such as ```.local``` or ```.intra``` that aren't part of the official IANA TLD list then this is additionally supported via a custom configuration file at the top level called ```custom_tlds.txt``` containing one TLD per line, with support for # comment prefixes. Just add your bespoke internal TLD to the file and it will then pass the host/domain/fqdn validations.
 
-##### IO::Socket::SSL failing self-signed certs, not respecting no verify #####
+##### IO::Socket::SSL doesn't respect ignoring self-signed certs in recent version(s) eg. 2.020 #####
 
-Workaround is to create the hidden touch file below in the same top-level directory as the library to make this it include and use Net::SSL instead of IO::Socket::SSL. The down side is that Net::SSL doesn't seem to validate certificates at all.
+Recent version(s) of IO::Socket::SSL (2.020) seem to fail to respect options to ignore self-signed certs. The workaround is to create the hidden touch file below in the same top-level directory as the library to make this it include and use Net::SSL instead of IO::Socket::SSL. The down side is that Net::SSL doesn't seem to validate certificates at all.
 ```
 touch .use_net_ssl
 ```
