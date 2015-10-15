@@ -617,7 +617,6 @@ my $total_tld_count = 0;
 
 sub load_tlds($){
     my $file = shift;
-    # downloaded from IANA, run 'make tld' to update
     my $fh = open_file($file);
     my $tld_count;
     while(<$fh>){
@@ -635,6 +634,7 @@ sub load_tlds($){
     #warn "$tld_count tlds loaded from tld file '$file'\n";
     $total_tld_count += $tld_count;
 }
+# downloaded from IANA, run 'make tld' to update
 my $tld_file = dirname(__FILE__) . "/tlds-alpha-by-domain.txt";
 load_tlds($tld_file);
 $total_tld_count > 900 or code_error("only $total_tld_count tlds loaded, expected > 900");
