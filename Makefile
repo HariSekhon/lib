@@ -24,6 +24,8 @@ make:
 	[ -x /usr/bin/apt-get ] && make apt-packages || :
 	[ -x /usr/bin/yum ]     && make yum-packages || :
 
+	git update-index --assume-unchanged custom_tlds.txt
+
 	# order here is important, in Travis and some stripped down client some deps are not pulled in automatically but are required for subsequent module builds
 	yes "" | $(SUDO2) cpan App::cpanminus
 	yes "" | $(SUDO2) cpanm --notest \
