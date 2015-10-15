@@ -457,6 +457,7 @@ is(validate_directory('b@ddir', 1), undef,      'validate_directory(b@ddir)');
 
 # ============================================================================ #
 is(isDomain("localDomain"),     "localDomain",      'isDomain("localDomain") eq localDomain');
+is(isDomain("domain.local"),    "domain.local",     'isDomain("domain.local") eq domain.local');
 is(isDomain("harisekhon.com"),  "harisekhon.com",   'isDomain("harisekhon.com") eq harisekhon.com');
 is(isDomain("1harisekhon.com"), "1harisekhon.com",  'isDomain("1harisekhon.com") eq 1harisekhon.com');
 is(isDomain("com"),             "com",              'isDomain("com") eq "com"');
