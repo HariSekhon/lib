@@ -65,7 +65,7 @@ use Scalar::Util 'blessed';
 use Term::ReadKey;
 use Time::Local;
 
-our $VERSION = "1.16.2";
+our $VERSION = "1.16.3";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -611,29 +611,42 @@ my  $domain_component   = '\b[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\b';
 # to allow the prototype to be checked
 sub open_file ($;$);
 sub code_error (@);
-# downloaded from IANA 'wget -O tlds-alpha-by-domain.txt http://data.iana.org/TLD/tlds-alpha-by-domain.txt'
-my $tld_file = dirname(__FILE__) . "/tlds-alpha-by-domain.txt";
-my $fh = open_file($tld_file);
+
 our $tld_regex = "\\b(?i:";
-my $tld_count = 0;
-while(<$fh>){
-    chomp;
-    s/#.*//;
-    next if /^\s*$/;
-    if(/^([A-Za-z0-9-]+)$/){
-        $tld_regex .= "$1|";
-        $tld_count += 1;
-    } else {
-        warn "TLD: '$_' from tld file '$tld_file' not validated, skipping that domain";
+my $total_tld_count = 0;
+
+sub load_tlds($){
+    my $file = shift;
+    # downloaded from IANA, run 'make tld' to update
+    my $fh = open_file($file);
+    my $tld_count;
+    while(<$fh>){
+        chomp;
+        s/#.*//;
+        next if /^\s*$/;
+        if(/^([A-Za-z0-9-]+)$/){
+            $tld_regex .= "$1|";
+            $tld_count += 1;
+        } else {
+            warn "TLD: '$_' from tld file '$file' not validated, skipping that domain";
+        }
     }
+    # debug isn't set by this point
+    #warn "$tld_count tlds loaded from tld file '$file'\n";
+    $total_tld_count += $tld_count;
 }
-# debug isn't set by this point
-#print "$tld_count tlds loaded\n";
-$tld_count > 900 or code_error("only $tld_count tlds loaded, expected > 900");
-#$tld_regex =~ s/\|$//;
-# some custom ones I've come across or used myself
-$tld_regex .= "local|localdomain|intra|intranet|internal)\\b";
+my $tld_file = dirname(__FILE__) . "/tlds-alpha-by-domain.txt";
+load_tlds($tld_file);
+$total_tld_count > 900 or code_error("only $total_tld_count tlds loaded, expected > 900");
+my $custom_tlds = dirname(__FILE__) . "/custom_tlds.txt";
+if(-f $custom_tlds){
+    load_tlds($custom_tlds);
+}
+$tld_regex =~ s/\|$//;
+$tld_regex .= ")\\b";
 #print "tld_regex = $tld_regex\n";
+# debug isn't set by this point
+#warn "$total_tld_count tlds loaded\n";
 
 # AWS regex from http://blogs.aws.amazon.com/security/blog/tag/key+rotation
 our $aws_access_key_regex = '(?<![A-Z0-9])[A-Z0-9]{20}(?![A-Z0-9])';
