@@ -26,6 +26,13 @@ make tld
 
 If using bespoke internal domains such as ```.local``` or ```.intra``` that aren't part of the official IANA TLD list then this is additionally supported via a custom configuration file at the top level called ```custom_tlds.txt``` containing one TLD per line, with support for # comment prefixes. Just add your bespoke internal TLD to the file and it will then pass the host/domain/fqdn validations.
 
+##### IO::Socket::SSL failing self-signed certs, not respecting no verify #####
+
+Workaround is to create the hidden touch file below in the same top-level directory as the library to make this it include and use Net::SSL instead of IO::Socket::SSL. The side affect is that Net::SSL doesn't seem to validate certificates at all
+```
+touch .use_net_ssl
+```
+
 #### See Also ####
 
 * [Java version of this library](https://github.com/harisekhon/lib-java)
