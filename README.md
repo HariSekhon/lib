@@ -16,7 +16,9 @@ Continuous Integration is run on this repo to build and unit test it.
 
 #### Configuration ####
 
-Strict validations include host/domain/fqdns using TLDs which are populated from the official IANA list. To update the official IANA TLD list with the latest valid TLDs do
+Strict validations include host/domain/fqdns using TLDs which are populated from the official IANA list, a snapshot of which is shipped as part of this project.
+
+To update the bundled official IANA TLD list with the latest valid TLDs do
 ```
 make tld
 ```
