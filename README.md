@@ -28,7 +28,7 @@ If using bespoke internal domains such as ```.local``` or ```.intra``` that aren
 
 ##### IO::Socket::SSL failing self-signed certs, not respecting no verify #####
 
-Workaround is to create the hidden touch file below in the same top-level directory as the library to make this it include and use Net::SSL instead of IO::Socket::SSL. The side affect is that Net::SSL doesn't seem to validate certificates at all
+Workaround is to create the hidden touch file below in the same top-level directory as the library to make this it include and use Net::SSL instead of IO::Socket::SSL. The down side is that Net::SSL doesn't seem to validate certificates at all.
 ```
 touch .use_net_ssl
 ```
