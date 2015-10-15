@@ -47,6 +47,7 @@ make:
 		Net::LDAPS \
 		Net::DNS \
 		Net::SSH::Expect \
+		Net::SSL \
 		Redis \
 		Readonly \
 		Readonly::XS \
