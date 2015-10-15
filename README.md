@@ -14,6 +14,14 @@ make test
 
 Continuous Integration is run on this repo to build and unit test it.
 
+#### Configuration ####
+
+Strict validations include host/domain/fqdns using TLDs which are populated from the official IANA list. To update the official IANA TLD list with the latest valid TLDs do
+```
+make tld
+```
+Also, if using bespoke internal domains such as ```.local``` or ```.intra``` this is supported via a custom configuration file at the top level called ```custom_tlds.txt``` containing only TLD per line, with support for # comment prefixes. Just add your bespoke internal TLD to the file and it will then pass the host/domain/fqdn validations.
+
 #### See Also ####
 
 * [Java version of this library](https://github.com/harisekhon/lib-java)
