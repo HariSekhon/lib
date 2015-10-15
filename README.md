@@ -20,7 +20,9 @@ Strict validations include host/domain/fqdns using TLDs which are populated from
 ```
 make tld
 ```
-Also, if using bespoke internal domains such as ```.local``` or ```.intra``` this is supported via a custom configuration file at the top level called ```custom_tlds.txt``` containing only TLD per line, with support for # comment prefixes. Just add your bespoke internal TLD to the file and it will then pass the host/domain/fqdn validations.
+##### Custom TLDs #####
+
+If using bespoke internal domains such as ```.local``` or ```.intra``` that aren't part of the official IANA TLD list then this is additionally supported via a custom configuration file at the top level called ```custom_tlds.txt``` containing one TLD per line, with support for # comment prefixes. Just add your bespoke internal TLD to the file and it will then pass the host/domain/fqdn validations.
 
 #### See Also ####
 
