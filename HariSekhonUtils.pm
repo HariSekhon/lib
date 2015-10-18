@@ -66,10 +66,11 @@ use Term::ReadKey;
 use Time::Local;
 # Workaround for IO::Socket::SSL bug not respecting disabling verifying self-signed certs
 if( -f dirname(__FILE__) . "/.use_net_ssl" ){
-    use Net::SSL;
+    require Net::SSL;
+    import Net::SSL;
 }
 
-our $VERSION = "1.16.4";
+our $VERSION = "1.16.5";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
