@@ -561,8 +561,9 @@ ok(!isHash(1),       "!isHash(1)");
 
 # ============================================================================ #
 ok(isHex("0xAf09b"), 'isHex');
-ok(!isHex(9),        '!isHex(9)');
 ok(!isHex("0xhari"), '!isHex("hari")');
+ok(isHex(0),         'isHex(0)');
+ok(!isHex("g"),       '!isHex(g)');
 
 # ============================================================================ #
 is(isHost("harisekhon.com"),    "harisekhon.com",   'isHost("harisekhon.com") eq harisekhon.com');
