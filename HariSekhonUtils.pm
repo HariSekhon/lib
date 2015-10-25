@@ -2056,7 +2056,7 @@ sub isHash ($) {
 sub isHex ($) {
     my $hex = shift;
     defined($hex) or return;
-    $hex =~ /^(0x[A-Fa-f\d]+)$/ or return;
+    $hex =~ /^((?:0x)?[A-Fa-f\d]+)$/ or return;
     return 1;
 }
 
