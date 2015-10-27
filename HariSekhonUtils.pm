@@ -3024,7 +3024,7 @@ sub usage (;@) {
         if($github_repo){
             print STDERR "/$github_repo";
         } elsif(dirname(abs_path(__FILE__)) =~ /tools/i){
-            print STDERR "/toolbox";
+            print STDERR "/tools";
         } elsif(dirname(abs_path(__FILE__)) =~ /nagios-plugins/i or $main::DESCRIPTION =~ /Nagios/i){
             print STDERR "/nagios-plugins";
         }
