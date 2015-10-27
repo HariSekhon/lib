@@ -36,9 +36,10 @@ touch .use_net_ssl
 #### See Also ####
 
 * [Java version of this library](https://github.com/harisekhon/lib-java)
+* [Python version of this library](https://github.com/harisekhon/pylib)
 
 Repos using this library:
 
 * [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins) - 220+ programs - the largest repo of monitoring code for Hadoop & NoSQL technologies, every Hadoop vendor's management API and every major NoSQL technology (HBase, Cassandra, MongoDB, Elasticsearch, Solr, Riak, Redis etc.) as well as traditional Linux and infrastructure
-* [Toolbox](https://github.com/harisekhon/toolbox) - 30+ tools for Hadoop, NoSQL, Solr, Elasticsearch, Pig, Hive, Web, Linux CLI
+* [Tools](https://github.com/harisekhon/tools) - 30+ tools for Hadoop, NoSQL, Solr, Elasticsearch, Pig, Hive, Web, Linux CLI
 * [Spotify Lookup & Command Line Controller](https://github.com/harisekhon/spotify) - converts Spotify URIs to 'Artist - Track' form by querying the Spotify Metadata API. Spotify Cmd - command line control of Spotify on Mac via AppleScript calls. Useful for automation.
