@@ -2415,7 +2415,7 @@ sub linux_only () {
 }
 
 sub linux_mac_only () {
-    isLinux or isMac or quit("UNKNOWN", sprintf($supported_os_msg, "Linux or Mac/Darwin") );
+    isLinuxOrMac or quit("UNKNOWN", sprintf($supported_os_msg, "Linux or Mac/Darwin") );
 }
 # ============================================================================ #
 
