@@ -628,11 +628,16 @@ is(validate_integer(6,"six",5,7),    6,  'validate_integer(6,"six",5,7)');
 is(isInterface("eth0"),     "eth0",     'isInterface("eth0")');
 is(isInterface("bond3"),    "bond3",    'isInterface("bond3")');
 is(isInterface("lo"),       "lo",       'isInterface("lo")');
-ok(!isInterface('b@interface'),         '!isInterface(\'b@dinterface\'');
+is(isInterface("docker0"),  "docker0",  'isInterface("docker0")');
+is(isInterface("vethfa1b2c3"), "vethfa1b2c3", 'isInterface("vethfa1b2c3")');
+ok(!isInterface("vethfa1b2z3"), 'isInterface("vethfa1b2z3")');
+ok(!isInterface('b@interface'), '!isInterface(\'b@dinterface\'');
 
 is(validate_interface("eth0"),     "eth0",     'validate_interface("eth0")');
 is(validate_interface("bond3"),    "bond3",    'validate_interface("bond3")');
 is(validate_interface("lo"),       "lo",       'validate_interface("lo")');
+is(validate_interface("docker0"),    "docker0",    'validate_interface("docker0")');
+is(validate_interface("vethfa1b2c3"), "vethfa1b2c3", 'validate_interface("vethfa1b2c3")');
 
 # ============================================================================ #
 is(isIP("10.10.10.1"),      "10.10.10.1",       'isIP("10.10.10.1") eq 10.10.10.1');

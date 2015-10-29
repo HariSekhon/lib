@@ -70,7 +70,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.16.5";
+our $VERSION = "1.16.6";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2096,7 +2096,7 @@ sub isInterface ($) {
     my $interface = shift;
     defined($interface) || return;
     # TODO: consider checking if the interface actually exists on the system
-    $interface =~ /^((?:em|eth|bond|lo)\d+|lo)$/ or return;
+    $interface =~ /^((?:em|eth|bond|lo|docker)\d+|lo|veth[A-Fa-f0-9]+)$/ or return;
     return $1;
 }
 
