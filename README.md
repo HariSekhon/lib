@@ -12,11 +12,11 @@ make &&
 make test
 ```
 
-Continuous Integration is run on this repo to build and unit test it.
+Continuous Integration is run on this repo to build and unit test it (Test::More).
 
 #### Configuration ####
 
-Strict validations include host/domain/fqdns using TLDs which are populated from the official IANA list, a snapshot of which is shipped as part of this project.
+Strict validations include host/domain/FQDNs using TLDs which are populated from the official IANA list, a snapshot of which is shipped as part of this project.
 
 To update the bundled official IANA TLD list with the latest valid TLDs do
 ```
