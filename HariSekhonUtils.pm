@@ -642,7 +642,7 @@ sub load_tlds($){
 # downloaded from IANA, run 'make tld' to update
 my $tld_file = dirname(__FILE__) . "/tlds-alpha-by-domain.txt";
 load_tlds($tld_file);
-$total_tld_count > 900 or code_error("only $total_tld_count tlds loaded, expected > 900");
+$total_tld_count > 900 or code_error("$total_tld_count tlds loaded, expected > 900");
 my $custom_tlds = dirname(__FILE__) . "/custom_tlds.txt";
 if(-f $custom_tlds){
     load_tlds($custom_tlds);
