@@ -632,7 +632,7 @@ sub load_tlds($){
             $tld_regex .= "$1|";
             $tld_count += 1;
         } else {
-            warn "TLD: '$_' from tld file '$file' not validated, skipping that domain";
+            warn "TLD: '$_' from tld file '$file' not validated, skipping that TLD";
         }
     }
     # debug isn't set by this point
