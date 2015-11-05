@@ -877,6 +877,16 @@ is(isVersion("3a"), undef, 'isVersion(3a) eq undef');
 is(isVersion("1.0-2"), undef, 'isVersion(1.0-2) eq undef');
 is(isVersion("1.0-a"), undef, 'isVersion(1.0-a) eq undef');
 
+is(isVersionLax(1), 1, 'isVersionLax(1)');
+is(isVersionLax("2.1.2"), "2.1.2", 'isVersionLax(2.1.2)');
+is(isVersionLax("2.2.0.4"), "2.2.0.4", 'isVersionLax(2.2.0.4)');
+is(isVersionLax("3.0"), "3.0", 'isVersionLax(3.0)');
+is(isVersionLax("a"), undef, 'isVersionLax(a) eq undef');
+is(isVersionLax("3a"), 3, 'isVersionLax(3a) eq undef');
+is(isVersionLax("1.0-2"), "1.0", 'isVersionLax(1.0-2) eq 1.0');
+is(isVersionLax("1.0-a"), "1.0", 'isVersionLax(1.0-a) eq 1.0');
+is(isVersionLax("hari"), undef, 'isVersionLax(hari) eq undef');
+
 # ============================================================================ #
 ok(isXml("<blah></blah>"), "isXML()");
 ok(!isXml("<blah>"), "!isXml()");

@@ -175,6 +175,7 @@ our %EXPORT_TAGS = (
                         isUrlPathSuffix
                         isUser
                         isVersion
+                        isVersionLax
                         isXml
                         user_exists
                     ) ],
@@ -260,6 +261,7 @@ our %EXPORT_TAGS = (
                         $url_regex
                         $user_regex
                         $version_regex
+                        $version_regex_lax
                     ) ],
     'status' =>  [  qw(
                         $status
@@ -688,6 +690,7 @@ our $krb5_principal_regex = "$user_regex(?:\/$hostname_regex)?(?:\@$domain_regex
 our $threshold_range_regex  = qr/^(\@)?(-?\d+(?:\.\d+)?)(:)(-?\d+(?:\.\d+)?)?$/;
 our $threshold_simple_regex = qr/^(-?\d+(?:\.\d+)?)$/;
 our $version_regex      = '\d(\.\d+)*';
+our $version_regex_lax  = $version_regex . '-?.*';
 
 # ============================================================================ #
 #                                   Options
@@ -2385,6 +2388,14 @@ sub isVersion($){
     my $version = shift;
     defined($version) or return;
     $version =~ /^($version_regex)$/ || return;
+    return $1;
+}
+
+sub isVersionLax($){
+    my $version = shift;
+    defined($version) or return;
+    # would use version_regex_lax but need to capture and don't want to force capture in the regex as that can mess with client code captures
+    $version =~ /^($version_regex)-?.*$/ || return;
     return $1;
 }
 
