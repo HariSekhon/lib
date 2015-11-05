@@ -70,7 +70,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.16.6";
+our $VERSION = "1.16.7";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -158,6 +158,7 @@ our %EXPORT_TAGS = (
                         isLinux
                         isLinuxOrMac
                         isMac
+			isMinVersion
                         isNagiosUnit
                         isNoSqlKey
                         isObject
@@ -2226,6 +2227,24 @@ sub isLdapDn ($) {
     defined($dn) or return;
     $dn =~ /^($ldap_dn_regex)$/ || return;
     return $1;
+}
+
+
+sub isMinVersion ($$) {
+    my $version = shift;
+    my $min     = shift;
+    if(not isVersionLax($version)){
+        warn(sprintf("'%s' is not a recognized version format", $version));
+        return;
+    }
+    isFloat($min) or code_error("invalid second arg passed to min_version");
+    if($version =~ /(\d+(?:\.\d+)?)/){
+        my $detected_version = $1;
+        if($detected_version >= $min){
+            return $detected_version;
+        }
+    }
+    return;
 }
 
 

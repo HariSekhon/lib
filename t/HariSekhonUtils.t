@@ -702,6 +702,17 @@ is(validate_ldap_dn("uid=hari,cn=users,cn=accounts,dc=local"),   "uid=hari,cn=us
 is_deeply([validate_metrics("gauges.waiting.count,gauges.total.used,gauges.waiting.count")], [ "gauges.total.used", "gauges.waiting.count" ], 'validate_metrics()');
 
 # ============================================================================ #
+
+is(isMinVersion('1.3.0', '1.3'), '1.3'); #, 'isMinVersion(1.3.0)');
+is(isMinVersion('1.3.0-alpha', '1.3'), '1.3', 'isMinVersion(1.3.0-alpha');
+is(isMinVersion('1.3', '1.3'), '1.3', 'isMinVersion(1.3)');
+is(isMinVersion('1.4', '1.3'), '1.4', 'isMinVersion(1.4)');
+is(isMinVersion('1.3.1', '1.2'), '1.3', 'isMinVersion(1.3.1)');
+is(isMinVersion('1.3.1', 1.2), '1.3', 'isMinVersion(1.3.1)');
+is(isMinVersion('1.3.1', '1.4'), undef);
+is(isMinVersion('1.2.99', '1.3'), undef);
+
+# ============================================================================ #
 is(isNagiosUnit("s"),   "s",    'isNagiosUnit(s) eq s');
 is(isNagiosUnit("ms"),  "ms",   'isNagiosUnit(s) eq ms');
 is(isNagiosUnit("us"),  "us",   'isNagiosUnit(us) eq us');
