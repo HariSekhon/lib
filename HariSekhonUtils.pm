@@ -1950,7 +1950,7 @@ sub isDatabaseColumnName ($) {
 sub isDatabaseFieldName ($) {
     my $field = shift;
     defined($field) || return;
-    ( $field  =~ /^(\d+)$/ or $field =~/^([\w()*,._-]+)$/ ) or return;
+    ( $field  =~ /^(\d+)$/ or $field =~/^([A-Za-z][\w()*,._-]+[A-Za-z0-9)])$/ ) or return;
     return $1;
 }
 
