@@ -3185,18 +3185,6 @@ sub validate_alnum($$){
 }
 
 
-# Takes a 3rd arg as a regex char range
-sub validate_chars($$$){
-    my $string   = shift;
-    my $name  = shift || croak "second argument (name) not defined when calling validate_chars()";
-    my $chars = shift;
-    defined($string) or usage "$name not defined";
-    $string = isChars($string, $chars) || usage "invalid $name defined: must be one of the following chars - $chars";
-    vlog_options($name, $string);
-    return $string;
-}
-
-
 sub validate_aws_access_key($){
     my $aws_access_key = shift;
     defined($aws_access_key) or usage "aws access key not defined";
@@ -3222,6 +3210,18 @@ sub validate_aws_secret_key($){
     $aws_secret_key = isAwsSecretKey($aws_secret_key) || usage "invalid aws secret key defined: must be 40 alphanumeric characters";
     vlog_options("aws secret key", "X"x38 . substr($aws_secret_key,38, 2));
     return $aws_secret_key;
+}
+
+
+# Takes a 3rd arg as a regex char range
+sub validate_chars($$$){
+    my $string   = shift;
+    my $name  = shift || croak "second argument (name) not defined when calling validate_chars()";
+    my $chars = shift;
+    defined($string) or usage "$name not defined";
+    $string = isChars($string, $chars) || usage "invalid $name defined: must be one of the following chars - $chars";
+    vlog_options($name, $string);
+    return $string;
 }
 
 
