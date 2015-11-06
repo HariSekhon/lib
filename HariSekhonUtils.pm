@@ -3247,6 +3247,25 @@ sub validate_database ($;$) {
 }
 
 
+sub validate_database_columnname ($) {
+    my $column = shift;
+    defined($column) || usage "column not defined";
+    $column = isDatabaseColumnName($column) || usage "invalid column defined: must be alphanumeric";
+    vlog_options("column", $column);
+    return $column;
+}
+
+
+sub validate_database_fieldname ($) {
+    my $field = shift;
+    defined($field) || usage "field not defined";
+    $field = isDatabaseFieldName($field) || usage "invalid field defined: must be a positive integer, or a valid field name";
+    ($field eq "0") and usage "invalid field defined: cannot be zero";
+    vlog_options("field", $field);
+    return $field;
+}
+
+
 sub validate_database_tablename ($;$$) {
     my $table           = shift;
     my $name            = shift;
@@ -3268,25 +3287,6 @@ sub validate_database_viewname ($;$$) {
     $view = isDatabaseViewName($view, $allow_qualified) || usage "invalid ${name}view defined: must be alphanumeric";
     vlog_options("${name}view", $view);
     return $view;
-}
-
-
-sub validate_database_columnname ($) {
-    my $column = shift;
-    defined($column) || usage "column not defined";
-    $column = isDatabaseColumnName($column) || usage "invalid column defined: must be alphanumeric";
-    vlog_options("column", $column);
-    return $column;
-}
-
-
-sub validate_database_fieldname ($) {
-    my $field = shift;
-    defined($field) || usage "field not defined";
-    $field = isDatabaseFieldName($field) || usage "invalid field defined: must be a positive integer, or a valid field name";
-    ($field eq "0") and usage "invalid field defined: cannot be zero";
-    vlog_options("field", $field);
-    return $field;
 }
 
 
