@@ -3201,7 +3201,7 @@ sub validate_aws_access_key($){
     my $aws_access_key = shift;
     defined($aws_access_key) or usage "aws access key not defined";
     $aws_access_key = isAwsAccessKey($aws_access_key) || usage "invalid aws access key defined: must be 20 alphanumeric characters";
-    vlog_options("aws_access_key", "X"x18 . substr($aws_access_key, 18, 2));
+    vlog_options("aws access key", "X"x18 . substr($aws_access_key, 18, 2));
     return $aws_access_key;
 }
 
