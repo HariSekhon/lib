@@ -490,7 +490,7 @@ is(validate_email('harisekhon@domain.com'),      'harisekhon@domain.com',     'v
 
 # ============================================================================ #
 is(isFilename("some_File.txt"),  "some_File.txt",   "isFilename(some_File.txt");
-is(isFilename("/tmp/test"),      "/tmp/test",       "isFilename(/tmp/test");
+is(isFilename("/tmp/te-st"),     "/tmp/te-st",      "isFilename(/tmp/te-st");
 is(isFilename("\@me"),           undef,             "isFilename(\@me)");
 
 # ============================================================================ #
@@ -500,7 +500,7 @@ is(validate_filename("/etc/passwd/", 1),            undef,                      
 
 # ============================================================================ #
 is(validate_file("HariSekhonUtils.pm"),        "HariSekhonUtils.pm",  'validate_file("HariSekhonUtils.pm")');
-if($^O eq "linux" or $^O eq "darwin"){
+if(isLinuxOrMac()){
     is(validate_file("/etc/passwd"),           "/etc/passwd",   'validate_file("/etc/passwd")');
 }
 is(validate_file("/etc/nonexistentfile", 1),    undef,          'validate_file("/etc/nonexistentfile", 1) eq undef');

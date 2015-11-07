@@ -3308,21 +3308,29 @@ sub validate_database_query_select_show ($;$) {
 }
 
 
-sub validate_domain ($;$) {
-    my $domain = shift;
-    my $name   = shift || "";
-    $name .= " " if $name;
-    defined($domain) || usage "${name}domain name not defined";
-    # don't print the domain as it gets reset to undef and results in "Use of uninitialized value $domain in concatenation (.) or string"
-    $domain = isDomain($domain) or usage "invalid ${name}domain name defined";
-    vlog_options("${name}domain", $domain);
-    return $domain;
-}
-
-
 #sub validate_dir ($;$) {
 #    validate_directory(@_);
 #}
+
+
+sub validate_dirname ($;$$$) {
+    my $dirname = shift;
+    my $name     = shift || "";
+    my $noquit   = shift;
+    my $no_vlog  = shift;
+    $name .= " " if $name;
+    if(not defined($dirname) or $dirname =~ /^\s*$/){
+        usage "${name}directory not defined";
+        return;
+    }
+    my $dirname2;
+    unless($dirname2 = isDirname($dirname)){
+        usage "invalid ${name}directory (does not match regex critera): '$dirname'" unless $noquit;
+        return;
+    }
+    vlog_options("${name}directory", $dirname2) unless $no_vlog;
+    return $dirname2;
+}
 
 
 sub validate_directory ($;$$$) {
@@ -3335,11 +3343,23 @@ sub validate_directory ($;$$$) {
         return validate_dirname($dir, $name, 1);
     }
     defined($dir) || usage "${name}directory not defined";
-    $dir = validate_dirname($dir, "noquit", $name, "noquit", $no_vlog) || usage "invalid ${name}directory (does not match regex criteria): '$dir'";
+    $dir = validate_dirname($dir, $name, "noquit", $no_vlog) || usage "invalid ${name}directory (does not match regex criteria): '$dir'";
     ( -d $dir) || usage "cannot find ${name}directory: '$dir'";
     return $dir;
 }
 *validate_dir = \&validate_directory;
+
+
+sub validate_domain ($;$) {
+    my $domain = shift;
+    my $name   = shift || "";
+    $name .= " " if $name;
+    defined($domain) || usage "${name}domain name not defined";
+    # don't print the domain as it gets reset to undef and results in "Use of uninitialized value $domain in concatenation (.) or string"
+    $domain = isDomain($domain) or usage "invalid ${name}domain name defined";
+    vlog_options("${name}domain", $domain);
+    return $domain;
+}
 
 
 # SECURITY NOTE: this only validates the email address is valid, it's doesn't make it safe to arbitrarily pass to commands or SQL etc!
@@ -3349,21 +3369,6 @@ sub validate_email ($) {
     isEmail($email) || usage "invalid email address defined: failed regex validation";
     # Not passing it through regex as I don't want to untaint it due to the addition of the valid ' char in email addresses
     return $email;
-}
-
-
-sub validate_file ($;$$$) {
-    my $filename = shift;
-    my $noquit   = shift;
-    my $name     = shift || "";
-    my $no_vlog  = shift;
-    $filename = validate_filename($filename, $noquit, $name, $no_vlog) or return;
-    unless( -f $filename ){
-        $name .= " " if $name;
-        usage "${name}file not found: '$filename' ($!)" unless $noquit;
-        return
-    }
-    return $filename;
 }
 
 
@@ -3386,23 +3391,18 @@ sub validate_filename ($;$$$) {
 }
 
 
-sub validate_dirname ($;$$$) {
-    my $dirname = shift;
-    my $name     = shift || "";
+sub validate_file ($;$$$) {
+    my $filename = shift;
     my $noquit   = shift;
+    my $name     = shift || "";
     my $no_vlog  = shift;
-    $name .= " " if $name;
-    if(not defined($dirname) or $dirname =~ /^\s*$/){
-        usage "${name}directory not defined";
-        return;
+    $filename = validate_filename($filename, $noquit, $name, $no_vlog) or return;
+    unless( -f $filename ){
+        $name .= " " if $name;
+        usage "${name}file not found: '$filename' ($!)" unless $noquit;
+        return
     }
-    my $dirname2;
-    unless($dirname2 = isDirname($dirname)){
-        usage "invalid ${name}directory (does not match regex critera): '$dirname'" unless $noquit;
-        return;
-    }
-    vlog_options("${name}directory", $dirname2) unless $no_vlog;
-    return $dirname2;
+    return $filename;
 }
 
 
