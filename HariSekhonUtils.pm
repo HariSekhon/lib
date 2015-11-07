@@ -3410,7 +3410,13 @@ sub validate_float ($$$$) {
     my ($float, $name, $min, $max) = @_;
     defined($float) || usage "$name not defined";
     isFloat($float,1) or usage "invalid $name defined: must be a real number";
-    ( isFloat($min, "allow_negative") and isFloat($max, "allow_negative") ) or usage "invalid min/max ($min/$max) passed to validate_float()";
+    if(
+        not ( isFloat($min, "allow_negative") or isScientific($min, "allow_negative") )
+        or
+        not ( isFloat($max, "allow_negative") or isScientific($max, "allow_negative") )
+    ){
+        usage "invalid min/max ($min/$max) passed to validate_float()";
+    }
     ($float >= $min && $float <= $max) or usage "invalid $name defined: must be real number between $min and $max";
     $float =~ /^(-?\d+(?:\.\d+)?)$/ or usage "invalid float $name passed to validate_float(), WARNING: caught LATE";
     $float = $1;
