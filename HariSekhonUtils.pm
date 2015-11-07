@@ -70,7 +70,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.17.0";
+our $VERSION = "1.17.1";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -3340,7 +3340,7 @@ sub validate_directory ($;$$$) {
     my $no_vlog = shift;
     $name .= " " if $name;
     if($noquit){
-        return validate_dirname($dir, $name, 1);
+        return validate_dirname($dir, $name, "noquit");
     }
     defined($dir) || usage "${name}directory not defined";
     $dir = validate_dirname($dir, $name, "noquit", $no_vlog) || usage "invalid ${name}directory (does not match regex criteria): '$dir'";
@@ -3802,7 +3802,7 @@ sub validate_ssl_opts(){
         $main::ua->ssl_opts( verify_hostname => 0 );
     }
     if(defined($ssl_ca_path)){
-        $ssl_ca_path = validate_directory($ssl_ca_path, undef, "SSL CA directory", "no vlog");
+        $ssl_ca_path = validate_directory($ssl_ca_path, "SSL CA directory", undef, "no vlog");
         $main::ua->ssl_opts( SSL_ca_path => $ssl_ca_path );
     }
     if($ssl or $tls){

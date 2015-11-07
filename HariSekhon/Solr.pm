@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.8.12";
+$VERSION = "0.8.13";
 
 use strict;
 use warnings;
@@ -432,9 +432,9 @@ sub validate_base_and_znode($$$){
     my $base = shift;
     my $znode = shift;
     my $name = shift;
-    $znode      = validate_filename($base, 0, "base znode") . "/$znode";
+    $znode      = validate_filename($base, "base znode") . "/$znode";
     $znode      =~ s/\/+/\//g;
-    $znode      = validate_filename($znode, 0, "clusterstate znode");
+    $znode      = validate_filename($znode, "clusterstate znode");
 }
 
 my %inactive_shards;

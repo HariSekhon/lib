@@ -442,9 +442,9 @@ is(isDirname("/tmp/test"), "/tmp/test", "isDirname(/tmp/test");
 is(isDirname("./test"),    "./test",    "isDirname(./test");
 is(isDirname("\@me"),      undef,       "isDirname(\@me)");
 
-is(validate_dirname("test_Dir"),    "test_Dir",      'validate_directory("test_Dir", 1)');
-is(validate_dirname("/tmp/test"),    "/tmp/test",    'validate_directory("/tmp/test", 1)');
-is(validate_dirname("/nonexistentdir", "name", "noquit"),    "/nonexistentdir",  'validate_directory("/nonexistentdir", 1)');
+is(validate_dirname("test_Dir"),    "test_Dir",      'validate_dirname("test_Dir")');
+is(validate_dirname("/tmp/test"),    "/tmp/test",    'validate_dirname("/tmp/test")');
+is(validate_dirname("/nonexistentdir", "name", "noquit"),    "/nonexistentdir",  'validate_dirname("/nonexistentdir", "noquit")');
 
 is(validate_directory("./t"),       "./t",      'validate_directory("./t")');
 if(isLinuxOrMac()){
@@ -494,9 +494,9 @@ is(isFilename("/tmp/te-st"),     "/tmp/te-st",      "isFilename(/tmp/te-st");
 is(isFilename("\@me"),           undef,             "isFilename(\@me)");
 
 # ============================================================================ #
-is(validate_filename("/etc/passwd"),                "/etc/passwd",              'validate_filename("/etc/passwd")');
-is(validate_filename("/etc/nonexistentfile", 1),    "/etc/nonexistentfile",     'validate_filename("/etc/nonexistentfile", 1)');
-is(validate_filename("/etc/passwd/", "name", "noquit"),            undef,                      'validate_filename("/etc/passwd/", 1)');
+is(validate_filename("/etc/passwd"),             "/etc/passwd",              'validate_filename("/etc/passwd")');
+is(validate_filename("/etc/nonexistentfile"),    "/etc/nonexistentfile",     'validate_filename("/etc/nonexistentfile")');
+is(validate_filename("/etc/passwd/", "name", "noquit"),            undef,    'validate_filename("/etc/passwd/", "name", "noquit")');
 
 # ============================================================================ #
 is(validate_file("HariSekhonUtils.pm"),        "HariSekhonUtils.pm",  'validate_file("HariSekhonUtils.pm")');

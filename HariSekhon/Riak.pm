@@ -15,7 +15,7 @@
 
 package HariSekhon::Riak;
 
-$VERSION = "0.1";
+$VERSION = "0.2";
 
 use strict;
 use warnings;
@@ -53,7 +53,7 @@ sub get_riak_admin_path(){
         if(grep {$_ eq $riak_admin_path } split(":", $ENV{"PATH"})){
             usage "$riak_admin_path already in \$riak_admin_path ($ENV{PATH})";
         }
-        $riak_admin_path = validate_directory($riak_admin_path, undef, "riak-admin PATH", "no vlog");
+        $riak_admin_path = validate_directory($riak_admin_path, "riak-admin PATH", undef, "no vlog");
         $ENV{"PATH"} = "$riak_admin_path:$ENV{PATH}";
         vlog2 "\$riak_admin_path for riak-admin:",   $ENV{"PATH"};
         vlog2;

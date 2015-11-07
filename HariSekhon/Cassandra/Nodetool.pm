@@ -9,7 +9,7 @@
 
 package HariSekhon::Cassandra::Nodetool;
 
-$VERSION = "0.2.8";
+$VERSION = "0.2.9";
 
 use strict;
 use warnings;
@@ -46,7 +46,7 @@ our $nodetool = "nodetool";
 sub validate_nodetool ($) {
     my $nodetool = shift;
     defined($nodetool) or usage "nodetool not defined";
-    $nodetool = validate_filename($nodetool, 0, "nodetool");
+    $nodetool = validate_filename($nodetool, "nodetool");
     $nodetool =~ /(?:^|\/)nodetool$/ or usage "invalid nodetool path given, must be the path to the nodetool command";
     $nodetool = which($nodetool, 1);
     return $nodetool;

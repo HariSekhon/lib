@@ -13,7 +13,7 @@
 
 package HariSekhon::ClouderaManager;
 
-$VERSION = "0.5";
+$VERSION = "0.5.1";
 
 use strict;
 use warnings;
@@ -144,7 +144,7 @@ sub cm_query(;$) {
         $tls = 1;
     }
     if(defined($ssl_ca_path)){
-        $ssl_ca_path = validate_directory($ssl_ca_path, undef, "SSL CA directory", "no vlog");
+        $ssl_ca_path = validate_directory($ssl_ca_path, "SSL CA directory", undef, "no vlog");
         $ua->ssl_opts( SSL_ca_path => $ssl_ca_path );
         $tls = 1;
     }
