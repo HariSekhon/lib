@@ -159,7 +159,7 @@ sub validate_cluster(){
         $cluster or usage "must specify cluster, use --list-clusters to show clusters managed by DataStax OpsCenter";
         $cluster =~ /^([\w-]+)$/ or usage "invalid cluster defined: must be alphanumeric, may contain dashes and underscores";
         $cluster = $1;
-        vlog_options "cluster", $cluster;
+        vlog_option "cluster", $cluster;
     }
 }
 

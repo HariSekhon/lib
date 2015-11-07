@@ -1189,11 +1189,11 @@ $verbose = 1;
 ok(HariSekhonUtils::vlog4("test1\ntest2"),   'vlog4("test1\ntest2")');
 
 $verbose = 1;
-ok(!vlog_options("option", "value"),         '!vlog_options("option", "value") in $verbose 1');
-ok(!vlog_options_bool("option", "value"),    '!vlog_options_bool("option", "value") in $verbose 1');
+ok(!vlog_option("option", "value"),         '!vlog_option("option", "value") in $verbose 1');
+ok(!vlog_option_bool("option", "value"),    '!vlog_option_bool("option", "value") in $verbose 1');
 $verbose = 2;
-ok(vlog_options("option", "value"),         'vlog_options("option", "value") in $verbose 2');
-ok(vlog_options_bool("option", "value"),    'vlog_options_bool("option", "value") in $verbose 2');
+ok(vlog_option("option", "value"),         'vlog_option("option", "value") in $verbose 2');
+ok(vlog_option_bool("option", "value"),    'vlog_option_bool("option", "value") in $verbose 2');
 
 is(which("sh"),                             "/bin/sh",      'which("sh") eq /bin/sh');
 is(which("/bin/bash"),                      "/bin/bash",    'which("bash") eq /bin/bash');

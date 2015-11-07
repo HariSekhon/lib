@@ -292,7 +292,7 @@ sub validate_elasticsearch_alias($){
     my $alias = shift;
     defined($alias) or usage "Elasticsearch alias not defined";
     $alias = isESType($alias) or usage "invalid ElasticSearch alias name given, must be lowercase alphanumeric";
-    vlog_options "alias", $alias;
+    vlog_option "alias", $alias;
     return $alias;
 }
 *validate_es_alias = \&validate_elasticsearch_alias;
@@ -301,7 +301,7 @@ sub validate_elasticsearch_cluster($){
     my $cluster = shift;
     defined($cluster) or usage "Elasticsearch cluster not defined";
     $cluster = isESCluster($cluster) or usage "invalid ElasticSearch cluster name given, must be lowercase alphanumeric";
-    vlog_options "cluster", $cluster;
+    vlog_option "cluster", $cluster;
     return $cluster;
 }
 *validate_es_cluster = \&validate_elasticsearch_cluster;
@@ -310,7 +310,7 @@ sub validate_elasticsearch_index($){
     my $index = shift;
     defined($index) or usage "Elasticsearch index not defined";
     $index = isESIndex($index) or usage "invalid ElasticSearch index name given, must be lowercase alphanumeric";
-    vlog_options "index", $index;
+    vlog_option "index", $index;
     return $index;
 }
 *validate_es_index = \&validate_elasticsearch_index;
@@ -319,7 +319,7 @@ sub validate_elasticsearch_type($){
     my $type = shift;
     defined($type) or usage "Elasticsearch type not defined";
     $type = isESType($type) or usage "invalid ElasticSearch type name given, must be lowercase alphanumeric";
-    vlog_options "type", $type;
+    vlog_option "type", $type;
     return $type;
 }
 *validate_es_type = \&validate_elasticsearch_type;

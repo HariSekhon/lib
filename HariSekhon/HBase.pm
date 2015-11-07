@@ -67,7 +67,7 @@ sub validate_hbase_column_qualifier ($) {
     my $column = shift;
     defined($column) || usage "hbase column not defined";
     $column = isHBaseColumnQualifier($column) || usage "invalid hbase column qualifier defined";
-    vlog_options("column qualifier", $column);
+    vlog_option("column qualifier", $column);
     return $column;
 }
 
@@ -75,7 +75,7 @@ sub validate_hbase_rowkey ($) {
     my $rowkey = shift;
     defined($rowkey) || usage "hbase rowkey not defined";
     $rowkey = isHBaseRowKey($rowkey) || usage "invalid hbase rowkey defined: must be alphanumeric, colons and # are allowed for compound keys";
-    vlog_options("rowkey", $rowkey);
+    vlog_option("rowkey", $rowkey);
     return $rowkey;
 }
 
@@ -83,7 +83,7 @@ sub validate_hbase_table ($) {
     my $table = shift;
     defined($table) || usage "hbase table not defined";
     $table = isHBasetable($table) || usage "invalid hbase table defined: must be alphanumeric, colons and # are allowed for compound keys";
-    vlog_options("table", $table);
+    vlog_option("table", $table);
     return $table;
 }
 

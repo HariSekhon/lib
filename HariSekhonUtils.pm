@@ -70,7 +70,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.17.1";
+our $VERSION = "1.17.2";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -435,8 +435,8 @@ our %EXPORT_TAGS = (
                         vlogt
                         vlog2t
                         vlog3t
-                        vlog_options
-                        vlog_options_bool
+                        vlog_option
+                        vlog_option_bool
                     ) ],
     'web'   =>  [   qw(
                         curl
@@ -2628,7 +2628,7 @@ sub parse_file_option($;$){
         }
     }
 
-    vlog_options("files", "[ '" . join("', '", @files) . "' ]");
+    vlog_option("files", "[ '" . join("', '", @files) . "' ]");
 
     return @files;
 }
@@ -3182,7 +3182,7 @@ sub validate_alnum($$){
     $arg = isAlNum($arg);
     # isAlNum returns zero as valid and undef when not valid so must check explicitly for undef and avoid 0 which is false in Perl
     defined($arg) || usage "invalid $name defined: must be alphanumeric";
-    vlog_options($name, $arg);
+    vlog_option($name, $arg);
     return $arg;
 }
 
@@ -3191,7 +3191,7 @@ sub validate_aws_access_key($){
     my $aws_access_key = shift;
     defined($aws_access_key) or usage "aws access key not defined";
     $aws_access_key = isAwsAccessKey($aws_access_key) || usage "invalid aws access key defined: must be 20 alphanumeric characters";
-    vlog_options("aws access key", "X"x18 . substr($aws_access_key, 18, 2));
+    vlog_option("aws access key", "X"x18 . substr($aws_access_key, 18, 2));
     return $aws_access_key;
 }
 
@@ -3201,7 +3201,7 @@ sub validate_aws_bucket($){
     defined($bucket) or usage "no aws bucket specified";
     $bucket = isDnsShortname($bucket) || usage "invalid aws bucket name defined: must be alphanumeric between 3 and 63 characters long";
     isIP($bucket) and usage "invalid aws bucket name defined: may not be formatted as an IP address";
-    vlog_options("aws bucket", $bucket);
+    vlog_option("aws bucket", $bucket);
     return $bucket;
 }
 
@@ -3210,7 +3210,7 @@ sub validate_aws_secret_key($){
     my $aws_secret_key = shift;
     defined($aws_secret_key) or usage "aws secret key not defined";
     $aws_secret_key = isAwsSecretKey($aws_secret_key) || usage "invalid aws secret key defined: must be 40 alphanumeric characters";
-    vlog_options("aws secret key", "X"x38 . substr($aws_secret_key,38, 2));
+    vlog_option("aws secret key", "X"x38 . substr($aws_secret_key,38, 2));
     return $aws_secret_key;
 }
 
@@ -3222,7 +3222,7 @@ sub validate_chars($$$){
     my $chars = shift;
     defined($string) or usage "$name not defined";
     $string = isChars($string, $chars) || usage "invalid $name defined: must be one of the following chars - $chars";
-    vlog_options($name, $string);
+    vlog_option($name, $string);
     return $string;
 }
 
@@ -3233,7 +3233,7 @@ sub validate_collection ($;$) {
     $name .= " " if $name;
     defined($collection) or usage "${name}collection not defined";
     $collection = isCollection($collection) || usage "invalid ${name}collection defined: must be alphanumeric, with optional periods in the middle";
-    vlog_options("${name}collection", $collection);
+    vlog_option("${name}collection", $collection);
     return $collection;
 }
 
@@ -3244,7 +3244,7 @@ sub validate_database ($;$) {
     $name .= " " if $name;
     defined($database)      || usage "${name}database not defined";
     $database = isDatabaseName($database) || usage "invalid ${name}database defined: must be alphanumeric";
-    vlog_options("${name}database", $database);
+    vlog_option("${name}database", $database);
     return $database;
 }
 
@@ -3253,7 +3253,7 @@ sub validate_database_columnname ($) {
     my $column = shift;
     defined($column) || usage "column not defined";
     $column = isDatabaseColumnName($column) || usage "invalid column defined: must be alphanumeric";
-    vlog_options("column", $column);
+    vlog_option("column", $column);
     return $column;
 }
 
@@ -3263,7 +3263,7 @@ sub validate_database_fieldname ($) {
     defined($field) || usage "field not defined";
     $field = isDatabaseFieldName($field) || usage "invalid field defined: must be a positive integer, or a valid field name";
     ($field eq "0") and usage "invalid field defined: cannot be zero";
-    vlog_options("field", $field);
+    vlog_option("field", $field);
     return $field;
 }
 
@@ -3275,7 +3275,7 @@ sub validate_database_tablename ($;$$) {
     $name .= " " if $name;
     defined($table) || usage "${name}table not defined";
     $table = isDatabaseTableName($table, $allow_qualified) || usage "invalid ${name}table defined: must be alphanumeric";
-    vlog_options("${name}table", $table);
+    vlog_option("${name}table", $table);
     return $table;
 }
 
@@ -3287,7 +3287,7 @@ sub validate_database_viewname ($;$$) {
     $name .= " " if $name;
     defined($view) || usage "${name}view not defined";
     $view = isDatabaseViewName($view, $allow_qualified) || usage "invalid ${name}view defined: must be alphanumeric";
-    vlog_options("${name}view", $view);
+    vlog_option("${name}view", $view);
     return $view;
 }
 
@@ -3305,7 +3305,7 @@ sub validate_database_query_select_show ($;$) {
     # this trips up users who put ; at the end of their query and doesn't offer that much protection anyway since DML is already checked for and it may be convenient to comment out end of query for testing
     #$query =~ /;|--/i and usage "invalid ${name}query defined: suspect chars ';' or '--' detected in query!";
     $query =~ /;/ and usage "invalid ${name}query defined: you may not add semi-colons to your queries, while it works on the command line, Nagios ends up choking by prematurely terminating the check command resulting in a null shell error before this plugin executes so the error handlers in this code do not have any chance to catch it";
-    vlog_options("${name}query", $query);
+    vlog_option("${name}query", $query);
     return $query;
 }
 
@@ -3330,7 +3330,7 @@ sub validate_dirname ($;$$$) {
         usage "invalid ${name}directory (does not match regex critera): '$dirname'" unless $noquit;
         return;
     }
-    vlog_options("${name}directory", $dirname2) unless $no_vlog;
+    vlog_option("${name}directory", $dirname2) unless $no_vlog;
     return $dirname2;
 }
 
@@ -3359,7 +3359,7 @@ sub validate_domain ($;$) {
     defined($domain) || usage "${name}domain name not defined";
     # don't print the domain as it gets reset to undef and results in "Use of uninitialized value $domain in concatenation (.) or string"
     $domain = isDomain($domain) or usage "invalid ${name}domain name defined";
-    vlog_options("${name}domain", $domain);
+    vlog_option("${name}domain", $domain);
     return $domain;
 }
 
@@ -3388,7 +3388,7 @@ sub validate_filename ($;$$$) {
         usage "invalid $name (does not match regex critera): '$filename'" unless $noquit;
         return;
     }
-    vlog_options($name, $filename2) unless $no_vlog;
+    vlog_option($name, $filename2) unless $no_vlog;
     return $filename2;
 }
 
@@ -3422,7 +3422,7 @@ sub validate_float ($$$$) {
     ($float >= $min && $float <= $max) or usage "invalid $name defined: must be real number between $min and $max";
     $float =~ /^(-?\d+(?:\.\d+)?)$/ or usage "invalid float $name passed to validate_float(), WARNING: caught LATE";
     $float = $1;
-    vlog_options($name, $float);
+    vlog_option($name, $float);
     return $float;
 }
 
@@ -3433,7 +3433,7 @@ sub validate_fqdn ($;$) {
     $name .= " " if $name;
     defined($fqdn) || usage "${name}FQDN not defined";
     $fqdn = isFqdn($fqdn) || usage "invalid ${name}FQDN defined";
-    vlog_options("${name}fqdn", $fqdn);
+    vlog_option("${name}fqdn", $fqdn);
     return $fqdn
 }
 
@@ -3449,7 +3449,7 @@ sub validate_host ($;$) {
     $name = "$name " if $name;
     defined($host) || usage "${name}host not defined";
     $host = isHost($host) || usage "invalid ${name}host '$host' defined: not a valid hostname or IP address";
-    vlog_options("${name}host", $host);
+    vlog_option("${name}host", $host);
     return $host;
 }
 
@@ -3472,7 +3472,7 @@ sub validate_hosts($$){
         $hosts[$i]  = validate_resolvable($hosts[$i]);
         $node_port  = $port unless defined($node_port);
         $hosts[$i] .= ":$node_port";
-        vlog_options("port", $node_port);
+        vlog_option("port", $node_port);
     }
     return @hosts;
 }
@@ -3494,7 +3494,7 @@ sub validate_hostport ($;$) {
     }
     $hostport = $host;
     $hostport .= ":$port" if $port;
-    vlog_options("${name}host:port", $hostport) unless $no_vlog;
+    vlog_option("${name}host:port", $hostport) unless $no_vlog;
     return $hostport;
 }
 
@@ -3505,7 +3505,7 @@ sub validate_hostname ($;$) {
     $name = "$name " if $name;
     defined($hostname) || usage "${name}hostname not defined";
     $hostname = isHostname($hostname) || usage "invalid ${name}hostname defined";
-    vlog_options("${name}hostname", $hostname);
+    vlog_option("${name}hostname", $hostname);
     return $hostname;
 }
 
@@ -3525,7 +3525,7 @@ sub validate_int ($$;$$) {
     }
     $integer =~ /^(-?\d+)$/ or usage "invalid integer $name passed to validate_int() - WARNING: caught LATE code may need updating";
     $integer = $1;
-    vlog_options($name, $integer);
+    vlog_option($name, $integer);
     return $integer;
 }
 *validate_integer = \&validate_int;
@@ -3535,7 +3535,7 @@ sub validate_interface ($) {
     my $interface = shift;
     defined($interface) || usage "interface not defined";
     $interface = isInterface($interface) || usage "invalid interface defined: must be either eth<N>, bond<N> or lo<N>";
-    vlog_options("interface", $interface);
+    vlog_option("interface", $interface);
     return $interface;
 }
 
@@ -3546,7 +3546,7 @@ sub validate_ip ($;$) {
     $name   .= " " if $name;
     defined($ip) || usage "${name}IP not defined";
     $ip = isIP($ip) || usage "invalid ${name}IP defined";
-    vlog_options("${name}IP", $ip);
+    vlog_option("${name}IP", $ip);
     return $ip;
 }
 
@@ -3557,7 +3557,7 @@ sub validate_krb5_princ ($;$) {
     $name .= " " if $name;
     defined($principal) or usage "krb5 principal not defined";
     $principal = isKrb5Princ($principal) || usage "invalid ${name}krb5 principal defined";
-    vlog_options("${name}krb5 principal", $principal);
+    vlog_option("${name}krb5 principal", $principal);
     return $principal;
 }
 
@@ -3568,7 +3568,7 @@ sub validate_krb5_realm ($;$) {
     $name .= " " if $name;
     defined($realm) || usage "${name}krb5 realm name not defined";
     $realm = isDomain($realm) || usage "invalid ${name}krb5 realm name defined";
-    vlog_options("${name}krb5 realm", $realm);
+    vlog_option("${name}krb5 realm", $realm);
     return $realm;
 }
 
@@ -3577,7 +3577,7 @@ sub validate_label ($) {
     my $label  = shift;
     defined($label) or usage "label not defined";
     $label = isLabel($label) || usage "invalid label defined: must be an alphanumeric identifier";
-    vlog_options("label", $label);
+    vlog_option("label", $label);
     return $label;
 }
 
@@ -3589,7 +3589,7 @@ sub validate_ldap_dn ($;$) {
     $name .= " " if $name;
     defined($dn) or usage "ldap ${name}dn not defined";
     $dn = isLdapDn($dn) || usage "invalid ldap ${name}dn defined";
-    vlog_options("ldap ${name}dn", $dn);
+    vlog_option("ldap ${name}dn", $dn);
     return $dn;
 }
 
@@ -3605,7 +3605,7 @@ sub validate_metrics ($) {
         }
         @metrics or usage "no valid metrics given";
         @metrics = uniq_array @metrics;
-        vlog_options("metrics", "[ " . join(" ", @metrics) . " ]");
+        vlog_option("metrics", "[ " . join(" ", @metrics) . " ]");
     }
     return @metrics;
 }
@@ -3627,7 +3627,7 @@ sub validate_node_list (@) {
     foreach (my $i = 0; $i < $node_count; $i++){
         $nodes[$i] = isHost($nodes[$i]) || usage "invalid node name '$nodes[$i]': must be hostname/FQDN or IP address";
     }
-    vlog_options("node list", "[ '" . join("', '", @nodes) . "' ]");
+    vlog_option("node list", "[ '" . join("', '", @nodes) . "' ]");
     return @nodes;
 }
 
@@ -3647,7 +3647,7 @@ sub validate_nodeport_list (@) {
     foreach(my $i = 0; $i < $node_count; $i++){
         $nodes[$i] = validate_hostport($nodes[$i]);
     }
-    vlog_options("node list", "[ '" . join("', '", @nodes) . "' ]");
+    vlog_option("node list", "[ '" . join("', '", @nodes) . "' ]");
     return @nodes;
 }
 
@@ -3658,7 +3658,7 @@ sub validate_nosql_key($;$){
     $name .= " " if $name;
     defined($key) or usage "${name}key not defined";
     $key = isNoSqlKey($key) || usage "invalid ${name}key name defined: may only contain characters: alphanumeric, commas, colons, underscores, pluses, dashes";
-    vlog_options("${name}key", $key);
+    vlog_option("${name}key", $key);
     return $key;
 }
 
@@ -3669,7 +3669,7 @@ sub validate_port ($;$) {
     $name    = "$name " if $name;
     defined($port)         || usage "${name}port not defined";
     $port  = isPort($port) || usage "invalid ${name}port number defined: must be a positive integer";
-    vlog_options("${name}port", $port);
+    vlog_option("${name}port", $port);
     return $port;
 }
 
@@ -3680,7 +3680,7 @@ sub validate_process_name ($;$) {
     $name .= " " if $name;
     defined($process) or usage "${name}process name not defined";
     $process = isProcessName($process) || usage "invalid ${name}process name defined";
-    vlog_options("${name}process name", $process);
+    vlog_option("${name}process name", $process);
     return $process;
 }
 
@@ -3702,7 +3702,7 @@ sub validate_program_path ($$;$) {
     $path =~ /(?:^|\/)$regex$/ || usage "invalid path given for $name, is not a path to the $name command";
     ( -f $path ) or usage "$path not found";
     ( -x $path ) or usage "$path not executable";
-    vlog_options("${name} program path", $path);
+    vlog_option("${name} program path", $path);
     return $path;
 }
 
@@ -3745,10 +3745,10 @@ sub validate_regex ($;$$$) {
         }
     }
     if($regex2){
-        vlog_options("${name}regex", $regex2) unless $noquit;
+        vlog_option("${name}regex", $regex2) unless $noquit;
         return $regex2;
     } else {
-        vlog_options("${name}regex", $regex) unless $noquit;
+        vlog_option("${name}regex", $regex) unless $noquit;
         return $regex;
     }
 }
@@ -3768,7 +3768,7 @@ sub validate_password ($;$$) {
         $password = $1;
         $password =~ /\$\(/ and usage "invalid ${name}password defined: may not contain \$( as this is a subshell escape and could be dangerous to pass through to programs on the command line";
     }
-    vlog_options("${name}password", "<omitted>");
+    vlog_option("${name}password", "<omitted>");
     return $password;
 }
 
@@ -3791,8 +3791,8 @@ sub validate_ssl_opts(){
         $main::ua->ssl_opts( SSL_ca_path => $ssl_ca_path );
     }
     if($ssl or $tls){
-        vlog_options("SSL CA Path",  $ssl_ca_path) if defined($ssl_ca_path);
-        vlog_options("SSL noverify", $ssl_noverify ? "true" : "false");
+        vlog_option("SSL CA Path",  $ssl_ca_path) if defined($ssl_ca_path);
+        vlog_option("SSL noverify", $ssl_noverify ? "true" : "false");
         $main::protocol = "https" if defined($main::protocol);
     }
 }
@@ -3801,7 +3801,7 @@ sub validate_ssl(){
     defined_main_ua();
     $ssl = 1 if(defined($ssl_ca_path) or defined($ssl_noverify));
     if($ssl){
-        vlog_options("SSL enabled",  "true");
+        vlog_option("SSL enabled",  "true");
     }
     validate_ssl_opts();
 }
@@ -3810,7 +3810,7 @@ sub validate_tls(){
     defined_main_ua();
     $tls = 1 if(defined($ssl_ca_path) or defined($ssl_noverify));
     if($tls){
-        vlog_options("TLS enabled",  "true");
+        vlog_option("TLS enabled",  "true");
     }
     validate_ssl_opts();
 }
@@ -3875,9 +3875,9 @@ sub validate_threshold ($$;$) {
     $thresholds{$name}{"range"} .= $thresholds{$name}{"lower"} if defined($thresholds{$name}{"lower"});
     $thresholds{$name}{"range"} .= ":" if (defined($thresholds{$name}{"lower"}) and defined($thresholds{$name}{"upper"}));
     $thresholds{$name}{"range"}.= $thresholds{$name}{"upper"} if defined($thresholds{$name}{"upper"});
-    vlog_options(sprintf("%-8s lower", $name), $thresholds{"$name"}{"lower"}) if defined($thresholds{"$name"}{"lower"});
-    vlog_options(sprintf("%-8s upper", $name), $thresholds{"$name"}{"upper"}) if defined($thresholds{"$name"}{"upper"});
-    vlog_options(sprintf("%-8s range inversion", $name), "on") if $thresholds{$name}{"invert_range"};
+    vlog_option(sprintf("%-8s lower", $name), $thresholds{"$name"}{"lower"}) if defined($thresholds{"$name"}{"lower"});
+    vlog_option(sprintf("%-8s upper", $name), $thresholds{"$name"}{"upper"}) if defined($thresholds{"$name"}{"upper"});
+    vlog_option(sprintf("%-8s range inversion", $name), "on") if $thresholds{$name}{"invert_range"};
     1;
 }
 
@@ -3939,7 +3939,7 @@ sub validate_units ($;$) {
     $name .= " " if $name;
     $units or usage("${name}units not defined");
     $units = isNagiosUnit($units) || usage("invalid ${name}units defined, must be one of: " . join(" ", @valid_units));
-    vlog_options("${name}units", $units);
+    vlog_option("${name}units", $units);
     return $units;
 }
 
@@ -3950,7 +3950,7 @@ sub validate_url ($;$) {
     $name .= " " if $name;
     defined($url) or usage "${name}url not defined";
     $url = isUrl($url) || usage "invalid ${name}url defined: '$url'";
-    vlog_options("${name}url", $url);
+    vlog_option("${name}url", $url);
     return $url;
 }
 
@@ -3961,7 +3961,7 @@ sub validate_url_path_suffix ($;$) {
     $name .= " " if $name;
     defined($url) or usage "${name}url not defined";
     $url = isUrlPathSuffix($url) || usage "invalid ${name}url defined: '$url'";
-    vlog_options("${name}url", $url);
+    vlog_option("${name}url", $url);
     return $url;
 }
 
@@ -3973,7 +3973,7 @@ sub validate_user ($;$) {
     $name .= " " if $name;
     defined($user) or usage "${name}username not defined";
     $user = isUser($user) || usage "invalid ${name}username defined: must be alphanumeric";
-    vlog_options("${name}user", $user);
+    vlog_option("${name}user", $user);
     return $user;
 }
 *validate_username = \&validate_user;
@@ -4049,13 +4049,13 @@ sub vlog4 (@){
 }
 
 
-sub vlog_options ($$) {
-    #scalar @_ eq 2 or code_error "incorrect number of args passed to vlog_options()";
+sub vlog_option ($$) {
+    #scalar @_ eq 2 or code_error "incorrect number of args passed to vlog_option()";
     vlog2 sprintf("%-25s %s", "$_[0]:", $_[1]);
 }
 
-sub vlog_options_bool ($$) {
-    vlog_options $_[0], ( $_[1] ? "true" : "false" );
+sub vlog_option_bool ($$) {
+    vlog_option $_[0], ( $_[1] ? "true" : "false" );
 }
 
 

@@ -610,7 +610,7 @@ sub validate_solr_collection($){
     my $collection = shift;
     defined($collection) or quit "CRITICAL", "Solr collection not specified";
     $collection = isSolrCollection($collection) or quit "CRITICAL", "invalid Solr collection specified";
-    vlog_options "collection", $collection;
+    vlog_option "collection", $collection;
     return $collection;
 }
 
@@ -625,7 +625,7 @@ sub validate_solr_collections($){
         push(@collections, $collection);
     }
     $collections = join(",", @collections);
-    vlog_options "collections", $collections;
+    vlog_option "collections", $collections;
     return $collections;
 }
 
@@ -633,7 +633,7 @@ sub validate_solr_collection_alias($){
     my $collection_alias = shift;
     defined($collection_alias) or quit "CRITICAL", "Solr collection alias not specified";
     $collection_alias = isSolrCollection($collection_alias) or quit "CRITICAL", "invalid Solr collection alias specified";
-    vlog_options "collection alias", $collection_alias;
+    vlog_option "collection alias", $collection_alias;
     return $collection_alias;
 }
 
@@ -641,7 +641,7 @@ sub validate_solr_core($){
     my $core = shift;
     defined($core) or quit "CRITICAL", "Solr core not specified";
     $core = isSolrCore($core) or quit "CRITICAL", "invalid Solr core specified";
-    vlog_options "core", $core;
+    vlog_option "core", $core;
     return $core;
 }
 
@@ -649,7 +649,7 @@ sub validate_solr_shard($){
     my $shard = shift;
     defined($shard) or quit "CRITICAL", "Solr shard not specified";
     $shard = isSolrShard($shard) or quit "CRITICAL", "invalid Solr shard specified";
-    vlog_options "shard", $shard;
+    vlog_option "shard", $shard;
     return $shard;
 }
 
@@ -662,7 +662,7 @@ sub validate_solr_context($){
         $solr_admin = "$context/admin";
     }
 
-    vlog_options "http context", $context;
+    vlog_option "http context", $context;
     return $context;
 }
 

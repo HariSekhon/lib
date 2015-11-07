@@ -356,7 +356,7 @@ sub validate_ambari_cluster($){
     defined($cluster) or usage "cluster not defined";
     $cluster =~ /^\s*([\w\s\.-]+)\s*$/ or usage "Invalid cluster name given, may only contain alphanumeric, space, dash, dots or underscores";
     $cluster = $1;
-    vlog_options "cluster", $cluster;
+    vlog_option "cluster", $cluster;
     return $cluster;
 }
 
@@ -365,7 +365,7 @@ sub validate_ambari_component($){
     defined($component) or usage "component not defined";
     $component =~ /^\s*([\w-]+)\s*$/ or usage "Invalid component given, use --list-components to see available components for a given cluster service";
     $component = uc $1;
-    vlog_options "component", $component;
+    vlog_option "component", $component;
     return $component;
 }
 
@@ -373,7 +373,7 @@ sub validate_ambari_node($){
     my $node = shift;
     defined($node) or usage "node not defined";
     $node = isHostname($node) || usage "invalid node given";
-    vlog_options "node", $node;
+    vlog_option "node", $node;
     return $node;
 }
 
@@ -382,7 +382,7 @@ sub validate_ambari_service($){
     defined($service) or usage "service not defined";
     $service    =~ /^\s*([\w-]+)\s*$/ or usage "Invalid service name given, must be alphanumeric with dashes";
     $service = uc $1;
-    vlog_options "service", $service;
+    vlog_option "service", $service;
     return $service;
 }
 

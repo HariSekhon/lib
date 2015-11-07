@@ -262,7 +262,7 @@ sub validate_cluster($){
     defined($cluster) or usage "cluster not specified";
     $cluster =~ /^([\w\.-]+)$/ or usage "invalid cluster name given, must be alphanumeric with dots and underscores permitted";
     $cluster = $1;
-    vlog_options "cluster", $cluster;
+    vlog_option "cluster", $cluster;
     return $cluster;
 }
 
@@ -283,7 +283,7 @@ sub validate_service($){
     defined($service) or usage "service not specified";
     $service =~ /^(\w[\w\s-]+\w)$/ or usage "invalid service name, must be alphanumeric, may contain spaces/dashes";
     $service = $1;
-    vlog_options "service", $service;
+    vlog_option "service", $service;
     return $service;
 }
 

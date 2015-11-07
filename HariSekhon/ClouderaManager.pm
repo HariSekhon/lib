@@ -149,9 +149,9 @@ sub cm_query(;$) {
         $tls = 1;
     }
     if($tls){
-        vlog_options "TLS enabled",  "true";
-        vlog_options "SSL CA Path",  $ssl_ca_path  if defined($ssl_ca_path);
-        vlog_options "TLS noverify", $tls_noverify ? "true" : "false";
+        vlog_option "TLS enabled",  "true";
+        vlog_option "SSL CA Path",  $ssl_ca_path  if defined($ssl_ca_path);
+        vlog_option "TLS noverify", $tls_noverify ? "true" : "false";
     }
     if($tls){
         $protocol = "https";
@@ -392,7 +392,7 @@ sub validate_cm_activity(){
     defined($activity) or usage "activity not defined";
     $activity =~ /^\s*([\w-]+)\s*$/ or usage "Invalid activity given, must be alphanumeric with dashes";
     $activity = $1;
-    vlog_options "activity", $activity;
+    vlog_option "activity", $activity;
     return $activity;
 }
 
@@ -400,14 +400,14 @@ sub validate_cm_cluster(){
     defined($cluster) or usage "cluster not defined";
     $cluster    =~ /^\s*([\w\s\.-]+)\s*$/ or usage "Invalid cluster name given, may only contain alphanumeric, space, dash, dots or underscores";
     $cluster = $1;
-    vlog_options "cluster", $cluster;
+    vlog_option "cluster", $cluster;
     return $cluster;
 }
 
 sub validate_cm_hostid(){
     defined($hostid) or usage "host id not defined";
     $hostid = isHostname($hostid) || usage "invalid host id given";
-    vlog_options "hostId", "$hostid";
+    vlog_option "hostId", "$hostid";
     return $hostid;
 }
 
@@ -415,7 +415,7 @@ sub validate_cm_nameservice(){
     defined($nameservice) or usage "nameservice not defined";
     $nameservice =~ /^\s*([\w-]+)\s*$/ or usage "Invalid nameservice given, must be alphanumeric with dashes";
     $nameservice = $1;
-    vlog_options "nameservice", $nameservice;
+    vlog_option "nameservice", $nameservice;
     return $nameservice;
 }
 
@@ -423,7 +423,7 @@ sub validate_cm_role(){
     defined($role) or usage "role not defined";
     $role =~ /^\s*([\w-]+-\w+-\w+)\s*$/ or usage "Invalid role id given, expected in format such as <service>-<role>-<hexid> (eg hdfs4-NAMENODE-73d774cdeca832ac6a648fa305019cef). Use --list-roles to see available roles + IDs for a given cluster service";
     $role = $1;
-    vlog_options "roleId", $role;
+    vlog_option "roleId", $role;
     return $role;
 }
 
@@ -431,7 +431,7 @@ sub validate_cm_service(){
     defined($service) or usage "service not defined";
     $service    =~ /^\s*([\w-]+)\s*$/ or usage "Invalid service name given, must be alphanumeric with dashes";
     $service = $1;
-    vlog_options "service", $service;
+    vlog_option "service", $service;
     return $service;
 }
 

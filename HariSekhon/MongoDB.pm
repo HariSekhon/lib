@@ -141,16 +141,16 @@ sub validate_mongo_hosts($){
     }
     $hosts  = "mongodb://" . join(",", @hosts);
 #my $hosts  = join(",", @hosts);
-    vlog_options "Mongo host list", $hosts;
+    vlog_option "Mongo host list", $hosts;
     return $hosts;
 }
 
 
 sub validate_mongo_sasl(){
     grep { $sasl_mechanism eq $_ } qw/GSSAPI PLAIN/ or usage "invalid sasl-mechanism specified, must be either GSSAPI or PLAIN";
-    vlog_options "ssl",  "enabled" if $ssl;
-    vlog_options "sasl", "enabled" if $sasl;
-    vlog_options "sasl-mechanism", $sasl_mechanism if $sasl;
+    vlog_option "ssl",  "enabled" if $ssl;
+    vlog_option "sasl", "enabled" if $sasl;
+    vlog_option "sasl-mechanism", $sasl_mechanism if $sasl;
 }
 
 1;
