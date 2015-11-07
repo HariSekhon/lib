@@ -794,6 +794,7 @@ is(isProcessName("ec2-run-instances"),  "ec2-run-instances",    'isProcessName("
 ok(isProcessName("sh <defunct>"),   'isProcessName("sh <defunct>")');
 ok(!isProcessName("./b\@dfile"),    '!isProcessName("./b@dfile")');
 ok(!isProcessName("[init] 3"),      '!isProcessName("[init] 3")');
+ok(!isProcessName("  "),      '!isProcessName("  ")');
 
 is(validate_process_name("../my_program"),      "../my_program",        'validate_process_name("../my_program")');
 is(validate_process_name("ec2-run-instances"),  "ec2-run-instances",    'validate_process_name("ec2-run-instances")');
