@@ -3564,9 +3564,9 @@ sub validate_krb5_realm ($;$) {
     my $realm = shift;
     my $name   = shift || "";
     $name .= " " if $name;
-    defined($realm) || usage "${name}realm name not defined";
-    $realm = isDomain($realm) || usage "invalid ${name}realm name defined";
-    vlog_options("${name}realm", $realm);
+    defined($realm) || usage "${name}krb5 realm name not defined";
+    $realm = isDomain($realm) || usage "invalid ${name}krb5 realm name defined";
+    vlog_options("${name}krb5 realm", $realm);
     return $realm;
 }
 
