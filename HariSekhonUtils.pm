@@ -3571,6 +3571,15 @@ sub validate_krb5_realm ($;$) {
 }
 
 
+sub validate_label ($) {
+    my $label  = shift;
+    defined($label) or usage "label not defined";
+    $label = isLabel($label) || usage "invalid label defined: must be an alphanumeric identifier";
+    vlog_options("label", $label);
+    return $label;
+}
+
+
 sub validate_ldap_dn ($;$) {
     #subtrace(@_);
     my $dn   = shift;
@@ -3693,15 +3702,6 @@ sub validate_program_path ($$;$) {
     ( -x $path ) or usage "$path not executable";
     vlog_options("${name} program path", $path);
     return $path;
-}
-
-
-sub validate_label ($) {
-    my $label  = shift;
-    defined($label) or usage "label not defined";
-    $label = isLabel($label) || usage "invalid label defined: must be an alphanumeric identifier";
-    vlog_options("label", $label);
-    return $label;
 }
 
 
