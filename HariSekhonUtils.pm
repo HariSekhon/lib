@@ -252,6 +252,7 @@ our %EXPORT_TAGS = (
                         $ip_prefix_regex
                         $ip_regex
                         $krb5_principal_regex
+                        $label_regex
                         $ldap_dn_regex
                         $mac_regex
                         $process_name_regex
@@ -690,6 +691,7 @@ our $ldap_dn_regex      = '\b\w+=[\w\s]+(?:,\w+=[\w\s]+)*\b';
 our $krb5_principal_regex = "$user_regex(?:\/$hostname_regex)?(?:\@$domain_regex)?";
 our $threshold_range_regex  = qr/^(\@)?(-?\d+(?:\.\d+)?)(:)(-?\d+(?:\.\d+)?)?$/;
 our $threshold_simple_regex = qr/^(-?\d+(?:\.\d+)?)$/;
+our $label_regex        = '\s*[\%\(\)\/\*\w-][\%\(\)\/\*\w\s-]+';
 our $version_regex      = '\d(\.\d+)*';
 our $version_regex_lax  = $version_regex . '-?.*';
 
@@ -2216,7 +2218,7 @@ sub isKrb5Princ ($) {
 sub isLabel ($) {
     my $label = shift;
     defined($label) or return;
-    $label =~ /^[\%\(\)\/\*\w\s-]+$/ or return;
+    $label =~ /^$label_regex$/ or return;
     return $label;
 }
 

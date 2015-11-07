@@ -694,6 +694,8 @@ is(validate_krb5_realm("harisekhon.com"),  "harisekhon.com",    'validate_krb5_r
 # ============================================================================ #
 is(isLabel("st4ts_used (%)"),    "st4ts_used (%)",    'isLabel("st4ts_used (%)")');
 ok(!isLabel('b@dlabel'),                            'isLabel(\'b@dlabel\')');
+ok(!isLabel(''));
+ok(!isLabel(' '));
 
 is(validate_label("st4ts_used (%)"),    "st4ts_used (%)",    'validate_label("st4ts_used (%)")');
 
