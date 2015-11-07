@@ -70,7 +70,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.16.7";
+our $VERSION = "1.17.0";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -3335,8 +3335,8 @@ sub validate_dirname ($;$$$) {
 
 sub validate_directory ($;$$$) {
     my $dir     = shift;
-    my $noquit  = shift;
     my $name    = shift || "";
+    my $noquit  = shift;
     my $no_vlog = shift;
     $name .= " " if $name;
     if($noquit){
@@ -3374,8 +3374,8 @@ sub validate_email ($) {
 
 sub validate_filename ($;$$$) {
     my $filename = shift;
-    my $noquit   = shift;
     my $name     = shift || "filename";
+    my $noquit   = shift;
     my $no_vlog  = shift;
     if(not defined($filename) or $filename =~ /^\s*$/){
         usage "$name not defined";
@@ -3393,10 +3393,10 @@ sub validate_filename ($;$$$) {
 
 sub validate_file ($;$$$) {
     my $filename = shift;
-    my $noquit   = shift;
     my $name     = shift || "";
+    my $noquit   = shift;
     my $no_vlog  = shift;
-    $filename = validate_filename($filename, $noquit, $name, $no_vlog) or return;
+    $filename = validate_filename($filename, $name. $noquit, $no_vlog) or return;
     unless( -f $filename ){
         $name .= " " if $name;
         usage "${name}file not found: '$filename' ($!)" unless $noquit;

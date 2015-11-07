@@ -444,7 +444,7 @@ is(isDirname("\@me"),      undef,       "isDirname(\@me)");
 
 is(validate_dirname("test_Dir"),    "test_Dir",      'validate_directory("test_Dir", 1)');
 is(validate_dirname("/tmp/test"),    "/tmp/test",    'validate_directory("/tmp/test", 1)');
-is(validate_dirname("/nonexistentdir", undef, 1),    "/nonexistentdir",  'validate_directory("/nonexistentdir", 1)');
+is(validate_dirname("/nonexistentdir", "name", "noquit"),    "/nonexistentdir",  'validate_directory("/nonexistentdir", 1)');
 
 is(validate_directory("./t"),       "./t",      'validate_directory("./t")');
 if(isLinuxOrMac()){
@@ -452,7 +452,7 @@ if(isLinuxOrMac()){
     is(validate_directory("/etc/"),     "/etc/",    'validate_directory("/etc/")');
     is(validate_dir("/etc/"),           "/etc/",    'validate_dir("/etc/")');
 }
-is(validate_directory('b@ddir', 1), undef,      'validate_directory(b@ddir)');
+is(validate_directory('b@ddir', "name", "noquit"), undef,      'validate_directory(b@ddir)');
 # cannot validate dir not existing here as it terminates program
 
 # ============================================================================ #
@@ -496,14 +496,14 @@ is(isFilename("\@me"),           undef,             "isFilename(\@me)");
 # ============================================================================ #
 is(validate_filename("/etc/passwd"),                "/etc/passwd",              'validate_filename("/etc/passwd")');
 is(validate_filename("/etc/nonexistentfile", 1),    "/etc/nonexistentfile",     'validate_filename("/etc/nonexistentfile", 1)');
-is(validate_filename("/etc/passwd/", 1),            undef,                      'validate_filename("/etc/passwd/", 1)');
+is(validate_filename("/etc/passwd/", "name", "noquit"),            undef,                      'validate_filename("/etc/passwd/", 1)');
 
 # ============================================================================ #
 is(validate_file("HariSekhonUtils.pm"),        "HariSekhonUtils.pm",  'validate_file("HariSekhonUtils.pm")');
 if(isLinuxOrMac()){
     is(validate_file("/etc/passwd"),           "/etc/passwd",   'validate_file("/etc/passwd")');
 }
-is(validate_file("/etc/nonexistentfile", 1),    undef,          'validate_file("/etc/nonexistentfile", 1) eq undef');
+is(validate_file("/etc/nonexistentfile", "name", "noquit"),    undef,          'validate_file("/etc/nonexistentfile", 1) eq undef');
 
 # ============================================================================ #
 
