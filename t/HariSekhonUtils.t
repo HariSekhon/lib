@@ -437,6 +437,11 @@ is(validate_database_viewname("myView", "Hive"), "myView",      'validate_databa
 is(validate_database_viewname("default.myTable", "Hive", "allow qualified"), "default.myTable",     'validate_database_viewname("default.myTable", "Hive", "allow qualified") eq default.myTable');
 
 # ============================================================================ #
+
+ok(validate_database_query_select_show("select * from myTable"));
+ok(validate_database_query_select_show("select count(*) from db.MyTable"));
+
+# ============================================================================ #
 is(isDirname("test_Dir"),  "test_Dir",  "isDirname(test_Dir)");
 is(isDirname("/tmp/test"), "/tmp/test", "isDirname(/tmp/test");
 is(isDirname("./test"),    "./test",    "isDirname(./test");

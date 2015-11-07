@@ -3396,7 +3396,7 @@ sub validate_file ($;$$$) {
     my $name     = shift || "";
     my $noquit   = shift;
     my $no_vlog  = shift;
-    $filename = validate_filename($filename, $name. $noquit, $no_vlog) or return;
+    $filename = validate_filename($filename, $name, $noquit, $no_vlog) or return;
     unless( -f $filename ){
         $name .= " " if $name;
         usage "${name}file not found: '$filename' ($!)" unless $noquit;
@@ -3410,6 +3410,7 @@ sub validate_float ($$$$) {
     my ($float, $name, $min, $max) = @_;
     defined($float) || usage "$name not defined";
     isFloat($float,1) or usage "invalid $name defined: must be a real number";
+    ( isFloat($min, "allow_negative") and isFloat($max, "allow_negative") ) or usage "invalid min/max ($min/$max) passed to validate_float()";
     ($float >= $min && $float <= $max) or usage "invalid $name defined: must be real number between $min and $max";
     $float =~ /^(-?\d+(?:\.\d+)?)$/ or usage "invalid float $name passed to validate_float(), WARNING: caught LATE";
     $float = $1;
