@@ -3752,30 +3752,6 @@ sub validate_regex ($;$$$) {
 }
 
 
-sub validate_user ($;$) {
-    #subtrace(@_);
-    my $user = shift;
-    my $name = shift || "";
-    $name .= " " if $name;
-    defined($user) or usage "${name}username not defined";
-    $user = isUser($user) || usage "invalid ${name}username defined: must be alphanumeric";
-    vlog_options("${name}user", $user);
-    return $user;
-}
-*validate_username = \&validate_user;
-
-
-sub validate_user_exists ($;$) {
-    #subtrace(@_);
-    my $user = shift;
-    my $name = shift || "";
-    $name .= " " if $name;
-    $user = validate_user($user);
-    user_exists($user) or usage "invalid ${name}user defined, not found on local system";
-    return $user;
-}
-
-
 sub validate_password ($;$$) {
     my $password  = shift;
     my $name      = shift || "";
@@ -3985,6 +3961,30 @@ sub validate_url_path_suffix ($;$) {
     $url = isUrlPathSuffix($url) || usage "invalid ${name}url defined: '$url'";
     vlog_options("${name}url", $url);
     return $url;
+}
+
+
+sub validate_user ($;$) {
+    #subtrace(@_);
+    my $user = shift;
+    my $name = shift || "";
+    $name .= " " if $name;
+    defined($user) or usage "${name}username not defined";
+    $user = isUser($user) || usage "invalid ${name}username defined: must be alphanumeric";
+    vlog_options("${name}user", $user);
+    return $user;
+}
+*validate_username = \&validate_user;
+
+
+sub validate_user_exists ($;$) {
+    #subtrace(@_);
+    my $user = shift;
+    my $name = shift || "";
+    $name .= " " if $name;
+    $user = validate_user($user);
+    user_exists($user) or usage "invalid ${name}user defined, not found on local system";
+    return $user;
 }
 
 

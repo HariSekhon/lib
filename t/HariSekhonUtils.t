@@ -874,7 +874,7 @@ is(isUser("hari1"),     "hari1",    'isUser("hari1")');
 is(isUser("mysql_test"), "mysql_test", 'isUser("mysql_test")');
 is(isUser('cloudera-scm'),  'cloudera-scm', 'isUser("cloudera-scm")');
 ok(!isUser("-hari"),                '!isUser("-hari")');
-ok(!isUser("1983hari"),             '!isUser("1983hari")');
+ok(!isUser("9hari"),             '!isUser("9hari")');
 
 is(validate_user("hadoop"),    "hadoop",   'validate_user("hadoop")');
 is(validate_user("hari1"),     "hari1",    'validate_user("hari1")');
