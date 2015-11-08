@@ -4,7 +4,7 @@
 #
 #  vim:ts=4:sts=4:sw=4:et
 #
-#  https://github.com/harisekhon
+#  https://github.com/harisekhon/lib
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #  
