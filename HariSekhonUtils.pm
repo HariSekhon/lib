@@ -646,7 +646,7 @@ sub load_tlds($){
 # downloaded from IANA, run 'make tld' to update
 my $tld_file = dirname(__FILE__) . "/tlds-alpha-by-domain.txt";
 load_tlds($tld_file);
-$total_tld_count > 900 or code_error("$total_tld_count tlds loaded, expected > 900");
+$total_tld_count > 1000 or code_error("$total_tld_count tlds loaded, expected > 1000");
 my $custom_tlds = dirname(__FILE__) . "/custom_tlds.txt";
 if(-f $custom_tlds){
     load_tlds($custom_tlds);
@@ -656,6 +656,7 @@ $tld_regex .= ")\\b";
 #print "tld_regex = $tld_regex\n";
 # debug isn't set by this point
 #warn "$total_tld_count tlds loaded\n";
+$total_tld_count < 2000 or code_error("$total_tld_count tlds loaded, expected < 2000");
 
 # AWS regex from http://blogs.aws.amazon.com/security/blog/tag/key+rotation
 our $aws_access_key_regex = '(?<![A-Z0-9])[A-Z0-9]{20}(?![A-Z0-9])';
