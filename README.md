@@ -28,7 +28,7 @@ If using bespoke internal domains such as ```.local``` or ```.intranet``` that a
 
 ##### IO::Socket::SSL doesn't respect ignoring self-signed certs in recent version(s) eg. 2.020 #####
 
-Recent version(s) of IO::Socket::SSL (2.020) seem to fail to respect options to ignore self-signed certs. The workaround is to create the hidden touch file below in the same top-level directory as the library to make this it include and use Net::SSL instead of IO::Socket::SSL.
+Recent version(s) of IO::Socket::SSL (2.020) seem to fail to respect options to ignore self-signed certs. The workaround is to create the hidden touch file below in the same top-level directory as the library to make it include and use Net::SSL instead of IO::Socket::SSL.
 ```
 touch .use_net_ssl
 ```
