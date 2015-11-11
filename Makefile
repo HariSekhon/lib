@@ -65,6 +65,8 @@ apt-packages:
 	$(SUDO) apt-get install -y build-essential libwww-perl git || :
 	# for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
 	$(SUDO) apt-get install -y libdbd-mysql-perl libmysqlclient-dev || :
+	# needed to build XML::Simple dep XML::Parser
+	$(SUDO) apt-get install -y libexpat1-dev || :
 
 .PHONY: yum-packages
 yum-packages:
