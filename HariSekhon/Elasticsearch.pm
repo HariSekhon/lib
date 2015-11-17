@@ -9,7 +9,7 @@
 
 package HariSekhon::Elasticsearch;
 
-$VERSION = "0.4.2";
+$VERSION = "0.5.0";
 
 use strict;
 use warnings;
@@ -139,7 +139,7 @@ sub curl_elasticsearch_raw($;$$){
     } else {
         $url .= "?";
     }
-    $url .= "timeout=" . minimum_value($timeout - 1, 1);
+    $url .= sprintf("timeout=%ds", minimum_value($timeout - 1, 1));
     $url .= "&pretty=true" if $verbose >= 3 or $debug;
     #my $content = curl "http://$host:$port/$url", "Elasticsearch", undef, undef, \&elasticsearch_err_handler, $type;
     my $content = curl "http://$host:$port/$url", "Elasticsearch", undef, undef, undef, $type, $body;
