@@ -35,8 +35,10 @@ touch .use_net_ssl
 
 #### See Also ####
 
-* [Java version of this library](https://github.com/harisekhon/lib-java)
-* [Python version of this library](https://github.com/harisekhon/pylib)
+Python and Java ports of this library can be found below - both with higher levels of code coverage testing:
+
+* [Java library](https://github.com/harisekhon/lib-java)
+* [Python library](https://github.com/harisekhon/pylib)
 
 Repos using this library:
 
