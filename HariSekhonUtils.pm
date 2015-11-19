@@ -1019,15 +1019,13 @@ sub catch_quit ($) {
     catch {
         if(isObject($@) and defined($@->{"message"})){
             $my_errmsg .= ": " . ref($@) . ": " . $@->{"message"};
-        }
-        if($!) {
+        } elsif($!) {
             $my_errmsg .= ": $!";
-            chomp $my_errmsg;
-        }
-        if($@ and not isObject($@)) {
+        } elsif($@ and not isObject($@)) {
             $my_errmsg .= ": $@";
-            chomp $my_errmsg;
         }
+        chomp $my_errmsg;
+        #$my_errmsg =~ s/ $filename_regex line \d+\.$//;
         quit "CRITICAL", $my_errmsg;
     };
     return 1;
