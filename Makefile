@@ -89,5 +89,9 @@ update:
 	git pull
 	make
 
+.PHONY: update
+update2:
+	git pull
+
 tld:
 	wget -O resources/tlds-alpha-by-domain.txt http://data.iana.org/TLD/tlds-alpha-by-domain.txt
