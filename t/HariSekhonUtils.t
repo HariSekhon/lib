@@ -440,6 +440,8 @@ is(validate_database_viewname("default.myTable", "Hive", "allow qualified"), "de
 
 ok(validate_database_query_select_show("select * from myTable"));
 ok(validate_database_query_select_show("select count(*) from db.MyTable"));
+ok(validate_database_query_select_show("select count(*) from db.created_date"));
+ok(validate_database_query_select_show("select count(*) from product_updates"));
 
 # ============================================================================ #
 is(isDirname("test_Dir"),  "test_Dir",  "isDirname(test_Dir)");

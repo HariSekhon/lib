@@ -70,7 +70,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.17.2";
+our $VERSION = "1.17.3";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -3302,7 +3302,7 @@ sub validate_database_query_select_show ($;$) {
     #debug("regex validating query: $query");
     $query =~ /^\s*((?:SHOW|SELECT)\s+.+)$/i || usage "invalid ${name}query defined: may only be a SELECT or SHOW statement";
     $query = $1;
-    $query =~ /insert|update|delete|create|drop|alter|truncate/i and usage "invalid ${name}query defined: found DML statement keywords!";
+    $query =~ /\b(?:insert|update|delete|create|drop|alter|truncate)\b/i and usage "invalid ${name}query defined: found DML statement keywords!";
     # this trips up users who put ; at the end of their query and doesn't offer that much protection anyway since DML is already checked for and it may be convenient to comment out end of query for testing
     #$query =~ /;|--/i and usage "invalid ${name}query defined: suspect chars ';' or '--' detected in query!";
     $query =~ /;/ and usage "invalid ${name}query defined: you may not add semi-colons to your queries, while it works on the command line, Nagios ends up choking by prematurely terminating the check command resulting in a null shell error before this plugin executes so the error handlers in this code do not have any chance to catch it";
