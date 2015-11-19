@@ -70,7 +70,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.17.3";
+our $VERSION = "1.17.4";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2272,10 +2272,10 @@ sub isNoSqlKey ($) {
 }
 
 
-#sub isObject ($) {
-#    my $object = shift;
-#    return blessed($object);
-#}
+sub isObject ($) {
+    my $object = shift;
+    return blessed($object);
+}
 
 
 sub isPathQualified($){
