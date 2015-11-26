@@ -334,9 +334,9 @@ sub list_users(;$){
         foreach(sort keys %users){
             print $_;
             if($verbose){
-                if(defined(@roles)){
+                if(@roles){
                     print " [roles: ";
-                } elsif(defined(@groups)){
+                } elsif(@groups){
                     print " [groups: ";
                 } else {
                     code_error("could not find Ambari roles or groups, caught late. $nagios_plugins_support_msg_api");
