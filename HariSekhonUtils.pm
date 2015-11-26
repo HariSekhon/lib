@@ -70,7 +70,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.17.4";
+our $VERSION = "1.17.5";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -294,6 +294,7 @@ our %EXPORT_TAGS = (
                         random_alnum
                         rstrip
                         rtrim
+                        strBool
                         strip
                         trim
                         trim_float
@@ -2935,6 +2936,16 @@ sub skip_java_output($){
     }
     return 0;
 }
+
+
+sub strBool($){
+    my $str = shift;
+    # " " returns true otherwise
+    $str = strip($str);
+    return "false" if $str =~ /false/i;
+    ( $str ? "true" : "false" );
+}
+
 
 sub strip ($) {
     my $string = shift;

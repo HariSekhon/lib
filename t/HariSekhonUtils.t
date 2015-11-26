@@ -1031,6 +1031,20 @@ is(set_timeout(10),     0,      "set_timeout(10) eq 0");
 is(set_timeout(10),     10,     "set_timeout(10) eq 10");
 
 # ============================================================================ #
+
+is(strBool("true"), "true", 'strBool("true") => true');
+is(strBool("True"), "true", 'strBool("True") => true');
+is(strBool("tRuE"), "true", 'strBool(tRuE) => true');
+is(strBool(1), "true", 'strBool(1) => true');
+is(strBool(-1), "true", 'strBool(-1) => true');
+is(strBool(0), "false", 'strBool(0) => false');
+is(strBool("false"), "false", 'strBool(false) => false');
+is(strBool("False"), "false", 'strBool(False) => false');
+is(strBool("fAlSe"), "false", 'strBool(FAlSe) => false');
+is(strBool(" "), "false", 'strBool(" ") => false');
+is(strBool(""), "false", 'strBool("") => false');
+
+# ============================================================================ #
 is(strip(" \t \n ha ri \t \n"),     "ha ri",   'strip()');
 is(trim(" \t \n ha ri \t \n"),      "ha ri",   'trim()');
 
