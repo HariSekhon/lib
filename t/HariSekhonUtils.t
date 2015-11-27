@@ -804,6 +804,9 @@ is(validate_process_name("sh <defunct>"),       "sh <defunct>",         'validat
 
 # ============================================================================ #
 ok(isPythonTraceback('  File "/var/lib/ambari-server/resources/scripts/stack_advisor.py", line 154, in <module>'), 'isPythonTraceback(  File "/var/lib/ambari-server/resources/scripts/stack_advisor.py", line 154, in <module>)');
+ok(isPythonTraceback('File "/var/lib/ambari-server/resources/scripts/stack_advisor.py", line 154, in <module>'), 'isPythonTraceback(File "/var/lib/ambari-server/resources/scripts/stack_advisor.py", line 154, in <module>)');
+ok(isPythonTraceback('  File "/var/lib/ambari-agent/cache/common-services/RANGER/0.4.0/package/scripts/ranger_admin.py", line 124, in <module>'), 'isPythonTraceback(  File "/var/lib/ambari-agent/cache/common-services/RANGER/0.4.0/package/scripts/ranger_admin.py", line 124, in <module>)');
+ok(isPythonTraceback('File "/var/lib/ambari-agent/cache/common-services/RANGER/0.4.0/package/scripts/ranger_admin.py", line 124, in <module>'), 'isPythonTraceback(File "/var/lib/ambari-agent/cache/common-services/RANGER/0.4.0/package/scripts/ranger_admin.py", line 124, in <module>)');
 ok(isPythonTraceback('... Traceback (most recent call last):'), 'isPythonTraceback("... Traceback (most recent call last):")');
 ok(!isPythonTraceback('blah'), 'isPythonTraceback("blah")');
 
