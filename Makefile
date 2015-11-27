@@ -22,8 +22,8 @@ endif
 
 .PHONY: make
 make:
-	[ -x /usr/bin/apt-get ] && make apt-packages || :
-	[ -x /usr/bin/yum ]     && make yum-packages || :
+	[ -x /usr/bin/apt-get ] && make apt-packages
+	[ -x /usr/bin/yum ]     && make yum-packages
 
 	git update-index --assume-unchanged resources/custom_tlds.txt
 
@@ -57,23 +57,23 @@ make:
 		Time::HiRes \
 		XML::SAX \
 		XML::Simple \
-		; echo
+		;
 
 .PHONY: apt-packages
 apt-packages:
-	$(SUDO) apt-get install -y gcc || :
+	$(SUDO) apt-get install -y gcc
 	# needed to fetch the library submodule at end of build
-	$(SUDO) apt-get install -y build-essential libwww-perl git || :
+	$(SUDO) apt-get install -y build-essential libwww-perl git
 	# for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
-	$(SUDO) apt-get install -y libdbd-mysql-perl libmysqlclient-dev || :
+	$(SUDO) apt-get install -y libdbd-mysql-perl libmysqlclient-dev
 	# needed to build XML::Simple dep XML::Parser
-	$(SUDO) apt-get install -y libexpat1-dev || :
+	$(SUDO) apt-get install -y libexpat1-dev
 
 .PHONY: yum-packages
 yum-packages:
-	rpm -q gcc perl-CPAN perl-libwww-perl git || $(SUDO) yum install -y gcc perl-CPAN perl-libwww-perl git || :
+	rpm -q gcc perl-CPAN perl-libwww-perl git || $(SUDO) yum install -y gcc perl-CPAN perl-libwww-perl git
 	# for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
-	rpm -q perl-DBD-MySQL mysql-devel || $(SUDO) yum install -y perl-DBD-MySQL mysql-devel || :
+	rpm -q perl-DBD-MySQL mysql-devel || $(SUDO) yum install -y perl-DBD-MySQL mysql-devel
 	# needed to build XML::Simple dep XML::Parser
 	rpm -q expat-devel || $(SUDO) yum install -y expat-devel
 
