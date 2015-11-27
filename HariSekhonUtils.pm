@@ -2,7 +2,7 @@
 #  Author: Hari Sekhon
 #  Date: 2011-09-15 11:30:24 +0100 (Thu, 15 Sep 2011)
 #
-#  http://github.com/harisekhon/lib
+#  https://github.com/harisekhon/lib
 #
 #  License: see accompanying LICENSE file
 #
@@ -294,6 +294,7 @@ our %EXPORT_TAGS = (
                         random_alnum
                         rstrip
                         rtrim
+                        strBool
                         strip
                         trim
                         trim_float
@@ -2935,6 +2936,16 @@ sub skip_java_output($){
     }
     return 0;
 }
+
+
+sub strBool($){
+    my $str = shift;
+    # " " returns true otherwise
+    $str = strip($str);
+    return "false" if $str =~ /false/i;
+    ( $str ? "true" : "false" );
+}
+
 
 sub strip ($) {
     my $string = shift;

@@ -2,7 +2,7 @@
 #  Author: Hari Sekhon
 #  Date: 2013-01-06 01:25:55 +0000 (Sun, 06 Jan 2013)
 #
-#  http://github.com/harisekhon/lib
+#  https://github.com/harisekhon/lib
 #
 #  License: see accompanying LICENSE file
 #
@@ -1032,6 +1032,20 @@ ok(remove_timeout(), 'remove_timeout()');
 # This is because the previous timer remaining time was 0
 is(set_timeout(10),     0,      "set_timeout(10) eq 0");
 is(set_timeout(10),     10,     "set_timeout(10) eq 10");
+
+# ============================================================================ #
+
+is(strBool("true"), "true", 'strBool("true") => true');
+is(strBool("True"), "true", 'strBool("True") => true');
+is(strBool("tRuE"), "true", 'strBool(tRuE) => true');
+is(strBool(1), "true", 'strBool(1) => true');
+is(strBool(-1), "true", 'strBool(-1) => true');
+is(strBool(0), "false", 'strBool(0) => false');
+is(strBool("false"), "false", 'strBool(false) => false');
+is(strBool("False"), "false", 'strBool(False) => false');
+is(strBool("fAlSe"), "false", 'strBool(FAlSe) => false');
+is(strBool(" "), "false", 'strBool(" ") => false');
+is(strBool(""), "false", 'strBool("") => false');
 
 # ============================================================================ #
 is(strip(" \t \n ha ri \t \n"),     "ha ri",   'strip()');

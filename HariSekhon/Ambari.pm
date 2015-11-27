@@ -2,7 +2,7 @@
 #  Author: Hari Sekhon
 #  Date: 2014-07-27 15:20:09 +0100 (Sun, 27 Jul 2014)
 #
-#  http://github.com/harisekhon/lib
+#  https://github.com/harisekhon/lib
 #
 #  License: see accompanying LICENSE file
 #  
@@ -13,7 +13,7 @@
 
 package HariSekhon::Ambari;
 
-$VERSION = "0.3.1";
+$VERSION = "0.4.0";
 
 use strict;
 use warnings;
@@ -313,15 +313,40 @@ sub list_users(;$){
     $json = curl_ambari "$url_prefix/users?fields=*";
     my %users;
     my $user;
+    # older Ambari called it roles
+    my @roles;
+    # newer Ambari 2.1.0 calls it groups
+    my @groups;
     foreach(get_field_array("items")){
-        @users{get_field2($_, "Users.user_name")} = get_field2_array($_, "Users.roles");
+        #@users{get_field2($_, "Users.user_name")} = get_field2_array($_, "Users.roles");
+        if(defined($_->{"Users"}->{"roles"})){
+            @roles = get_field2_array($_, "Users.roles");
+            @users{get_field2($_, "Users.user_name")} = @roles;
+        } elsif(defined($_->{"Users"}->{"groups"})){
+            @groups = get_field2_array($_, "Users.groups");
+            @users{get_field2($_, "Users.user_name")} = @groups;
+        } else {
+            code_error("could not find Users.roles or Users.groups. $nagios_plugins_support_msg_api");
+        }
     }
     if($quit){
         print "Ambari users:\n\n";
         foreach(sort keys %users){
             print $_;
             if($verbose){
-                print " [roles: " . join(",", $users{$_}) . "]";
+                if(@roles){
+                    print " [roles: ";
+                } elsif(@groups){
+                    print " [groups: ";
+                } else {
+                    code_error("could not find Ambari roles or groups, caught late. $nagios_plugins_support_msg_api");
+                }
+                if($users{$_}){
+                    print join(",", $users{$_})
+                } else {
+                    print "<none>";
+                }
+                print "]";
             }
             print "\n";
         }
