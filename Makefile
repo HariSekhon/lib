@@ -64,7 +64,6 @@ make:
 apt-packages:
 	# being old-skool I still used apt-get but it can't install build-essential due to dep conflicts trying to install newer gcc/g++, aptitude holds the packages back and works
 	$(SUDO) apt-get install -y aptitude
-	$(SUDO) aptitude install -y gcc
 	# needed to fetch the library submodule at end of build
 	$(SUDO) aptitude install -y build-essential libwww-perl git
 	# for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
