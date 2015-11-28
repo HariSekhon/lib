@@ -22,8 +22,8 @@ endif
 
 .PHONY: make
 make:
-	[ -x /usr/bin/apt-get ] && make apt-packages
-	[ -x /usr/bin/yum ]     && make yum-packages
+	[ -x /usr/bin/apt-get ] && make apt-packages || :
+	[ -x /usr/bin/yum ]     && make yum-packages || :
 
 	git update-index --assume-unchanged resources/custom_tlds.txt
 
