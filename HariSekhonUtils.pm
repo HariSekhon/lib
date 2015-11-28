@@ -3368,7 +3368,8 @@ sub validate_domain ($;$) {
     $name .= " " if $name;
     defined($domain) || usage "${name}domain name not defined";
     # don't print the domain as it gets reset to undef and results in "Use of uninitialized value $domain in concatenation (.) or string"
-    $domain = isDomain($domain) or usage "invalid ${name}domain name defined";
+    my $domain2 = $domain;
+    $domain = isDomain($domain) or usage "invalid ${name}domain name '$domain2' defined";
     vlog_option("${name}domain", $domain);
     return $domain;
 }
@@ -3442,7 +3443,8 @@ sub validate_fqdn ($;$) {
     my $name = shift || "";
     $name .= " " if $name;
     defined($fqdn) || usage "${name}FQDN not defined";
-    $fqdn = isFqdn($fqdn) || usage "invalid ${name}FQDN defined";
+    my $fqdn2 = $fqdn;
+    $fqdn = isFqdn($fqdn) || usage "invalid ${name}FQDN '$fqdn' defined";
     vlog_option("${name}fqdn", $fqdn);
     return $fqdn
 }
