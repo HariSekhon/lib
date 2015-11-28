@@ -52,6 +52,7 @@ make:
 		Redis \
 		Readonly \
 		Readonly::XS \
+		Sys::Syslog \
 		Term::ReadKey \
 		Thrift \
 		Time::HiRes \
