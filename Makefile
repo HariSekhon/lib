@@ -62,7 +62,7 @@ make:
 	# the backdated version might not be the perfect version, found by digging around in the git repo
 	$(SUDO2) cpanm Redis || $(SUDO2) cpanm DAMS/Redis-1.976
 	@echo
-	@echo BUILD SUCCESSFUL (lib)
+	@echo "BUILD SUCCESSFUL (lib)"
 
 
 .PHONY: apt-packages
