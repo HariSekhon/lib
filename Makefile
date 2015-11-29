@@ -49,7 +49,6 @@ make:
 		Net::DNS \
 		Net::SSH::Expect \
 		Net::SSL \
-		Redis \
 		Readonly \
 		Readonly::XS \
 		Sys::Syslog \
@@ -59,6 +58,12 @@ make:
 		XML::SAX \
 		XML::Simple \
 		;
+	# newer versions of the Redis module require Perl >= 5.10, this will install the older compatible version for RHEL5/CentOS5 servers still running Perl 5.8 if the latest module fails
+	# the backdated version might not be the perfect version, found by digging around in the git repo
+	$(SUDO2) cpanm Redis || $(SUDO2) cpanm DAMS/Redis-1.976
+	@echo
+	@echo BUILD SUCCESSFUL (lib)
+
 
 .PHONY: apt-packages
 apt-packages:
@@ -78,18 +83,22 @@ yum-packages:
 	# needed to build XML::Simple dep XML::Parser
 	rpm -q expat-devel || $(SUDO) yum install -y expat-devel
 
+
 .PHONY: test
 test:
 	PERL5LIB=$(PERLBREW_ROOT) PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -lrsv --timer t
+
 
 .PHONY: install
 install:
 	@echo "No installation needed, just add '$(PWD)' to your \$$PATH"
 
+
 .PHONY: update
 update:
 	git pull
 	make
+
 
 .PHONY: update
 update2:
