@@ -665,6 +665,7 @@ our $aws_secret_key_regex = '(?<![A-Za-z0-9/+=])[A-Za-z0-9/+=]{40}(?![A-Za-z0-9/
 our $domain_regex       = '(?:' . $domain_component . '\.)*' . $tld_regex;
 our $domain_regex2      = '(?:' . $domain_component . '\.)+' . $tld_regex;
 our $domain_regex_strict = $domain_regex2;
+# must permit numbers as valid host identifiers that are being used in the wild in FQDNs
 our $hostname_component = '\b[A-Za-z0-9](?:[A-Za-z0-9_\-]{0,61}[a-zA-Z0-9])?\b';
 our $aws_host_component = 'ip-(?:10-\d+-\d+-\d+|172-1[6-9]-\d+-\d+|172-2[0-9]-\d+-\d+|172-3[0-1]-\d+-\d+|192-168-\d+-\d+)';
 our $hostname_regex     = "$hostname_component(?:\.$domain_regex)?";
