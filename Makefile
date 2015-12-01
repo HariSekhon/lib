@@ -7,8 +7,10 @@
 
 ifdef TRAVIS
 	SUDO2 =
+	CPANM = cpanm
 else
 	SUDO2 = sudo
+	CPANM = /usr/local/bin/cpanm
 endif
 
 # EUID /  UID not exported in Make
@@ -29,7 +31,7 @@ make:
 
 	# order here is important, in Travis and some stripped down client some deps are not pulled in automatically but are required for subsequent module builds
 	yes "" | $(SUDO2) cpan App::cpanminus
-	yes "" | $(SUDO2) cpanm --notest \
+	yes "" | $(SUDO2) $(CPANM) --notest \
 		YAML \
 		Data::Dumper \
 		Devel::Cover::Report::Coveralls \
@@ -60,7 +62,7 @@ make:
 		;
 	# newer versions of the Redis module require Perl >= 5.10, this will install the older compatible version for RHEL5/CentOS5 servers still running Perl 5.8 if the latest module fails
 	# the backdated version might not be the perfect version, found by digging around in the git repo
-	$(SUDO2) cpanm Redis || $(SUDO2) cpanm DAMS/Redis-1.976.tar.gz
+	$(SUDO2) $(CPANM) Redis || $(SUDO2) $(CPANM) DAMS/Redis-1.976.tar.gz
 	@echo
 	@echo "BUILD SUCCESSFUL (lib)"
 
