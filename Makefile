@@ -28,8 +28,8 @@ make:
 	git update-index --assume-unchanged resources/custom_tlds.txt
 
 	# order here is important, in Travis and some stripped down client some deps are not pulled in automatically but are required for subsequent module builds
-	yes "" | $(SUDO2) cpan App::cpanminus
-	yes "" | $(SUDO2) cpanm --notest \
+	yes "" | $(SUDO2) /usr/bin/cpan App::cpanminus
+	yes "" | $(SUDO2) /usr/local/bin/cpanm --notest \
 		YAML \
 		Data::Dumper \
 		Devel::Cover::Report::Coveralls \
