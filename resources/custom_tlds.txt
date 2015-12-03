@@ -18,3 +18,4 @@ localdomain
 intra
 intranet
 internal
+vm
