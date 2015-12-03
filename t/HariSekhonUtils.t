@@ -562,7 +562,9 @@ is(validate_fqdn("www.harisekhon.com"),     "www.harisekhon.com",      'validate
 is(validate_fqdn("myhost.local"),         "myhost.local",          'validate_fqdn("myhost.local")');
 
 # ============================================================================ #
-ok(isHash({ "one" => 1 }), "isHash()");
+ok(isHash({ "one" => 1 }), "isHash({one=>1})");
+ok(isHash({}), "isHash({})");
+ok(!isHash(\{}), "isHash(\\{})");
 ok(!isHash("one"),   "!isHash(one)");
 ok(!isHash(1),       "!isHash(1)");
 
@@ -666,11 +668,19 @@ is(validate_ip("10.10.10.255"),      "10.10.10.255",     'validate_ip("10.10.10.
 is(validate_ip("255.255.255.254"),   "255.255.255.254",  'validate_ip("255.255.255.254")');
 
 # ============================================================================ #
+is(isJavaBean("java.lang:type=Memory"), "java.lang:type=Memory", 'isJavaBean("java.lang:type=Memory") eq java.lang:type=Memory');
+is(isJavaBean("1hari"),                 undef,                   'isJavaBean("1hari") eq undef');
+
+is(validate_java_bean("java.lang:type=Memory"), "java.lang:type=Memory", 'validate_java_bean(java.lang:type=Memory) eq java.lang:type=Memory');
+#is(validate_java_bean("hari:"), undef, 'validate_java_bean("hari:") eq undef');
+
+# ============================================================================ #
 ok(isJavaException("        at org.apache.ambari.server.api.services.stackadvisor.StackAdvisorRunner.runScript(StackAdvisorRunner.java:96)"), 'isJavaException(" at org.apache.ambari.server...."');
-ok(!isJavaException("blah"), '!isJavaException("blah"');
+ok(!isJavaException("blah"), '!isJavaException("blah")');
 
 # ============================================================================ #
 ok(isJson('{ "test": "data" }'),   'isJson({ "test": "data" })');
+ok(isJson('{}'),   'isJson({})');
 ok(!isJson(' { "test": }'),        '!isJson({ "test": })');
 
 # ============================================================================ #
@@ -829,10 +839,10 @@ is(validate_regex('somePosix[Rr]egex.*`evilcmd`', undef, "noquit", "posix"),    
 is(validate_regex('somePosix[Rr]egex.*`evilcmd', undef, "noquit", "posix"),         undef,       'validate_regex("somePosix[Rr]egex.*`evilcmd", undef, 1, 1) eq undef');
 
 # ============================================================================ #
+ok(!isScalar(1),                '!isScalar(1)');
 ok(isScalar(\$status),          'isScalar(\$status)');
 ok(!isScalar(\@usage_order),    '!isScalar(\@usage_order)');
 ok(!isScalar(\%ERRORS),         '!isScalar(\%ERRORS)');
-ok(!isScalar(1),                '!isScalar(1)');
 
 # ============================================================================ #
 is(isScientific("1.2345E10"),   "1.2345E10",    'isScientific(1.2345E10)');
@@ -1074,6 +1084,9 @@ is(int(timecomponents2days($time_parts[0], $time_parts[1], $time_parts[2], $time
 #is(timecomponents2days($time_parts[0], $time_parts[1], $time_parts[2], $time_parts[3], $time_parts[4], $time_parts[5] + 1),    1/86400,  'timecomponents2days');
 
 # ============================================================================ #
+
+is_deeply([sort_insensitive(("one", "Two", "three", "", "one"))],     [ "", "one", "one", "three", "Two" ],    'sort_insensitive()');
+
 is_deeply([uniq_array(("one", "two", "three", "", "one"))],     [ "", "one", "three", "two" ],    'uniq_array()');
 is_deeply([uniq_array2(("one", "two", "three", "", "one"))],     [ "one", "two", "three", "" ],    'uniq_array2()');
 is_deeply([uniq_array_ordered(("one", "two", "three", "", "one"))],     [ "one", "two", "three", "" ],    'uniq_array_ordered()');

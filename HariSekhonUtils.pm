@@ -70,7 +70,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.17.5";
+our $VERSION = "1.17.6";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -100,6 +100,7 @@ our %EXPORT_TAGS = (
                         get_field2_hash
                         get_field2_int
                         inArray
+                        sort_insensitive
                         uniq_array
                         uniq_array2
                         uniq_array_ordered
@@ -151,6 +152,7 @@ our %EXPORT_TAGS = (
                         isInt
                         isInterface
                         isKrb5Princ
+                        isJavaBean
                         isJavaException
                         isJson
                         isLabel
@@ -158,7 +160,7 @@ our %EXPORT_TAGS = (
                         isLinux
                         isLinuxOrMac
                         isMac
-			isMinVersion
+                        isMinVersion
                         isNagiosUnit
                         isNoSqlKey
                         isObject
@@ -346,6 +348,7 @@ our %EXPORT_TAGS = (
                         validate_integer
                         validate_interface
                         validate_ip
+                        validate_java_bean
                         validate_krb5_princ
                         validate_krb5_realm
                         validate_label
@@ -2125,6 +2128,14 @@ sub isIP ($) {
     return $ip;
 }
 
+
+sub isJavaBean ($) {
+    my $string = shift;
+    $string =~ /^([A-Za-z][A-Za-z0-9\.:=_-]+[A-Za-z])$/ or return undef;
+    return $1;
+}
+
+
 sub isJavaException ($) {
     my $string = shift;
     if($string =~ /(?:^\s+at|^Caused by:)\s+\w+(?:\.\w+)+/){
@@ -2341,11 +2352,17 @@ sub isRef ($;$) {
 
 
 sub isScalar ($;$) {
-    my $isScalar = ref $_[0] eq "SCALAR";
-    if($_[1]){
-        unless($isScalar){
-            code_error "non scalar reference passed";
-        }
+    my $arg  = shift;
+    my $quit = shift;
+    my $ref = ref $arg;
+    my $isScalar = 0;
+    # needs more testing and thought before I can enable this
+    #if(not $ref or $ref eq "SCALAR" or $ref eq "JSON::PP::Boolean"){
+    if($ref eq "SCALAR"){
+        $isScalar = 1;
+    }
+    if($quit and !$isScalar){
+        code_error "non scalar reference passed";
     }
     return $isScalar;
 }
@@ -3021,11 +3038,19 @@ sub trim_float ($) {
 #}
 
 
+sub sort_insensitive (@) {
+    my @array = @_; # or code_error "no arg passed to sort_insensitive()";
+    isArray(\@array) or code_error "sort_insensitive() was passed a non-array";
+    scalar @array or code_error "sort_insensitive() was passed an empty array";
+    return sort { "\L$a" cmp "\L$b" } @array;
+}
+
+
 sub uniq_array (@) {
     my @array = @_; # or code_error "no arg passed to uniq_array";
     isArray(\@array) or code_error "uniq_array was passed a non-array";
     scalar @array or code_error "uniq_array was passed an empty array";
-    return ( sort keys %{{ map { $_ => 1 } @array }} );
+    return sort keys %{{ map { $_ => 1 } @array }};
 }
 
 
@@ -3561,6 +3586,17 @@ sub validate_ip ($;$) {
     $ip = isIP($ip) || usage "invalid ${name}IP defined";
     vlog_option("${name}IP", $ip);
     return $ip;
+}
+
+
+sub validate_java_bean ($;$) {
+    my $bean = shift;
+    my $name = shift || "";
+    $name .= " " if $name;
+    defined($bean) or usage "java bean not defined";
+    $bean = isJavaBean($bean) || usage "invalid ${name}java bean defined";
+    vlog_option("${name}java bean", $bean);
+    return $bean;
 }
 
 
