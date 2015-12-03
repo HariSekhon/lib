@@ -669,6 +669,7 @@ is(validate_ip("255.255.255.254"),   "255.255.255.254",  'validate_ip("255.255.2
 
 # ============================================================================ #
 is(isJavaBean("java.lang:type=Memory"), "java.lang:type=Memory", 'isJavaBean("java.lang:type=Memory") eq java.lang:type=Memory');
+is(isJavaBean("Hadoop:service=NameNode,name=FSNamesystem"), "Hadoop:service=NameNode,name=FSNamesystem", 'isJavaBean("Hadoop:service=NameNode,name=FSNamesystem") eq Hadoop:service=NameNode,name=FSNamesystem');
 is(isJavaBean("1hari"),                 undef,                   'isJavaBean("1hari") eq undef');
 
 is(validate_java_bean("java.lang:type=Memory"), "java.lang:type=Memory", 'validate_java_bean(java.lang:type=Memory) eq java.lang:type=Memory');
