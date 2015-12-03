@@ -2131,7 +2131,7 @@ sub isIP ($) {
 
 sub isJavaBean ($) {
     my $string = shift;
-    $string =~ /^([A-Za-z][A-Za-z0-9.,:=_-]+[A-Za-z])$/ or return undef;
+    $string =~ /^([A-Za-z][A-Za-z0-9.,:=_-]+[A-Za-z0-9])$/ or return undef;
     return $1;
 }
 

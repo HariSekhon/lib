@@ -670,6 +670,7 @@ is(validate_ip("255.255.255.254"),   "255.255.255.254",  'validate_ip("255.255.2
 # ============================================================================ #
 is(isJavaBean("java.lang:type=Memory"), "java.lang:type=Memory", 'isJavaBean("java.lang:type=Memory") eq java.lang:type=Memory');
 is(isJavaBean("Hadoop:service=NameNode,name=FSNamesystem"), "Hadoop:service=NameNode,name=FSNamesystem", 'isJavaBean("Hadoop:service=NameNode,name=FSNamesystem") eq Hadoop:service=NameNode,name=FSNamesystem');
+is(isJavaBean("Hadoop:service=DataNode,name=DataNodeActivity-sandbox.hortonworks.com-50010"), "Hadoop:service=DataNode,name=DataNodeActivity-sandbox.hortonworks.com-50010", 'isJavaBean("Hadoop:service=DataNode,name=DataNodeActivity-sandbox.hortonworks.com-50010") eq Hadoop:service=DataNode,name=DataNodeActivity-sandbox.hortonworks.com-50010 ');
 is(isJavaBean("1hari"),                 undef,                   'isJavaBean("1hari") eq undef');
 
 is(validate_java_bean("java.lang:type=Memory"), "java.lang:type=Memory", 'validate_java_bean(java.lang:type=Memory) eq java.lang:type=Memory');
