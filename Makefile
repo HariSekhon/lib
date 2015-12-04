@@ -72,6 +72,8 @@ apt-packages:
 	$(SUDO) apt-get update
 	# needed to fetch the library submodule at end of build
 	$(SUDO) apt-get install -y build-essential libwww-perl git
+	# needed to build Net::SSLeay for IO::Socket::SSL for Net::LDAPS
+	$(SUDO) apt-get install -y libssl-dev libsasl2-dev
 	# for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
 	$(SUDO) apt-get install -y libdbd-mysql-perl libmysqlclient-dev
 	# needed to build XML::Simple dep XML::Parser
