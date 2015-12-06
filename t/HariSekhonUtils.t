@@ -1044,6 +1044,7 @@ ok(remove_timeout(), 'remove_timeout()');
 # This is because the previous timer remaining time was 0
 is(set_timeout(10),     0,      "set_timeout(10) eq 0");
 is(set_timeout(10),     10,     "set_timeout(10) eq 10");
+ok(remove_timeout(), 'remove_timeout()');
 
 # ============================================================================ #
 
