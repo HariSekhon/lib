@@ -75,7 +75,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.17.7";
+our $VERSION = "1.17.8";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -487,20 +487,22 @@ $EXPORT_TAGS{'most'}        = [ @EXPORT     ];
 $EXPORT_TAGS{'EXPORT_OK'}   = [ @EXPORT_OK  ];
 $EXPORT_TAGS{'EXPORT'}      = [ @EXPORT     ];
 
-# This now needs to be before BEGIN{} so we can reference it in die_sub()
-#
-# Std Nagios Exit Codes. Not using weak nagios utils.pm. Also improves portability to not rely on it being present
-our %ERRORS = (
-    "OK"        => 0,
-    "WARNING"   => 1,
-    "CRITICAL"  => 2,
-    "UNKNOWN"   => 3,
-    "DEPENDENT" => 4
-);
-
 our $status_prefix = "";
 
+our %ERRORS;
+
 BEGIN {
+    # needs to be before die_sub(), otherwise could get 'Use of uninitialized value $HariSekhonUtils::ERRORS{"CRITICAL"} in exit' and exit with blank / 0 incorrect error code on early stage failures such as 'This Perl not built to support threads'
+    #
+    # Std Nagios Exit Codes. Not using weak nagios utils.pm. Also improves portability to not rely on it being present
+    %ERRORS = (
+        "OK"        => 0,
+        "WARNING"   => 1,
+        "CRITICAL"  => 2,
+        "UNKNOWN"   => 3,
+        "DEPENDENT" => 4
+    );
+
     delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
     $ENV{'PATH'} = '/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin';
 
