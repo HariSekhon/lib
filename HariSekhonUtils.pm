@@ -52,12 +52,16 @@
 package HariSekhonUtils;
 use warnings;
 use strict;
+# fixes 'Can't locate object method "tid" via package "threads" at /usr/lib64/perl5/XSLoader.pm line 94.' caused by http_proxy/https_proxy environment variables
+use threads;
 use 5.006_001;
 use Carp;
 use Cwd 'abs_path';
 use Fcntl ':flock';
 use File::Basename;
 use Getopt::Long qw(:config bundling);
+# fixes 'Can't locate object method "flush" via package "IO::Handle" at /usr/local/share/perl5/LWP/UserAgent.pm line 536.' in -D/--debug mode
+use IO::Handle;
 use POSIX;
 use JSON 'decode_json';
 use Scalar::Util 'blessed';
@@ -70,7 +74,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.17.6";
+our $VERSION = "1.17.7";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1400,6 +1404,7 @@ sub curl ($;$$$$$$) {
     #}
     defined_main_ua();
     $main::ua->show_progress(1) if $debug;
+    $main::ua->env_proxy;
     my $req = HTTP::Request->new($type, $url);
     # Doesn't work
     #$ua->credentials($host, '', $user, $password);
