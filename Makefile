@@ -5,7 +5,7 @@
 
 # Library dependencies are handled in one place in calling project
 
-ifdef TRAVIS
+ifdef PERLBREW_PERL
 	SUDO2 =
 	CPANM = cpanm
 else
