@@ -52,9 +52,13 @@
 package HariSekhonUtils;
 use warnings;
 use strict;
-# fixes 'Can't locate object method "tid" via package "threads" at /usr/lib64/perl5/XSLoader.pm line 94.' caused by http_proxy/https_proxy environment variables
+# fixes 'Can't locate object method "tid" via package "threads" at /usr/lib64/perl5/XSLoader.pm line 94.' caused by http_proxy/https_proxy environment variables (LWP module)
 # eval'ing it for perls built without thread support (like Travis CI)
-eval 'use threads;';
+use Config;
+if($Config{usethreads}){
+    require threads;
+    import threads;
+}
 use 5.006_001;
 use Carp;
 use Cwd 'abs_path';
