@@ -9,7 +9,7 @@
 
 package HariSekhon::MapR;
 
-$VERSION = "0.5";
+$VERSION = "0.5.1";
 
 use strict;
 use warnings;
@@ -82,6 +82,7 @@ our %mapr_options = (
     "no-ssl"   =>  [ \$no_ssl,  "Don't use SSL, newer versions of MCS seem to only use SSL, use this only on older versions of MCS if you don't have SSL (you may need to also change the port to 8080 instead of 8443)" ],
 );
 delete $mapr_options{"S|ssl"};
+$mapr_options{"ssl-noverify"}[1] =~ s/\(.*//;
 
 our %mapr_option_cluster = (
     "C|cluster=s"   => [ \$cluster,       "Cluster Name as shown in MapR Control System (eg. \"my.cluster.com\", see --list-clusters, \$MAPR_CLUSTER, \$CLUSTER)" ],
