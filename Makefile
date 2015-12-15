@@ -30,6 +30,7 @@ make:
 	git update-index --assume-unchanged resources/custom_tlds.txt
 
 	# order here is important, in Travis and some stripped down client some deps are not pulled in automatically but are required for subsequent module builds
+	(echo y; echo o conf prerequisites_policy follow; echo o conf commit) | cpan
 	yes "" | $(SUDO2) cpan App::cpanminus
 	yes "" | $(SUDO2) $(CPANM) --notest \
 		YAML \
