@@ -13,7 +13,7 @@ perl:
   # latest Redis cpan module requires Perl >= 5.10
   #- "5.10"
   # there is workaround in build now to install older version if latest fails for RHEL5/CentOS5 servers
-  - "5.8"
+  #- "5.8"
 
 install:
   # "cpanm ." causes: No output has been received in the last 10 minutes, this potentially indicates a stalled build or something wrong with the build itself.
