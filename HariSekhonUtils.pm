@@ -79,7 +79,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.17.8";
+our $VERSION = "1.17.9";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -3092,6 +3092,13 @@ sub check_terminal_size(){
         $hchar   = 99999999;
         $wpixels = 99999999;
         $hpixels = 99999999;
+    }
+    # Travis gets suspiciously small width
+    if($wchar < 80){
+        $wchar = 80;
+    }
+    if($hchar < 25){
+        $hchar = 25;
     }
     1;
 }
