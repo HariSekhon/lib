@@ -5,12 +5,14 @@
 
 # Library dependencies are handled in one place in calling project
 
+export PATH := $(PATH):/usr/local/bin
+
+CPANM = cpanm
+
 ifdef PERLBREW_PERL
 	SUDO2 =
-	CPANM = cpanm
 else
 	SUDO2 = sudo
-	CPANM = /usr/local/bin/cpanm
 endif
 
 # EUID /  UID not exported in Make
@@ -24,6 +26,7 @@ endif
 
 .PHONY: make
 make:
+	echo $(PATH)
 	if [ -x /usr/bin/apt-get ]; then make apt-packages; fi
 	if [ -x /usr/bin/yum ];     then make yum-packages; fi
 
