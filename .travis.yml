@@ -16,13 +16,13 @@ perl:
   #- "5.8"
 
 # multi-OS is a beta feature
-os:
-  - linux
-  - osx
+#os:
+#  - linux
+#  - osx
 
-matrix:
-  allow_failures:
-  - os: osx
+#matrix:
+#  allow_failures:
+#  - os: osx
 
 install:
   # "cpanm ." causes: No output has been received in the last 10 minutes, this potentially indicates a stalled build or something wrong with the build itself.
