@@ -10,6 +10,7 @@ export PATH := $(PATH):/usr/local/bin
 CPANM = cpanm
 
 ifdef PERLBREW_PERL
+ifdef TRAVIS
 	SUDO2 =
 else
 	SUDO2 = sudo
