@@ -9,8 +9,7 @@ export PATH := $(PATH):/usr/local/bin
 
 CPANM = cpanm
 
-ifdef PERLBREW_PERL
-ifdef TRAVIS
+ifneq ("$(PERLBREW_PERL)$(TRAVIS)", "")
 	SUDO2 =
 else
 	SUDO2 = sudo
@@ -27,7 +26,6 @@ endif
 
 .PHONY: make
 make:
-	echo $(PATH)
 	if [ -x /usr/bin/apt-get ]; then make apt-packages; fi
 	if [ -x /usr/bin/yum ];     then make yum-packages; fi
 
