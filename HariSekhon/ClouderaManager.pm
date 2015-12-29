@@ -398,7 +398,7 @@ sub validate_cm_activity(){
 
 sub validate_cm_cluster(){
     defined($cluster) or usage "cluster not defined";
-    $cluster    =~ /^\s*([\w\s\.-]+)\s*$/ or usage "Invalid cluster name given, may only contain alphanumeric, space, dash, dots or underscores";
+    $cluster    =~ /^\s*([\w\s\%\.-]+)\s*$/ or usage "Invalid cluster name given, may only contain alphanumeric, space, dash, dots or underscores";
     $cluster = $1;
     vlog_option "cluster", $cluster;
     return $cluster;
