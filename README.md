@@ -1,4 +1,4 @@
-Hari Sekhon Perl Library [![Build Status](https://travis-ci.org/harisekhon/lib.svg?branch=master)](https://travis-ci.org/harisekhon/lib)
+Hari Sekhon Perl Library [![Build Status](https://travis-ci.org/HariSekhon/lib.svg?branch=master)](https://travis-ci.org/HariSekhon/lib)
 ========================
 
 My personal Perl library, full of lots of validation code and utility functions.
