@@ -129,3 +129,7 @@ update-no-recompile:
 
 tld:
 	wget -O resources/tlds-alpha-by-domain.txt http://data.iana.org/TLD/tlds-alpha-by-domain.txt
+
+.PHONY: clean
+clean:
+	@echo Nothing to clean
