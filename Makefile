@@ -95,7 +95,7 @@ yum-packages:
 .PHONY: test
 test:
 	PERL5LIB=$(PERLBREW_ROOT) PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -lrsv --timer t
-	bash-tools/travis.sh
+	bash-tools/all.sh
 
 
 .PHONY: install
@@ -105,8 +105,7 @@ install:
 
 .PHONY: update
 update:
-	git pull
-	git submodule update --remote
+	make update-no-recompile
 	make
 
 
@@ -117,6 +116,7 @@ update2:
 .PHONY: update-no-recompile
 update-no-recompile:
 	git pull
+	git submodule update --remote
 
 tld:
 	wget -O resources/tlds-alpha-by-domain.txt http://data.iana.org/TLD/tlds-alpha-by-domain.txt
