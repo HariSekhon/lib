@@ -77,17 +77,24 @@ make:
 apt-packages:
 	$(SUDO) apt-get update
 	# needed to fetch the library submodule at end of build
-	$(SUDO) apt-get install -y build-essential libwww-perl git
+	$(SUDO) apt-get install -y build-essential
+	$(SUDO) apt-get install -y libwww-perl
+	$(SUDO) apt-get install -y git
 	# needed to build Net::SSLeay for IO::Socket::SSL for Net::LDAPS
-	$(SUDO) apt-get install -y libssl-dev libsasl2-dev
+	$(SUDO) apt-get install -y libssl-dev
+	$(SUDO) apt-get install -y libsasl2-dev
 	# for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
-	$(SUDO) apt-get install -y libdbd-mysql-perl libmysqlclient-dev
+	$(SUDO) apt-get install -y libdbd-mysql-perl
+	$(SUDO) apt-get install -y libmysqlclient-dev
 	# needed to build XML::Simple dep XML::Parser
 	$(SUDO) apt-get install -y libexpat1-dev
 
 .PHONY: yum-packages
 yum-packages:
-	rpm -q gcc perl-CPAN perl-libwww-perl git || $(SUDO) yum install -y gcc perl-CPAN perl-libwww-perl git
+	rpm -q gcc || $(SUDO) yum install -y gcc
+	rpm -q perl-CPAN || $(SUDO) yum install -y perl-CPAN
+	rpm -q perl-libwww-perl || $(SUDO) yum install -y perl-libwww-perl
+	rpm -q git || $(SUDO) yum install -y git
 	# for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
 	rpm -q perl-DBD-MySQL mysql-devel || $(SUDO) yum install -y perl-DBD-MySQL mysql-devel
 	# needed to build XML::Simple dep XML::Parser
