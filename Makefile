@@ -25,7 +25,7 @@ else
 endif
 
 .PHONY: make
-make:
+build:
 	if [ -x /usr/bin/apt-get ]; then make apt-packages; fi
 	if [ -x /usr/bin/yum ];     then make yum-packages; fi
 
