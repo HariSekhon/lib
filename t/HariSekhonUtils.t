@@ -177,9 +177,9 @@ my $var2;
 is($var, undef, "\$var starts undef");
 is($var2, undef, "\$var2 starts undef");
 ok(env_var("HOSTNAME", \$var),   "env_var(HOSTNAME, \\\$var)");
-ok(env_vars(["SHELL","HOSTNAME"], \$var2),   "env_var(HOSTNAME, \\\$var)");
+ok(env_vars(["PWD", "HOSTNAME"], \$var2),   "env_vars([PWD,HOSTNAME], \\\$var2)");
 is($var,  $ENV{"HOSTNAME"}, "\$var eq \$ENV{HOSTNAME}");
-is($var2, $ENV{"SHELL"},    "\$var2 eq \$ENV{SHELL}");
+is($var2, $ENV{"PWD"},    "\$var2 eq \$ENV{PWD}");
 
 # ============================================================================ #
 ok(cmd("ps"), 'cmd("ps");');
