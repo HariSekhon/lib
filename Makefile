@@ -95,7 +95,7 @@ yum-packages:
 .PHONY: test
 test:
 	PERL5LIB=$(PERLBREW_ROOT) PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -lrsv --timer t
-	tests/travis.sh
+	bash-tools/travis.sh
 
 
 .PHONY: install
