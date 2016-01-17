@@ -109,8 +109,12 @@ update:
 	make
 
 
-.PHONY: update
+.PHONY: update2
 update2:
+	make update-no-recompile
+
+.PHONY: update-no-recompile
+update-no-recompile:
 	git pull
 
 tld:
