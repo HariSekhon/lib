@@ -116,7 +116,7 @@ update2:
 .PHONY: update-no-recompile
 update-no-recompile:
 	git pull
-	git submodule update --remote
+	git submodule update --remote --recursive
 
 tld:
 	wget -O resources/tlds-alpha-by-domain.txt http://data.iana.org/TLD/tlds-alpha-by-domain.txt
