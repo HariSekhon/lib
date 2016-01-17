@@ -29,6 +29,8 @@ make:
 	if [ -x /usr/bin/apt-get ]; then make apt-packages; fi
 	if [ -x /usr/bin/yum ];     then make yum-packages; fi
 
+	git submodule init
+	git submodule update --remote --recursive
 	git update-index --assume-unchanged resources/custom_tlds.txt
 
 	# order here is important, in Travis and some stripped down client some deps are not pulled in automatically but are required for subsequent module builds
