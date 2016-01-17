@@ -106,6 +106,7 @@ install:
 .PHONY: update
 update:
 	git pull
+	git submodule update --remote
 	make
 
 
