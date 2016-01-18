@@ -15,7 +15,7 @@ perl:
   # there is workaround in build now to install older version if latest fails for RHEL5/CentOS5 servers
   #- "5.8"
 
-sudo: true
+sudo: required
 
 notifications:
   email: false
