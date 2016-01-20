@@ -96,7 +96,8 @@ yum-packages:
 	rpm -q perl-libwww-perl || $(SUDO) yum install -y perl-libwww-perl
 	rpm -q git || $(SUDO) yum install -y git
 	# for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
-	rpm -q perl-DBD-MySQL mysql-devel || $(SUDO) yum install -y perl-DBD-MySQL mysql-devel
+	rpm -q mysql-devel || $(SUDO) yum install -y mysql-devel
+	rpm -q perl-DBD-MySQL || $(SUDO) yum install -y perl-DBD-MySQL
 	# needed to build XML::Simple dep XML::Parser
 	rpm -q expat-devel || $(SUDO) yum install -y expat-devel
 
