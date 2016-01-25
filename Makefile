@@ -30,7 +30,7 @@ build:
 	if [ -x /usr/bin/yum ];     then make yum-packages; fi
 
 	git submodule init
-	git submodule update --remote --recursive
+	git submodule update --recursive
 	git update-index --assume-unchanged resources/custom_tlds.txt
 
 	# order here is important, in Travis and some stripped down client some deps are not pulled in automatically but are required for subsequent module builds
@@ -126,7 +126,7 @@ update2:
 .PHONY: update-no-recompile
 update-no-recompile:
 	git pull
-	git submodule update --init --remote --recursive
+	git submodule update --init --recursive
 
 tld:
 	wget -O resources/tlds-alpha-by-domain.txt http://data.iana.org/TLD/tlds-alpha-by-domain.txt
