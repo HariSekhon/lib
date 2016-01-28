@@ -79,7 +79,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.17.9";
+our $VERSION = "1.18.0";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1738,6 +1738,21 @@ sub get_options {
 
     defined($help) and usage();
     defined($version) and version();
+
+    if(defined($ENV{"DEBUG"}) and $ENV{"DEBUG"}){
+        $debug = 1;
+    }
+
+    if(defined($ENV{"VERBOSE"}) and isInt($ENV{"VERBOSE"})){
+        my $env_verbose = $1;
+        if($env_verbose > $verbose){
+            $verbose = $env_verbose;
+            vlog3("environment variable \$VERBOSE = $env_verbose, increasing verbosity");
+        } else {
+            warn "environment variable \$VERBOSE is not an integer ('$env_verbose')";
+        }
+    }
+
     verbose_mode();
     #vlog2("options:\n");
     # validation is done on an option by option basis
