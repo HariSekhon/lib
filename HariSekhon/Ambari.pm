@@ -19,7 +19,7 @@ use strict;
 use warnings;
 BEGIN {
     use File::Basename;
-    use lib dirname(__FILE__) . "..";
+    use lib dirname(__FILE__) . "/..";
 }
 use HariSekhonUtils;
 use Carp;
