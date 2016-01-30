@@ -104,6 +104,8 @@ yum-packages:
 
 .PHONY: test
 test:
+	./find_uncovered_subs.sh
+	@echo; echo Running unit tests
 	PERL5LIB=$(PERLBREW_ROOT) PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -lrsv --timer t
 	bash-tools/all.sh
 	bash-tools/perl_syntax.sh HariSekhonUtils.pm
