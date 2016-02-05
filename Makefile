@@ -1,3 +1,4 @@
+#  vim:ts=4:sts=4:sw=4:noet
 #
 #  Author: Hari Sekhon
 #  Date: 2013-01-06 15:45:00 +0000 (Sun, 06 Jan 2013)
@@ -8,7 +9,7 @@
 #
 #  If you're using my code you're welcome to connect with me on LinkedIn and optionally send me feedback to help improve or steer this or other code I publish
 #
-#  http://www.linkedin.com/in/harisekhon
+#  https://www.linkedin.com/in/harisekhon
 #
 
 # Library dependencies are handled in one place in calling project
