@@ -9,7 +9,7 @@
 
 package HariSekhon::MongoDB;
 
-$VERSION = "0.1.2";
+$VERSION = "0.2.0";
 
 use strict;
 use warnings;
@@ -74,9 +74,17 @@ sub connect_mongo($;$){
     my $hosts = shift;
     my $mongo_connect_options_hashref = shift() || {};
     my $client;
+    if($user and $password){
+        # doing it this way to avoid username/password fields which break unauthenticated even when supplying 'undef' values
+        $hosts =~ s/mongodb:\/\///;
+        $hosts = "mongodb://$user:$password\@$hosts";
+    }
     try {
         $client = MongoDB::MongoClient->new(
                                             "host"           => $hosts,
+                                            #"username"       => $user,
+                                            #"password"       => $password,
+                                            "db_name"        => "admin",
                                             # hangs when giving only nodes of a replica set that aren't the Primary
                                             #"find_master"    => 1,
                                             "timeout"        => int($timeout * 1000 / 4), # connection timeout
@@ -99,7 +107,7 @@ sub curl_mongo($){
     my $path = shift;
     $path =~ s/^\///;
     my $url = "http://$host:$port/$path";
-    my $content = curl $url, "MongoDB", undef, undef, \&curl_mongo_err_handler;
+    my $content = curl $url, "MongoDB", $user, $password, \&curl_mongo_err_handler;
     try{
         $json = decode_json $content;
     };
@@ -117,10 +125,13 @@ sub curl_mongo($){
 
 sub curl_mongo_err_handler($){
     my $response = shift;
-    my $content  = $response->content;
+    my $content  = strip($response->content);
     my $json;
     my $additional_information = "";
     unless($response->code eq "200"){
+        if(scalar split("\n", $content) < 2){
+            $additional_information .= $content
+        }
         if($response->code eq "500"){
             $additional_information .= ". Have you enabled the rest interface with the mongod --rest option?";
         }
