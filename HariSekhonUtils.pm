@@ -79,7 +79,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.18.0";
+our $VERSION = "1.18.1";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -559,7 +559,9 @@ BEGIN {
     # This is because the die handler causes program exit instead of return from eval {} block required for exception handling
     sub try(&) {
         my $old_die = $SIG{__DIE__};
-        undef $SIG{__DIE__};
+        if(defined($SIG{__DIE__})){
+            undef $SIG{__DIE__};
+        }
         eval {$_[0]->()};
         #$SIG{__DIE__} = \&die_sub;
         $SIG{__DIE__} = $old_die;
