@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.8.14";
+$VERSION = "0.8.15";
 
 use strict;
 use warnings;
@@ -602,7 +602,7 @@ sub msg_shard_status(){
 sub isSolrCollection($){
     my $collection = shift;
     defined($collection) or return undef;
-    $collection =~ /^([\w-]+)$/ or return undef;
+    $collection =~ /^([\w\.-]+)$/ or return undef;
     return $1;
 }
 *isSolrCore  = \&isSolrCollection;
