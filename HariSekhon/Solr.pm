@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.8.13";
+$VERSION = "0.8.14";
 
 use strict;
 use warnings;
@@ -450,19 +450,21 @@ our $show_settings;
 sub check_collection($){
     my $collection = shift;
     vlog2 "collection '$collection': ";
-    my %shards = get_field_hash("$collection.shards");
+    my $collection2 = $collection;
+    $collection2 =~ s/\./\\./g;
+    my %shards = get_field_hash("$collection2.shards");
     foreach my $shard (sort keys %shards){
-        my $state = get_field("$collection.shards.$shard.state");
+        my $state = get_field("$collection2.shards.$shard.state");
         vlog2 "\t\t\tshard '$shard' state '$state'";
         unless($state eq "active"){
             $inactive_shards{$collection}{$shard} = $state;
             #push(@{$inactive_shard_states{$collection}{$state}}, $shard);
         }
-        my %replicas = get_field_hash("$collection.shards.$shard.replicas");
+        my %replicas = get_field_hash("$collection2.shards.$shard.replicas");
         my $found_active_replica = 0;
         foreach my $replica (sort keys %replicas){
-            my $replica_name  = get_field("$collection.shards.$shard.replicas.$replica.node_name");
-            my $replica_state = get_field("$collection.shards.$shard.replicas.$replica.state");
+            my $replica_name  = get_field("$collection2.shards.$shard.replicas.$replica.node_name");
+            my $replica_state = get_field("$collection2.shards.$shard.replicas.$replica.state");
             $replica_name =~ s/_solr$//;
             vlog2 "\t\t\t\t\treplica '$replica_name' state '$replica_state'";
             if($replica_state eq "active"){
@@ -484,10 +486,10 @@ sub check_collection($){
     if($inactive_shards{$collection} and not %{$inactive_shards{$collection}}){
         delete $inactive_shards{$collection};
     }
-    $facts{$collection}{"maxShardsPerNode"}  = get_field_int("$collection.maxShardsPerNode");
-    $facts{$collection}{"router"}            = get_field("$collection.router.name");
-    $facts{$collection}{"replicationFactor"} = get_field_int("$collection.replicationFactor");
-    $facts{$collection}{"autoAddReplicas"}   = get_field("$collection.autoAddReplicas", 1);
+    $facts{$collection}{"maxShardsPerNode"}  = get_field_int("$collection2.maxShardsPerNode");
+    $facts{$collection}{"router"}            = get_field("$collection2.router.name");
+    $facts{$collection}{"replicationFactor"} = get_field_int("$collection2.replicationFactor");
+    $facts{$collection}{"autoAddReplicas"}   = get_field("$collection2.autoAddReplicas", 1);
     vlog2;
 }
 
