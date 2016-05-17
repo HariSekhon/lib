@@ -84,7 +84,6 @@ our @EXPORT = ( qw (
                     list_solr_shards
                     msg_shard_status
                     query_solr
-                    validate_base_and_znode
                     validate_solr_collection
                     validate_solr_collections
                     validate_solr_collection_alias
@@ -426,15 +425,6 @@ sub list_solr_replicas($;$){
         }
         exit $ERRORS{"UNKNOWN"};
     }
-}
-
-sub validate_base_and_znode($$$){
-    my $base = shift;
-    my $znode = shift;
-    my $name = shift;
-    $znode      = validate_filename($base, "base znode") . "/$znode";
-    $znode      =~ s/\/+/\//g;
-    $znode      = validate_filename($znode, "clusterstate znode");
 }
 
 my %inactive_shards;

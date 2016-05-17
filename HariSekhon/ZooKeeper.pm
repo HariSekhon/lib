@@ -52,6 +52,7 @@ our @EXPORT = ( qw (
                     zoo_debug
                     zookeeper_random_conn_order
                     isZnode
+                    validate_base_and_znode
                     validate_znode
                     isZookeeperEnsemble
                     validate_zookeeper_ensemble
@@ -291,6 +292,15 @@ sub validate_znode($;$){
     defined($znode) or usage "${name}znode not defined";
     $znode = isZnode($znode) or usage "invalid ${name}znode";
     return $znode;
+}
+
+sub validate_base_and_znode($$$){
+    my $base = shift;
+    my $znode = shift;
+    my $name = shift;
+    $znode = validate_znode($base, "base") . "/$znode";
+    $znode =~ s/\/+/\//g;
+    $znode = validate_znode($znode, $name);
 }
 
 sub isZookeeperEnsemble($){
