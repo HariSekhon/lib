@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.8.15";
+$VERSION = "0.8.16";
 
 use strict;
 use warnings;
