@@ -11,7 +11,7 @@
 
 package HariSekhon::ZooKeeper;
 
-$VERSION = "0.8.1";
+$VERSION = "0.8.2";
 
 use strict;
 use warnings;
@@ -280,7 +280,7 @@ sub translate_zoo_error($){
 sub isZnode($){
     my $znode = shift;
     defined($znode) or undef;
-    $znode =~ /^(\/(?:(?:[\w-]+\/)*[\w-]+)?)$/ or undef;
+    $znode =~ /^(\/(?:(?:[\w\._-]+\/)*[\w:\._-]+)?)$/ or undef;
     $znode = $1;
     return $znode;
 }

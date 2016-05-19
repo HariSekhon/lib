@@ -18,6 +18,7 @@ require_ok('HariSekhon::ZooKeeper');
 
 is(isZnode('/'),        '/',        "isZnode('/')");
 is(isZnode('/config'),  '/config',  "isZnode('/config')");
+is(isZnode('/live_nodes/172.17.0.2:8983_solr'), '/live_nodes/172.17.0.2:8983_solr', "isZnode('/live_nodes/172.17.0.2:8983_solr')");
 is(isZnode('/config/'), undef,      "isZnode('/config/') eq undef");
 is(isZnode('/c@nfig'),  undef,      "isZnode('/c\@nfig') eq undef");
 
