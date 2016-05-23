@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.8.16";
+$VERSION = "0.8.17";
 
 use strict;
 use warnings;
@@ -485,6 +485,9 @@ sub check_collection($){
 
 sub check_collections(){
     my $found = 0;
+    unless(%$json){
+        quit "CRITICAL", "no collections found";
+    }
     foreach(keys %$json){
         if($collection){
             if($collection eq $_){
