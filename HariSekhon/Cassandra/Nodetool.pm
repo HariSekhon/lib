@@ -9,7 +9,7 @@
 
 package HariSekhon::Cassandra::Nodetool;
 
-$VERSION = "0.2.9";
+$VERSION = "0.2.10";
 
 use strict;
 use warnings;
@@ -39,7 +39,7 @@ our @EXPORT = ( qw (
 );
 our @EXPORT_OK = ( @EXPORT );
 
-$ENV{"PATH"} .= ":/usr/bin:/usr/sbin:/usr/local/cassandra/bin";
+$ENV{"PATH"} .= ":/usr/bin:/usr/sbin:/usr/local/cassandra/bin:/opt/cassandra/bin:/cassandra/bin";
 
 our $nodetool = "nodetool";
 
