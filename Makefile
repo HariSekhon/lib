@@ -63,7 +63,9 @@ build:
 		Net::LDAP \
 		Net::LDAPI \
 		Net::LDAPS \
-		Net::DNS \
+		# downgrading Net::DNS as a workaround for taint mode bug:
+		# https://rt.cpan.org/Public/Bug/Display.html?id=114819
+		Net::DNS@1.05 \
 		Net::SSH::Expect \
 		Net::SSL \
 		Readonly \
