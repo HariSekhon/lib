@@ -44,6 +44,10 @@ build:
 
 	# order here is important, in Travis and some stripped down client some deps are not pulled in automatically but are required for subsequent module builds
 	# this doesn't work it's misaligned with the prompts, should use expect instead if I were going to do this
+	#
+	# downgrading Net::DNS as a workaround for taint mode bug:
+	# https://rt.cpan.org/Public/Bug/Display.html?id=114819
+	#
 	#(echo y; echo o conf prerequisites_policy follow; echo o conf commit) | cpan
 	yes "" | $(SUDO2) cpan App::cpanminus
 	yes "" | $(SUDO2) $(CPANM) --notest \
@@ -63,8 +67,6 @@ build:
 		Net::LDAP \
 		Net::LDAPI \
 		Net::LDAPS \
-		# downgrading Net::DNS as a workaround for taint mode bug:
-		# https://rt.cpan.org/Public/Bug/Display.html?id=114819
 		Net::DNS@1.05 \
 		Net::SSH::Expect \
 		Net::SSL \
