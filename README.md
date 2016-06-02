@@ -1,5 +1,9 @@
-Hari Sekhon Perl Library [![Build Status](https://travis-ci.org/HariSekhon/lib.svg?branch=master)](https://travis-ci.org/HariSekhon/lib) [![DockerHub](https://img.shields.io/badge/docker-available-blue.svg)](https://hub.docker.com/r/harisekhon/centos-github/)
+Hari Sekhon Perl Library
 ========================
+[![Build Status](https://travis-ci.org/HariSekhon/lib.svg?branch=master)](https://travis-ci.org/HariSekhon/lib)
+![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20OS%20X-lightgrey.svg)
+[![DockerHub](https://img.shields.io/badge/docker%20container-available-blue.svg)](https://hub.docker.com/r/harisekhon/centos-github/)
+
 
 My personal Perl library, full of lots of validation code and utility functions.
 
