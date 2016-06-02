@@ -9,7 +9,7 @@
 
 package HariSekhon::Cassandra::Nodetool;
 
-$VERSION = "0.2.10";
+$VERSION = "0.2.11";
 
 use strict;
 use warnings;
@@ -98,7 +98,7 @@ our $nodetool_errors_regex = qr/
                                 error    |
                                 user     |
                                 password |
-                                Exception |
+                                Exception(?!s\s*:\s*\d+) |
                                 in thread
                              /xi;
 
