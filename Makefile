@@ -148,7 +148,7 @@ update-no-recompile:
 	git submodule update --init --recursive
 
 tld:
-	wget -O resources/tlds-alpha-by-domain.txt http://data.iana.org/TLD/tlds-alpha-by-domain.txt
+	wget -t 100 --retry-connrefused -O resources/tlds-alpha-by-domain.txt http://data.iana.org/TLD/tlds-alpha-by-domain.txt
 
 .PHONY: clean
 clean:
