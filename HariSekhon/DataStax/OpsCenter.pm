@@ -9,7 +9,7 @@
 
 package HariSekhon::DataStax::OpsCenter;
 
-$VERSION = "0.4";
+$VERSION = "0.5";
 
 use strict;
 use warnings;
@@ -157,7 +157,7 @@ sub list_nodes(){
 sub validate_cluster(){
     unless($list_clusters){
         $cluster or usage "must specify cluster, use --list-clusters to show clusters managed by DataStax OpsCenter";
-        $cluster =~ /^([\w-]+)$/ or usage "invalid cluster defined: must be alphanumeric, may contain dashes and underscores";
+        $cluster =~ /^([\w\s-]+)$/ or usage "invalid cluster defined: must be alphanumeric, may contain spaces, ashes and underscores";
         $cluster = $1;
         vlog_option "cluster", $cluster;
     }
@@ -166,7 +166,7 @@ sub validate_cluster(){
 sub validate_keyspace(){
     unless($list_clusters or $list_keyspaces){
         $keyspace or usage "must specify keyspace, use --list-keyspaces to show keyspaces managed by Cassandra cluster '$cluster'";
-        $keyspace = validate_alnum($keyspace, "keyspace");
+        $keyspace = validate_chars($keyspace, '\w', "keyspace");
     }
 }
 
