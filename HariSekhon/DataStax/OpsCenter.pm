@@ -9,7 +9,7 @@
 
 package HariSekhon::DataStax::OpsCenter;
 
-$VERSION = "0.5";
+$VERSION = "0.5.1";
 
 use strict;
 use warnings;
@@ -166,7 +166,7 @@ sub validate_cluster(){
 sub validate_keyspace(){
     unless($list_clusters or $list_keyspaces){
         $keyspace or usage "must specify keyspace, use --list-keyspaces to show keyspaces managed by Cassandra cluster '$cluster'";
-        $keyspace = validate_chars($keyspace, '\w', "keyspace");
+        $keyspace = validate_chars($keyspace, "keyspace", '\w');
     }
 }
 
