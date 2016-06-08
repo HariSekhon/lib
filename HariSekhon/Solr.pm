@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.8.17";
+$VERSION = "0.8.18";
 
 use strict;
 use warnings;
@@ -453,6 +453,7 @@ sub check_collection($){
         my %replicas = get_field_hash("$collection2.shards.$shard.replicas");
         my $found_active_replica = 0;
         foreach my $replica (sort keys %replicas){
+            $replica =~ s/\./\\./g;
             my $replica_name  = get_field("$collection2.shards.$shard.replicas.$replica.node_name");
             my $replica_state = get_field("$collection2.shards.$shard.replicas.$replica.state");
             $replica_name =~ s/_solr$//;
