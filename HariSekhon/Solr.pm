@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.8.18";
+$VERSION = "0.8.19";
 
 use strict;
 use warnings;
@@ -444,18 +444,20 @@ sub check_collection($){
     $collection2 =~ s/\./\\./g;
     my %shards = get_field_hash("$collection2.shards");
     foreach my $shard (sort keys %shards){
-        my $state = get_field("$collection2.shards.$shard.state");
+        my $shard2 = $shard;
+        $shard2 =~ s/\./\\./g;
+        my $state = get_field("$collection2.shards.$shard2.state");
         vlog2 "\t\t\tshard '$shard' state '$state'";
         unless($state eq "active"){
             $inactive_shards{$collection}{$shard} = $state;
             #push(@{$inactive_shard_states{$collection}{$state}}, $shard);
         }
-        my %replicas = get_field_hash("$collection2.shards.$shard.replicas");
+        my %replicas = get_field_hash("$collection2.shards.$shard2.replicas");
         my $found_active_replica = 0;
         foreach my $replica (sort keys %replicas){
             $replica =~ s/\./\\./g;
-            my $replica_name  = get_field("$collection2.shards.$shard.replicas.$replica.node_name");
-            my $replica_state = get_field("$collection2.shards.$shard.replicas.$replica.state");
+            my $replica_name  = get_field("$collection2.shards.$shard2.replicas.$replica.node_name");
+            my $replica_state = get_field("$collection2.shards.$shard2.replicas.$replica.state");
             $replica_name =~ s/_solr$//;
             vlog2 "\t\t\t\t\treplica '$replica_name' state '$replica_state'";
             if($replica_state eq "active"){
