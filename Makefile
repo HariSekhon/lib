@@ -52,6 +52,7 @@ build:
 	yes "" | $(SUDO2) cpan App::cpanminus
 	yes "" | $(SUDO2) $(CPANM) --notest \
 		YAML \
+		Class::Accessor \
 		Data::Dumper \
 		Devel::Cover::Report::Coveralls \
 		ExtUtils::Constant \
