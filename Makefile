@@ -147,6 +147,13 @@ update-no-recompile:
 	git pull
 	git submodule update --init --recursive
 
+.PHONY: update-submodules
+update-submodules:
+	git submodule update --init --recursive --remote
+.PHONY: updatem
+updatem:
+	make update-submodules
+
 tld:
 	wget -t 100 --retry-connrefused -O resources/tlds-alpha-by-domain.txt http://data.iana.org/TLD/tlds-alpha-by-domain.txt
 
