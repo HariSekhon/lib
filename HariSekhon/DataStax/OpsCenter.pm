@@ -157,7 +157,7 @@ sub list_nodes(){
 sub validate_cluster(){
     unless($list_clusters){
         $cluster or usage "must specify cluster, use --list-clusters to show clusters managed by DataStax OpsCenter";
-        $cluster =~ /^([\w\s-]+)$/ or usage "invalid cluster defined: must be alphanumeric, may contain spaces, ashes and underscores";
+        $cluster =~ /^([\w\s-]+)$/ or usage "invalid cluster defined: must be alphanumeric, may contain spaces, dashes and underscores";
         $cluster = $1;
         vlog_option "cluster", $cluster;
     }
