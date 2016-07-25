@@ -1,7 +1,7 @@
 Hari Sekhon Perl Library
 ========================
 [![Build Status](https://travis-ci.org/HariSekhon/lib.svg?branch=master)](https://travis-ci.org/HariSekhon/lib)
-![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20OS%20X-lightgrey.svg)
+[![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20OS%20X-blue.svg)](https://github.com/harisekhon/lib#hari-sekhon-perl-library)
 [![DockerHub](https://img.shields.io/badge/docker-available-blue.svg)](https://hub.docker.com/r/harisekhon/centos-github/)
 
 
