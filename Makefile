@@ -35,6 +35,7 @@ endif
 
 .PHONY: build
 build:
+	if [ -x /sbin/apk ];        then make apk-packages; fi
 	if [ -x /usr/bin/apt-get ]; then make apt-packages; fi
 	if [ -x /usr/bin/yum ];     then make yum-packages; fi
 
@@ -87,6 +88,30 @@ build:
 	@echo "BUILD SUCCESSFUL (lib)"
 
 
+.PHONY: apk-packages
+apk-packages:
+	$(SUDO) apk update
+	$(SUDO) apk add alpine-sdk
+	$(SUDO) apk add bash
+	$(SUDO) apk add expat-dev
+	$(SUDO) apk add gcc
+	$(SUDO) apk add git
+	$(SUDO) apk add libxml2-dev
+	$(SUDO) apk add openssl-dev
+	$(SUDO) apk add perl
+	$(SUDO) apk add perl-dev
+	$(SUDO) apk add wget
+
+.PHONY: apk-packages-remove
+apk-packages-remove:
+	$(SUDO) apk del alpine-sdk
+	$(SUDO) apk del expat-dev
+	$(SUDO) apk del gcc
+	$(SUDO) apk del libxml2-dev
+	$(SUDO) apk del openssl-dev
+	$(SUDO) apk del perl-dev
+	$(SUDO) apk del wget
+
 .PHONY: apt-packages
 apt-packages:
 	$(SUDO) apt-get update
@@ -103,6 +128,16 @@ apt-packages:
 	# needed to build XML::Simple dep XML::Parser
 	$(SUDO) apt-get install -y libexpat1-dev
 
+.PHONY: apt-packages-remove
+apt-packages:
+	$(SUDO) apt-get update
+	# needed to fetch the library submodule at end of build
+	$(SUDO) apt-get purge -y build-essential
+	$(SUDO) apt-get purge -y libssl-dev
+	$(SUDO) apt-get purge -y libsasl2-dev
+	$(SUDO) apt-get purge -y libmysqlclient-dev
+	$(SUDO) apt-get purge -y libexpat1-dev
+
 .PHONY: yum-packages
 yum-packages:
 	rpm -q gcc || $(SUDO) yum install -y gcc
@@ -115,6 +150,11 @@ yum-packages:
 	# needed to build XML::Simple dep XML::Parser
 	rpm -q expat-devel || $(SUDO) yum install -y expat-devel
 
+.PHONY: yum-packages-remove
+yum-packages:
+	rpm -q gcc && $(SUDO) yum remove -y gcc
+	rpm -q perl-CPAN && $(SUDO) yum remove -y perl-CPAN
+	rpm -q mysql-devel && $(SUDO) yum remove -y mysql-devel
 
 .PHONY: test
 test:
