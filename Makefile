@@ -50,7 +50,7 @@ build:
 	# https://rt.cpan.org/Public/Bug/Display.html?id=114819
 	#
 	#(echo y; echo o conf prerequisites_policy follow; echo o conf commit) | cpan
-	yes "" | $(SUDO2) cpan App::cpanminus
+	which cpanm &>/dev/null || yes "" | $(SUDO2) cpan App::cpanminus
 	yes "" | $(SUDO2) $(CPANM) --notest \
 		YAML \
 		Class::Accessor \
