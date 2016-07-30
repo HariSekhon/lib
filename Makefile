@@ -128,7 +128,7 @@ apt-packages:
 	$(SUDO) apt-get install -y libexpat1-dev
 
 .PHONY: apt-packages-remove
-apt-packages:
+apt-packages-remove:
 	$(SUDO) apt-get purge -y build-essential
 	$(SUDO) apt-get purge -y libssl-dev
 	$(SUDO) apt-get purge -y libsasl2-dev
