@@ -129,8 +129,6 @@ apt-packages:
 
 .PHONY: apt-packages-remove
 apt-packages:
-	$(SUDO) apt-get update
-	# needed to fetch the library submodule at end of build
 	$(SUDO) apt-get purge -y build-essential
 	$(SUDO) apt-get purge -y libssl-dev
 	$(SUDO) apt-get purge -y libsasl2-dev
