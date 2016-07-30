@@ -1,7 +1,3 @@
-[submodule "Dockerfiles"]
-	path = Dockerfiles
-	url = https://github.com/harisekhon/Dockerfiles
-	branch = master
 [submodule "bash-tools"]
 	path = bash-tools
 	url = https://github.com/harisekhon/bash-tools
