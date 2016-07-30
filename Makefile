@@ -136,7 +136,7 @@ apt-packages-remove:
 	$(SUDO) apt-get purge -y libexpat1-dev
 
 .PHONY: yum-packages
-yum-packages-remove:
+yum-packages:
 	rpm -q gcc || $(SUDO) yum install -y gcc
 	rpm -q perl-CPAN || $(SUDO) yum install -y perl-CPAN
 	rpm -q perl-libwww-perl || $(SUDO) yum install -y perl-libwww-perl
@@ -148,7 +148,7 @@ yum-packages-remove:
 	rpm -q expat-devel || $(SUDO) yum install -y expat-devel
 
 .PHONY: yum-packages-remove
-yum-packages:
+yum-packages-remove:
 	rpm -q gcc && $(SUDO) yum remove -y gcc
 	rpm -q perl-CPAN && $(SUDO) yum remove -y perl-CPAN
 	rpm -q mysql-devel && $(SUDO) yum remove -y mysql-devel
