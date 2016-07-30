@@ -87,7 +87,6 @@ build:
 	@echo
 	@echo "BUILD SUCCESSFUL (lib)"
 
-
 .PHONY: apk-packages
 apk-packages:
 	$(SUDO) apk update
