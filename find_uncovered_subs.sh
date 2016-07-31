@@ -4,7 +4,7 @@
 #  Author: Hari Sekhon
 #  Date: 2015-06-28 13:44:33 +0100 (Sun, 28 Jun 2015)
 #
-#  https://github.com/harisekhon
+#  https://github.com/harisekhon/lib
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
@@ -16,7 +16,7 @@
 set -euo pipefail
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-cd "$srcdir"
+cd "$srcdir/.."
 
 found=0
 grep sub HariSekhonUtils.pm | sed 's/^sub //;s/ .*//;/^[[:space:]]*$/d' |
