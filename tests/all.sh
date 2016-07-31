@@ -26,7 +26,7 @@ bash-tools/all.sh
 
 section "Perl Lib"
 
-./find_uncovered_subs.sh
+tests/find_uncovered_subs.sh
 
 # don't overlap with bash-tools, just scan these lib directories
 bash-tools/check_perl_syntax.sh HariSekhonUtils.pm
