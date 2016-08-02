@@ -152,6 +152,7 @@ yum-packages-remove:
 	rpm -q gcc && $(SUDO) yum remove -y gcc
 	rpm -q perl-CPAN && $(SUDO) yum remove -y perl-CPAN
 	rpm -q mysql-devel && $(SUDO) yum remove -y mysql-devel
+	rpm -q expat-devel && $(SUDO) yum remove -y expat-devel
 
 .PHONY: test
 test:
