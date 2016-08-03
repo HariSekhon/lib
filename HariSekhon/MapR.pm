@@ -9,7 +9,7 @@
 
 package HariSekhon::MapR;
 
-$VERSION = "0.5.1";
+$VERSION = "0.5.2";
 
 use strict;
 use warnings;
@@ -127,10 +127,11 @@ sub curl_mapr($$$;$){
     $url or code_error "invalid url passed to curl_mapr()";
     if($no_ssl){
         $protocol = "http";
-        if($port == 8443){
-            vlog2 "detected port still set to 8443 but using --no-ssl, switching to port 8080";
-            $port = 8080;
-        }
+        # MapR 5.1 sandbox ships MCS without SSL still on 8443
+        #if($port == 8443){
+            #vlog2 "detected port still set to 8443 but using --no-ssl, switching to port 8080";
+            #$port = 8080;
+        #}
     }
     my $url_prefix = "$protocol://$host:$port";
     $url = "$url_prefix/rest/$url";
