@@ -13,7 +13,7 @@
 
 package HariSekhon::ClouderaManager;
 
-$VERSION = "0.5.1";
+$VERSION = "0.5.2";
 
 use strict;
 use warnings;
@@ -55,8 +55,10 @@ our @EXPORT = ( qw (
                     $url
                     $url_prefix
                     %cm_options
+                    %cm_option_cluster
                     %cm_options_tls
                     %cm_options_list
+                    %cm_options_list_basic
                     cm_query
                     check_cm_field
                     list_activities
@@ -109,15 +111,21 @@ our $list_services      = 0;
 
 env_creds("CM", "Cloudera Manager");
 
+env_var("CM_CLUSTER", \$cluster);
+
 our %cm_options_tls = (
     "T|tls"            => [ \$tls,          "Use TLS connection to Cloudera Manager (automatically updates port to $ssl_port if still set to $default_port to save one 302 redirect round trip)" ],
     "ssl-CA-path=s"    => [ \$ssl_ca_path,  "Path to CA certificate directory for validating SSL certificate (automatically enables --tls)" ],
     "tls-noverify"     => [ \$tls_noverify, "Do not verify SSL certificate from Cloudera Manager (automatically enables --tls)" ],
 );
 
+our %cm_option_cluster = (
+    "C|cluster=s"      => [ \$cluster,      "Cluster Name as shown in Cloudera Manager (eg. \"Cluster - CDH4\", \$CM_CLUSTER)" ],
+);
+
 our %cm_options = (
     %cm_options_tls,
-    "C|cluster=s"      => [ \$cluster,      "Cluster Name as shown in Cloudera Manager (eg. \"Cluster - CDH4\")" ],
+    %cm_option_cluster,
     "S|service=s"      => [ \$service,      "Service Name as shown in Cloudera Manager (eg. hdfs1, mapreduce4). Requires --cluster" ],
     "I|hostId=s"       => [ \$hostid,       "FQDN or HostId of node, see --list-hosts" ],
     "N|nameservice=s"  => [ \$nameservice,  "Nameservice (as specified in your HA configuration under dfs.nameservices). Requires --cluster and --service, see --list-nameservices" ],
@@ -125,13 +133,17 @@ our %cm_options = (
     "M|CM-mgmt"        => [ \$cm_mgmt,      "Cloudera Manager Management services" ],
 );
 
-our %cm_options_list = (
-    "list-activities"   => [ \$list_activities,          "List activities for a given cluster service. Requires --cluster and --service" ],
+our %cm_options_list_basic = (
     "list-clusters"     => [ \$list_clusters,           "List clusters for a given cluster service. Requires --cluster and --service" ],
     "list-hosts"        => [ \$list_hosts,              "List host id of nodes managed my Cloudera Manager" ],
+    "list-services"     => [ \$list_services,           "List services for a given cluster. Convenience switch to find the serviceId to query, prints service ids and exits immediately. Requires --cluster" ],
+);
+
+our %cm_options_list = (
+    "list-activities"   => [ \$list_activities,          "List activities for a given cluster service. Requires --cluster and --service" ],
     "list-nameservices" => [ \$list_nameservices,       "List nameservices for a given cluster service. Requires --cluster and --service. Service should be an HDFS service id" ],
     "list-roles"        => [ \$list_roles,              "List roles for a given cluster service. Requires --cluster and --service" ],
-    "list-services"     => [ \$list_services,           "List services for a given cluster. Convenience switch to find the serviceId to query, prints service ids and exits immediately. Requires --cluster" ],
+    %cm_options_list_basic,
 );
 
 @usage_order = qw/host port user password tls ssl-CA-path tls-noverify metrics all-metrics cluster service hostId activityId nameservice roleId CM-mgmt list-activities list-clusters list-hosts list-nameservices list-roles list-services warning critical/;
