@@ -137,20 +137,20 @@ apt-packages-remove:
 
 .PHONY: yum-packages
 yum-packages:
-	rpm -q gcc || $(SUDO) yum install -y gcc
-	rpm -q perl-CPAN || $(SUDO) yum install -y perl-CPAN
-	rpm -q perl-libwww-perl || $(SUDO) yum install -y perl-libwww-perl
-	rpm -q git || $(SUDO) yum install -y git
+	rpm -q gcc               || $(SUDO) yum install -y gcc
+	rpm -q perl-CPAN         || $(SUDO) yum install -y perl-CPAN
+	rpm -q perl-libwww-perl  || $(SUDO) yum install -y perl-libwww-perl
+	rpm -q git               || $(SUDO) yum install -y git
 	# for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
-	rpm -q mysql-devel || $(SUDO) yum install -y mysql-devel
-	rpm -q perl-DBD-MySQL || $(SUDO) yum install -y perl-DBD-MySQL
+	rpm -q mysql-devel       || $(SUDO) yum install -y mysql-devel
+	rpm -q perl-DBD-MySQL    || $(SUDO) yum install -y perl-DBD-MySQL
 	# needed to build XML::Simple dep XML::Parser
-	rpm -q expat-devel || $(SUDO) yum install -y expat-devel
+	rpm -q expat-devel       || $(SUDO) yum install -y expat-devel
 
 .PHONY: yum-packages-remove
 yum-packages-remove:
-	rpm -q gcc && $(SUDO) yum remove -y gcc
-	rpm -q perl-CPAN && $(SUDO) yum remove -y perl-CPAN
+	rpm -q gcc         && $(SUDO) yum remove -y gcc
+	rpm -q perl-CPAN   && $(SUDO) yum remove -y perl-CPAN
 	rpm -q mysql-devel && $(SUDO) yum remove -y mysql-devel
 	rpm -q expat-devel && $(SUDO) yum remove -y expat-devel
 
