@@ -3811,6 +3811,7 @@ sub validate_regex ($;$$$) {
             quit "UNKNOWN", "invalid ${name}posix regex supplied: contains sub shell metachars ( \$( / ` ) that would be dangerous to pass to shell" unless $noquit;
             return;
         } else {
+            # XXX: this behaviour is broken in busybox (used in Alpine linux on docker) - it doesn't detect the error in the regex - the validation must be too weak - must install proper grep in that case
             my @output = cmd("egrep '$regex' < /dev/null");
             #if(grep({$_ =~ "Unmatched"} @output)){
             if(@output){

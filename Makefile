@@ -50,7 +50,7 @@ build:
 	# https://rt.cpan.org/Public/Bug/Display.html?id=114819
 	#
 	#(echo y; echo o conf prerequisites_policy follow; echo o conf commit) | cpan
-	which cpanm || { yes "" | $(SUDO) cpan App::cpanminus; }
+	which cpanm || { yes "" | $(SUDO2) cpan App::cpanminus; }
 	yes "" | $(SUDO2) $(CPANM) --notest \
 		YAML \
 		Class::Accessor \
@@ -95,6 +95,8 @@ apk-packages:
 	$(SUDO) apk add expat-dev
 	$(SUDO) apk add gcc
 	$(SUDO) apk add git
+	# needed for validate_regex() posix unit test as busybox's in-built grep doesn't validate regex errors
+	$(SUDO) apk add grep
 	$(SUDO) apk add libxml2-dev
 	$(SUDO) apk add openssl-dev
 	$(SUDO) apk add perl
