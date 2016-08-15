@@ -79,7 +79,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.18.2";
+our $VERSION = "1.18.3";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -3099,13 +3099,15 @@ sub uniq_array2(@){
 *uniq_array_ordered = \&uniq_array2;
 
 sub get_terminal_size(){
-    ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize();
+    eval {
+        ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize();
+    };
     check_terminal_size();
 }
 
 sub check_terminal_size(){
     unless(defined($wchar) and defined($hchar) and defined($wpixels) and defined($hpixels)){
-        warn "\nTerm::ReadKey GetTerminalSize() failed to return values! Ignore this warning if you are teeing to a logfile (otherwise your terminal is messed up...)\n\n\n";
+        #warn "\nTerm::ReadKey GetTerminalSize() failed to return values! Ignore this warning if you are teeing to a logfile (otherwise your terminal is messed up...)\n\n\n";
         $wchar   = 99999999;
         $hchar   = 99999999;
         $wpixels = 99999999;
