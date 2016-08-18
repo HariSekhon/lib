@@ -79,7 +79,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.18.3";
+our $VERSION = "1.18.4";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -3100,6 +3100,7 @@ sub uniq_array2(@){
 
 sub get_terminal_size(){
     eval {
+        local $SIG{__WARN__} = sub {};
         ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize();
     };
     check_terminal_size();
