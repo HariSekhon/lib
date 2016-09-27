@@ -868,6 +868,7 @@ is(isUrl("https://gmail.com"),      "https://gmail.com",        'isUrl("https://
 is(isUrl(1),                        "http://1",                 'isUrl(1) eq http://1');
 is(isUrl("-help"),                  undef,                      'isUrl(-help) eq undef');
 is(isUrl("http://cdh43:50070/dfsnodelist.jsp?whatNodes=LIVE"),  'http://cdh43:50070/dfsnodelist.jsp?whatNodes=LIVE', 'isUrl(http://cdh43:50070/dfsnodelist.jsp?whatNodes=LIVE)');
+is(isUrl("http://namenode:50070/dfshealth.html#tab-overview"),  'http://namenode:50070/dfshealth.html#tab-overview', 'http://namenode:50070/dfshealth.html#tab-overview');
 
 is(validate_url("www.google.com"),          "http://www.google.com",    'validate_url("www.google.com")');
 is(validate_url("http://www.google.com"),   "http://www.google.com",    'validate_url("http://www.google.com")');
