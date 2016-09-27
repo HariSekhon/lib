@@ -3100,6 +3100,7 @@ sub uniq_array2(@){
 
 sub get_terminal_size(){
     eval {
+        local $SIG{__WARN__} = sub {};
         ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize();
     };
     check_terminal_size();
