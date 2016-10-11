@@ -583,6 +583,8 @@ is(isHost("10.10.10.10"),       "10.10.10.10",      'isHost("10.10.10.10") eq 10
 ok(isHost("10.10.10.100"),      'isHost("10.10.10.100")');
 ok(isHost("10.10.10.0"),        'isHost("10.10.10.0")');
 ok(isHost("10.10.10.255"),      'isHost("10.10.10.255")');
+ok(!isHost("NO_SERVER_AVAILABLE"), '!isHost("NO_SERVER_AVAILABLE")');
+ok(!isHost("NO_HOST_AVAILABLE"), '!isHost("NO_HOST_AVAILABLE")');
 ok(!isHost("10.10.10.256"),     '!isHost("10.10.10.256")');
 ok(!isHost("a"x256),            '!isHost("a"x256)');
 
@@ -605,6 +607,8 @@ is(isHostname("a"),               "a", 'isHostname("a") eq a');
 is(isHostname("1"),               "1", 'isHostname("1") eq 1');
 is(isHostname("harisekhon1.com"), "harisekhon1.com", 'isHostname(harisekhon1.com) eq harisekhon1.com');
 is(isHostname("1harisekhon.com"), "1harisekhon.com", 'isHostname(1harisekhon.com) eq 1harisekhon.com');
+is(isHostname("NO_SERVER_AVAILABLE"), undef, '!isHostname("NO_SERVER_AVAILABLE")');
+is(isHostname("NO_HOST_AVAILABLE"),   undef, '!isHostname("NO_HOST_AVAILABLE")');
 is(isHostname("-help"),           undef, 'isHostname(-help) eq undef');
 is(isHostname("a"x63),            "a"x63, 'isHostname("a"x63) eq "a"x63');
 is(isHostname("a"x64),            undef, 'isHostname("a"x64) eq undef');

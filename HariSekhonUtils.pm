@@ -79,7 +79,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.18.4";
+our $VERSION = "1.18.5";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -2104,6 +2104,10 @@ sub isHex ($) {
 sub isHost ($) {
     my $host = shift;
     defined($host) or return;
+    # special case to short-circuit failure when chaining find_active_server.py
+    if($host eq "NO_SERVER_AVAILABLE" or $host eq "NO_HOST_AVAILABLE"){
+        return;
+    }
     # at casual glance this looks like it's duplicating isHostname but it's using a different unified regex of isHostname + isIP
     if(length($host) > 255){ # Can't be a hostname
         return;
@@ -2118,6 +2122,10 @@ sub isHost ($) {
 sub isHostname ($) {
     my $hostname = shift;
     defined($hostname) or return;
+    # special case to short-circuit failure when chaining find_active_server.py
+    if($hostname eq "NO_SERVER_AVAILABLE" or $hostname eq "NO_HOST_AVAILABLE"){
+        return;
+    }
     return if(length($hostname) > 255);
     $hostname =~ /^($hostname_regex)$/ or return;
     return $1;
