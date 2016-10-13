@@ -541,6 +541,8 @@ ok(isFloat(1.1),        'isFloat(1.1)');
 ok(!isFloat(-1.1),      '!isFloat(-1.1)');
 ok(isFloat(-1.1, 1),    'isFloat(-1.1, 1)');
 
+ok(!isFloat("2a"),     '!isFloat("2a")');
+ok(!isFloat("a2"),     '!isFloat("a2")');
 ok(!isFloat("nan"),     '!isFloat("nan")');
 ok(!isFloat("nan", 1),  '!isFloat("nan", 1)');
 
