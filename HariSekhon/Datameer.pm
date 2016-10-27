@@ -39,8 +39,8 @@ $port = $DATAMEER_DEFAULT_PORT;
 env_creds("DATAMEER");
 
 our %datameer_options = (
-    "H|host=s"         => [ \$host,         "Datameer server   (\$DATAMEER_HOST, \$HOST)" ],
-    "P|port=s"         => [ \$port,         "Datameer port     (\$DATAMEER_PORT, \$PORT, default: $DATAMEER_DEFAULT_PORT)" ],
+    "H|host=s"         => [ \$host,         "Datameer server (\$DATAMEER_HOST, \$HOST)" ],
+    "P|port=s"         => [ \$port,         "Datameer port   (\$DATAMEER_PORT, \$PORT, default: $DATAMEER_DEFAULT_PORT)" ],
     %useroptions,
 );
 
