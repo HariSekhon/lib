@@ -44,44 +44,9 @@ build:
 	git submodule update --recursive
 	git update-index --assume-unchanged resources/custom_tlds.txt
 
-	# order here is important, in Travis and some stripped down client some deps are not pulled in automatically but are required for subsequent module builds
-	# this doesn't work it's misaligned with the prompts, should use expect instead if I were going to do this
-	#
-	# downgrading Net::DNS as a workaround for taint mode bug:
-	# https://rt.cpan.org/Public/Bug/Display.html?id=114819
-	#
 	#(echo y; echo o conf prerequisites_policy follow; echo o conf commit) | cpan
 	which cpanm || { yes "" | $(SUDO2) cpan App::cpanminus; }
-	yes "" | $(SUDO2) $(CPANM) --notest \
-		YAML \
-		Class::Accessor \
-		Data::Dumper \
-		Devel::Cover::Report::Coveralls \
-		ExtUtils::Constant \
-		IO::Socket::IP \
-		IO::Socket::Timeout \
-		JSON \
-		JSON::XS \
-		LWP::Simple \
-		LWP::UserAgent \
-		Math::Round \
-		MongoDB \
-		MongoDB::MongoClient \
-		Net::LDAP \
-		Net::LDAPI \
-		Net::LDAPS \
-		Net::DNS@1.05 \
-		Net::SSH::Expect \
-		Net::SSL \
-		Readonly \
-		Readonly::XS \
-		Sys::Syslog \
-		Term::ReadKey \
-		Thrift \
-		Time::HiRes \
-		XML::SAX \
-		XML::Simple \
-		;
+	yes "" | $(SUDO2) $(CPANM) --notest `sed 's/#.*//; /^[[:space:]]*$$/d;' < cpan-requirements.txt`
 	# newer versions of the Redis module require Perl >= 5.10, this will install the older compatible version for RHEL5/CentOS5 servers still running Perl 5.8 if the latest module fails
 	# the backdated version might not be the perfect version, found by digging around in the git repo
 	$(SUDO2) $(CPANM) --notest Redis || $(SUDO2) $(CPANM) --notest DAMS/Redis-1.976.tar.gz
