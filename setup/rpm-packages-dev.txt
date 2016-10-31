@@ -14,7 +14,7 @@
 #                          RPM Dev Package Requirements
 # ============================================================================ #
 
-gcc
-perl-CPAN
-mysql-devel
 expat-devel
+gcc
+mysql-devel
+perl-CPAN
