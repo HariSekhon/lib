@@ -1,0 +1,53 @@
+#  vim:ts=4:sts=4:sw=4:noet
+#
+#  Author: Hari Sekhon
+#  Date: 2013-01-06 15:45:00 +0000 (Sun, 06 Jan 2013)
+#
+#  https://github.com/harisekhon/lib
+#
+#  License: see accompanying Hari Sekhon LICENSE file
+#
+#  If you're using my code you're welcome to connect with me on LinkedIn and optionally send me feedback to help improve or steer this or other code I publish
+#
+#  https://www.linkedin.com/in/harisekhon
+#
+
+# Library dependencies are handled in one place in calling project
+
+# order here is important, in Travis and some stripped down client some deps are not pulled in automatically but are required for subsequent module builds
+# this doesn't work it's misaligned with the prompts, should use expect instead if I were going to do this
+#
+# downgrading Net::DNS as a workaround for taint mode bug:
+# https://rt.cpan.org/Public/Bug/Display.html?id=114819
+
+YAML
+Class::Accessor
+Data::Dumper
+Devel::Cover::Report::Coveralls
+ExtUtils::Constant
+IO::Socket::IP
+IO::Socket::Timeout
+JSON
+JSON::XS
+LWP::Simple
+LWP::UserAgent
+Math::Round
+MongoDB
+MongoDB::MongoClient
+Net::LDAP
+Net::LDAPI
+Net::LDAPS
+Net::DNS@1.05
+Net::SSH::Expect
+Net::SSL
+Readonly
+Readonly::XS
+# newer versions of the Redis module require Perl >= 5.10
+# Make tries and then falls back to a backdated version for compatibility
+# Redis
+Sys::Syslog
+Term::ReadKey
+Thrift
+Time::HiRes
+XML::SAX
+XML::Simple
