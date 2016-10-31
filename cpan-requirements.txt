@@ -12,13 +12,9 @@
 #  https://www.linkedin.com/in/harisekhon
 #
 
-# Library dependencies are handled in one place in calling project
-
-# order here is important, in Travis and some stripped down client some deps are not pulled in automatically but are required for subsequent module builds
-# this doesn't work it's misaligned with the prompts, should use expect instead if I were going to do this
-#
-# downgrading Net::DNS as a workaround for taint mode bug:
-# https://rt.cpan.org/Public/Bug/Display.html?id=114819
+# ============================================================================ #
+#                            CPAN Module Dependencies
+# ============================================================================ #
 
 Class::Accessor
 Data::Dumper
@@ -36,6 +32,8 @@ MongoDB::MongoClient
 Net::LDAP
 Net::LDAPI
 Net::LDAPS
+# downgrading Net::DNS as a workaround for taint mode bug:
+# https://rt.cpan.org/Public/Bug/Display.html?id=114819
 Net::DNS@1.05
 Net::SSH::Expect
 Net::SSL
