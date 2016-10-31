@@ -67,26 +67,11 @@ apk-packages-remove:
 .PHONY: apt-packages
 apt-packages:
 	$(SUDO) apt-get update
-	# needed to fetch the library submodule at end of build
-	$(SUDO) apt-get install -y build-essential
-	$(SUDO) apt-get install -y libwww-perl
-	$(SUDO) apt-get install -y git
-	# needed to build Net::SSLeay for IO::Socket::SSL for Net::LDAPS
-	$(SUDO) apt-get install -y libssl-dev
-	$(SUDO) apt-get install -y libsasl2-dev
-	# for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
-	$(SUDO) apt-get install -y libdbd-mysql-perl
-	$(SUDO) apt-get install -y libmysqlclient-dev
-	# needed to build XML::Simple dep XML::Parser
-	$(SUDO) apt-get install -y libexpat1-dev
+	$(SUDO) apt-get install -y `sed 's/#.*//; /^[[:space:]]*$$/d' < deb-packages.txt`
 
 .PHONY: apt-packages-remove
 apt-packages-remove:
-	$(SUDO) apt-get purge -y build-essential
-	$(SUDO) apt-get purge -y libssl-dev
-	$(SUDO) apt-get purge -y libsasl2-dev
-	$(SUDO) apt-get purge -y libmysqlclient-dev
-	$(SUDO) apt-get purge -y libexpat1-dev
+	$(SUDO) apt-get purge -y `sed 's/#.*//; /^[[:space:]]*$$/d' < deb-packages-dev.txt`
 
 .PHONY: yum-packages
 yum-packages:
