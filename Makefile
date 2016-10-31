@@ -56,7 +56,6 @@ build:
 .PHONY: apk-packages
 apk-packages:
 	$(SUDO) apk update
-	# grep needed for validate_regex() posix unit test as busybox's in-built grep doesn't validate regex errors
 	$(SUDO) apk add `sed 's/#.*//; /^[[:space:]]*$$/d' < apk-packages.txt`
 
 .PHONY: apk-packages-remove
