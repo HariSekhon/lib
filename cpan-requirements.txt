@@ -20,7 +20,6 @@
 # downgrading Net::DNS as a workaround for taint mode bug:
 # https://rt.cpan.org/Public/Bug/Display.html?id=114819
 
-YAML
 Class::Accessor
 Data::Dumper
 Devel::Cover::Report::Coveralls
@@ -51,3 +50,4 @@ Thrift
 Time::HiRes
 XML::SAX
 XML::Simple
+YAML
