@@ -9,7 +9,7 @@
 
 package HariSekhon::Elasticsearch;
 
-$VERSION = "0.5.0";
+$VERSION = "0.6.0";
 
 use strict;
 use warnings;
@@ -19,6 +19,7 @@ BEGIN {
 }
 use HariSekhonUtils;
 use Carp;
+use Data::Dumper;
 use LWP::Simple '$ua';
 
 set_port_default(9200);
@@ -115,7 +116,30 @@ sub elasticsearch_err_handler($){
             foreach(qw/status error message reason/){
                 if(defined($json->{$_})){
                     $_ eq "status" and $json->{$_} eq $response->code and next;
-                    $info .= ". " . ucfirst($_) . ": " . $json->{$_};
+                    my $tmp = $json->{$_};
+                    $info .= ". " . ucfirst($_) . ": ";
+                    if(isHash($tmp)){
+                        my $reason            = get_field2($tmp, "reason", 1);
+                        my $type              = get_field2($tmp, "type", 1);
+                        my $root_cause_reason = get_field2($tmp, "root_cause.reason", 1);
+                        my $root_cause_type   = get_field2($tmp, "root_cause.type", 1);
+                        if($reason){
+                            if($type){
+                                $info .= "$type: ";
+                            }
+                            $info .= "$reason";
+                            if($root_cause_type and $root_cause_type ne $type){
+                                $info .= ": $root_cause_type";
+                            }
+                            if($root_cause_reason and $root_cause_reason ne $reason){
+                                $info .= ": $root_cause_reason";
+                            }
+                        } else {
+                            $info .= Dumper($tmp);
+                        }
+                    } else {
+                        $info .= $json->{$tmp};
+                    }
                 }
             }
         }
@@ -139,10 +163,13 @@ sub curl_elasticsearch_raw($;$$){
     } else {
         $url .= "?";
     }
-    $url .= sprintf("timeout=%ds", minimum_value($timeout - 1, 1));
+    # Elasticsearch 5.0 no longer accepts the timeout parameter everywhere
+    if($url ne '?'){
+        $url .= sprintf("timeout=%ds", minimum_value($timeout - 1, 1));
+    }
     $url .= "&pretty=true" if $verbose >= 3 or $debug;
-    #my $content = curl "http://$host:$port/$url", "Elasticsearch", undef, undef, \&elasticsearch_err_handler, $type;
-    my $content = curl "http://$host:$port/$url", "Elasticsearch", undef, undef, undef, $type, $body;
+    #my $content = curl "http://$host:$port/$url", "Elasticsearch", undef, undef, undef, $type, $body;
+    my $content = curl "http://$host:$port/$url", "Elasticsearch", undef, undef, \&elasticsearch_err_handler, $type, $body;
     return $content;
 }
 
