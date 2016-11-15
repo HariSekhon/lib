@@ -168,6 +168,7 @@ sub curl_elasticsearch_raw($;$$){
         $url .= sprintf("timeout=%ds&", minimum_value($timeout - 1, 1));
     }
     $url .= "pretty=true" if $verbose >= 3 or $debug;
+    $url =~ s/\&$//;
     #my $content = curl "http://$host:$port/$url", "Elasticsearch", undef, undef, undef, $type, $body;
     my $content = curl "http://$host:$port/$url", "Elasticsearch", undef, undef, \&elasticsearch_err_handler, $type, $body;
     return $content;
