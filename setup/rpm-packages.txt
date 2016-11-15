@@ -15,11 +15,13 @@
 # ============================================================================ #
 
 gcc
+git
 perl-CPAN
 perl-libwww-perl
-git
+
 # for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
 mysql-devel
 perl-DBD-MySQL
+
 # needed to build XML::Simple dep XML::Parser
 expat-devel
