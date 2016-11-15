@@ -9,7 +9,7 @@
 
 package HariSekhon::Elasticsearch;
 
-$VERSION = "0.6.0";
+$VERSION = "0.6.1";
 
 use strict;
 use warnings;
@@ -164,7 +164,8 @@ sub curl_elasticsearch_raw($;$$){
         $url .= "?";
     }
     # Elasticsearch 5.0 no longer accepts the timeout parameter everywhere
-    if($url ne '?' and $url !~ /_cat/){
+    if($url ne '?' and
+       $url !~ /_cat|_settings|_stats|_cluster/){
         $url .= sprintf("timeout=%ds&", minimum_value($timeout - 1, 1));
     }
     $url .= "pretty=true" if $verbose >= 3 or $debug;
