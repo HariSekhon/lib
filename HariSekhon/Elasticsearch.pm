@@ -164,7 +164,7 @@ sub curl_elasticsearch_raw($;$$){
         $url .= "?";
     }
     # Elasticsearch 5.0 no longer accepts the timeout parameter everywhere
-    if($url ne '?'){
+    if($url ne '?' and $url !~ /_cat/){
         $url .= sprintf("timeout=%ds", minimum_value($timeout - 1, 1));
     }
     $url .= "&pretty=true" if $verbose >= 3 or $debug;
