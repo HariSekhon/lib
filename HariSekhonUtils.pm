@@ -79,7 +79,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.18.5";
+our $VERSION = "1.18.6";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1743,6 +1743,8 @@ sub get_options {
 
     if(defined($ENV{"DEBUG"}) and $ENV{"DEBUG"}){
         $debug = 1;
+    }
+    if($debug){
         $verbose = 3;
     }
 
