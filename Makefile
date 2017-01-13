@@ -61,7 +61,6 @@ build:
 apk-packages:
 	$(SUDO) apk update
 	$(SUDO) apk add `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/apk-packages.txt`
-	make apk-packages-remove
 
 .PHONY: apk-packages-remove
 apk-packages-remove:
