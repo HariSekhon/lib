@@ -46,6 +46,8 @@ build:
 
 	#(echo y; echo o conf prerequisites_policy follow; echo o conf commit) | cpan
 	which cpanm || { yes "" | $(SUDO2) cpan App::cpanminus; }
+	# some libraries need this to be present first
+	$(SUDO2) $(CPANM) --no-test Test::More
 	yes "" | $(SUDO2) $(CPANM) --notest `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/cpan-requirements.txt`
 
 	# newer versions of the Redis module require Perl >= 5.10, this will install the older compatible version for RHEL5/CentOS5 servers still running Perl 5.8 if the latest module fails
