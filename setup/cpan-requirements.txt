@@ -42,6 +42,7 @@ Readonly::XS
 # Redis
 Sys::Syslog
 Term::ReadKey
+Test::More
 Thrift
 Time::HiRes
 XML::SAX
