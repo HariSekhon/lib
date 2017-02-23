@@ -28,3 +28,4 @@ libmysqlclient-dev
 
 # needed to build XML::Simple dep XML::Parser
 libexpat1-dev
+libredis-perl
