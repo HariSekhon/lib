@@ -16,5 +16,5 @@
 
 expat-devel
 gcc
-mysql-devel
+#mysql-devel
 perl-CPAN
