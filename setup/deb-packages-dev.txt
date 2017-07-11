@@ -16,6 +16,7 @@
 
 build-essential
 libexpat1-dev
-libmysqlclient-dev
+#libmysqlclient-dev
+libmariadbd-dev
 libsasl2-dev
 libssl-dev

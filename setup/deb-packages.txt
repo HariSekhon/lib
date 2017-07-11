@@ -24,7 +24,8 @@ libsasl2-dev
 
 # for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
 libdbd-mysql-perl
-libmysqlclient-dev
+#libmysqlclient-dev
+libmariadbd-dev
 
 # needed to build XML::Simple dep XML::Parser
 libexpat1-dev
