@@ -79,7 +79,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.18.6";
+our $VERSION = "1.18.7";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -3868,7 +3868,11 @@ sub validate_password ($;$$) {
         $password = $1;
         $password =~ /\$\(/ and usage "invalid ${name}password defined: may not contain \$( as this is a subshell escape and could be dangerous to pass through to programs on the command line";
     }
-    vlog_option("${name}password", "<omitted>");
+    if($ENV{'PASSWORD_DEBUG'}){
+        vlog_option("${name}password", "$password");
+    } else { 
+        vlog_option("${name}password", "<omitted>");
+    }
     return $password;
 }
 
