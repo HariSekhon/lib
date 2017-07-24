@@ -1133,6 +1133,9 @@ if(isLinuxOrMac()){
 }
 
 is(validate_password('wh@tev3r'),   'wh@tev3r',     'validate_password(\'wh@tev3r\')');
+$ENV{'PASSWORD_DEBUG'} = 1;
+is(validate_password('wh@tev3r'),   'wh@tev3r',     'validate_password(\'wh@tev3r\')');
+delete $ENV{'PASSWORD_DEBUG'};
 
 # ssl isn't set here
 ok(!validate_ssl(), 'validate_ssl()');
