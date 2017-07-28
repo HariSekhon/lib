@@ -1736,9 +1736,9 @@ sub get_options {
             $verbose = int(isInt($ENV{'VERBOSE'}));
         }
     }
-    if($timeout eq undef){
+    if(not defined($timeout)){
         if($ENV{'TIMEOUT'}){
-            if(isInt($ENV{'TIMEOUT'}) ne undef){
+            if(defined(isInt($ENV{'TIMEOUT'}))){
                 vlog3("environment variable \$TIMEOUT = $ENV{TIMEOUT} and timeout not already set, setting timeout = $ENV{TIMEOUT}");
                 # assigning through isInt() again to untaint
                 $timeout = int(isInt($ENV{'TIMEOUT'}));
@@ -1747,7 +1747,7 @@ sub get_options {
             }
         }
     }
-    if($timeout eq undef){
+    if(not defined($timeout)){
         $timeout = $timeout_default;
     }
     # TODO: finish this debug code
