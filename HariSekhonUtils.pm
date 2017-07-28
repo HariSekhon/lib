@@ -79,7 +79,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.18.8";
+our $VERSION = "1.18.9";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1729,25 +1729,6 @@ sub get_options {
         $option_count{$_} > 1 and code_error("Duplicate option key detected '$_'");
     }
     GetOptions(%options3) or usage();
-    if(isInt($ENV{'VERBOSE'})){
-        if(int($ENV{'VERBOSE'}) > $verbose){
-            vlog3("environment variable \$VERBOSE = $ENV{VERBOSE}, increasing verbosity");
-            $verbose = int($ENV{'VERBOSE'});
-        }
-    }
-    if(not defined($timeout)){
-        if($ENV{'TIMEOUT'}){
-            if(isInt($ENV{'TIMEOUT'})){
-                vlog3("environment variable \$TIMEOUT = $ENV{TIMEOUT} and timeout not already set, setting timeout = $ENV{TIMEOUT}");
-                $timeout = int($ENV{'TIMEOUT'});
-            } else {
-                warn "\$TIMEOUT environment variable is not an integer ($ENV{TIMEOUT})";
-            }
-        }
-    }
-    if(not defined($timeout)){
-        $timeout = $timeout_default;
-    }
     # TODO: finish this debug code
 #    if($debug){
 #        foreach(sort keys %options3){
@@ -1767,19 +1748,36 @@ sub get_options {
         $verbose = 3;
     }
 
-    if(defined($ENV{"VERBOSE"}) and isInt($ENV{"VERBOSE"})){
-        my $env_verbose = $1;
-        if($env_verbose > $verbose){
-            $verbose = $env_verbose;
-            vlog3("environment variable \$VERBOSE = $env_verbose, increasing verbosity");
+    if(defined($ENV{'VERBOSE'})){
+        if(isInt($ENV{'VERBOSE'})){
+            my $env_verbose = int($ENV{'VERBOSE'});
+            if($env_verbose > $verbose){
+                $verbose = $env_verbose;
+                vlog3("environment variable \$VERBOSE = $env_verbose, increasing verbosity");
+            }
         } else {
-            warn "environment variable \$VERBOSE is not an integer ('$env_verbose')";
+            warn "environment variable \$VERBOSE is not an integer ('$ENV{VERBOSE}')";
         }
     }
 
     verbose_mode();
     #vlog2("options:\n");
     # validation is done on an option by option basis
+
+    if(defined($ENV{'TIMEOUT'})){
+        if(isInt($ENV{'TIMEOUT'})){
+            if(not defined($timeout)){
+                vlog3("environment variable \$TIMEOUT = $ENV{TIMEOUT} and timeout not already set, setting timeout = $ENV{TIMEOUT}");
+                $timeout = int($ENV{'TIMEOUT'});
+            }
+        } else {
+            warn "\$TIMEOUT environment variable is not an integer ('$ENV{TIMEOUT}')";
+        }
+    }
+    if(not defined($timeout)){
+        $timeout = $timeout_default;
+    }
+
     1;
 }
 
