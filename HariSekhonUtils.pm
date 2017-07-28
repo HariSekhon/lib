@@ -79,7 +79,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.18.7";
+our $VERSION = "1.18.8";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -613,7 +613,7 @@ our $timeout_current_action = "";
 our $timeout_default = 10;
 our $timeout_max     = 60;
 our $timeout_min     = 1;
-our $timeout         = $timeout_default;
+our $timeout         = undef;
 our $usage_line      = "usage: $progname [ options ]";
 our $user;
 our %thresholds;
@@ -720,8 +720,8 @@ our $version_regex_lax  = $version_regex . '-?.*';
 # universal options added automatically when using get_options()
 our %default_options = (
     "D|debug+"     => [ \$debug,    "Debug code" ],
-    "t|timeout=i"  => [ \$timeout,  "Timeout in secs (default: $timeout_default)" ],
-    "v|verbose+"   => [ \$verbose,  "Verbose mode (-v, -vv, -vvv ...)" ],
+    "t|timeout=i"  => [ \$timeout,  "Timeout in secs (\$TIMEOUT, default: $timeout_default)" ],
+    "v|verbose+"   => [ \$verbose,  "Verbose level (\$VERBOSE=<int>, or use multiple -v, -vv, -vvv)" ],
     "V|version"    => [ \$version,  "Print version and exit" ],
     "h|help"       => [ \$help,     "Print description and usage options" ],
 );
@@ -1729,6 +1729,27 @@ sub get_options {
         $option_count{$_} > 1 and code_error("Duplicate option key detected '$_'");
     }
     GetOptions(%options3) or usage();
+    if(isInt($ENV{'VERBOSE'})){
+        if(int($ENV{'VERBOSE'}) > $verbose){
+            vlog3("environment variable \$VERBOSE = $ENV{VERBOSE}, increasing verbosity");
+            # assigning through isInt() again to untaint
+            $verbose = int(isInt($ENV{'VERBOSE'}));
+        }
+    }
+    if($timeout eq undef){
+        if($ENV{'TIMEOUT'}){
+            if(isInt($ENV{'TIMEOUT'}) ne undef){
+                vlog3("environment variable \$TIMEOUT = $ENV{TIMEOUT} and timeout not already set, setting timeout = $ENV{TIMEOUT}");
+                # assigning through isInt() again to untaint
+                $timeout = int(isInt($ENV{'TIMEOUT'}));
+            } else {
+                warn "\$TIMEOUT environment variable is not an integer ($ENV{TIMEOUT})";
+            }
+        }
+    }
+    if($timeout eq undef){
+        $timeout = $timeout_default;
+    }
     # TODO: finish this debug code
 #    if($debug){
 #        foreach(sort keys %options3){
