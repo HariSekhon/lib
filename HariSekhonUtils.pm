@@ -1732,16 +1732,14 @@ sub get_options {
     if(isInt($ENV{'VERBOSE'})){
         if(int($ENV{'VERBOSE'}) > $verbose){
             vlog3("environment variable \$VERBOSE = $ENV{VERBOSE}, increasing verbosity");
-            # assigning through isInt() again to untaint
-            $verbose = int(isInt($ENV{'VERBOSE'}));
+            $verbose = int($ENV{'VERBOSE'});
         }
     }
     if(not defined($timeout)){
         if($ENV{'TIMEOUT'}){
-            if(defined(isInt($ENV{'TIMEOUT'}))){
+            if(isInt($ENV{'TIMEOUT'})){
                 vlog3("environment variable \$TIMEOUT = $ENV{TIMEOUT} and timeout not already set, setting timeout = $ENV{TIMEOUT}");
-                # assigning through isInt() again to untaint
-                $timeout = int(isInt($ENV{'TIMEOUT'}));
+                $timeout = int($ENV{'TIMEOUT'});
             } else {
                 warn "\$TIMEOUT environment variable is not an integer ($ENV{TIMEOUT})";
             }
