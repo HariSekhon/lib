@@ -1753,7 +1753,7 @@ sub get_options {
             my $env_verbose = int($ENV{'VERBOSE'});
             if($env_verbose > $verbose){
                 $verbose = $env_verbose;
-                vlog3("environment variable \$VERBOSE = $env_verbose, increasing verbosity");
+                vlog3("environment variable \$VERBOSE = '$env_verbose', increasing verbosity");
             }
         } else {
             warn "environment variable \$VERBOSE is not an integer ('$ENV{VERBOSE}')";
@@ -1767,7 +1767,7 @@ sub get_options {
     if(defined($ENV{'TIMEOUT'})){
         if(isInt($ENV{'TIMEOUT'})){
             if(not defined($timeout)){
-                vlog3("environment variable \$TIMEOUT = $ENV{TIMEOUT} and timeout not already set, setting timeout = $ENV{TIMEOUT}");
+                vlog3("environment variable \$TIMEOUT = '$ENV{TIMEOUT}' and timeout not already set, setting timeout = $ENV{TIMEOUT}");
                 $timeout = int($ENV{'TIMEOUT'});
             }
         } else {
