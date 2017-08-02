@@ -36,6 +36,6 @@ is_travis || bash-tools/check_perl_syntax.sh HariSekhon
 
 bash-tools/check_perl_syntax.sh t
 
-echo "Running unit tests"
+section "Running Perl Unit Tests"
 
 PERL5LIB=${PERLBREW_ROOT:-} PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -I . -lrsv --timer t
