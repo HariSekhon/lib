@@ -14,11 +14,13 @@
 #                            RPM Package Requirements
 # ============================================================================ #
 
+# TODO: replace as many CPAN modules with system packages as possible - test back to centos 6
+
 gcc
 git
 perl-CPAN
 perl-libwww-perl
-perl-libxml-perl
+perl-XML-LibXML
 
 # for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
 #mysql-devel
