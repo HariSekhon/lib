@@ -21,7 +21,7 @@ gcc
 git
 # grep needed for validate_regex() posix unit test as busybox's in-built grep doesn't validate regex errors
 grep
-libxml2-dev
+libxml-perl
 #openssl-dev
 libressl-dev
 perl
