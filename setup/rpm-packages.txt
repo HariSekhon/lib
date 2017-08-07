@@ -18,6 +18,7 @@ gcc
 git
 perl-CPAN
 perl-libwww-perl
+perl-libxml-perl
 
 # for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
 #mysql-devel
