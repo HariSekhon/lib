@@ -101,7 +101,7 @@ is(get_status_code("DEPENDENT"),  4, "get_status_code(DEPENDENT) eq 4");
 #is(get_status_code("NONEXISTENT"),  undef, "get_status_code(NONEXISTENT) eq undef");
 
 # This should cause compilation failure
-#ok(critical("blah"), 'critical("blah")');
+#ok(critical("something"), 'critical("something")');
 
 # ============================================================================ #
 $verbose++;
@@ -320,11 +320,11 @@ is(get_path_owner("/etc/passwd"), "root", 'get_path_owner("/etc/passwd") eq "roo
 
 # ============================================================================ #
 
-is(perf_suffix("blah_in_bytes"),    "b",    'perf_suffix("blah_in_bytes")');
-is(perf_suffix("blah_in_millis"),   "ms",   'perf_suffix("blah_in_millis")');
-is(perf_suffix("blah.bytes"),       "b",    'perf_suffix("blah.bytes")');
-is(perf_suffix("blah.millis"),      "ms",   'perf_suffix("blah.millis")');
-is(perf_suffix("blah.blah2"),       "",     'perf_suffix("blah.blah2")');
+is(perf_suffix("something_in_bytes"),    "b",    'perf_suffix("something_in_bytes")');
+is(perf_suffix("something_in_millis"),   "ms",   'perf_suffix("something_in_millis")');
+is(perf_suffix("something.bytes"),       "b",    'perf_suffix("something.bytes")');
+is(perf_suffix("something.millis"),      "ms",   'perf_suffix("something.millis")');
+is(perf_suffix("somethign.something2"),  "",     'perf_suffix("something.something2")');
 
 # ============================================================================ #
 is(get_upper_threshold("warning"),   "5",     'get_upper_threshold(warning)');
@@ -684,7 +684,7 @@ is(validate_java_bean("java.lang:type=Memory"), "java.lang:type=Memory", 'valida
 
 # ============================================================================ #
 ok(isJavaException("        at org.apache.ambari.server.api.services.stackadvisor.StackAdvisorRunner.runScript(StackAdvisorRunner.java:96)"), 'isJavaException(" at org.apache.ambari.server...."');
-ok(!isJavaException("blah"), '!isJavaException("blah")');
+ok(!isJavaException("notanexception"), '!isJavaException("notanexception")');
 
 # ============================================================================ #
 ok(isJson('{ "test": "data" }'),   'isJson({ "test": "data" })');
@@ -775,17 +775,17 @@ is(validate_nosql_key("HariSekhon:check_riak_write.pl:riak1:1385226607.02182:20a
 
 # ============================================================================ #
 
-ok(isPathQualified("./blah"), 'isPathQualified("./blah")');
-ok(isPathQualified("/blah"),  'isPathQualified("/blah")');
-ok(isPathQualified("./path/to/blah.txt"), 'isPathQualified("./path/to/blah")');
-ok(isPathQualified("/path/to/blah.txt"),  'isPathQualified("/path/to/blah")');
-ok(isPathQualified("/tmp/.blah"),  'isPathQualified("/tmp/.blah")');
-ok(!isPathQualified("blah"),  'isPathQualified("blah")');
-ok(!isPathQualified(".blah"),  'isPathQualified(".blah")');
+ok(isPathQualified("./somepath"), 'isPathQualified("./somepath")');
+ok(isPathQualified("/somepath"),  'isPathQualified("/somepath")');
+ok(isPathQualified("./path/to/somepath.txt"), 'isPathQualified("./path/to/somepath")');
+ok(isPathQualified("/path/to/somepath.txt"),  'isPathQualified("/path/to/somepath")');
+ok(isPathQualified("/tmp/.somepath"),  'isPathQualified("/tmp/.somepath")');
+ok(!isPathQualified("somepath"),  'isPathQualified("somepath")');
+ok(!isPathQualified(".somepath"),  'isPathQualified(".somepath")');
 ok(!isPathQualified("#tmpfile#"),  'isPathQualified("#tmpfile#")');
 ok(!isPathQualified("Europe/London"),  'isPathQualified("Europe/London")');
 # not supporting tilda home dirs
-ok(!isPathQualified("~blah"),  'isPathQualified("~blah")');
+ok(!isPathQualified("~someuser"),  'isPathQualified("~someuser")');
 
 # ============================================================================ #
 is(isPort(1),       1,      'isPort(1)');
@@ -826,7 +826,7 @@ ok(isPythonTraceback('File "/var/lib/ambari-server/resources/scripts/stack_advis
 ok(isPythonTraceback('  File "/var/lib/ambari-agent/cache/common-services/RANGER/0.4.0/package/scripts/ranger_admin.py", line 124, in <module>'), 'isPythonTraceback(  File "/var/lib/ambari-agent/cache/common-services/RANGER/0.4.0/package/scripts/ranger_admin.py", line 124, in <module>)');
 ok(isPythonTraceback('File "/var/lib/ambari-agent/cache/common-services/RANGER/0.4.0/package/scripts/ranger_admin.py", line 124, in <module>'), 'isPythonTraceback(File "/var/lib/ambari-agent/cache/common-services/RANGER/0.4.0/package/scripts/ranger_admin.py", line 124, in <module>)');
 ok(isPythonTraceback('... Traceback (most recent call last):'), 'isPythonTraceback("... Traceback (most recent call last):")');
-ok(!isPythonTraceback('blah'), 'isPythonTraceback("blah")');
+ok(!isPythonTraceback('notapythontraceback'), '!isPythonTraceback("notapythontraceback")');
 
 # ============================================================================ #
 is(isRegex(".*"),   ".*",   'isRegex(".*") eq ".*"');
@@ -931,8 +931,8 @@ is(isVersionLax("1.0-a"), "1.0", 'isVersionLax(1.0-a) eq 1.0');
 is(isVersionLax("hari"), undef, 'isVersionLax(hari) eq undef');
 
 # ============================================================================ #
-ok(isXml("<blah></blah>"), "isXML()");
-ok(!isXml("<blah>"), "!isXml()");
+ok(isXml("<sometag></sometag>"), "isXML()");
+ok(!isXml("<sometag>"), "!isXml()");
 
 # ============================================================================ #
 ok(isYes("yEs"), 'isYes(yEs)');
