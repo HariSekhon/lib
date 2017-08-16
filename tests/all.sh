@@ -15,16 +15,17 @@
 
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
-
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/.."
 
 . bash-tools/utils.sh
 
-bash-tools/all.sh
+section "Perl Lib Tests"
 
-section "Perl Lib"
+perl_lib_start_time="$(start_timer)"
+
+bash-tools/all.sh
 
 tests/find_uncovered_subs.sh
 
@@ -39,3 +40,6 @@ bash-tools/check_perl_syntax.sh t
 section "Running Perl Unit Tests"
 
 PERL5LIB=${PERLBREW_ROOT:-} PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -I . -lrsv --timer t
+
+time_taken "$perl_lib_start_time" "Perl Lib Tests Completed in"
+section2 "Perl Lib Tests Successful"
