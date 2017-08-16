@@ -514,9 +514,9 @@ BEGIN {
     if(substr(basename($0), 0, 6) eq "check_"){
         open STDERR, ">&STDOUT";
         select(STDERR);
-        $| = 1; 
+        $| = 1;
         select(STDOUT);
-        $| = 1; 
+        $| = 1;
     }
 
     sub die_sub {
@@ -1086,7 +1086,7 @@ sub catch_quit ($) {
 ##    # TODO: consider replacing this with first position insertion in array in get_options for efficiency
 ##    foreach my $option (keys %options){
 ##        unless grep { grep($options keys %{$_} } @options){
-##            push(@options, { $_ => $options{$_} }) 
+##            push(@options, { $_ => $options{$_} })
 ##        };
 ##    }
 ##    #foreach(keys %hashref){
@@ -1096,7 +1096,7 @@ sub catch_quit ($) {
 
 
 #sub update_option_description {
-#    my $option = 
+#    my $option =
 #}
 
 
@@ -1397,7 +1397,7 @@ sub curl ($;$$$$$$) {
         vlog3($body);
     }
     #unless(defined(&main::get)){
-        # inefficient, it'll import for each curl call, instead force top level author to 
+        # inefficient, it'll import for each curl call, instead force top level author to
         # use LWP::Simple 'get'
         #debug("importing LWP::Simple 'get'\n");
         #require LWP::Simple;
@@ -2607,7 +2607,7 @@ sub msg_thresholds (;$$) {
                             defined($thresholds{"${name}warning"}{"range"}) or
                             defined($thresholds{"${name}critical"}{"range"})
                           )
-            ) 
+            )
         ) {
         $msg2 .= " (";
         if(defined($thresholds{"${name}critical"}{"error"})){
@@ -3887,7 +3887,7 @@ sub validate_password ($;$$) {
     }
     if($ENV{'PASSWORD_DEBUG'}){
         vlog_option("${name}password", "$password");
-    } else { 
+    } else {
         vlog_option("${name}password", "<omitted>");
     }
     return $password;

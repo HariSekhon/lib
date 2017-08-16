@@ -5,7 +5,7 @@
 #  https://github.com/harisekhon/lib
 #
 #  License: see accompanying Hari Sekhon LICENSE file
-#  
+#
 
 package HariSekhon::MapR;
 
@@ -257,7 +257,7 @@ sub list_volumes(){
         }
         exit $ERRORS{"UNKNOWN"};
     }
-} 
+}
 
 sub validate_cluster($){
     my $cluster = shift;

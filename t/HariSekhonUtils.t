@@ -111,7 +111,7 @@ ok(status(), "status()");
 # ============================================================================ #
 ok(!try { print "try\n"; }, "try{}");
 ok(!catch { print "caught\n"; }, "catch{}");
-ok(catch_quit("catch quit"), "catch_quit()"); 
+ok(catch_quit("catch quit"), "catch_quit()");
 
 # ============================================================================ #
 ok(autoflush(), "autoflush()");
@@ -1166,7 +1166,7 @@ ok(HariSekhonUtils::print_options(), 'print_options()');
 # """
 # Unfortunately, Devel::Cover does not yet work with threads.  I have done
 # some work in this area, but there is still more to be done.
-# 
+#
 # Dubious, test returned 1 (wstat 256, 0x100)
 # All 517 subtests passed
 # """

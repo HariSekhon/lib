@@ -11,7 +11,7 @@
 # TODO: add regex test for expected exit code line to check the test file was written correctly
 
 # Format for the test files is:
-# 
+#
 # # hash prefixed or blank lines are ignored up to the first non-blank/comment line (subsequent blank lines may be a valid part of expected output)
 #
 # ./command --with --all --args

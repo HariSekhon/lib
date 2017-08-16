@@ -5,7 +5,7 @@
 #  https://github.com/harisekhon/lib
 #
 #  License: see accompanying LICENSE file
-#  
+#
 
 # Forked from check_ambari.pl from the Advanced Nagios Plugins Collection
 #
