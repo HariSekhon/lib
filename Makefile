@@ -82,8 +82,8 @@ apt-packages:
 .PHONY: apt-packages-remove
 apt-packages-remove:
 	$(SUDO) apt-get purge -y `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/deb-packages-dev.txt`
-	$(SUDO) apt-get install -y libmariadbd-dev || :
-	$(SUDO) apt-get install -y libmysqlclient-dev || :
+	$(SUDO) apt-get purge -y libmariadbd-dev || :
+	$(SUDO) apt-get purge -y libmysqlclient-dev || :
 
 .PHONY: yum-packages
 yum-packages:
