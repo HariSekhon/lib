@@ -14,6 +14,8 @@
 #                            Deb Package Requirements
 # ============================================================================ #
 
+# TODO: replace as many CPAN modules as possible with system modules, test back to ubuntu 12 and debian 7
+
 build-essential
 git
 libwww-perl
@@ -24,11 +26,7 @@ libxml-perl
 libssl-dev
 libsasl2-dev
 
-# for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
 #libdbd-mysql-perl
-#libmysqlclient-dev
-#libmariadbd-dev
-#python-mysqldb
 
 # needed to build XML::Simple dep XML::Parser
 libexpat1-dev
