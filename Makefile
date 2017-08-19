@@ -56,6 +56,8 @@ build:
 
 	@echo
 	@echo "BUILD SUCCESSFUL (lib)"
+	@echo
+	@echo
 
 .PHONY: quick
 quick:
