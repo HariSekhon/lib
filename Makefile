@@ -93,7 +93,7 @@ yum-packages:
 
 .PHONY: yum-packages-remove
 yum-packages-remove:
-	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/rpm-packages-dev.txt`; do rpm -q $$x && $(SUDO) yum remove -y $$x; done
+	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/rpm-packages-dev.txt`; do if rpm -q $$x; then $(SUDO) yum remove -y $$x; fi; done
 
 .PHONY: test
 test:
