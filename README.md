@@ -16,7 +16,7 @@ make &&
 make test
 ```
 
-Continuous Integration is run on this repo to build and unit test it (Test::More, almost 800 unit tests).
+[Continuous Integration](https://travis-ci.org/HariSekhon/lib) is run on this repo to build and unit test it (Test::More, almost 800 unit tests).
 
 #### Configuration ####
 
