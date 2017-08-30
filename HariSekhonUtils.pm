@@ -1319,11 +1319,8 @@ sub cmd ($;$$$) {
     my $exitcode      = $?;
     my @output        = split("\n", $return_output);
     $exitcode         = $exitcode >> 8;
-    if ($verbose >= 3) {
-        #foreach(@output){ print "output: $_\n"; }
-        print "output:\n\n$return_output\n";
-        print "exitcode: $exitcode\n\n";
-    }
+    vlog3("output:\n\n$return_output");
+    vlog3("exitcode: $exitcode\n");
     if ($errchk and $exitcode != 0) {
         my $err = "";
         if(substr($progname, 0, 6) eq "check_"){
