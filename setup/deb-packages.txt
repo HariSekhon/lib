@@ -18,6 +18,7 @@
 
 build-essential
 git
+perl
 libwww-perl
 
 libxml-perl
