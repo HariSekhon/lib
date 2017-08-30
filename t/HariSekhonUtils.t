@@ -332,8 +332,14 @@ is(get_upper_threshold("critical"),  "10",    'get_upper_threshold(critical)');
 is(get_upper_thresholds(),           "5;10",  'get_upper_thresholds()');
 
 # ============================================================================ #
-ok(go_flock_yourself(), "go_flock_yourself()");
-ok(flock_off(), "flock_off()");
+if(isLinux() and (`stat -f -L -c %T .` eq "nfs\n" or `df -P -T . | tail -n +2 | awk '{print \$2}'` =~ /^nfs\d+?$/)){
+    vlog2("skipping flock test on Linux as running on NFS and could encounter stale locks");
+} elsif(isMac() and `df -t nfs .` ne ""){
+    vlog2("skipping flock test on Mac as running on NFS and could encounter stale locks");
+} else {
+    ok(go_flock_yourself(), "go_flock_yourself()");
+    ok(flock_off(), "flock_off()");
+}
 
 ok(hr(), 'hr()');
 
