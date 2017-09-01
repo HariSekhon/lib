@@ -3321,7 +3321,7 @@ sub validate_chars($$$){
     my $name  = shift || croak "second argument (name) not defined when calling validate_chars()";
     my $chars = shift;
     defined($string) or usage "$name not defined";
-    $string = isChars($string, $chars) || usage "invalid $name defined: must be one of the following chars - $chars";
+    $string = isChars($string, $chars) || usage "invalid $name defined: must contain only the following chars - $chars";
     vlog_option($name, $string);
     return $string;
 }
