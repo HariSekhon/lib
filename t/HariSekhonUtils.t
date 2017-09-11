@@ -231,11 +231,23 @@ use HariSekhonUtils ':regex';
 ok(escape_regex("(.*)\\["), 'escape_regex()');
 
 # ============================================================================ #
+is(expand_units("7", "B"), 7, 'expand_units("7", "B") eq 7');
+is(expand_units("8b"), 8, 'expand_units("8b") eq 8');
+
 is(expand_units("10", "KB"), 10240, 'expand_units("10", "KB") eq 10240');
+is(expand_units("10KB"), 10240, 'expand_units("10KB") eq 10240');
+
 is(expand_units("10", "mB"), 10485760, 'expand_units("10", "mB") eq 10485760');
+is(expand_units("10mB"), 10485760, 'expand_units("10mB") eq 10485760');
+
 is(expand_units("10", "Gb"), 10737418240, 'expand_units("10", "Gb") eq 10737418240');
+is(expand_units("10Gb"), 10737418240, 'expand_units("10Gb") eq 10737418240');
+
 is(expand_units("10", "tb"), 10995116277760, 'expand_units("10", "tb") eq 10995116277760');
+is(expand_units("10tb"), 10995116277760, 'expand_units("10tb") eq 10995116277760');
+
 is(expand_units("10", "Pb"), 11258999068426240, 'expand_units("10", "Pb") eq 11258999068426240');
+is(expand_units("10Pb"), 11258999068426240, 'expand_units("10Pb") eq 11258999068426240');
 
 # ============================================================================ #
 is(minimum_value(1, 4), 4, 'minimum_value(1,4)');
