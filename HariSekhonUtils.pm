@@ -1315,8 +1315,12 @@ sub cmd ($;$$$) {
         return $fh;
     }
     vlog3("cmd: $cmd");
+    # XXX: this doesn't work to solve Alpine's buggy behaviour of not returning error output and non-zero exit code when testing validate_regex() posix with broken capture of no closing brace
+    #open my $fh, "$cmd 2>&1 |";
     my $return_output = `$cmd 2>&1`;
     my $exitcode      = $?;
+    #my $return_output = do { local $/; <$fh> };
+    #close $fh;
     my @output        = split("\n", $return_output);
     $exitcode         = $exitcode >> 8;
     vlog3("output:\n\n$return_output");
