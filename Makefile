@@ -126,14 +126,12 @@ install:
 
 
 .PHONY: update
-update:
-	make update-no-recompile
-	make
-
+update: update-no-recompile build
+	:
 
 .PHONY: update2
-update2:
-	make update-no-recompile
+update2: update-no-recompile
+	:
 
 .PHONY: update-no-recompile
 update-no-recompile:
@@ -144,8 +142,8 @@ update-no-recompile:
 update-submodules:
 	git submodule update --init --remote
 .PHONY: updatem
-updatem:
-	make update-submodules
+updatem: update-submodules
+	:
 
 tld:
 	wget -t 100 --retry-connrefused -O resources/tlds-alpha-by-domain.txt http://data.iana.org/TLD/tlds-alpha-by-domain.txt
