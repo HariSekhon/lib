@@ -19,6 +19,8 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/.."
 
+export PROJECT="lib (perl)"
+
 . bash-tools/utils.sh
 
 section "Perl Lib Tests"
