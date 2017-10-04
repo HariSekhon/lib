@@ -27,8 +27,6 @@ section "Perl Lib Tests"
 
 perl_lib_start_time="$(start_timer)"
 
-bash-tools/all.sh
-
 tests/find_uncovered_subs.sh
 
 # don't overlap with bash-tools, just scan these lib directories
@@ -42,6 +40,8 @@ bash-tools/check_perl_syntax.sh t
 section "Running Perl Unit Tests"
 
 PERL5LIB=${PERLBREW_ROOT:-} PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -I . -lrsv --timer t
+
+bash-tools/all.sh
 
 time_taken "$perl_lib_start_time" "Perl Lib Tests Completed in"
 section2 "Perl Lib Tests Successful"
