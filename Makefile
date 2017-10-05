@@ -153,10 +153,8 @@ clean:
 
 .PHONY: deep-clean
 deep-clean: clean
-	$(SUDO) rm -fr /root/.cache \
-				   /root/.cpan \
+	$(SUDO) rm -fr /root/.cpan \
 				   /root/.cpanm \
-				   ~/.cache \
 				   ~/.cpan \
 				   ~/.cpanm \
 				   2>/dev/null
