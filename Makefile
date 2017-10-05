@@ -16,6 +16,8 @@
 
 export PATH := $(PATH):/usr/local/bin
 
+CPANM := cpanm
+
 SUDO := sudo
 SUDO_PERL := sudo
 
