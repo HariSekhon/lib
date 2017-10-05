@@ -16,22 +16,19 @@
 
 export PATH := $(PATH):/usr/local/bin
 
-CPANM = cpanm
+SUDO := sudo
+SUDO_PERL := sudo
 
 ifdef PERLBREW_PERL
-	SUDO2 =
-else
-	SUDO2 = sudo
+	SUDO_PERL =
 endif
 
-# must come after to reset SUDO2 to blank if root
+# must come after to reset SUDO_PERL to blank if root
 # EUID /  UID not exported in Make
 # USER not populated in Docker
 ifeq '$(shell id -u)' '0'
 	SUDO =
-	SUDO2 =
-else
-	SUDO = sudo
+	SUDO_PERL =
 endif
 
 # ===================
@@ -66,14 +63,14 @@ build:
 	git update-index --assume-unchanged resources/custom_tlds.txt
 
 	#(echo y; echo o conf prerequisites_policy follow; echo o conf commit) | cpan
-	which cpanm || { yes "" | $(SUDO2) cpan App::cpanminus; }
+	which cpanm || { yes "" | $(SUDO_PERL) cpan App::cpanminus; }
 	# some libraries need this to be present first
-	$(SUDO2) $(CPANM) --notest Test::More
-	yes "" | $(SUDO2) $(CPANM) --notest `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/cpan-requirements.txt`
+	$(SUDO_PERL) $(CPANM) --notest Test::More
+	yes "" | $(SUDO_PERL) $(CPANM) --notest `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/cpan-requirements.txt`
 
 	# newer versions of the Redis module require Perl >= 5.10, this will install the older compatible version for RHEL5/CentOS5 servers still running Perl 5.8 if the latest module fails
 	# the backdated version might not be the perfect version, found by digging around in the git repo
-	$(SUDO2) $(CPANM) --notest Redis || $(SUDO2) $(CPANM) --notest DAMS/Redis-1.976.tar.gz
+	$(SUDO_PERL) $(CPANM) --notest Redis || $(SUDO_PERL) $(CPANM) --notest DAMS/Redis-1.976.tar.gz
 
 	@echo
 	@echo "BUILD SUCCESSFUL (lib)"
@@ -150,7 +147,10 @@ tld:
 
 .PHONY: clean
 clean:
-	@echo Nothing to clean
+	:
+
+deep-clean: clean
+	$(SUDO) rm -fr /root/.cache /root/.cpanm ~/.cpanm ~/.cache 2>/dev/null
 
 .PHONY: push
 push:
