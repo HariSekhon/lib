@@ -151,6 +151,7 @@ tld:
 clean:
 	:
 
+.PHONY: deep-clean
 deep-clean: clean
 	$(SUDO) rm -fr /root/.cache /root/.cpanm ~/.cpanm ~/.cache 2>/dev/null
 
