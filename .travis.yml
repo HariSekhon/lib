@@ -33,9 +33,14 @@ notifications:
 env:
   - DEBUG=1 PYTHONUNBUFFERED=1
 
-branches:
-  only:
-    - master
+#branches:
+#  only:
+#    - master
+
+cache:
+  directories:
+    - .cpanm
+    - .cpan
 
 # multi-OS is a beta feature
 #os:
