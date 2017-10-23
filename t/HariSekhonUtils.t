@@ -920,13 +920,15 @@ is(validate_url_path_suffix("/~hari"),           "/~hari",                  'val
 # ============================================================================ #
 is(isUser("hadoop"),    "hadoop",   'isUser("hadoop")');
 is(isUser("hari1"),     "hari1",    'isUser("hari1")');
+is(isUser("9hari"),     "9hari",    'isUser("9hari")');
+is(isUser("12345678"),  "12345678", 'isUser("12345678")');
 is(isUser("mysql_test"), "mysql_test", 'isUser("mysql_test")');
 is(isUser('cloudera-scm'),  'cloudera-scm', 'isUser("cloudera-scm")');
 ok(!isUser("-hari"),                '!isUser("-hari")');
-ok(!isUser("9hari"),             '!isUser("9hari")');
 
 is(validate_user("hadoop"),    "hadoop",   'validate_user("hadoop")');
 is(validate_user("hari1"),     "hari1",    'validate_user("hari1")');
+is(validate_user("12345678"),     "12345678",    'validate_user("12345678")');
 is(validate_user("cloudera-scm"),     "cloudera-scm",    'validate_user("cloudera-scm")');
 
 # ============================================================================ #
