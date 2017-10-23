@@ -928,6 +928,7 @@ ok(!isUser("-hari"),                '!isUser("-hari")');
 
 is(validate_user("hadoop"),    "hadoop",   'validate_user("hadoop")');
 is(validate_user("hari1"),     "hari1",    'validate_user("hari1")');
+is(validate_user("9hari"),     "9hari",    'validate_user("9hari")');
 is(validate_user("12345678"),     "12345678",    'validate_user("12345678")');
 is(validate_user("cloudera-scm"),     "cloudera-scm",    'validate_user("cloudera-scm")');
 
