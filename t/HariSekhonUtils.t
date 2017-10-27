@@ -121,6 +121,7 @@ ok(assert_array([1,2,3], "test array"), "assert_array()");
 ok(assert_float(1.1, "test float"), "assert_floatt(1.1)");
 ok(assert_hash({"one" => 1, "two" => 2}, "test hash"), "assert_hash()");
 ok(assert_int(10, "test int"), "assert_int(10)");
+ok(assert_int(-1, "negative int"), "assert_int(-1)");
 
 # ============================================================================ #
 #                           O S   H e l p e r s
