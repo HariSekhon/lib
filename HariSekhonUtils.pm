@@ -79,7 +79,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.18.10";
+our $VERSION = "1.18.11";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1147,7 +1147,7 @@ sub assert_hash($$) {
 sub assert_int($$) {
     my $int  = shift;
     my $name = shift;
-    isInt($int) or quit "UNKNOWN", "$name is not an integer! $nagios_plugins_support_msg_api";
+    isInt($int, "signed") or quit "UNKNOWN", "$name is not an integer! $nagios_plugins_support_msg_api";
 }
 
 
