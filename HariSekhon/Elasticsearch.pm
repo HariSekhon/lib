@@ -179,7 +179,7 @@ sub curl_elasticsearch_raw($;$$){
             $ua->ssl_opts('SSL_verify_mode' => 'SSL_VERIFY_NONE');
         }
     }
-    if ($password) {
+    if ($user and $password) {
         $content = curl "$protocol://$host:$port/$url", "Elasticsearch", $user, $password, \&elasticsearch_err_handler, $type, $body;
     } else {
         $content = curl "$protocol://$host:$port/$url", "Elasticsearch", undef, undef, \&elasticsearch_err_handler, $type, $body;
