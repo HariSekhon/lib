@@ -5,7 +5,7 @@
 #  https://github.com/harisekhon/lib
 #
 #  License: see accompanying LICENSE file
-#  
+#
 
 # Forked from check_cloudera_manager_metrics.pl (2013) from the Advanced Nagios Plugins Collection
 #
@@ -189,7 +189,7 @@ sub cm_query(;$) {
     chomp $content;
     vlog3 "returned HTML:\n\n" . ( $content ? $content : "<blank>" ) . "\n";
     vlog2 "http code: " . $response->code;
-    vlog2 "message: " . $response->message; 
+    vlog2 "message: " . $response->message;
     if(!$response->is_success){
         my $err = "failed to query Cloudera Manager at '$url_prefix': " . $response->code . " " . $response->message;
         if($content =~ /"message"\s*:\s*"(.+)"/){

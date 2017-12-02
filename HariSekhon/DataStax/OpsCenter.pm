@@ -5,7 +5,7 @@
 #  https://github.com/harisekhon/lib
 #
 #  License: see accompanying Hari Sekhon LICENSE file
-#  
+#
 
 package HariSekhon::DataStax::OpsCenter;
 

@@ -18,6 +18,12 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/.."
 
+. bash-tools/utils.sh
+
+section "Checking for uncovered subs"
+
+start_time="$(start_timer)"
+
 found=0
 grep sub HariSekhonUtils.pm | sed 's/^sub //;s/ .*//;/^[[:space:]]*$/d' |
 while read sub; do
@@ -28,3 +34,6 @@ while read sub; do
 done
 echo "Found $found uncovered subroutines"
 [ $found -eq 0 ] || exit 1
+
+time_taken "$start_time"
+section2 "Finished checking for uncovered subs"

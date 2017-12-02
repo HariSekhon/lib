@@ -16,26 +16,46 @@
 
 export PATH := $(PATH):/usr/local/bin
 
-CPANM = cpanm
+CPANM := cpanm
+
+SUDO := sudo
+SUDO_PERL := sudo
 
 ifdef PERLBREW_PERL
-	SUDO2 =
-else
-	SUDO2 = sudo
+	SUDO_PERL =
 endif
 
-# must come after to reset SUDO2 to blank if root
+# must come after to reset SUDO_PERL to blank if root
 # EUID /  UID not exported in Make
 # USER not populated in Docker
 ifeq '$(shell id -u)' '0'
 	SUDO =
-	SUDO2 =
-else
-	SUDO = sudo
+	SUDO_PERL =
 endif
+
+# ===================
+# bootstrap commands:
+
+# Alpine:
+#
+#   apk add --no-cache git make && git clone https://github.com/harisekhon/lib && cd lib && make
+
+# Debian / Ubuntu:
+#
+#   apt-get update && apt-get install -y make git && git clone https://github.com/harisekhon/lib && cd lib && make
+
+# RHEL / CentOS:
+#
+#   yum install -y make git && git clone https://github.com/harisekhon/lib && cd lib && make
+
+# ===================
 
 .PHONY: build
 build:
+	@echo ==============
+	@echo Perl Lib Build
+	@echo ==============
+
 	if [ -x /sbin/apk ];        then make apk-packages; fi
 	if [ -x /usr/bin/apt-get ]; then make apt-packages; fi
 	if [ -x /usr/bin/yum ];     then make yum-packages; fi
@@ -45,17 +65,19 @@ build:
 	git update-index --assume-unchanged resources/custom_tlds.txt
 
 	#(echo y; echo o conf prerequisites_policy follow; echo o conf commit) | cpan
-	which cpanm || { yes "" | $(SUDO2) cpan App::cpanminus; }
+	which cpanm || { yes "" | $(SUDO_PERL) cpan App::cpanminus; }
 	# some libraries need this to be present first
-	$(SUDO2) $(CPANM) --notest Test::More
-	yes "" | $(SUDO2) $(CPANM) --notest `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/cpan-requirements.txt`
+	$(SUDO_PERL) $(CPANM) --notest Test::More
+	yes "" | $(SUDO_PERL) $(CPANM) --notest `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/cpan-requirements.txt`
 
 	# newer versions of the Redis module require Perl >= 5.10, this will install the older compatible version for RHEL5/CentOS5 servers still running Perl 5.8 if the latest module fails
 	# the backdated version might not be the perfect version, found by digging around in the git repo
-	$(SUDO2) $(CPANM) --notest Redis || $(SUDO2) $(CPANM) --notest DAMS/Redis-1.976.tar.gz
+	$(SUDO_PERL) $(CPANM) --notest Redis || $(SUDO_PERL) $(CPANM) --notest DAMS/Redis-1.976.tar.gz
 
 	@echo
 	@echo "BUILD SUCCESSFUL (lib)"
+	@echo
+	@echo
 
 .PHONY: quick
 quick:
@@ -64,7 +86,7 @@ quick:
 .PHONY: apk-packages
 apk-packages:
 	$(SUDO) apk update
-	$(SUDO) apk add `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/apk-packages.txt`
+	$(SUDO) apk add `sed 's/#.*//; /^[[:space:]]*$$/d' setup/apk-packages.txt setup/apk-packages-dev.txt`
 
 .PHONY: apk-packages-remove
 apk-packages-remove:
@@ -74,19 +96,24 @@ apk-packages-remove:
 .PHONY: apt-packages
 apt-packages:
 	$(SUDO) apt-get update
-	$(SUDO) apt-get install -y `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/deb-packages.txt`
+	$(SUDO) apt-get install -y `sed 's/#.*//; /^[[:space:]]*$$/d' setup/deb-packages.txt setup/deb-packages-dev.txt`
+	# Ubuntu 12 Precise which is still used in Travis CI uses libmysqlclient-dev, but Debian 9 Stretch and Ubuntu 16 Xenial
+	# use libmariadbd-dev so this must now be handled separately as a failback
+	$(SUDO) apt-get install -y libmariadbd-dev || $(SUDO) apt-get install -y libmysqlclient-dev
 
 .PHONY: apt-packages-remove
 apt-packages-remove:
 	$(SUDO) apt-get purge -y `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/deb-packages-dev.txt`
+	$(SUDO) apt-get purge -y libmariadbd-dev || :
+	$(SUDO) apt-get purge -y libmysqlclient-dev || :
 
 .PHONY: yum-packages
 yum-packages:
-	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/rpm-packages.txt`; do rpm -q $$x || $(SUDO) yum install -y $$x; done
+	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/rpm-packages.txt setup/rpm-packages-dev.txt`; do rpm -q $$x || $(SUDO) yum install -y $$x; done
 
 .PHONY: yum-packages-remove
 yum-packages-remove:
-	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/rpm-packages-dev.txt`; do rpm -q $$x && $(SUDO) yum remove -y $$x; done
+	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/rpm-packages-dev.txt`; do if rpm -q $$x; then $(SUDO) yum remove -y $$x; fi; done
 
 .PHONY: test
 test:
@@ -98,14 +125,12 @@ install:
 
 
 .PHONY: update
-update:
-	make update-no-recompile
-	make
-
+update: update-no-recompile build
+	:
 
 .PHONY: update2
-update2:
-	make update-no-recompile
+update2: update-no-recompile
+	:
 
 .PHONY: update-no-recompile
 update-no-recompile:
@@ -116,15 +141,26 @@ update-no-recompile:
 update-submodules:
 	git submodule update --init --remote
 .PHONY: updatem
-updatem:
-	make update-submodules
+updatem: update-submodules
+	:
 
 tld:
 	wget -t 100 --retry-connrefused -O resources/tlds-alpha-by-domain.txt http://data.iana.org/TLD/tlds-alpha-by-domain.txt
 
 .PHONY: clean
 clean:
-	@echo Nothing to clean
+	:
+
+.PHONY: deep-clean
+deep-clean: clean
+	# have to remove .cache for Python because we call bash-tools/check_pytools.sh which does a python build
+	$(SUDO) rm -fr /root/.cpan \
+				   /root/.cpanm \
+				   /root/.cache \
+				   ~/.cpan \
+				   ~/.cpanm \
+				   ~/.cache \
+				   2>/dev/null
 
 .PHONY: push
 push:

@@ -101,7 +101,7 @@ is(get_status_code("DEPENDENT"),  4, "get_status_code(DEPENDENT) eq 4");
 #is(get_status_code("NONEXISTENT"),  undef, "get_status_code(NONEXISTENT) eq undef");
 
 # This should cause compilation failure
-#ok(critical("blah"), 'critical("blah")');
+#ok(critical("something"), 'critical("something")');
 
 # ============================================================================ #
 $verbose++;
@@ -111,7 +111,7 @@ ok(status(), "status()");
 # ============================================================================ #
 ok(!try { print "try\n"; }, "try{}");
 ok(!catch { print "caught\n"; }, "catch{}");
-ok(catch_quit("catch quit"), "catch_quit()"); 
+ok(catch_quit("catch quit"), "catch_quit()");
 
 # ============================================================================ #
 ok(autoflush(), "autoflush()");
@@ -121,6 +121,7 @@ ok(assert_array([1,2,3], "test array"), "assert_array()");
 ok(assert_float(1.1, "test float"), "assert_floatt(1.1)");
 ok(assert_hash({"one" => 1, "two" => 2}, "test hash"), "assert_hash()");
 ok(assert_int(10, "test int"), "assert_int(10)");
+ok(assert_int(-1, "negative int"), "assert_int(-1)");
 
 # ============================================================================ #
 #                           O S   H e l p e r s
@@ -231,11 +232,23 @@ use HariSekhonUtils ':regex';
 ok(escape_regex("(.*)\\["), 'escape_regex()');
 
 # ============================================================================ #
+is(expand_units("7", "B"), 7, 'expand_units("7", "B") eq 7');
+is(expand_units("8b"), 8, 'expand_units("8b") eq 8');
+
 is(expand_units("10", "KB"), 10240, 'expand_units("10", "KB") eq 10240');
+is(expand_units("10KB"), 10240, 'expand_units("10KB") eq 10240');
+
 is(expand_units("10", "mB"), 10485760, 'expand_units("10", "mB") eq 10485760');
+is(expand_units("10mB"), 10485760, 'expand_units("10mB") eq 10485760');
+
 is(expand_units("10", "Gb"), 10737418240, 'expand_units("10", "Gb") eq 10737418240');
+is(expand_units("10Gb"), 10737418240, 'expand_units("10Gb") eq 10737418240');
+
 is(expand_units("10", "tb"), 10995116277760, 'expand_units("10", "tb") eq 10995116277760');
+is(expand_units("10tb"), 10995116277760, 'expand_units("10tb") eq 10995116277760');
+
 is(expand_units("10", "Pb"), 11258999068426240, 'expand_units("10", "Pb") eq 11258999068426240');
+is(expand_units("10Pb"), 11258999068426240, 'expand_units("10Pb") eq 11258999068426240');
 
 # ============================================================================ #
 is(minimum_value(1, 4), 4, 'minimum_value(1,4)');
@@ -320,11 +333,11 @@ is(get_path_owner("/etc/passwd"), "root", 'get_path_owner("/etc/passwd") eq "roo
 
 # ============================================================================ #
 
-is(perf_suffix("blah_in_bytes"),    "b",    'perf_suffix("blah_in_bytes")');
-is(perf_suffix("blah_in_millis"),   "ms",   'perf_suffix("blah_in_millis")');
-is(perf_suffix("blah.bytes"),       "b",    'perf_suffix("blah.bytes")');
-is(perf_suffix("blah.millis"),      "ms",   'perf_suffix("blah.millis")');
-is(perf_suffix("blah.blah2"),       "",     'perf_suffix("blah.blah2")');
+is(perf_suffix("something_in_bytes"),    "b",    'perf_suffix("something_in_bytes")');
+is(perf_suffix("something_in_millis"),   "ms",   'perf_suffix("something_in_millis")');
+is(perf_suffix("something.bytes"),       "b",    'perf_suffix("something.bytes")');
+is(perf_suffix("something.millis"),      "ms",   'perf_suffix("something.millis")');
+is(perf_suffix("somethign.something2"),  "",     'perf_suffix("something.something2")');
 
 # ============================================================================ #
 is(get_upper_threshold("warning"),   "5",     'get_upper_threshold(warning)');
@@ -332,8 +345,14 @@ is(get_upper_threshold("critical"),  "10",    'get_upper_threshold(critical)');
 is(get_upper_thresholds(),           "5;10",  'get_upper_thresholds()');
 
 # ============================================================================ #
-ok(go_flock_yourself(), "go_flock_yourself()");
-ok(flock_off(), "flock_off()");
+if(isLinux() and (`stat -f -L -c %T .` eq "nfs\n" or `df -P -T . | tail -n +2 | awk '{print \$2}'` =~ /^nfs\d+?$/)){
+    vlog2("skipping flock test on Linux as running on NFS and could encounter stale locks");
+} elsif(isMac() and `df -t nfs .` ne ""){
+    vlog2("skipping flock test on Mac as running on NFS and could encounter stale locks");
+} else {
+    ok(go_flock_yourself(), "go_flock_yourself()");
+    ok(flock_off(), "flock_off()");
+}
 
 ok(hr(), 'hr()');
 
@@ -684,7 +703,7 @@ is(validate_java_bean("java.lang:type=Memory"), "java.lang:type=Memory", 'valida
 
 # ============================================================================ #
 ok(isJavaException("        at org.apache.ambari.server.api.services.stackadvisor.StackAdvisorRunner.runScript(StackAdvisorRunner.java:96)"), 'isJavaException(" at org.apache.ambari.server...."');
-ok(!isJavaException("blah"), '!isJavaException("blah")');
+ok(!isJavaException("notanexception"), '!isJavaException("notanexception")');
 
 # ============================================================================ #
 ok(isJson('{ "test": "data" }'),   'isJson({ "test": "data" })');
@@ -775,17 +794,17 @@ is(validate_nosql_key("HariSekhon:check_riak_write.pl:riak1:1385226607.02182:20a
 
 # ============================================================================ #
 
-ok(isPathQualified("./blah"), 'isPathQualified("./blah")');
-ok(isPathQualified("/blah"),  'isPathQualified("/blah")');
-ok(isPathQualified("./path/to/blah.txt"), 'isPathQualified("./path/to/blah")');
-ok(isPathQualified("/path/to/blah.txt"),  'isPathQualified("/path/to/blah")');
-ok(isPathQualified("/tmp/.blah"),  'isPathQualified("/tmp/.blah")');
-ok(!isPathQualified("blah"),  'isPathQualified("blah")');
-ok(!isPathQualified(".blah"),  'isPathQualified(".blah")');
+ok(isPathQualified("./somepath"), 'isPathQualified("./somepath")');
+ok(isPathQualified("/somepath"),  'isPathQualified("/somepath")');
+ok(isPathQualified("./path/to/somepath.txt"), 'isPathQualified("./path/to/somepath")');
+ok(isPathQualified("/path/to/somepath.txt"),  'isPathQualified("/path/to/somepath")');
+ok(isPathQualified("/tmp/.somepath"),  'isPathQualified("/tmp/.somepath")');
+ok(!isPathQualified("somepath"),  'isPathQualified("somepath")');
+ok(!isPathQualified(".somepath"),  'isPathQualified(".somepath")');
 ok(!isPathQualified("#tmpfile#"),  'isPathQualified("#tmpfile#")');
 ok(!isPathQualified("Europe/London"),  'isPathQualified("Europe/London")');
 # not supporting tilda home dirs
-ok(!isPathQualified("~blah"),  'isPathQualified("~blah")');
+ok(!isPathQualified("~someuser"),  'isPathQualified("~someuser")');
 
 # ============================================================================ #
 is(isPort(1),       1,      'isPort(1)');
@@ -826,7 +845,7 @@ ok(isPythonTraceback('File "/var/lib/ambari-server/resources/scripts/stack_advis
 ok(isPythonTraceback('  File "/var/lib/ambari-agent/cache/common-services/RANGER/0.4.0/package/scripts/ranger_admin.py", line 124, in <module>'), 'isPythonTraceback(  File "/var/lib/ambari-agent/cache/common-services/RANGER/0.4.0/package/scripts/ranger_admin.py", line 124, in <module>)');
 ok(isPythonTraceback('File "/var/lib/ambari-agent/cache/common-services/RANGER/0.4.0/package/scripts/ranger_admin.py", line 124, in <module>'), 'isPythonTraceback(File "/var/lib/ambari-agent/cache/common-services/RANGER/0.4.0/package/scripts/ranger_admin.py", line 124, in <module>)');
 ok(isPythonTraceback('... Traceback (most recent call last):'), 'isPythonTraceback("... Traceback (most recent call last):")');
-ok(!isPythonTraceback('blah'), 'isPythonTraceback("blah")');
+ok(!isPythonTraceback('notapythontraceback'), '!isPythonTraceback("notapythontraceback")');
 
 # ============================================================================ #
 is(isRegex(".*"),   ".*",   'isRegex(".*") eq ".*"');
@@ -839,12 +858,16 @@ is(isRegex("(.*"),  undef,  'isRegex("(.*") eq undef');
 like(validate_regex("some[Rr]egex.*(capture)"),   qr/\(\?(?:\^|-xism):some\[Rr\]egex\.\*\(capture\)\)/,  'validate_regex("some[Rr]egex.*(capture)")');
 # Errors out still, should detect and fail gracefully
 #is(validate_regex("some[Rr]egex.*(capture broken", 1),   undef,  'validate_regex("some[Rr]egex.*(capture broken", 1)');
-is(validate_regex("somePosix[Rr]egex.*(capture)", undef, 0, "posix"),   "somePosix[Rr]egex.*(capture)",      'validate_regex("somePosix[Rr]egex.*(capture)", undef, 0, 1)');
-is(validate_regex("somePosix[Rr]egex.*(capture broken", undef, "noquit", "posix"),  undef,       'validate_regex("somePosix[Rr]egex.*(capture broken", undef, 1, 1) eq undef');
-is(validate_regex('somePosix[Rr]egex.*$(evilcmd)', undef, "noquit", "posix"),       undef,       'validate_regex("somePosix[Rr]egex.*$(evilcmd)", undef, 1, 1) eq undef');
-is(validate_regex('somePosix[Rr]egex.*$(evilcmd', undef, "noquit", "posix"),        undef,       'validate_regex("somePosix[Rr]egex.*$(evilcmd", undef, 1, 1) eq undef');
-is(validate_regex('somePosix[Rr]egex.*`evilcmd`', undef, "noquit", "posix"),        undef,       'validate_regex("somePosix[Rr]egex.*`evilcmd`", undef, 1, 1) eq undef');
-is(validate_regex('somePosix[Rr]egex.*`evilcmd', undef, "noquit", "posix"),         undef,       'validate_regex("somePosix[Rr]egex.*`evilcmd", undef, 1, 1) eq undef');
+is(validate_regex("somePosix[Rr]egex.*(capture)", undef, 0, "posix"),   "somePosix[Rr]egex.*(capture)",      'validate_regex("somePosix[Rr]egex.*(capture)", undef, 0, posix)');
+if(-f "/etc/alpine-release" ){
+    warn "WARNING: Alpine behaviour is currently broken for validate_regex() posix check due to a bug in the shell behaviour around calling egrep - will not validate posix regex properly";
+} else {
+    is(validate_regex("somePosix[Rr]egex.*(capture broken", undef, "noquit", "posix"),  undef,       'validate_regex("somePosix[Rr]egex.*(capture broken", undef, noquit, posix) eq undef');
+}
+is(validate_regex('somePosix[Rr]egex.*$(evilcmd)', undef, "noquit", "posix"),       undef,       'validate_regex("somePosix[Rr]egex.*$(evilcmd)", undef, noquit, posix) eq undef');
+is(validate_regex('somePosix[Rr]egex.*$(evilcmd', undef, "noquit", "posix"),        undef,       'validate_regex("somePosix[Rr]egex.*$(evilcmd", undef, noquit, posix) eq undef');
+is(validate_regex('somePosix[Rr]egex.*`evilcmd`', undef, "noquit", "posix"),        undef,       'validate_regex("somePosix[Rr]egex.*`evilcmd`", undef, noquit, posix) eq undef');
+is(validate_regex('somePosix[Rr]egex.*`evilcmd', undef, "noquit", "posix"),         undef,       'validate_regex("somePosix[Rr]egex.*`evilcmd", undef, noquit, posix) eq undef');
 
 # ============================================================================ #
 ok(!isScalar(1),                '!isScalar(1)');
@@ -898,13 +921,16 @@ is(validate_url_path_suffix("/~hari"),           "/~hari",                  'val
 # ============================================================================ #
 is(isUser("hadoop"),    "hadoop",   'isUser("hadoop")');
 is(isUser("hari1"),     "hari1",    'isUser("hari1")');
+is(isUser("9hari"),     "9hari",    'isUser("9hari")');
+is(isUser("12345678"),  "12345678", 'isUser("12345678")');
 is(isUser("mysql_test"), "mysql_test", 'isUser("mysql_test")');
 is(isUser('cloudera-scm'),  'cloudera-scm', 'isUser("cloudera-scm")');
 ok(!isUser("-hari"),                '!isUser("-hari")');
-ok(!isUser("9hari"),             '!isUser("9hari")');
 
 is(validate_user("hadoop"),    "hadoop",   'validate_user("hadoop")');
 is(validate_user("hari1"),     "hari1",    'validate_user("hari1")');
+is(validate_user("9hari"),     "9hari",    'validate_user("9hari")');
+is(validate_user("12345678"),     "12345678",    'validate_user("12345678")');
 is(validate_user("cloudera-scm"),     "cloudera-scm",    'validate_user("cloudera-scm")');
 
 # ============================================================================ #
@@ -931,8 +957,8 @@ is(isVersionLax("1.0-a"), "1.0", 'isVersionLax(1.0-a) eq 1.0');
 is(isVersionLax("hari"), undef, 'isVersionLax(hari) eq undef');
 
 # ============================================================================ #
-ok(isXml("<blah></blah>"), "isXML()");
-ok(!isXml("<blah>"), "!isXml()");
+ok(isXml("<sometag></sometag>"), "isXML()");
+ok(!isXml("<sometag>"), "!isXml()");
 
 # ============================================================================ #
 ok(isYes("yEs"), 'isYes(yEs)');
@@ -1166,7 +1192,7 @@ ok(HariSekhonUtils::print_options(), 'print_options()');
 # """
 # Unfortunately, Devel::Cover does not yet work with threads.  I have done
 # some work in this area, but there is still more to be done.
-# 
+#
 # Dubious, test returned 1 (wstat 256, 0x100)
 # All 517 subtests passed
 # """

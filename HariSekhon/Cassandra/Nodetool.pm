@@ -95,8 +95,8 @@ our $nodetool_errors_regex = qr/
                                 unknown\s+host   |
                                 connection\s+refused  |
                                 failed\s+to\s+connect |
-                                error    |
-                                user     |
+                                error |
+                                user  |
                                 password |
                                 Exception(?!s\s*:\s*\d+) |
                                 in thread

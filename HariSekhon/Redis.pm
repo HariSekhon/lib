@@ -7,7 +7,7 @@
 #  https://github.com/harisekhon/lib
 #
 #  License: see accompanying LICENSE file
-#  
+#
 
 package HariSekhon::Redis;
 

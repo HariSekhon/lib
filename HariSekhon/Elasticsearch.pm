@@ -5,11 +5,11 @@
 #  https://github.com/harisekhon/lib
 #
 #  License: see accompanying LICENSE file
-#  
+#
 
 package HariSekhon::Elasticsearch;
 
-$VERSION = "0.6.1";
+$VERSION = "0.7.0";
 
 use strict;
 use warnings;
@@ -171,7 +171,19 @@ sub curl_elasticsearch_raw($;$$){
     $url .= "pretty=true" if $verbose >= 3 or $debug;
     $url =~ s/\&$//;
     #my $content = curl "http://$host:$port/$url", "Elasticsearch", undef, undef, undef, $type, $body;
-    my $content = curl "http://$host:$port/$url", "Elasticsearch", undef, undef, \&elasticsearch_err_handler, $type, $body;
+    my $content = undef;
+    my $protocol = "http";
+    if ($ssl) {
+        $protocol = "https";
+        if ($ssl_noverify) {
+            $ua->ssl_opts('SSL_verify_mode' => 'SSL_VERIFY_NONE');
+        }
+    }
+    if ($user and $password) {
+        $content = curl "$protocol://$host:$port/$url", "Elasticsearch", $user, $password, \&elasticsearch_err_handler, $type, $body;
+    } else {
+        $content = curl "$protocol://$host:$port/$url", "Elasticsearch", undef, undef, \&elasticsearch_err_handler, $type, $body;
+    }
     return $content;
 }
 

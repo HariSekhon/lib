@@ -79,7 +79,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.18.9";
+our $VERSION = "1.18.11";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -514,9 +514,9 @@ BEGIN {
     if(substr(basename($0), 0, 6) eq "check_"){
         open STDERR, ">&STDOUT";
         select(STDERR);
-        $| = 1; 
+        $| = 1;
         select(STDOUT);
-        $| = 1; 
+        $| = 1;
     }
 
     sub die_sub {
@@ -704,7 +704,7 @@ our $host_regex         = "\\b(?:$hostname_regex|$ip_regex)\\b";
 our $process_name_regex = '\s*[\w_\.\/\<\>-][\w\s_\.\/\<\>-]*';
 our $url_path_suffix_regex = '/(?:[\w.,:\/%&?!#=*|\[\]~+-]+)?';
 our $url_regex          = '\b(?i:https?://' . $host_regex . '(?::\d{1,5})?(?:' . $url_path_suffix_regex . ')?)';
-our $user_regex         = '\b[A-Za-z][A-Za-z0-9_-]*[A-Za-z0-9]\b';
+our $user_regex         = '\b[A-Za-z0-9][A-Za-z0-9_-]*[A-Za-z0-9]\b';
 our $column_regex       = '\b[\w\:]+\b';
 our $ldap_dn_regex      = '\b\w+=[\w\s]+(?:,\w+=[\w\s]+)*\b';
 our $krb5_principal_regex = "$user_regex(?:\/$hostname_regex)?(?:\@$domain_regex)?";
@@ -1086,7 +1086,7 @@ sub catch_quit ($) {
 ##    # TODO: consider replacing this with first position insertion in array in get_options for efficiency
 ##    foreach my $option (keys %options){
 ##        unless grep { grep($options keys %{$_} } @options){
-##            push(@options, { $_ => $options{$_} }) 
+##            push(@options, { $_ => $options{$_} })
 ##        };
 ##    }
 ##    #foreach(keys %hashref){
@@ -1096,7 +1096,7 @@ sub catch_quit ($) {
 
 
 #sub update_option_description {
-#    my $option = 
+#    my $option =
 #}
 
 
@@ -1147,7 +1147,7 @@ sub assert_hash($$) {
 sub assert_int($$) {
     my $int  = shift;
     my $name = shift;
-    isInt($int) or quit "UNKNOWN", "$name is not an integer! $nagios_plugins_support_msg_api";
+    isInt($int, "signed") or quit "UNKNOWN", "$name is not an integer! $nagios_plugins_support_msg_api";
 }
 
 
@@ -1315,15 +1315,16 @@ sub cmd ($;$$$) {
         return $fh;
     }
     vlog3("cmd: $cmd");
+    # XXX: this doesn't work to solve Alpine's buggy behaviour of not returning error output and non-zero exit code when testing validate_regex() posix with broken capture of no closing brace
+    #open my $fh, "$cmd 2>&1 |";
     my $return_output = `$cmd 2>&1`;
     my $exitcode      = $?;
+    #my $return_output = do { local $/; <$fh> };
+    #close $fh;
     my @output        = split("\n", $return_output);
     $exitcode         = $exitcode >> 8;
-    if ($verbose >= 3) {
-        #foreach(@output){ print "output: $_\n"; }
-        print "output:\n\n$return_output\n";
-        print "exitcode: $exitcode\n\n";
-    }
+    vlog3("output:\n\n$return_output");
+    vlog3("exitcode: $exitcode\n");
     if ($errchk and $exitcode != 0) {
         my $err = "";
         if(substr($progname, 0, 6) eq "check_"){
@@ -1397,7 +1398,7 @@ sub curl ($;$$$$$$) {
         vlog3($body);
     }
     #unless(defined(&main::get)){
-        # inefficient, it'll import for each curl call, instead force top level author to 
+        # inefficient, it'll import for each curl call, instead force top level author to
         # use LWP::Simple 'get'
         #debug("importing LWP::Simple 'get'\n");
         #require LWP::Simple;
@@ -2607,7 +2608,7 @@ sub msg_thresholds (;$$) {
                             defined($thresholds{"${name}warning"}{"range"}) or
                             defined($thresholds{"${name}critical"}{"range"})
                           )
-            ) 
+            )
         ) {
         $msg2 .= " (";
         if(defined($thresholds{"${name}critical"}{"error"})){
@@ -3324,7 +3325,7 @@ sub validate_chars($$$){
     my $name  = shift || croak "second argument (name) not defined when calling validate_chars()";
     my $chars = shift;
     defined($string) or usage "$name not defined";
-    $string = isChars($string, $chars) || usage "invalid $name defined: must be one of the following chars - $chars";
+    $string = isChars($string, $chars) || usage "invalid $name defined: must contain only the following chars - $chars";
     vlog_option($name, $string);
     return $string;
 }
@@ -3842,6 +3843,7 @@ sub validate_regex ($;$$$) {
             return;
         } else {
             # XXX: this behaviour is broken in busybox (used in Alpine linux on docker) - it doesn't detect the error in the regex - the validation must be too weak - must install proper grep in that case
+            # cannot return exitcode and test that because the random regex won't match /dev/null
             my @output = cmd("egrep '$regex' < /dev/null");
             #if(grep({$_ =~ "Unmatched"} @output)){
             if(@output){
@@ -3887,7 +3889,7 @@ sub validate_password ($;$$) {
     }
     if($ENV{'PASSWORD_DEBUG'}){
         vlog_option("${name}password", "$password");
-    } else { 
+    } else {
         vlog_option("${name}password", "<omitted>");
     }
     return $password;

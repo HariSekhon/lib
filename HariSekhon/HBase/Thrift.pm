@@ -5,7 +5,7 @@
 #  https://github.com/harisekhon/lib
 #
 #  License: see accompanying LICENSE file
-#  
+#
 
 # Split off from my check_hbase_table.pl Nagios Plugin
 

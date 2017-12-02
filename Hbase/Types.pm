@@ -40,7 +40,7 @@ sub read {
   my $ftype = 0;
   my $fid   = 0;
   $xfer += $input->readStructBegin(\$fname);
-  while (1) 
+  while (1)
   {
     $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
     if ($ftype == TType::STOP) {
@@ -147,7 +147,7 @@ sub read {
   my $ftype = 0;
   my $fid   = 0;
   $xfer += $input->readStructBegin(\$fname);
-  while (1) 
+  while (1)
   {
     $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
     if ($ftype == TType::STOP) {
@@ -323,7 +323,7 @@ sub read {
   my $ftype = 0;
   my $fid   = 0;
   $xfer += $input->readStructBegin(\$fname);
-  while (1) 
+  while (1)
   {
     $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
     if ($ftype == TType::STOP) {
@@ -465,7 +465,7 @@ sub read {
   my $ftype = 0;
   my $fid   = 0;
   $xfer += $input->readStructBegin(\$fname);
-  while (1) 
+  while (1)
   {
     $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
     if ($ftype == TType::STOP) {
@@ -566,7 +566,7 @@ sub read {
   my $ftype = 0;
   my $fid   = 0;
   $xfer += $input->readStructBegin(\$fname);
-  while (1) 
+  while (1)
   {
     $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
     if ($ftype == TType::STOP) {
@@ -621,7 +621,7 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRUCT, scalar(@{$self->{mutations}}));
       {
-        foreach my $iter6 (@{$self->{mutations}}) 
+        foreach my $iter6 (@{$self->{mutations}})
         {
           $xfer += ${iter6}->write($output);
         }
@@ -675,7 +675,7 @@ sub read {
   my $ftype = 0;
   my $fid   = 0;
   $xfer += $input->readStructBegin(\$fname);
-  while (1) 
+  while (1)
   {
     $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
     if ($ftype == TType::STOP) {
@@ -776,7 +776,7 @@ sub read {
   my $ftype = 0;
   my $fid   = 0;
   $xfer += $input->readStructBegin(\$fname);
-  while (1) 
+  while (1)
   {
     $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
     if ($ftype == TType::STOP) {
@@ -834,7 +834,7 @@ sub write {
     {
       $xfer += $output->writeMapBegin(TType::STRING, TType::STRUCT, scalar(keys %{$self->{columns}}));
       {
-        while( my ($kiter14,$viter15) = each %{$self->{columns}}) 
+        while( my ($kiter14,$viter15) = each %{$self->{columns}})
         {
           $xfer += $output->writeString($kiter14);
           $xfer += ${viter15}->write($output);
@@ -901,7 +901,7 @@ sub read {
   my $ftype = 0;
   my $fid   = 0;
   $xfer += $input->readStructBegin(\$fname);
-  while (1) 
+  while (1)
   {
     $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
     if ($ftype == TType::STOP) {
@@ -995,7 +995,7 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRING, scalar(@{$self->{columns}}));
       {
-        foreach my $iter22 (@{$self->{columns}}) 
+        foreach my $iter22 (@{$self->{columns}})
         {
           $xfer += $output->writeString($iter22);
         }
@@ -1053,7 +1053,7 @@ sub read {
   my $ftype = 0;
   my $fid   = 0;
   $xfer += $input->readStructBegin(\$fname);
-  while (1) 
+  while (1)
   {
     $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
     if ($ftype == TType::STOP) {
@@ -1118,7 +1118,7 @@ sub read {
   my $ftype = 0;
   my $fid   = 0;
   $xfer += $input->readStructBegin(\$fname);
-  while (1) 
+  while (1)
   {
     $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
     if ($ftype == TType::STOP) {
@@ -1183,7 +1183,7 @@ sub read {
   my $ftype = 0;
   my $fid   = 0;
   $xfer += $input->readStructBegin(\$fname);
-  while (1) 
+  while (1)
   {
     $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
     if ($ftype == TType::STOP) {

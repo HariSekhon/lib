@@ -42,7 +42,7 @@ is(validate_solr_core('My-HDP'), 'My-HDP', "validate_solr_core('My-HDP') eq My-H
 is(validate_solr_shard('HDP'), 'HDP', "validate_solr_shard('HDP') eq HDP");
 is(validate_solr_shard('My-HDP'), 'My-HDP', "validate_solr_shard('My-HDP') eq My-HDP");
 
-is(validate_solr_context("/bl/ah"), "/bl/ah", 'validate_solr_context(/bl/ah) eq /bl/ah');
-is(validate_solr_context("/my-bl/ah"), "/my-bl/ah", 'validate_solr_context(/my-bl/ah) eq /my-bl/ah');
+is(validate_solr_context("/solr/context"), "/solr/context", 'validate_solr_context(/solr/context) eq /solr/context');
+is(validate_solr_context("/so-lr/con-text"), "/so-lr/con-text", 'validate_solr_context(/so-lr/con-text) eq /so-lr/con-text');
 
 done_testing();

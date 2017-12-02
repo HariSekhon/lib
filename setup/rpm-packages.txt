@@ -18,6 +18,7 @@
 
 gcc
 git
+perl
 perl-CPAN
 perl-libwww-perl
 perl-XML-LibXML
