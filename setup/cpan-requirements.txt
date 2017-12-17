@@ -43,7 +43,7 @@ Readonly::XS
 Sys::Syslog
 Term::ReadKey
 Test::More
-Thrift
+Thrift@0.10.0
 Time::HiRes
 XML::SAX
 XML::Simple
