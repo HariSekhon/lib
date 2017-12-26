@@ -79,7 +79,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.18.11";
+our $VERSION = "1.18.12";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -3058,7 +3058,7 @@ sub timecomponents2days($$$$$$){
     } else {
         $month_int = month2int($month);
     }
-    my $epoch = timegm($sec, $min, $hour, $day, $month_int, $year-1900) || code_error "failed to convert timestamp $year-$month-$day $hour:$min:$sec";
+    my $epoch = timegm($sec, $min, $hour, $day, $month_int - 1, $year - 1900) || code_error "failed to convert timestamp $year-$month-$day $hour:$min:$sec";
     my $now   = time || code_error "failed to get epoch timestamp";
     return ($epoch - $now) / (86400);
 }
