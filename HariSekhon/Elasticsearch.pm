@@ -9,7 +9,7 @@
 
 package HariSekhon::Elasticsearch;
 
-$VERSION = "0.6.1";
+$VERSION = "0.7.0";
 
 use strict;
 use warnings;
@@ -174,15 +174,15 @@ sub curl_elasticsearch_raw($;$$){
     my $content = undef;
     my $protocol = "http";
     if ($ssl) {
-    	$protocol = "https";
-    	if ($ssl_noverify) {
-    		$ua->ssl_opts('SSL_verify_mode' => 'SSL_VERIFY_NONE');
-    	}
+        $protocol = "https";
+        if ($ssl_noverify) {
+            $ua->ssl_opts('SSL_verify_mode' => 'SSL_VERIFY_NONE');
+        }
     }
-	if ($password) {
-    	$content = curl "$protocol://$host:$port/$url", "Elasticsearch", $user, $password, \&elasticsearch_err_handler, $type, $body;
+    if ($user and $password) {
+        $content = curl "$protocol://$host:$port/$url", "Elasticsearch", $user, $password, \&elasticsearch_err_handler, $type, $body;
     } else {
-    	$content = curl "$protocol://$host:$port/$url", "Elasticsearch", undef, undef, \&elasticsearch_err_handler, $type, $body;
+        $content = curl "$protocol://$host:$port/$url", "Elasticsearch", undef, undef, \&elasticsearch_err_handler, $type, $body;
     }
     return $content;
 }
