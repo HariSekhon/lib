@@ -21,7 +21,6 @@ use HariSekhonUtils;
 use Carp;
 use Data::Dumper;
 use LWP::Simple '$ua';
-use IO::Socket::SSL;
 
 set_port_default(9200);
 
@@ -177,7 +176,7 @@ sub curl_elasticsearch_raw($;$$){
     if ($ssl) {
         $protocol = "https";
         if ($ssl_noverify) {
-            $ua->ssl_opts(verify_hostname => 0, SSL_verify_mode => SSL_VERIFY_NONE);
+            $ua->ssl_opts(verify_hostname => 0, SSL_verify_mode => 0);
         }
     }
     if ($user and $password) {
