@@ -56,6 +56,8 @@ build:
 	@echo Perl Lib Build
 	@echo ==============
 
+	perl -v
+
 	if [ -x /sbin/apk ];        then make apk-packages; fi
 	if [ -x /usr/bin/apt-get ]; then make apt-packages; fi
 	if [ -x /usr/bin/yum ];     then make yum-packages; fi
@@ -66,6 +68,7 @@ build:
 
 	#(echo y; echo o conf prerequisites_policy follow; echo o conf commit) | cpan
 	which cpanm || { yes "" | $(SUDO_PERL) cpan App::cpanminus; }
+	$(CPANM) -V | head -n2
 	# some libraries need this to be present first
 	$(SUDO_PERL) $(CPANM) --notest Test::More
 	yes "" | $(SUDO_PERL) $(CPANM) --notest `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/cpan-requirements.txt`
