@@ -58,9 +58,9 @@ build:
 
 	perl -v
 
-	if [ -x /sbin/apk ];        then make apk-packages; fi
-	if [ -x /usr/bin/apt-get ]; then make apt-packages; fi
-	if [ -x /usr/bin/yum ];     then make yum-packages; fi
+	if [ -x /sbin/apk ];        then $(MAKE) apk-packages; fi
+	if [ -x /usr/bin/apt-get ]; then $(MAKE) apt-packages; fi
+	if [ -x /usr/bin/yum ];     then $(MAKE) yum-packages; fi
 
 	git submodule init
 	git submodule update --recursive
@@ -84,7 +84,7 @@ build:
 
 .PHONY: quick
 quick:
-	QUICK=1 make
+	QUICK=1 $(MAKE)
 
 .PHONY: apk-packages
 apk-packages:
