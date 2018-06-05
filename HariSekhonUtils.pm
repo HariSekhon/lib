@@ -2594,6 +2594,9 @@ sub msg_perf_thresholds (;$$$) {
     $tmp .= ";";
     $tmp .= $thresholds{"${name}critical"}{$type} if defined($thresholds{"${name}critical"}{$type});
     $tmp .= ";";
+    $tmp .= 0;
+    $tmp .= ";";
+    $tmp .= $thresholds{"${name}critical"}{$type} if defined($thresholds{"${name}critical"}{$type});
     if(defined($return) and $return){
         return $tmp;
     } else {
