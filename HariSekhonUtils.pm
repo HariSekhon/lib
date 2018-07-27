@@ -1416,8 +1416,12 @@ sub curl ($;$$$$$$) {
     $main::ua->show_progress(1) if $debug;
     $main::ua->env_proxy;
     my $req = HTTP::Request->new($type, $url);
-    # Doesn't work
-    #$ua->credentials($host, '', $user, $password);
+    # LWP timeout should always be less than global timeout to prevent "UNKNOWN" erorrs
+    if ($timeout >= 1) {
+        $main::ua->timeout($timeout-.5);
+    } else {
+        $main::ua->timeout(.5);
+    }
     $req->authorization_basic($user, $password) if (defined($user) and defined($password));
     $req->content($body) if $body;
     my $response = $main::ua->request($req);
