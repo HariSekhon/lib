@@ -58,29 +58,53 @@ build:
 
 	perl -v
 
-	if [ -x /sbin/apk ];        then $(MAKE) apk-packages; fi
-	if [ -x /usr/bin/apt-get ]; then $(MAKE) apt-packages; fi
-	if [ -x /usr/bin/yum ];     then $(MAKE) yum-packages; fi
+	$(MAKE) common
+	$(MAKE) perl
 
-	git submodule init
-	git submodule update --recursive
 	git update-index --assume-unchanged resources/custom_tlds.txt
-
-	#(echo y; echo o conf prerequisites_policy follow; echo o conf commit) | cpan
-	which cpanm || { yes "" | $(SUDO_PERL) cpan App::cpanminus; }
-	$(CPANM) -V | head -n2
-	# some libraries need this to be present first
-	$(SUDO_PERL) $(CPANM) --notest Test::More
-	yes "" | $(SUDO_PERL) $(CPANM) --notest `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/cpan-requirements.txt`
-
-	# newer versions of the Redis module require Perl >= 5.10, this will install the older compatible version for RHEL5/CentOS5 servers still running Perl 5.8 if the latest module fails
-	# the backdated version might not be the perfect version, found by digging around in the git repo
-	$(SUDO_PERL) $(CPANM) --notest Redis || $(SUDO_PERL) $(CPANM) --notest DAMS/Redis-1.976.tar.gz
 
 	@echo
 	@echo "BUILD SUCCESSFUL (lib)"
 	@echo
 	@echo
+
+.PHONY: common
+common: system-packages submodules
+	:
+
+.PHONY: submodules
+submodules:
+	git submodule init
+	git submodule update --recursive
+
+.PHONY: system-packages
+system-packages:
+	if [ -x /sbin/apk ];        then $(MAKE) apk-packages; fi
+	if [ -x /usr/bin/apt-get ]; then $(MAKE) apt-packages; fi
+	if [ -x /usr/bin/yum ];     then $(MAKE) yum-packages; fi
+	if [ -x /usr/local/bin/brew -a `uname` = Darwin ]; then $(MAKE) homebrew-packages; fi
+
+.PHONY: perl
+perl:
+	#(echo y; echo o conf prerequisites_policy follow; echo o conf commit) | cpan
+	which cpanm || { yes "" | $(SUDO_PERL) cpan App::cpanminus; }
+	$(CPANM) -V | head -n2
+
+	# some libraries need this to be present first
+	$(SUDO_PERL) $(CPANM) --notest Test::More
+
+	# Workaround for Mac OS X not finding the OpenSSL libraries when building
+	if [ -d /usr/local/opt/openssl/include -a \
+	     -d /usr/local/opt/openssl/lib     -a \
+	     `uname` = Darwin ]; then \
+	     yes "" | $(SUDO_PERL) OPENSSL_INCLUDE=/usr/local/opt/openssl/include OPENSSL_LIB=/usr/local/opt/openssl/lib $(CPANM) Crypt::SSLeay; \
+	fi
+
+	yes "" | $(SUDO_PERL) $(CPANM) --notest `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/cpan-requirements.txt`
+
+	# newer versions of the Redis module require Perl >= 5.10, this will install the older compatible version for RHEL5/CentOS5 servers still running Perl 5.8 if the latest module fails
+	# the backdated version might not be the perfect version, found by digging around in the git repo
+	$(SUDO_PERL) $(CPANM) --notest Redis || $(SUDO_PERL) $(CPANM) --notest DAMS/Redis-1.976.tar.gz
 
 .PHONY: quick
 quick:
@@ -117,6 +141,12 @@ yum-packages:
 .PHONY: yum-packages-remove
 yum-packages-remove:
 	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/rpm-packages-dev.txt`; do if rpm -q $$x; then $(SUDO) yum remove -y $$x; fi; done
+
+.PHONY: homebrew-packages
+homebrew-packages:
+	# Sudo is not required as running Homebrew as root is extremely dangerous and no longer supported as Homebrew does not drop privileges on installation you would be giving all build scripts full access to your system
+	# Fails if any of the packages are already installed, ignore and continue - if it's a problem the latest build steps will fail with missing headers
+	brew install `sed 's/#.*//; /^[[:space:]]*$$/d' setup/brew-packages.txt` || :
 
 .PHONY: test
 test:
