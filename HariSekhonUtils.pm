@@ -3163,8 +3163,8 @@ sub usage (;@) {
         print STDERR "Hari Sekhon - https://github.com/harisekhon";
         if($github_repo){
             print STDERR "/$github_repo";
-        } elsif(dirname(abs_path(__FILE__)) =~ /tools/i){
-            print STDERR "/tools";
+        } elsif(dirname(abs_path(__FILE__)) =~ /devops-perl-tools/i){
+            print STDERR "/devops-perl-tools";
         } elsif(dirname(abs_path(__FILE__)) =~ /nagios-plugins/i or $main::DESCRIPTION =~ /Nagios/i){
             print STDERR "/nagios-plugins";
         }
