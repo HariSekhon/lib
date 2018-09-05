@@ -246,7 +246,7 @@ our %EXPORT_TAGS = (
     'regex' =>  [   qw(
                         escape_regex
                         $aws_access_key_regex
-                        $aws_host_component
+                        $aws_host_ip_regex
                         $aws_hostname_regex
                         $aws_fqdn_regex
                         $aws_secret_key_regex
@@ -683,14 +683,16 @@ our $domain_regex2      = '(?:' . $domain_component . '\.)+' . $tld_regex;
 our $domain_regex_strict = $domain_regex2;
 # must permit numbers as valid host identifiers that are being used in the wild in FQDNs
 our $hostname_component = '\b[A-Za-z0-9](?:[A-Za-z0-9_\-]{0,61}[a-zA-Z0-9])?\b';
-our $aws_host_component = 'ip-(?:10-\d+-\d+-\d+|172-1[6-9]-\d+-\d+|172-2[0-9]-\d+-\d+|172-3[0-1]-\d+-\d+|192-168-\d+-\d+)';
+#our $aws_host_ip_regex  = 'ip-(?:10-\d+-\d+-\d+|172-1[6-9]-\d+-\d+|172-2[0-9]-\d+-\d+|172-3[0-1]-\d+-\d+|192-168-\d+-\d+)';
+# the ip- prefix gives it away as an IP so can be a bit more general and let's catch all IPs not just private ranges
+our $aws_host_ip_regex  = '\bip-\d+-\d+-\d+-\d+\b';
 our $hostname_regex     = "$hostname_component(?:\.$domain_regex)?";
-our $aws_hostname_regex = "$aws_host_component(?:\.$domain_regex)?";
+our $aws_hostname_regex = "$aws_host_ip_regex(?:\.$domain_regex)?";
 our $dirname_regex      = '[\/\w\s\\.,:*()=%?+-]+';
 our $filename_regex     = $dirname_regex . '[^\/]';
 our $rwxt_regex         = '[r-][w-][x-][r-][w-][x-][r-][w-][xt-]';
 our $fqdn_regex         = $hostname_component . '\.' . $domain_regex;
-our $aws_fqdn_regex     = $aws_host_component . '\.' . $domain_regex;
+our $aws_fqdn_regex     = $aws_host_ip_regex . '\.' . $domain_regex;
 # SECURITY NOTE: I'm allowing single quote through as it's found in Irish email addresses. This makes the $email_regex non-safe without further validation. This regex only tests whether it's a valid email address, nothing more. DO NOT UNTAINT EMAIL or pass to cmd to SQL without further validation!!!
 our $email_regex        = '\b[A-Za-z0-9](?:[A-Za-z0-9\._\%\'\+-]{0,62}[A-Za-z0-9\._\%\+-])?@' . $domain_regex . '\b';
 # TODO: review this IP regex again
