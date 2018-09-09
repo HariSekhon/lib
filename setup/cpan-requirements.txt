@@ -41,6 +41,7 @@ Readonly::XS
 # Make tries and then falls back to a backdated version for compatibility
 # Redis
 Sys::Syslog
+Term::ANSIColor
 Term::ReadKey
 Test::More
 Thrift
