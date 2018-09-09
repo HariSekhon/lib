@@ -71,6 +71,7 @@ use POSIX;
 use JSON 'decode_json';
 use Scalar::Util 'blessed';
 #use Sys::Hostname;
+#use Term::ANSIColor 2.01 qw(colorstrip);
 use Term::ReadKey;
 use Time::Local;
 # Workaround for IO::Socket::SSL bug not respecting disabling verifying self-signed certs
@@ -79,7 +80,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.18.10";
+our $VERSION = "1.19.0";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -307,6 +308,7 @@ our %EXPORT_TAGS = (
                         rtrim
                         strBool
                         strip
+                        strip_ansi_escape_codes
                         trim
                         trim_float
                     ) ],
@@ -3031,6 +3033,18 @@ sub strip ($) {
     return $string;
 }
 *trim = \&strip;
+
+
+sub strip_ansi_escape_codes ($) {
+    my $string = shift;
+    # will only strip color codes, but want to strip all ansi escape codes for use in anoymize.pl to avoid non-printing chars from breaking anonymizations
+    ##$string = colorstrip($string);
+    #$string =~ s/\x1b\[[0-9;]*m//gio;
+    #$string =~ s/\x1b\[[0-9;]*[a-zA-Z]//gio;
+    # ported from https://github.com/HariSekhon/pylib
+    $string =~ s/(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]//gio;
+    return $string;
+}
 
 
 sub subtrace (@) {
