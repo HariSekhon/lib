@@ -247,7 +247,7 @@ our %EXPORT_TAGS = (
     'regex' =>  [   qw(
                         escape_regex
                         $aws_access_key_regex
-                        $aws_host_component
+                        $aws_host_ip_regex
                         $aws_hostname_regex
                         $aws_fqdn_regex
                         $aws_secret_key_regex
@@ -685,21 +685,23 @@ our $domain_regex2      = '(?:' . $domain_component . '\.)+' . $tld_regex;
 our $domain_regex_strict = $domain_regex2;
 # must permit numbers as valid host identifiers that are being used in the wild in FQDNs
 our $hostname_component = '\b[A-Za-z0-9](?:[A-Za-z0-9_\-]{0,61}[a-zA-Z0-9])?\b';
-our $aws_host_component = 'ip-(?:10-\d+-\d+-\d+|172-1[6-9]-\d+-\d+|172-2[0-9]-\d+-\d+|172-3[0-1]-\d+-\d+|192-168-\d+-\d+)';
+#our $aws_host_ip_regex  = 'ip-(?:10-\d+-\d+-\d+|172-1[6-9]-\d+-\d+|172-2[0-9]-\d+-\d+|172-3[0-1]-\d+-\d+|192-168-\d+-\d+)';
+# the ip- prefix gives it away as an IP so can be a bit more general and let's catch all IPs not just private ranges
+our $aws_host_ip_regex  = '\bip-\d+-\d+-\d+-\d+\b';
 our $hostname_regex     = "$hostname_component(?:\.$domain_regex)?";
-our $aws_hostname_regex = "$aws_host_component(?:\.$domain_regex)?";
+our $aws_hostname_regex = "$aws_host_ip_regex(?:\.$domain_regex)?";
 our $dirname_regex      = '[\/\w\s\\.,:*()=%?+-]+';
 our $filename_regex     = $dirname_regex . '[^\/]';
 our $rwxt_regex         = '[r-][w-][x-][r-][w-][x-][r-][w-][xt-]';
 our $fqdn_regex         = $hostname_component . '\.' . $domain_regex;
-our $aws_fqdn_regex     = $aws_host_component . '\.' . $domain_regex;
+our $aws_fqdn_regex     = $aws_host_ip_regex . '\.' . $domain_regex;
 # SECURITY NOTE: I'm allowing single quote through as it's found in Irish email addresses. This makes the $email_regex non-safe without further validation. This regex only tests whether it's a valid email address, nothing more. DO NOT UNTAINT EMAIL or pass to cmd to SQL without further validation!!!
 our $email_regex        = '\b[A-Za-z0-9](?:[A-Za-z0-9\._\%\'\+-]{0,62}[A-Za-z0-9\._\%\+-])?@' . $domain_regex . '\b';
 # TODO: review this IP regex again
 our $ip_prefix_regex    = '\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}';
 our $ip_regex           = $ip_prefix_regex . '(?:25[0-5]|2[0-4][0-9]|[01]?[1-9][0-9]|[01]?0[1-9]|[12]00|[0-9])\b'; # now allowing 0 or 255 as the final octet due to CIDR
 our $subnet_mask_regex  = '\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[1-9][0-9]|[01]?0[1-9]|[12]00|[0-9])\b';
-our $mac_regex          = '\b[0-9A-F-af]{1,2}[:-](?:[0-9A-Fa-f]{1,2}[:-]){4}[0-9A-Fa-f]{1,2}\b';
+our $mac_regex          = '\b[0-9A-Fa-f]{1,2}[:-](?:[0-9A-Fa-f]{1,2}[:-]){4}[0-9A-Fa-f]{1,2}\b';
 our $host_regex         = "\\b(?:$hostname_regex|$ip_regex)\\b";
 # I did a scan of registered running process names across several hundred linux servers of a diverse group of enterprise applications with 500 unique process names (58k individual processes) to determine that there are cases with spaces, slashes, dashes, underscores, chevrons (<defunct>), dots (script.p[ly], in.tftpd etc) to determine what this regex should be. Incidentally it appears that Linux truncates registered process names to 15 chars.
 # This is not from ps -ef etc it is the actual process registered name, hence init not [init] as it appears in ps output
@@ -1149,7 +1151,7 @@ sub assert_hash($$) {
 sub assert_int($$) {
     my $int  = shift;
     my $name = shift;
-    isInt($int) or quit "UNKNOWN", "$name is not an integer! $nagios_plugins_support_msg_api";
+    isInt($int, "signed") or quit "UNKNOWN", "$name is not an integer! $nagios_plugins_support_msg_api";
 }
 
 
@@ -1418,8 +1420,12 @@ sub curl ($;$$$$$$) {
     $main::ua->show_progress(1) if $debug;
     $main::ua->env_proxy;
     my $req = HTTP::Request->new($type, $url);
-    # Doesn't work
-    #$ua->credentials($host, '', $user, $password);
+    # LWP timeout should always be less than global timeout to prevent "UNKNOWN" erorrs
+    if ($timeout >= 1) {
+        $main::ua->timeout($timeout-.5);
+    } else {
+        $main::ua->timeout(.5);
+    }
     $req->authorization_basic($user, $password) if (defined($user) and defined($password));
     $req->content($body) if $body;
     my $response = $main::ua->request($req);
@@ -3068,11 +3074,11 @@ sub timecomponents2days($$$$$$){
     my $sec   = shift;
     my $month_int;
     if(isInt($month)){
-        $month_int = $month;
+        $month_int = $month - 1;
     } else {
         $month_int = month2int($month);
     }
-    my $epoch = timegm($sec, $min, $hour, $day, $month_int, $year-1900) || code_error "failed to convert timestamp $year-$month-$day $hour:$min:$sec";
+    my $epoch = timegm($sec, $min, $hour, $day, $month_int, $year - 1900) || code_error "failed to convert timestamp $year-$month-$day $hour:$min:$sec";
     my $now   = time || code_error "failed to get epoch timestamp";
     return ($epoch - $now) / (86400);
 }
@@ -3173,8 +3179,8 @@ sub usage (;@) {
         print STDERR "Hari Sekhon - https://github.com/harisekhon";
         if($github_repo){
             print STDERR "/$github_repo";
-        } elsif(dirname(abs_path(__FILE__)) =~ /tools/i){
-            print STDERR "/tools";
+        } elsif(dirname(abs_path(__FILE__)) =~ /devops-perl-tools/i){
+            print STDERR "/devops-perl-tools";
         } elsif(dirname(abs_path(__FILE__)) =~ /nagios-plugins/i or $main::DESCRIPTION =~ /Nagios/i){
             print STDERR "/nagios-plugins";
         }

@@ -29,7 +29,8 @@ MongoDB
 MongoDB::MongoClient
 # downgrading Net::DNS as a workaround for taint mode bug:
 # https://rt.cpan.org/Public/Bug/Display.html?id=114819
-Net::DNS@1.05
+#Net::DNS@1.05
+Net::DNS
 Net::LDAP
 Net::LDAPI
 Net::LDAPS
@@ -44,7 +45,7 @@ Sys::Syslog
 Term::ANSIColor
 Term::ReadKey
 Test::More
-Thrift
+Thrift@0.10.0
 Time::HiRes
 XML::SAX
 XML::Simple

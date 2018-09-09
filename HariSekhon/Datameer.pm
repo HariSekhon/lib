@@ -61,7 +61,7 @@ sub datameer_curl($$$){
         quit "CRITICAL", "invalid json returned by '$host:$port'";
     };
     if(isHash($json) and defined($json->{"error"})){
-	quit "CRITICAL", $json->{"error"};
+        quit "CRITICAL", $json->{"error"};
     }
 
     return $json;
