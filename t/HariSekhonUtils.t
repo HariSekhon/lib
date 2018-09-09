@@ -1096,6 +1096,12 @@ is(strip(" \t \n ha ri \t \n"),     "ha ri",   'strip()');
 is(trim(" \t \n ha ri \t \n"),      "ha ri",   'trim()');
 
 # ============================================================================ #
+#is(strip_ansi_escape_codes('some ^[[01;31m^[[Kcontent^[[m^[[K here'), 'some content here', 'strip_ansi_escape_codes(some content here)');
+is(strip_ansi_escape_codes("some \e[01;31m\e[Kcontent\e[m\e[K here"), 'some content here', 'strip_ansi_escape_codes(some content here)');
+#is(strip_ansi_escape_codes('some ^[[01;31m^[[Khigh^[[m^[[Klighted ^[[01;31m^[[Kcontent^[[m^[[K'), 'some highlighted content', 'strip_ansi_escape_codes(some highlighted content)');
+is(strip_ansi_escape_codes("some \e[01;31m\e[Khigh\e[m\e[Klighted \e[01;31m\e[Kcontent\e[m\e[K"), 'some highlighted content', 'strip_ansi_escape_codes(some highlighted content)');
+
+# ============================================================================ #
 is(trim_float("0.10"), "0.1", 'trim_float("0.10") eq "0.1"');
 is(trim_float("0.101"), "0.101", 'trim_float("0.101") eq "0.101"');
 
