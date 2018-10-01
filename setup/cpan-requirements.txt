@@ -15,7 +15,7 @@
 # ============================================================================ #
 
 Class::Accessor
-# fixing version to stop it breaking in Travis CI Perl 5.10 builds
+# pinning version to stop it breaking Travis CI Perl 5.10 builds
 Data::Dumper@2.161
 Devel::Cover::Report::Coveralls
 ExtUtils::Constant
