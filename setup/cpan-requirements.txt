@@ -15,7 +15,8 @@
 # ============================================================================ #
 
 Class::Accessor
-Data::Dumper
+# fixing version to stop it breaking in Travis CI Perl 5.10 builds
+Data::Dumper@2.161
 Devel::Cover::Report::Coveralls
 ExtUtils::Constant
 IO::Socket::IP
