@@ -80,7 +80,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.19.0";
+our $VERSION = "1.19.2";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -227,6 +227,7 @@ our %EXPORT_TAGS = (
                         prompt
                         plural
                         remove_timeout
+                        set_host_default
                         set_port_default
                         set_threshold_defaults
                         timecomponents2days
@@ -820,6 +821,20 @@ my $long_options_len  = 0;
 #    %options = ( %options, %useroptions );
 #}
 
+my $default_host;
+sub set_host_default($;$){
+    #defined($default_host) and code_error("default host cannot be set twice");
+    # already defined, first one wins
+    defined($default_host) and not defined($_[1]) and return;
+    $default_host = shift;
+    isHost($default_host) or code_error("invalid host passed as first arg to set_host_default");
+    if(not defined($host)){
+        $host = $default_host;
+    }
+    $hostoptions{"H|host=s"}[1] =~ s/\)$/, default: $default_host\)/;
+    return $host;
+}
+
 my $default_port;
 sub set_port_default($;$){
     #defined($default_port) and code_error("default port cannot be set twice");
@@ -827,7 +842,9 @@ sub set_port_default($;$){
     defined($default_port) and not defined($_[1]) and return;
     $default_port = shift;
     isPort($default_port) or code_error("invalid port passed as first arg to set_port_default");
-    $port = $default_port;
+    if(not defined($port)){
+        $port = $default_port;
+    }
     $hostoptions{"P|port=s"}[1] =~ s/\)$/, default: $default_port\)/;
     return $port;
 }
@@ -3314,7 +3331,7 @@ sub validate_alnum($$){
 sub validate_aws_access_key($){
     my $aws_access_key = shift;
     defined($aws_access_key) or usage "aws access key not defined";
-    $aws_access_key = isAwsAccessKey($aws_access_key) || usage "invalid aws access key defined: must be 20 alphanumeric characters";
+    $aws_access_key = isAwsAccessKey($aws_access_key) || usage "invalid aws access key defined: must be 20 uppercase alphanumeric characters";
     vlog_option("aws access key", "X"x18 . substr($aws_access_key, 18, 2));
     return $aws_access_key;
 }
