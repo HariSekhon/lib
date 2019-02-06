@@ -46,7 +46,7 @@ Sys::Syslog
 Term::ANSIColor
 Term::ReadKey
 Test::More
-Thrift@0.10.0
+#Thrift
 Time::HiRes
 XML::SAX
 XML::Simple
