@@ -100,7 +100,7 @@ perl:
 	     yes "" | $(SUDO_PERL) OPENSSL_INCLUDE=/usr/local/opt/openssl/include OPENSSL_LIB=/usr/local/opt/openssl/lib $(CPANM) --notest Crypt::SSLeay; \
 	fi
 
-	$(SUDO_PERL) $(CPANM) --notest Thrift || :
+	$(SUDO_PERL) $(CPANM) --notest Thrift@0.10.0 || :
 
 	$(SUDO_PERL) $(CPANM) --notest `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/cpan-requirements.txt`
 
