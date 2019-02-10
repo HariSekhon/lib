@@ -125,6 +125,10 @@ apk-packages-remove:
 .PHONY: apt-packages
 apt-packages:
 	$(SUDO) apt-get update
+
+	# App::CPANMinus is in repos so install the deb if available instead of installing via cpan
+	$(SUDO) apt-get install -y cpanminus || :
+
 	$(SUDO) apt-get install -y `sed 's/#.*//; /^[[:space:]]*$$/d' setup/deb-packages.txt setup/deb-packages-dev.txt`
 	# Ubuntu 12 Precise which is still used in Travis CI uses libmysqlclient-dev, but Debian 9 Stretch and Ubuntu 16 Xenial
 	# use libmariadbd-dev so this must now be handled separately as a failback
@@ -138,6 +142,9 @@ apt-packages-remove:
 
 .PHONY: yum-packages
 yum-packages:
+	# App::CPANMinus is in CentOS 7 base repo so install the rpm if available instead of installing via cpan
+	rpm -q perl-App-cpanminus || $(SUDO) yum install -y perl-App-cpanminus || :
+
 	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/rpm-packages.txt setup/rpm-packages-dev.txt`; do rpm -q $$x || $(SUDO) yum install -y $$x; done
 
 .PHONY: yum-packages-remove
