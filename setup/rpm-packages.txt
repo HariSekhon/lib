@@ -30,6 +30,7 @@ perl-XML-LibXML
 # needed to build XML::Simple dep XML::Parser
 expat-devel
 
+perl-Crypt-SSLeay
 perl-JSON
 #perl-JSON-PP
 perl-Math-Round
