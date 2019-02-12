@@ -19,6 +19,8 @@ Class::Accessor
 Data::Dumper@2.161
 Devel::Cover::Report::Coveralls
 ExtUtils::Constant
+# required for Net::LDAP
+inc::Module::Install
 IO::Socket::IP
 IO::Socket::Timeout
 JSON
@@ -46,6 +48,7 @@ Sys::Syslog
 Term::ANSIColor
 Term::ReadKey
 Test::More
+# installs but returns an error code
 #Thrift
 Time::HiRes
 XML::SAX
