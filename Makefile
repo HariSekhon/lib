@@ -102,7 +102,7 @@ perl:
 
 	$(SUDO_PERL) $(CPANM) --notest Thrift@0.10.0 || :
 
-	$(SUDO_PERL) $(CPANM) --notest `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/cpan-requirements.txt`
+	$(SUDO_PERL) $(CPANM) --notest `sed 's/#.*//; /^[[:space:]]*$$/d' setup/cpan-requirements.txt`
 
 	# newer versions of the Redis module require Perl >= 5.10, this will install the older compatible version for RHEL5/CentOS5 servers still running Perl 5.8 if the latest module fails
 	# the backdated version might not be the perfect version, found by digging around in the git repo
@@ -119,7 +119,7 @@ apk-packages:
 
 .PHONY: apk-packages-remove
 apk-packages-remove:
-	$(SUDO) apk del `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/apk-packages-dev.txt` || :
+	$(SUDO) apk del `sed 's/#.*//; /^[[:space:]]*$$/d' setup/apk-packages-dev.txt` || :
 	$(SUDO) rm -fr /var/cache/apk/*
 
 .PHONY: apt-packages
@@ -136,7 +136,7 @@ apt-packages:
 
 .PHONY: apt-packages-remove
 apt-packages-remove:
-	$(SUDO) apt-get purge -y `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/deb-packages-dev.txt`
+	$(SUDO) apt-get purge -y `sed 's/#.*//; /^[[:space:]]*$$/d' setup/deb-packages-dev.txt`
 	$(SUDO) apt-get purge -y libmariadbd-dev || :
 	$(SUDO) apt-get purge -y libmysqlclient-dev || :
 
@@ -145,11 +145,11 @@ yum-packages:
 	# App::CPANMinus is in CentOS 7 base repo so install the rpm if available instead of installing via cpan
 	rpm -q perl-App-cpanminus || $(SUDO) yum install -y perl-App-cpanminus || :
 
-	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/rpm-packages.txt setup/rpm-packages-dev.txt`; do rpm -q $$x || $(SUDO) yum install -y $$x; done
+	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' setup/rpm-packages.txt setup/rpm-packages-dev.txt`; do rpm -q $$x || $(SUDO) yum install -y $$x; done
 
 .PHONY: yum-packages-remove
 yum-packages-remove:
-	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/rpm-packages-dev.txt`; do if rpm -q $$x; then $(SUDO) yum remove -y $$x; fi; done
+	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' setup/rpm-packages-dev.txt`; do if rpm -q $$x; then $(SUDO) yum remove -y $$x; fi; done
 
 .PHONY: homebrew-packages
 homebrew-packages:
