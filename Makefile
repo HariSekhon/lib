@@ -109,7 +109,7 @@ perl:
 	@echo
 	@echo "Installing any CPAN Modules missed by system packages"
 	for cpan_module in `sed 's/#.*//; /^[[:space:]]*$$/d' setup/cpan-requirements-packaged.txt`; do \
-		perl -e "use $$cpan_module;" || $(SUDO_PERL) $(CPANM) --notest "$$cpan_module"; \
+		perl -e "use $$cpan_module;" || $(SUDO_PERL) $(CPANM) --notest "$$cpan_module" || exit $$?; \
 	done
 	@echo
 	# newer versions of the Redis module require Perl >= 5.10, this will install the older compatible version for RHEL5/CentOS5 servers still running Perl 5.8 if the latest module fails
