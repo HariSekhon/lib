@@ -20,8 +20,6 @@ gcc
 git
 perl
 perl-CPAN
-perl-libwww-perl
-perl-XML-LibXML
 
 # for DBD::mysql as well as headers to build DBD::mysql if building from CPAN
 #mysql-devel
@@ -31,18 +29,20 @@ perl-XML-LibXML
 expat-devel
 
 perl-Crypt-SSLeay
+perl-Devel-Cover
 perl-JSON
-#perl-JSON-PP
+perl-LDAP
 perl-Math-Round
 perl-Net-DNS
-perl-LDAP
 perl-Redis
 perl-Sys-Syslog
 perl-TermReadKey
 perl-Time-HiRes
+perl-XML-LibXML
 perl-XML-SAX
 perl-XML-Simple
 perl-YAML
+perl-libwww-perl
 
 #perl-Readonly-XS
 #perl-Readonly
