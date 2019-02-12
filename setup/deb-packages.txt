@@ -20,6 +20,8 @@ build-essential
 git
 perl
 
+procps
+
 # needed to build Net::SSLeay for IO::Socket::SSL for Net::LDAPS
 libssl-dev
 libsasl2-dev
