@@ -20,7 +20,6 @@
 # newer versions of the Redis module require Perl >= 5.10
 # Make tries and then falls back to a backdated version for compatibility
 # Redis
-Sys::Syslog
 Term::ANSIColor
 Test::More
 # installs but returns an error code
