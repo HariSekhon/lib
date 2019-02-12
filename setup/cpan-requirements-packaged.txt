@@ -30,8 +30,6 @@ Net::LDAPS
 Net::SSL
 Sys::Syslog
 Term::ReadKey
-# installs but returns an error code
-#Thrift
 Time::HiRes
 XML::SAX
 XML::Simple
