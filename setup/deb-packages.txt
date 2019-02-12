@@ -33,3 +33,19 @@ libsasl2-dev
 libexpat1-dev
 
 libredis-perl
+#libdata-dumper-simple-perl
+libjson-perl
+libjson-xs-perl
+libio-all-lwp-perl
+libmath-round-perl
+libmongodb-perl
+libnet-dns-perl
+libnet-ldap-perl
+libnet-ssleay-perl
+#libreadonly-perl
+#libreadonly-xs-perl
+libterm-readkey-perl
+libxml-sax-perl
+libxml-simple-perl
+libyaml-perl
+libdevel-cover-perl
