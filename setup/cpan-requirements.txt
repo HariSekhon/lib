@@ -14,41 +14,29 @@
 #                            CPAN Module Dependencies
 # ============================================================================ #
 
-#JSON
-#JSON::XS
-#Math::Round
-#MongoDB
-#MongoDB::MongoClient
-# downgrading Net::DNS as a workaround for taint mode bug:
-# https://rt.cpan.org/Public/Bug/Display.html?id=114819
-#Net::DNS@1.05
-#Net::LDAP
-#Net::LDAPI
-#Net::LDAPS
-#Net::SSL
+# Most CPAN modules have been replaced with System Packages (RPM / Debs)
+# and placed in cpan-packaged-requirements.txt
+
 # newer versions of the Redis module require Perl >= 5.10
 # Make tries and then falls back to a backdated version for compatibility
 # Redis
 Sys::Syslog
 Term::ANSIColor
-#Term::ReadKey
 Test::More
 # installs but returns an error code
 #Thrift
-#Time::HiRes
-#XML::SAX
-#XML::Simple
-#YAML
+
 
 # pinning version to stop it breaking Travis CI Perl 5.10 builds
 #Data::Dumper@2.161
 
-#Readonly
-#Readonly::XS
-#IO::Socket::Timeout
-#IO::Socket::IP
 #Class::Accessor
 #Devel::Cover::Report::Coveralls
 #ExtUtils::Constant
+#IO::Socket::IP
+#IO::Socket::Timeout
+#Readonly
+#Readonly::XS
+
 # required for Net::LDAP
 #inc::Module::Install
