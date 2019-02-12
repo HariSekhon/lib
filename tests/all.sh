@@ -39,7 +39,8 @@ bash-tools/check_perl_syntax.sh t
 
 section "Running Perl Unit Tests"
 
-PERL5LIB=${PERLBREW_ROOT:-} PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -I . -lrsv --timer t
+#PERL5LIB=${PERLBREW_ROOT:-} PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -I . -lrsv --timer t
+PERL5LIB=${PERLBREW_ROOT:-} prove -I . -lrsv --timer t
 
 bash-tools/all.sh
 
