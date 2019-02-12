@@ -29,3 +29,19 @@ perl-XML-LibXML
 
 # needed to build XML::Simple dep XML::Parser
 expat-devel
+
+perl-JSON
+#perl-JSON-PP
+perl-Math-Round
+perl-Net-DNS
+perl-LDAP
+perl-Redis
+perl-Sys-Syslog
+perl-TermReadKey
+perl-Time-HiRes
+perl-XML-SAX
+perl-XML-Simple
+perl-YAML
+
+#perl-Readonly-XS
+#perl-Readonly
