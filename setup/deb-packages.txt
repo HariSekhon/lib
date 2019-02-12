@@ -29,6 +29,7 @@ libsasl2-dev
 # needed to build XML::Simple dep XML::Parser
 libexpat1-dev
 
+libcrypt-ssleay-perl
 libdevel-cover-perl
 libio-all-lwp-perl
 libjson-perl
