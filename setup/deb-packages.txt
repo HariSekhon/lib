@@ -19,9 +19,6 @@
 build-essential
 git
 perl
-libwww-perl
-
-libxml-perl
 
 # needed to build Net::SSLeay for IO::Socket::SSL for Net::LDAPS
 libssl-dev
@@ -32,20 +29,24 @@ libsasl2-dev
 # needed to build XML::Simple dep XML::Parser
 libexpat1-dev
 
-libredis-perl
-#libdata-dumper-simple-perl
+libdevel-cover-perl
+libio-all-lwp-perl
 libjson-perl
 libjson-xs-perl
-libio-all-lwp-perl
 libmath-round-perl
 libmongodb-perl
 libnet-dns-perl
 libnet-ldap-perl
 libnet-ssleay-perl
-#libreadonly-perl
-#libreadonly-xs-perl
+libredis-perl
 libterm-readkey-perl
+libwww-perl
+libxml-perl
 libxml-sax-perl
 libxml-simple-perl
 libyaml-perl
-libdevel-cover-perl
+
+#libdata-dumper-simple-perl
+
+#libreadonly-perl
+#libreadonly-xs-perl
