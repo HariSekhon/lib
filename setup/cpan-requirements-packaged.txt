@@ -16,6 +16,7 @@
 
 # Installed via RPM packages, but double checks if these modules are installed and if not then installs via cpanm
 
+Devel::Cover
 JSON
 JSON::XS
 Math::Round
