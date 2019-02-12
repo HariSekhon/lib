@@ -90,22 +90,31 @@ perl:
 	which cpanm || { yes "" | $(SUDO_PERL) cpan App::cpanminus; }
 	$(CPANM) -V | head -n2
 
-	# some libraries need this to be present first
+	@echo "Installing Test::More first because some libraries need this to already be present to build"
 	$(SUDO_PERL) $(CPANM) --notest Test::More
 
 	# Workaround for Mac OS X not finding the OpenSSL libraries when building
 	if [ -d /usr/local/opt/openssl/include -a \
 	     -d /usr/local/opt/openssl/lib     -a \
 	     `uname` = Darwin ]; then \
+		 @echo "Installing Crypt::SSLeay with local openssl library locations"; \
 	     yes "" | $(SUDO_PERL) OPENSSL_INCLUDE=/usr/local/opt/openssl/include OPENSSL_LIB=/usr/local/opt/openssl/lib $(CPANM) --notest Crypt::SSLeay; \
 	fi
-
+	@echo
+	@echo "Installing Thrift"
 	$(SUDO_PERL) $(CPANM) --notest Thrift@0.10.0 || :
-
+	@echo
+	@echo "Installing CPAN Modules"
 	$(SUDO_PERL) $(CPANM) --notest `sed 's/#.*//; /^[[:space:]]*$$/d' setup/cpan-requirements.txt`
-
+	@echo
+	@echo "Installing any CPAN Modules missed by system packages"
+	for cpan_module in `sed 's/#.*//; /^[[:space:]]*$$/d' setup/cpan-requirements-packaged.txt`; do \
+		perl -e "use $$cpan_module;" || $(SUDO_PERL) $(CPANM) --notest "$$cpan_module"; \
+	done
+	@echo
 	# newer versions of the Redis module require Perl >= 5.10, this will install the older compatible version for RHEL5/CentOS5 servers still running Perl 5.8 if the latest module fails
 	# the backdated version might not be the perfect version, found by digging around in the git repo
+	@echo "Installing Redis module or backdated version for older Perl"
 	$(SUDO_PERL) $(CPANM) --notest Redis || $(SUDO_PERL) $(CPANM) --notest DAMS/Redis-1.976.tar.gz
 
 .PHONY: quick
