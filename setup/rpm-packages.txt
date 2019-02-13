@@ -14,8 +14,6 @@
 #                            RPM Package Requirements
 # ============================================================================ #
 
-# TODO: replace as many CPAN modules with system packages as possible - test back to centos 6
-
 gcc
 git
 perl
@@ -28,22 +26,3 @@ which
 
 # needed to build XML::Simple dep XML::Parser
 expat-devel
-
-perl-Crypt-SSLeay
-perl-Devel-Cover
-perl-JSON
-perl-LDAP
-perl-Math-Round
-perl-Net-DNS
-perl-Redis
-perl-Sys-Syslog
-perl-TermReadKey
-perl-Time-HiRes
-perl-XML-LibXML
-perl-XML-SAX
-perl-XML-Simple
-perl-YAML
-perl-libwww-perl
-
-#perl-Readonly-XS
-#perl-Readonly
