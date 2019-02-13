@@ -139,6 +139,7 @@ apt-packages:
 	$(SUDO) apt-get install -y cpanminus || :
 
 	$(SUDO) apt-get install -y `sed 's/#.*//; /^[[:space:]]*$$/d' setup/deb-packages.txt setup/deb-packages-dev.txt`
+	$(SUDO) apt-get install -y `sed 's/#.*//; /^[[:space:]]*$$/d' setup/deb-packages-cpan.txt` || :
 	# Ubuntu 12 Precise which is still used in Travis CI uses libmysqlclient-dev, but Debian 9 Stretch and Ubuntu 16 Xenial
 	# use libmariadbd-dev so this must now be handled separately as a failback
 	$(SUDO) apt-get install -y libmariadbd-dev || $(SUDO) apt-get install -y libmysqlclient-dev
