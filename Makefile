@@ -156,6 +156,7 @@ yum-packages:
 	rpm -q perl-App-cpanminus || $(SUDO) yum install -y perl-App-cpanminus || :
 
 	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' setup/rpm-packages.txt setup/rpm-packages-dev.txt`; do rpm -q $$x || $(SUDO) yum install -y $$x; done
+	$(SUDO) yum install -y `sed 's/#.*//; /^[[:space:]]*$$/d' setup/rpm-packages-cpan.txt` || :
 
 .PHONY: yum-packages-remove
 yum-packages-remove:
