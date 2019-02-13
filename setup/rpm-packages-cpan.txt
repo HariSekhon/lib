@@ -1,0 +1,36 @@
+#  vim:ts=4:sts=4:sw=4:noet
+#
+#  Author: Hari Sekhon
+#  Date: 2013-01-06 15:45:00 +0000 (Sun, 06 Jan 2013)
+#
+#  https://github.com/harisekhon/lib
+#
+#  License: see accompanying Hari Sekhon LICENSE file
+#
+#  https://www.linkedin.com/in/harisekhon
+#
+
+# ============================================================================ #
+#                         RPM CPAN Package Requirements
+# ============================================================================ #
+
+# Install if available in repos, otherwise will be installed by cpanm
+
+perl-Crypt-SSLeay
+perl-Devel-Cover
+perl-JSON
+perl-LDAP
+perl-Math-Round
+perl-Net-DNS
+perl-Redis
+perl-Sys-Syslog
+perl-TermReadKey
+perl-Time-HiRes
+perl-XML-LibXML
+perl-XML-SAX
+perl-XML-Simple
+perl-YAML
+perl-libwww-perl
+
+#perl-Readonly-XS
+#perl-Readonly
