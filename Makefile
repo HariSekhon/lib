@@ -56,8 +56,6 @@ build:
 	@echo Perl Lib Build
 	@echo ==============
 
-	perl -v
-
 	$(MAKE) common
 	$(MAKE) perl
 
@@ -86,6 +84,8 @@ system-packages:
 
 .PHONY: perl
 perl:
+	perl -v
+
 	#(echo y; echo o conf prerequisites_policy follow; echo o conf commit) | cpan
 	which cpanm || { yes "" | $(SUDO_PERL) cpan App::cpanminus; }
 	$(CPANM) -V | head -n2
@@ -198,3 +198,7 @@ deep-clean: clean
 .PHONY: push
 push:
 	git push
+
+.PHONY: docker-alpine
+docker-alpine:
+	docker run -ti -v $$PWD:/pl alpine sh -c 'apk add --no-cache make && cd /pl && make build test'
