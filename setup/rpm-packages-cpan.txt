@@ -18,6 +18,7 @@
 
 perl-Crypt-SSLeay
 perl-Devel-Cover
+perl-IO-Tty
 perl-JSON
 perl-LDAP
 perl-Math-Round
