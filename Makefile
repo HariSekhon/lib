@@ -90,20 +90,31 @@ perl:
 	which cpanm || { yes "" | $(SUDO_PERL) cpan App::cpanminus; }
 	$(CPANM) -V | head -n2
 
-	# some libraries need this to be present first
+	@echo "Installing Test::More first because some libraries need this to already be present to build"
 	$(SUDO_PERL) $(CPANM) --notest Test::More
 
 	# Workaround for Mac OS X not finding the OpenSSL libraries when building
 	if [ -d /usr/local/opt/openssl/include -a \
 	     -d /usr/local/opt/openssl/lib     -a \
 	     `uname` = Darwin ]; then \
+		 @echo "Installing Crypt::SSLeay with local openssl library locations"; \
 	     yes "" | $(SUDO_PERL) OPENSSL_INCLUDE=/usr/local/opt/openssl/include OPENSSL_LIB=/usr/local/opt/openssl/lib $(CPANM) --notest Crypt::SSLeay; \
 	fi
-
-	yes "" | $(SUDO_PERL) $(CPANM) --notest `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/cpan-requirements.txt`
-
+	@echo
+	@echo "Installing Thrift"
+	$(SUDO_PERL) $(CPANM) --notest Thrift@0.10.0 || :
+	@echo
+	@echo "Installing CPAN Modules"
+	$(SUDO_PERL) $(CPANM) --notest `sed 's/#.*//; /^[[:space:]]*$$/d' setup/cpan-requirements.txt`
+	@echo
+	@echo "Installing any CPAN Modules missed by system packages"
+	for cpan_module in `sed 's/#.*//; /^[[:space:]]*$$/d' setup/cpan-requirements-packaged.txt`; do \
+		perl -e "use $$cpan_module;" || $(SUDO_PERL) $(CPANM) --notest "$$cpan_module" || exit 1; \
+	done
+	@echo
 	# newer versions of the Redis module require Perl >= 5.10, this will install the older compatible version for RHEL5/CentOS5 servers still running Perl 5.8 if the latest module fails
 	# the backdated version might not be the perfect version, found by digging around in the git repo
+	@echo "Installing Redis module or backdated version for older Perl"
 	$(SUDO_PERL) $(CPANM) --notest Redis || $(SUDO_PERL) $(CPANM) --notest DAMS/Redis-1.976.tar.gz
 
 .PHONY: quick
@@ -117,30 +128,39 @@ apk-packages:
 
 .PHONY: apk-packages-remove
 apk-packages-remove:
-	$(SUDO) apk del `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/apk-packages-dev.txt` || :
+	$(SUDO) apk del `sed 's/#.*//; /^[[:space:]]*$$/d' setup/apk-packages-dev.txt` || :
 	$(SUDO) rm -fr /var/cache/apk/*
 
 .PHONY: apt-packages
 apt-packages:
 	$(SUDO) apt-get update
+
+	# App::CPANMinus is in repos so install the deb if available instead of installing via cpan
+	$(SUDO) apt-get install -y cpanminus || :
+
 	$(SUDO) apt-get install -y `sed 's/#.*//; /^[[:space:]]*$$/d' setup/deb-packages.txt setup/deb-packages-dev.txt`
+	$(SUDO) apt-get install -y `sed 's/#.*//; /^[[:space:]]*$$/d' setup/deb-packages-cpan.txt` || :
 	# Ubuntu 12 Precise which is still used in Travis CI uses libmysqlclient-dev, but Debian 9 Stretch and Ubuntu 16 Xenial
 	# use libmariadbd-dev so this must now be handled separately as a failback
 	$(SUDO) apt-get install -y libmariadbd-dev || $(SUDO) apt-get install -y libmysqlclient-dev
 
 .PHONY: apt-packages-remove
 apt-packages-remove:
-	$(SUDO) apt-get purge -y `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/deb-packages-dev.txt`
+	$(SUDO) apt-get purge -y `sed 's/#.*//; /^[[:space:]]*$$/d' setup/deb-packages-dev.txt`
 	$(SUDO) apt-get purge -y libmariadbd-dev || :
 	$(SUDO) apt-get purge -y libmysqlclient-dev || :
 
 .PHONY: yum-packages
 yum-packages:
-	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/rpm-packages.txt setup/rpm-packages-dev.txt`; do rpm -q $$x || $(SUDO) yum install -y $$x; done
+	# App::CPANMinus is in CentOS 7 base repo so install the rpm if available instead of installing via cpan
+	rpm -q perl-App-cpanminus || $(SUDO) yum install -y perl-App-cpanminus || :
+
+	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' setup/rpm-packages.txt setup/rpm-packages-dev.txt`; do rpm -q $$x || $(SUDO) yum install -y $$x; done
+	$(SUDO) yum install -y `sed 's/#.*//; /^[[:space:]]*$$/d' setup/rpm-packages-cpan.txt` || :
 
 .PHONY: yum-packages-remove
 yum-packages-remove:
-	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/rpm-packages-dev.txt`; do if rpm -q $$x; then $(SUDO) yum remove -y $$x; fi; done
+	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' setup/rpm-packages-dev.txt`; do if rpm -q $$x; then $(SUDO) yum remove -y $$x; fi; done
 
 .PHONY: homebrew-packages
 homebrew-packages:

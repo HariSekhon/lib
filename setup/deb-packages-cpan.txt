@@ -1,0 +1,40 @@
+#  vim:ts=4:sts=4:sw=4:noet
+#
+#  Author: Hari Sekhon
+#  Date: 2013-01-06 15:45:00 +0000 (Sun, 06 Jan 2013)
+#
+#  https://github.com/harisekhon/lib
+#
+#  License: see accompanying Hari Sekhon LICENSE file
+#
+#  https://www.linkedin.com/in/harisekhon
+#
+
+# ============================================================================ #
+#                         Deb CPAN Package Requirements
+# ============================================================================ #
+
+# Install if available in repos, otherwise will be installed by cpanm
+
+libcrypt-ssleay-perl
+libdevel-cover-perl
+libio-all-lwp-perl
+libjson-perl
+libjson-xs-perl
+libmath-round-perl
+libmongodb-perl
+libnet-dns-perl
+libnet-ldap-perl
+libnet-ssleay-perl
+libredis-perl
+libterm-readkey-perl
+libwww-perl
+libxml-perl
+libxml-sax-perl
+libxml-simple-perl
+libyaml-perl
+
+#libdata-dumper-simple-perl
+
+#libreadonly-perl
+#libreadonly-xs-perl

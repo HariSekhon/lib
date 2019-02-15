@@ -11,22 +11,26 @@
 #
 
 # ============================================================================ #
-#                            Deb Package Requirements
+#                         RPM CPAN Package Requirements
 # ============================================================================ #
 
-# TODO: replace as many CPAN modules as possible with system modules, test back to ubuntu 12 and debian 7
+# Install if available in repos, otherwise will be installed by cpanm
 
-build-essential
-git
-perl
+perl-Crypt-SSLeay
+perl-Devel-Cover
+perl-JSON
+perl-LDAP
+perl-Math-Round
+perl-Net-DNS
+perl-Redis
+perl-Sys-Syslog
+perl-TermReadKey
+perl-Time-HiRes
+perl-XML-LibXML
+perl-XML-SAX
+perl-XML-Simple
+perl-YAML
+perl-libwww-perl
 
-procps
-
-# needed to build Net::SSLeay for IO::Socket::SSL for Net::LDAPS
-libssl-dev
-libsasl2-dev
-
-#libdbd-mysql-perl
-
-# needed to build XML::Simple dep XML::Parser
-libexpat1-dev
+#perl-Readonly-XS
+#perl-Readonly

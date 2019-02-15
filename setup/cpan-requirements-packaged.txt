@@ -1,0 +1,37 @@
+#  vim:ts=4:sts=4:sw=4:noet
+#
+#  Author: Hari Sekhon
+#  Date: 2013-01-06 15:45:00 +0000 (Sun, 06 Jan 2013)
+#
+#  https://github.com/harisekhon/lib
+#
+#  License: see accompanying Hari Sekhon LICENSE file
+#
+#  https://www.linkedin.com/in/harisekhon
+#
+
+# ============================================================================ #
+#                           CPAN Requirements Packaged
+# ============================================================================ #
+
+# Installed via RPM packages, but double checks if these modules are installed and if not then installs via cpanm
+
+Devel::Cover
+JSON
+JSON::XS
+Math::Round
+MongoDB
+MongoDB::MongoClient
+# downgrading Net::DNS as a workaround for taint mode bug:
+# https://rt.cpan.org/Public/Bug/Display.html?id=114819
+Net::DNS@1.05
+Net::LDAP
+Net::LDAPI
+Net::LDAPS
+Net::SSL
+Sys::Syslog
+Term::ReadKey
+Time::HiRes
+XML::SAX
+XML::Simple
+YAML
