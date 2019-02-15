@@ -223,3 +223,18 @@ push:
 .PHONY: docker-alpine
 docker-alpine:
 	docker run -ti -v $$PWD:/pl alpine sh -c 'apk add --no-cache make && cd /pl && make build test'
+
+# For quick testing only - for actual Dockerfile builds see https://hub.docker.com/r/harisekhon/debian-github
+.PHONY: docker-debian
+docker-debian:
+	docker run -ti -v $$PWD:/pl debian sh -c 'apk add --no-cache make && cd /pl && make build test'
+
+# For quick testing only - for actual Dockerfile builds see https://hub.docker.com/r/harisekhon/centos-github
+.PHONY: docker-centos
+docker-centos:
+	docker run -ti -v $$PWD:/pl centos sh -c 'apk add --no-cache make && cd /pl && make build test'
+
+# For quick testing only - for actual Dockerfile builds see https://hub.docker.com/r/harisekhon/ubuntu-github
+.PHONY: docker-ubuntu
+docker-ubuntu:
+	docker run -ti -v $$PWD:/pl ubuntu sh -c 'apk add --no-cache make && cd /pl && make build test'
