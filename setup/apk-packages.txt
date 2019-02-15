@@ -28,6 +28,7 @@ grep
 libressl-dev
 wget
 
+perl-crypt-ssleay
 perl-json
 perl-ldap
 perl-math-round
