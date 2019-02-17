@@ -31,7 +31,8 @@ notifications:
   email: false
 
 env:
-  - DEBUG=1 PYTHONUNBUFFERED=1
+  #- DEBUG=1 PYTHONUNBUFFERED=1
+  - PYTHONUNBUFFERED=1
 
 #branches:
 #  only:
