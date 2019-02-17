@@ -32,6 +32,7 @@ perl-XML-SAX
 perl-XML-Simple
 perl-YAML
 perl-libwww-perl
+perl-thrift
 
 #perl-Readonly-XS
 #perl-Readonly
