@@ -30,6 +30,8 @@ Net::LDAP
 Net::LDAPI
 Net::LDAPS
 Net::SSL
+# newer versions of the Redis module require Perl >= 5.10, so may need to install an older version manually to get past this if the packaged version isn't found
+Redis
 Sys::Syslog
 Term::ReadKey
 Time::HiRes
