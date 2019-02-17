@@ -148,6 +148,7 @@ apt-packages-remove:
 
 .PHONY: yum-packages
 yum-packages:
+	bash-tools/install_epel_repo.sh
 	bash-tools/yum-install-packages.sh setup/rpm-packages.txt setup/rpm-packages-dev.txt
 	NO_FAIL=1 bash-tools/yum-install-packages.sh setup/rpm-packages-cpan.txt
 
