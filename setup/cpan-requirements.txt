@@ -17,19 +17,18 @@
 # Most CPAN modules have been replaced with System Packages (RPM / Debs)
 # and placed in cpan-packaged-requirements.txt
 
-# newer versions of the Redis module require Perl >= 5.10
-# Make tries and then falls back to a backdated version for compatibility
-# Redis
+# need to avoid this error:
+# HariSekhon/HBase/Thrift.pm:       Base class package "Class::Accessor" is empty.
+Class::Accessor
+
 Term::ANSIColor
 Test::More
 # installs but returns an error code
 #Thrift
 
-
 # pinning version to stop it breaking Travis CI Perl 5.10 builds
 #Data::Dumper@2.161
 
-#Class::Accessor
 #Devel::Cover::Report::Coveralls
 #ExtUtils::Constant
 #IO::Socket::IP

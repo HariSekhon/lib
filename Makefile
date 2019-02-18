@@ -67,7 +67,7 @@ build:
 	@echo
 
 .PHONY: common
-common: system-packages submodules
+common: submodules system-packages
 	:
 
 .PHONY: submodules
@@ -120,8 +120,8 @@ quick:
 
 .PHONY: apk-packages
 apk-packages:
-	$(SUDO) apk update
-	$(SUDO) apk add `sed 's/#.*//; /^[[:space:]]*$$/d' setup/apk-packages.txt setup/apk-packages-dev.txt`
+	bash-tools/apk-install-packages.sh setup/apk-packages.txt setup/apk-packages-dev.txt
+	NO_FAIL=1 NO_UPDATE=1 bash-tools/apk-install-packages.sh setup/apk-packages-cpan.txt
 
 .PHONY: apk-packages-remove
 apk-packages-remove:
@@ -130,13 +130,12 @@ apk-packages-remove:
 
 .PHONY: apt-packages
 apt-packages:
-	$(SUDO) apt-get update
+	bash-tools/apt-install-packages.sh setup/deb-packages.txt setup/deb-packages-dev.txt
+	NO_FAIL=1 NO_UPDATE=1 bash-tools/apt-install-packages.sh setup/deb-packages-cpan.txt
 
 	# App::CPANMinus is in repos so install the deb if available instead of installing via cpan
 	$(SUDO) apt-get install -y cpanminus || :
 
-	$(SUDO) apt-get install -y `sed 's/#.*//; /^[[:space:]]*$$/d' setup/deb-packages.txt setup/deb-packages-dev.txt`
-	$(SUDO) apt-get install -y `sed 's/#.*//; /^[[:space:]]*$$/d' setup/deb-packages-cpan.txt` || :
 	# Ubuntu 12 Precise which is still used in Travis CI uses libmysqlclient-dev, but Debian 9 Stretch and Ubuntu 16 Xenial
 	# use libmariadbd-dev so this must now be handled separately as a failback
 	$(SUDO) apt-get install -y libmariadbd-dev || $(SUDO) apt-get install -y libmysqlclient-dev
@@ -149,11 +148,12 @@ apt-packages-remove:
 
 .PHONY: yum-packages
 yum-packages:
+	bash-tools/install_epel_repo.sh
+	bash-tools/yum-install-packages.sh setup/rpm-packages.txt setup/rpm-packages-dev.txt
+	NO_FAIL=1 bash-tools/yum-install-packages.sh setup/rpm-packages-cpan.txt
+
 	# App::CPANMinus is in CentOS 7 base repo so install the rpm if available instead of installing via cpan
 	rpm -q perl-App-cpanminus || $(SUDO) yum install -y perl-App-cpanminus || :
-
-	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' setup/rpm-packages.txt setup/rpm-packages-dev.txt`; do rpm -q $$x || $(SUDO) yum install -y $$x; done
-	$(SUDO) yum install -y `sed 's/#.*//; /^[[:space:]]*$$/d' setup/rpm-packages-cpan.txt` || :
 
 .PHONY: yum-packages-remove
 yum-packages-remove:

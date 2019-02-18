@@ -25,18 +25,5 @@ perl-doc
 # grep needed for validate_regex() posix unit test as busybox's in-built grep doesn't validate regex errors
 grep
 #openssl-dev
-libressl-dev
+#libressl-dev
 wget
-
-perl-crypt-ssleay
-perl-json
-perl-ldap
-perl-math-round
-perl-net-dns
-perl-net-ssleay
-perl-sys-syslog
-perl-term-readkey
-perl-time-hires
-perl-xml-libxml
-perl-xml-sax
-perl-yaml
