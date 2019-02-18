@@ -19,7 +19,7 @@ expat-dev
 gcc
 #libxml2-dev
 #openssl-dev
-libressl-dev
+#libressl-dev
 perl-dev
 wget
 # needed to build Net::SSLeay
