@@ -14,8 +14,6 @@
 #                            Deb Package Requirements
 # ============================================================================ #
 
-# TODO: replace as many CPAN modules as possible with system modules, test back to ubuntu 12 and debian 7
-
 build-essential
 git
 perl
