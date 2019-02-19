@@ -12,27 +12,6 @@
 #  https://www.linkedin.com/in/harisekhon
 #
 
-# Library dependencies are handled in one place in calling project
-
-export PATH := $(PATH):/usr/local/bin
-
-CPANM := cpanm
-
-SUDO := sudo
-SUDO_PERL := sudo
-
-ifdef PERLBREW_PERL
-	SUDO_PERL =
-endif
-
-# must come after to reset SUDO_PERL to blank if root
-# EUID /  UID not exported in Make
-# USER not populated in Docker
-ifeq '$(shell id -u)' '0'
-	SUDO =
-	SUDO_PERL =
-endif
-
 # ===================
 # bootstrap commands:
 
@@ -50,13 +29,19 @@ endif
 
 # ===================
 
+ifneq ("$(wildcard bash-tools/Makefile.in)", "")
+	include bash-tools/Makefile.in
+endif
+
 .PHONY: build
 build:
 	@echo ==============
 	@echo Perl Lib Build
 	@echo ==============
 
-	$(MAKE) common
+	$(MAKE) init
+	if [ -z "$(CPANM)" ]; then make; exit $?; fi
+	$(MAKE) system-packages
 	$(MAKE) perl
 
 	git update-index --assume-unchanged resources/custom_tlds.txt
@@ -66,21 +51,9 @@ build:
 	@echo
 	@echo
 
-.PHONY: common
-common: submodules system-packages
-	:
-
-.PHONY: submodules
-submodules:
-	git submodule init
-	git submodule update --recursive
-
-.PHONY: system-packages
-system-packages:
-	if [ -x /sbin/apk ];        then $(MAKE) apk-packages; fi
-	if [ -x /usr/bin/apt-get ]; then $(MAKE) apt-packages; fi
-	if [ -x /usr/bin/yum ];     then $(MAKE) yum-packages; fi
-	if [ -x /usr/local/bin/brew -a `uname` = Darwin ]; then $(MAKE) homebrew-packages; fi
+.PHONY: init
+init:
+	git submodule update --init --recursive
 
 .PHONY: perl
 perl:
@@ -101,69 +74,15 @@ perl:
 	     yes "" | $(SUDO_PERL) OPENSSL_INCLUDE=/usr/local/opt/openssl/include OPENSSL_LIB=/usr/local/opt/openssl/lib $(CPANM) --notest Crypt::SSLeay; \
 	fi
 	@echo
-	@echo "Installing Thrift"
+	#@echo "Installing Thrift"
 	$(SUDO_PERL) $(CPANM) --notest Thrift@0.10.0 || :
 	@echo
-	@echo "Installing CPAN Modules"
-	$(SUDO_PERL) $(CPANM) --notest `sed 's/#.*//; /^[[:space:]]*$$/d' setup/cpan-requirements.txt`
-	@echo
-	@bash-tools/perl_cpanm_install_if_absent.sh setup/cpan-requirements-packaged.txt
+	@bash-tools/perl_cpanm_install_if_absent.sh setup/cpan-requirements.txt setup/cpan-requirements-packaged.txt
 	@echo
 	# newer versions of the Redis module require Perl >= 5.10, this will install the older compatible version for RHEL5/CentOS5 servers still running Perl 5.8 if the latest module fails
 	# the backdated version might not be the perfect version, found by digging around in the git repo
-	@echo "Installing Redis module or backdated version for older Perl"
-	$(SUDO_PERL) $(CPANM) --notest Redis || $(SUDO_PERL) $(CPANM) --notest DAMS/Redis-1.976.tar.gz
-
-.PHONY: quick
-quick:
-	QUICK=1 $(MAKE)
-
-.PHONY: apk-packages
-apk-packages:
-	bash-tools/apk-install-packages.sh setup/apk-packages.txt setup/apk-packages-dev.txt
-	NO_FAIL=1 NO_UPDATE=1 bash-tools/apk-install-packages.sh setup/apk-packages-cpan.txt
-
-.PHONY: apk-packages-remove
-apk-packages-remove:
-	$(SUDO) apk del `sed 's/#.*//; /^[[:space:]]*$$/d' setup/apk-packages-dev.txt` || :
-	$(SUDO) rm -fr /var/cache/apk/*
-
-.PHONY: apt-packages
-apt-packages:
-	bash-tools/apt-install-packages.sh setup/deb-packages.txt setup/deb-packages-dev.txt
-	NO_FAIL=1 NO_UPDATE=1 bash-tools/apt-install-packages.sh setup/deb-packages-cpan.txt
-
-	# App::CPANMinus is in repos so install the deb if available instead of installing via cpan
-	$(SUDO) apt-get install -y cpanminus || :
-
-	# Ubuntu 12 Precise which is still used in Travis CI uses libmysqlclient-dev, but Debian 9 Stretch and Ubuntu 16 Xenial
-	# use libmariadbd-dev so this must now be handled separately as a failback
-	$(SUDO) apt-get install -y libmariadbd-dev || $(SUDO) apt-get install -y libmysqlclient-dev
-
-.PHONY: apt-packages-remove
-apt-packages-remove:
-	$(SUDO) apt-get purge -y `sed 's/#.*//; /^[[:space:]]*$$/d' setup/deb-packages-dev.txt`
-	$(SUDO) apt-get purge -y libmariadbd-dev || :
-	$(SUDO) apt-get purge -y libmysqlclient-dev || :
-
-.PHONY: yum-packages
-yum-packages:
-	bash-tools/install_epel_repo.sh
-	bash-tools/yum-install-packages.sh setup/rpm-packages.txt setup/rpm-packages-dev.txt
-	NO_FAIL=1 bash-tools/yum-install-packages.sh setup/rpm-packages-cpan.txt
-
-	# App::CPANMinus is in CentOS 7 base repo so install the rpm if available instead of installing via cpan
-	rpm -q perl-App-cpanminus || $(SUDO) yum install -y perl-App-cpanminus || :
-
-.PHONY: yum-packages-remove
-yum-packages-remove:
-	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' setup/rpm-packages-dev.txt`; do if rpm -q $$x; then $(SUDO) yum remove -y $$x; fi; done
-
-.PHONY: homebrew-packages
-homebrew-packages:
-	# Sudo is not required as running Homebrew as root is extremely dangerous and no longer supported as Homebrew does not drop privileges on installation you would be giving all build scripts full access to your system
-	# Fails if any of the packages are already installed, ignore and continue - if it's a problem the latest build steps will fail with missing headers
-	brew install `sed 's/#.*//; /^[[:space:]]*$$/d' setup/brew-packages.txt` || :
+	#@echo "Installing Redis module or backdated version for older Perl"
+	#$(SUDO_PERL) $(CPANM) --notest Redis || $(SUDO_PERL) $(CPANM) --notest DAMS/Redis-1.976.tar.gz
 
 .PHONY: test
 test:
@@ -172,27 +91,6 @@ test:
 .PHONY: install
 install:
 	@echo "No installation needed, just add '$(PWD)' to your \$$PATH"
-
-
-.PHONY: update
-update: update-no-recompile build
-	:
-
-.PHONY: update2
-update2: update-no-recompile
-	:
-
-.PHONY: update-no-recompile
-update-no-recompile:
-	git pull
-	git submodule update --init --recursive
-
-.PHONY: update-submodules
-update-submodules:
-	git submodule update --init --remote
-.PHONY: updatem
-updatem: update-submodules
-	:
 
 tld:
 	wget -t 100 --retry-connrefused -O resources/tlds-alpha-by-domain.txt http://data.iana.org/TLD/tlds-alpha-by-domain.txt
@@ -211,27 +109,3 @@ deep-clean: clean
 				   ~/.cpanm \
 				   ~/.cache \
 				   2>/dev/null
-
-.PHONY: push
-push:
-	git push
-
-# For quick testing only - for actual Dockerfile builds see https://hub.docker.com/r/harisekhon/alpine-github
-.PHONY: docker-alpine
-docker-alpine:
-	bash-tools/docker_mount_build_exec.sh alpine
-
-# For quick testing only - for actual Dockerfile builds see https://hub.docker.com/r/harisekhon/debian-github
-.PHONY: docker-debian
-docker-debian:
-	bash-tools/docker_mount_build_exec.sh debian
-
-# For quick testing only - for actual Dockerfile builds see https://hub.docker.com/r/harisekhon/centos-github
-.PHONY: docker-centos
-docker-centos:
-	bash-tools/docker_mount_build_exec.sh centos
-
-# For quick testing only - for actual Dockerfile builds see https://hub.docker.com/r/harisekhon/ubuntu-github
-.PHONY: docker-ubuntu
-docker-ubuntu:
-	bash-tools/docker_mount_build_exec.sh ubuntu
