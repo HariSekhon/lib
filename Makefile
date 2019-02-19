@@ -60,7 +60,7 @@ perl:
 	perl -v
 
 	#(echo y; echo o conf prerequisites_policy follow; echo o conf commit) | cpan
-	which cpanm || { yes "" | $(SUDO_PERL) cpan App::cpanminus; }
+	which $(CPANM) || { yes "" | $(SUDO_PERL) cpan App::cpanminus; }
 	$(CPANM) -V | head -n2
 
 	@echo "Installing Test::More first because some libraries need this to already be present to build"
