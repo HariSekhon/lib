@@ -26,3 +26,5 @@ which
 
 # needed to build XML::Simple dep XML::Parser
 expat-devel
+
+wget
