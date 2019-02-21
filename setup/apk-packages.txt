@@ -14,10 +14,7 @@
 #                          Alpine Package Requirements
 # ============================================================================ #
 
-alpine-sdk
 bash
-expat-dev
-gcc
 git
 perl
 perl-dev
