@@ -18,3 +18,5 @@ git
 perl
 
 procps
+
+wget
