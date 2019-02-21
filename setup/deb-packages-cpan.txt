@@ -17,6 +17,7 @@
 # Install if available in repos, otherwise will be installed by cpanm
 
 libcrypt-ssleay-perl
+libdbd-mysql-perl
 libdevel-cover-perl
 libio-all-lwp-perl
 libjson-perl
