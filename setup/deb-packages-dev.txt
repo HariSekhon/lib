@@ -15,6 +15,12 @@
 # ============================================================================ #
 
 build-essential
+
 libexpat1-dev
-libsasl2-dev
+
+# needed to build Net::SSLeay for IO::Socket::SSL for Net::LDAPS
 libssl-dev
+libsasl2-dev
+
+# needed to build XML::Simple dep XML::Parser
+libexpat1-dev
