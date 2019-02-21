@@ -14,17 +14,7 @@
 #                            Deb Package Requirements
 # ============================================================================ #
 
-build-essential
 git
 perl
 
 procps
-
-# needed to build Net::SSLeay for IO::Socket::SSL for Net::LDAPS
-libssl-dev
-libsasl2-dev
-
-#libdbd-mysql-perl
-
-# needed to build XML::Simple dep XML::Parser
-libexpat1-dev
