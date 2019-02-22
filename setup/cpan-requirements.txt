@@ -14,6 +14,9 @@
 #                            CPAN Module Dependencies
 # ============================================================================ #
 
+# needed for other modules to build
+inc::Module::Install
+
 # Most CPAN modules have been replaced with System Packages (RPM / Debs)
 # and placed in cpan-packaged-requirements.txt
 
@@ -35,6 +38,3 @@ Test::More
 #IO::Socket::Timeout
 #Readonly
 #Readonly::XS
-
-# required for Net::LDAP
-#inc::Module::Install
