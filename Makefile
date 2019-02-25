@@ -41,7 +41,7 @@ build:
 
 	$(MAKE) init
 	if [ -z "$(CPANM)" ]; then make; exit $$?; fi
-	$(MAKE) system-packages
+	$(MAKE) system-packages-perl
 	$(MAKE) perl
 
 	git update-index --assume-unchanged resources/custom_tlds.txt
