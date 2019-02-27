@@ -17,7 +17,7 @@
 gcc
 perl-CPAN
 
-# for XML::Simple
+# needed to build XML::Simple dep XML::Parser
 expat-devel
 
 #mysql-devel
