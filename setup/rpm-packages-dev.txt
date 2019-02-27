@@ -20,4 +20,6 @@ perl-CPAN
 # needed to build XML::Simple dep XML::Parser
 expat-devel
 
+# for headers to build DBD::mysql if building from CPAN
 #mysql-devel
+
