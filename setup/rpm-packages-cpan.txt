@@ -21,6 +21,7 @@ perl-Devel-Cover
 perl-IO-Tty
 perl-JSON
 perl-LDAP
+perl-LWP-Authen-Negotiate
 perl-Math-Round
 perl-Net-DNS
 perl-Redis
