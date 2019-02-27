@@ -27,4 +27,4 @@ libsasl2-dev
 libexpat1-dev
 
 # needed to build GSSAPI for LWP::Authen::Negotiate
-krb5-config
+libkrb5-dev
