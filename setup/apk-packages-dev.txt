@@ -15,10 +15,18 @@
 # ============================================================================ #
 
 alpine-sdk
-expat-dev
 gcc
+
+perl-dev  # contains CPAN
+perl-app-cpanminus
+perl-doc
+
+expat-dev
+
 #libxml2-dev
+
 #openssl-dev
 #libressl-dev
+
 # needed to build Net::SSLeay
 zlib-dev
