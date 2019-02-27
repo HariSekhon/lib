@@ -16,11 +16,14 @@
 
 bash
 git
+
 perl
-perl-dev
-perl-doc
+perl-utils
+
 # grep needed for validate_regex() posix unit test as busybox's in-built grep doesn't validate regex errors
 grep
+
 #openssl-dev
 #libressl-dev
+
 wget
