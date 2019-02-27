@@ -21,3 +21,4 @@
 # libmariadbd-dev and if failing then try falling back to libmysqlclient-dev
 libmysqlclient-dev
 libmariadbd-dev
+libmariadb-dev-compat
