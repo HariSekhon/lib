@@ -16,6 +16,7 @@
 
 # Install if available in repos, otherwise will be installed by cpanm
 
+#perl-DBD-MySQL
 perl-Crypt-SSLeay
 perl-Devel-Cover
 perl-IO-Tty
