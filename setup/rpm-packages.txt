@@ -24,7 +24,4 @@ which
 #mysql-devel
 #perl-DBD-MySQL
 
-# needed to build XML::Simple dep XML::Parser
-expat-devel
-
 wget
