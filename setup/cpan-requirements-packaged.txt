@@ -20,6 +20,7 @@ Devel::Cover
 IO::Pty
 JSON
 JSON::XS
+LWP::Authen::Negotiate
 Math::Round
 MongoDB
 MongoDB::MongoClient
