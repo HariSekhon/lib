@@ -16,6 +16,7 @@
 
 build-essential
 
+# for XML::Simple building
 libexpat1-dev
 
 # needed to build Net::SSLeay for IO::Socket::SSL for Net::LDAPS
