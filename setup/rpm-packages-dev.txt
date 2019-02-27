@@ -23,4 +23,3 @@ expat-devel
 
 # for headers to build DBD::mysql if building from CPAN
 #mysql-devel
-
