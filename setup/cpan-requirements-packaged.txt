@@ -27,9 +27,9 @@ MongoDB::MongoClient
 # downgrading Net::DNS as a workaround for taint mode bug:
 # https://rt.cpan.org/Public/Bug/Display.html?id=114819
 Net::DNS@1.05
-Net::LDAP
-Net::LDAPI
-Net::LDAPS
+#Net::LDAP
+#Net::LDAPI
+#Net::LDAPS
 Net::SSL
 # newer versions of the Redis module require Perl >= 5.10, so may need to install an older version manually to get past this if the packaged version isn't found
 Redis
