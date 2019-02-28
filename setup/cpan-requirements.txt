@@ -24,7 +24,7 @@ inc::Module::Install
 # HariSekhon/HBase/Thrift.pm:       Base class package "Class::Accessor" is empty.
 Class::Accessor
 
-Term::ANSIColor
+#Term::ANSIColor
 Test::More
 # installs but returns an error code
 #Thrift
