@@ -18,7 +18,7 @@
 
 #perl-DBD-MySQL
 perl-Crypt-SSLeay
-perl-Devel-Cover
+#perl-Devel-Cover
 perl-IO-Tty
 perl-JSON
 #perl-LDAP
