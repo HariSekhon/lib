@@ -21,18 +21,17 @@ perl-Crypt-SSLeay
 perl-Devel-Cover
 perl-IO-Tty
 perl-JSON
-perl-LDAP
+#perl-LDAP
 perl-LWP-Authen-Negotiate
 perl-Math-Round
-perl-Net-DNS
 perl-Redis
 perl-Sys-Syslog
 perl-TermReadKey
 perl-Time-HiRes
 perl-XML-LibXML
-perl-XML-SAX
+#perl-XML-SAX
 perl-XML-Simple
-perl-YAML
+#perl-YAML
 perl-libwww-perl
 perl-thrift
 
