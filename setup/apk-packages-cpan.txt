@@ -18,7 +18,6 @@ perl-crypt-ssleay
 perl-json
 perl-ldap
 perl-math-round
-perl-net-dns
 perl-net-ssleay
 perl-sys-syslog
 perl-term-readkey
