@@ -24,7 +24,6 @@ libjson-perl
 libjson-xs-perl
 libmath-round-perl
 libmongodb-perl
-libnet-dns-perl
 libnet-ldap-perl
 libnet-ssleay-perl
 libredis-perl
