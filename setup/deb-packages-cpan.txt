@@ -18,7 +18,7 @@
 
 libcrypt-ssleay-perl
 libdbd-mysql-perl
-libdevel-cover-perl
+#libdevel-cover-perl
 libio-all-lwp-perl
 libjson-perl
 libjson-xs-perl
