@@ -16,6 +16,6 @@
 
 git
 perl
-
+procps
 wget
 which
