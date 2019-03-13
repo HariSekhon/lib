@@ -21,6 +21,7 @@ IO::Pty
 JSON
 JSON::XS
 LWP::Authen::Negotiate
+LWP::Protocol::https
 Math::Round
 MongoDB
 MongoDB::MongoClient
