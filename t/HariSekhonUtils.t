@@ -925,6 +925,7 @@ is(isUser("9hari"),     "9hari",    'isUser("9hari")');
 is(isUser("12345678"),  "12345678", 'isUser("12345678")');
 is(isUser("mysql_test"), "mysql_test", 'isUser("mysql_test")');
 is(isUser('cloudera-scm'),  'cloudera-scm', 'isUser("cloudera-scm")');
+is(isUser('hari.sekhon'),  'hari.sekhon', 'isUser("hari.sekhon")');
 ok(!isUser("-hari"),                '!isUser("-hari")');
 
 is(validate_user("hadoop"),    "hadoop",   'validate_user("hadoop")');
