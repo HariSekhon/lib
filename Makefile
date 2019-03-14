@@ -88,6 +88,10 @@ perl:
 test:
 	tests/all.sh
 
+.PHONY: unittest
+unittest:
+	tests/unittest.sh
+
 .PHONY: install
 install:
 	@echo "No installation needed, just add '$(PWD)' to your \$$PATH"
