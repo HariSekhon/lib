@@ -739,10 +739,12 @@ ok(!isLabel(' '));
 is(validate_label("st4ts_used (%)"),    "st4ts_used (%)",    'validate_label("st4ts_used (%)")');
 
 # ============================================================================ #
-is(isLdapDn("uid=hari,cn=users,cn=accounts,dc=local"),   "uid=hari,cn=users,cn=accounts,dc=local", 'isLdapDn()');
+is(isLdapDn("uid=hari,ou=users,ou=accounts,dc=local"),   "uid=hari,ou=users,ou=accounts,dc=local", 'isLdapDn()');
+is(isLdapDn("cn=hari-superuser,ou=big-users,ou=accounts,dc=local"),   "cn=hari-superuser,ou=big-users,ou=accounts,dc=local", 'isLdapDn()');
 is(isLdapDn("hari\@LOCAL"), undef, '!isLdapDn()');
 
-is(validate_ldap_dn("uid=hari,cn=users,cn=accounts,dc=local"),   "uid=hari,cn=users,cn=accounts,dc=local", 'validate_ldap_dn()');
+is(validate_ldap_dn("uid=hari,ou=users,ou=accounts,dc=local"),   "uid=hari,ou=users,ou=accounts,dc=local", 'validate_ldap_dn()');
+is(validate_ldap_dn("cn=hari-superuser,ou=big-users,ou=accounts,dc=local"),   "cn=hari-superuser,ou=big-users,ou=accounts,dc=local", 'validate_ldap_dn()');
 
 # ============================================================================ #
 is_deeply([validate_metrics("gauges.waiting.count,gauges.total.used,gauges.waiting.count")], [ "gauges.total.used", "gauges.waiting.count" ], 'validate_metrics()');
