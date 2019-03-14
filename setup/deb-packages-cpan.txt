@@ -29,6 +29,7 @@ libnet-ssleay-perl
 libredis-perl
 libterm-readkey-perl
 libwww-perl
+liblwp-protocol-https-perl
 libxml-perl
 libxml-sax-perl
 libxml-simple-perl

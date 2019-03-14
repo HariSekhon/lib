@@ -22,6 +22,7 @@ perl-Crypt-SSLeay
 perl-IO-Tty
 perl-JSON
 #perl-LDAP
+perl-LWP-Protocol-https
 perl-LWP-Authen-Negotiate
 perl-Math-Round
 perl-Redis

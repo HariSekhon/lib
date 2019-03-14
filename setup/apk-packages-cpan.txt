@@ -16,7 +16,8 @@
 
 perl-crypt-ssleay
 perl-json
-perl-ldap
+#perl-ldap
+perl-lwp-protocol-https
 perl-math-round
 perl-net-ssleay
 perl-sys-syslog
