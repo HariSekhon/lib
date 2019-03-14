@@ -29,18 +29,10 @@ perl_lib_start_time="$(start_timer)"
 
 tests/find_uncovered_subs.sh
 
-# don't overlap with bash-tools, just scan these lib directories
-bash-tools/check_perl_syntax.sh HariSekhonUtils.pm
+# overlaps with bash-tools
+#bash-tools/check_perl_syntax.sh HariSekhonUtils.pm
 
-# for some reason 'Base class package "Class::Accessor" is empty.' in Travis but not locally
-is_travis || bash-tools/check_perl_syntax.sh HariSekhon
-
-bash-tools/check_perl_syntax.sh t
-
-section "Running Perl Unit Tests"
-
-#PERL5LIB=${PERLBREW_ROOT:-} PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -I . -lrsv --timer t
-PERL5LIB=${PERLBREW_ROOT:-} prove -I . -lrsv --timer t
+tests/unittest.sh
 
 bash-tools/all.sh
 
