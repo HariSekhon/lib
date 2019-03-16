@@ -21,6 +21,9 @@ perl-dev  # contains CPAN
 perl-app-cpanminus
 perl-doc
 
+# needed to build GSSAPI for dependencies
+heimdal-dev
+
 expat-dev
 
 #libxml2-dev
