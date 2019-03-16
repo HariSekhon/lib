@@ -66,13 +66,6 @@ perl:
 	@echo "Installing Test::More first because some libraries need this to already be present to build"
 	$(SUDO_PERL) $(CPANM) --notest Test::More
 
-	# Workaround for Mac OS X not finding the OpenSSL libraries when building
-	if [ -d /usr/local/opt/openssl/include -a \
-	     -d /usr/local/opt/openssl/lib     -a \
-	     `uname` = Darwin ]; then \
-		 @echo "Installing Crypt::SSLeay with local openssl library locations"; \
-	     yes "" | $(SUDO_PERL) OPENSSL_INCLUDE=/usr/local/opt/openssl/include OPENSSL_LIB=/usr/local/opt/openssl/lib $(CPANM) --notest Crypt::SSLeay; \
-	fi
 	@echo
 	#@echo "Installing Thrift"
 	$(SUDO_PERL) $(CPANM) --notest Thrift@0.10.0 || :
