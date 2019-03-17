@@ -19,6 +19,7 @@ perl-crypt-ssleay
 perl-json
 perl-libwww
 perl-lwp-protocol-https
+perl-lwp-useragent-determined
 perl-math-round
 perl-net-ssleay
 perl-sys-syslog
