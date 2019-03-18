@@ -14,10 +14,12 @@
 #                          Alpine Package Requirements
 # ============================================================================ #
 
+#perl-ldap
 perl-crypt-ssleay
 perl-json
-#perl-ldap
+perl-libwww
 perl-lwp-protocol-https
+perl-lwp-useragent-determined
 perl-math-round
 perl-net-ssleay
 perl-sys-syslog
