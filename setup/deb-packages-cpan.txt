@@ -18,22 +18,24 @@
 
 libcrypt-ssleay-perl
 libdbd-mysql-perl
-#libdevel-cover-perl
 libio-all-lwp-perl
 libjson-perl
 libjson-xs-perl
+liblwp-protocol-https-perl
 libmath-round-perl
 libmongodb-perl
+libnet-dns-perl
 libnet-ldap-perl
 libnet-ssleay-perl
 libredis-perl
 libterm-readkey-perl
 libwww-perl
-liblwp-protocol-https-perl
 libxml-perl
 libxml-sax-perl
 libxml-simple-perl
 libyaml-perl
+
+#libdevel-cover-perl
 
 #libdata-dumper-simple-perl
 
