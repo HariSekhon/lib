@@ -22,7 +22,7 @@ cd "$srcdir/.."
 export PROJECT="lib (perl)"
 
 # shellcheck disable=SC1091
-. bash-tools/utils.sh
+. bash-tools/lib/utils.sh
 
 section "Perl Lib Tests"
 
