@@ -18,6 +18,7 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/.."
 
+# shellcheck disable=SC1091
 . bash-tools/utils.sh
 
 section "Checking for uncovered subs"
@@ -25,13 +26,12 @@ section "Checking for uncovered subs"
 start_time="$(start_timer)"
 
 found=0
-grep sub HariSekhonUtils.pm | sed 's/^sub //;s/ .*//;/^[[:space:]]*$/d' |
-while read sub; do
-    if ! fgrep -q "$sub" HariSekhonUtils.pm; then
+while read -r sub; do
+    if ! grep -Fq "$sub" HariSekhonUtils.pm; then
         echo "$sub is not covered by unit tests"
-        let found+=1
+        ((found++))
     fi
-done
+done < <(grep sub HariSekhonUtils.pm | sed 's/^sub //;s/ .*//;/^[[:space:]]*$/d')
 echo "Found $found uncovered subroutines"
 [ $found -eq 0 ] || exit 1
 
