@@ -19,7 +19,7 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$srcdir/.."
 
 # shellcheck disable=SC1091
-. bash-tools/utils.sh
+. bash-tools/lib/utils.sh
 
 section "Checking for uncovered subs"
 
