@@ -29,6 +29,8 @@
 
 # ===================
 
+REPO := HariSekhon/lib
+
 ifneq ("$(wildcard bash-tools/Makefile.in)", "")
 	include bash-tools/Makefile.in
 endif
@@ -109,4 +111,8 @@ deep-clean: clean
 
 .PHONY: travis
 travis:
-	travis_last_log.py /lib
+	travis_last_log.py $(REPO)
+
+.PHONY: travis-debug
+travis-debug:
+	travis_debug_session.py $(REPO)
