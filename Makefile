@@ -106,3 +106,7 @@ deep-clean: clean
 				   ~/.cpanm \
 				   ~/.cache \
 				   2>/dev/null
+
+.PHONY: travis
+travis:
+	travis_last_log.py /lib
