@@ -31,6 +31,8 @@
 
 REPO := HariSekhon/lib
 
+CODE_FILES := $(shell find . -name '*.pl' -o -name '*.pm' -o -name '*.sh' | grep -v -e bash-tools -e Hbase)
+
 ifneq ("$(wildcard bash-tools/Makefile.in)", "")
 	include bash-tools/Makefile.in
 endif
