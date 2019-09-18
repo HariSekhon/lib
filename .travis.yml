@@ -65,7 +65,7 @@ install:
   - travis_retry make
 
 script:
-  #- PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -lrsv t 
+  #- PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -lrsv t
   - travis_retry make test
 
 after_success:
