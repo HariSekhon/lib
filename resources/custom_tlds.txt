@@ -19,3 +19,4 @@ intra
 intranet
 internal
 vm
+cloud
