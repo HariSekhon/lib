@@ -157,6 +157,12 @@ if($^O eq "linux" or $^O eq "darwin"){
 
 # ============================================================================ #
 
+is($host, undef, "\$host starts undef");
+ok(set_host_default("localhost"), "set_host_default(localhost)");
+is($host, "localhost", "\$host eq localhost");
+
+# ============================================================================ #
+
 is($port, undef, "\$port starts undef");
 ok(set_port_default(80), "set_port_default(80)");
 is($port, 80, "\$port eq 80");
