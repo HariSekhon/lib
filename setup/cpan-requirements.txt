@@ -27,7 +27,7 @@ Class::Accessor
 #Term::ANSIColor
 Test::More
 # installs but returns an error code
-#Thrift
+Thrift
 
 # pinning version to stop it breaking Travis CI Perl 5.10 builds
 #Data::Dumper@2.161
