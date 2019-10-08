@@ -19,7 +19,7 @@
 libcrypt-ssleay-perl
 libdbd-mysql-perl
 libio-all-lwp-perl
-libio-pty-easy-perl
+libio-pty-perl
 libjson-perl
 libjson-xs-perl
 liblwp-protocol-https-perl
