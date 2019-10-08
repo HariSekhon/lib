@@ -14,6 +14,9 @@
 #                            CPAN Module Dependencies
 # ============================================================================ #
 
+# needed by bash-tools/perl_generate_fatpacks.sh
+App::FatPacker
+
 # needed for other modules to build
 inc::Module::Install
 
