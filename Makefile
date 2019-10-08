@@ -29,13 +29,13 @@
 
 # ===================
 
-REPO := HariSekhon/lib
-
-CODE_FILES := $(shell find . -type f -name '*.pl' -o -type f -name '*.pm' -o -type f -name '*.sh' | grep -v -e bash-tools -e Hbase)
-
 ifneq ("$(wildcard bash-tools/Makefile.in)", "")
 	include bash-tools/Makefile.in
 endif
+
+REPO := HariSekhon/lib
+
+CODE_FILES := $(shell find . -type f -name '*.pl' -o -type f -name '*.pm' -o -type f -name '*.sh' | grep -v -e bash-tools -e Hbase)
 
 .PHONY: build
 build:
