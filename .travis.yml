@@ -29,7 +29,7 @@ os:
   - linux
   - osx
 
-dist: trusty
+#dist: trusty
 
 sudo: required
 
@@ -66,6 +66,10 @@ install:
 
 script:
   #- PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -lrsv t
+  - python -V
+  #- which pip || sudo easy_install pip
+  - which pip || apt-get update && apt-get install -y python-pip
+  - pip -V
   - travis_retry make test
 
 after_success:
