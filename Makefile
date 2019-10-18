@@ -77,10 +77,10 @@ perl:
 	@#bash-tools/perl_cpanm_install_if_absent.sh setup/cpan-requirements.txt setup/cpan-requirements-packaged.txt
 	$(MAKE) cpan
 	@echo
-	# newer versions of the Redis module require Perl >= 5.10, this will install the older compatible version for RHEL5/CentOS5 servers still running Perl 5.8 if the latest module fails
-	# the backdated version might not be the perfect version, found by digging around in the git repo
-	#@echo "Installing Redis module or backdated version for older Perl"
-	#$(SUDO_PERL) $(CPANM) --notest Redis || $(SUDO_PERL) $(CPANM) --notest DAMS/Redis-1.976.tar.gz
+	@# newer versions of the Redis module require Perl >= 5.10, this will install the older compatible version for RHEL5/CentOS5 servers still running Perl 5.8 if the latest module fails
+	@# the backdated version might not be the perfect version, found by digging around in the git repo
+	@#echo "Installing Redis module or backdated version for older Perl"
+	@#$(SUDO_PERL) $(CPANM) --notest Redis || $(SUDO_PERL) $(CPANM) --notest DAMS/Redis-1.976.tar.gz
 
 .PHONY: test
 test:
