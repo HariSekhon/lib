@@ -72,8 +72,8 @@ install:
 script:
   #- PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -lrsv t
   - python -V
-  #- which pip || sudo easy_install pip
-  - which pip || sudo apt-get update && sudo apt-get install -y python-pip
+  - which pip || sudo easy_install pip
+  #- which pip || sudo apt-get update && sudo apt-get install -y python-pip
   - pip -V
   - travis_retry make test
 
