@@ -35,7 +35,7 @@ tests/find_uncovered_subs.sh
 
 tests/unittest.sh
 
-bash-tools/all.sh
+bash-tools/check_all.sh
 
 time_taken "$perl_lib_start_time" "Perl Lib Tests Completed in"
 section2 "Perl Lib Tests Successful"
