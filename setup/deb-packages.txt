@@ -15,12 +15,8 @@
 # ============================================================================ #
 
 git
-
-# contains cpan
-perl
-
+perl  # contains cpan
 cpanminus
-
+ca-certificates
 procps
-
 wget
