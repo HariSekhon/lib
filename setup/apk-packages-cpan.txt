@@ -21,6 +21,7 @@ perl-libwww
 perl-lwp-protocol-https
 perl-lwp-useragent-determined
 perl-math-round
+perl-mozilla-ca
 perl-net-ssleay
 perl-sys-syslog
 perl-term-readkey
