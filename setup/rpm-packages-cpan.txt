@@ -25,6 +25,7 @@ perl-JSON
 perl-LWP-Protocol-https
 perl-LWP-Authen-Negotiate
 perl-Math-Round
+perl-Mozilla-CA
 perl-Redis
 perl-Sys-Syslog
 perl-TermReadKey
