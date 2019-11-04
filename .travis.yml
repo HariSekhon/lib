@@ -13,7 +13,8 @@
 #  http://www.linkedin.com/in/harisekhon
 #
 
-version: ~> 1.0
+# sets language to Ruby and breaks build
+#version: ~> 1.0
 
 language: perl
 perl:
