@@ -9,7 +9,7 @@
 
 package HariSekhon::Solr;
 
-$VERSION = "0.8.19";
+$VERSION = "0.9.0";
 
 use strict;
 use warnings;
@@ -131,7 +131,7 @@ our $num_found;
 
 our %solroptions = (
     %hostoptions,
-    #%useroptions,
+    %useroptions,
     %ssloptions,
 );
 
@@ -240,7 +240,7 @@ sub curl_solr($;$$){
     $url .= "&indent=true" if $verbose > 2;
     $url .= "&debugQuery=true" if $debug;
     my $start = time;
-    my $json = curl_json $url, "Solr", undef, undef, \&curl_solr_err_handler, $type, $content;
+    my $json = curl_json $url, "Solr", $user, $password, \&curl_solr_err_handler, $type, $content;
     $query_time   = round((time - $start) * 1000); # secs => ms
     # just use NTP check, if doing this logic in every plugin then everything would alarm at the same time drowning out the real problem
     #$query_time < 0 and quit "UNKNOWN", "Solr query time < 0 ms - NTP problem?";
