@@ -11,7 +11,7 @@
 
 package HariSekhon::Redis;
 
-$VERSION = "0.2";
+$VERSION = "0.2.1";
 
 use strict;
 use warnings;
@@ -71,13 +71,14 @@ sub connect_redis(%){
     my $host     = $params{"host"} || croak "no host passed to connect_redis";
     my $port     = $params{"port"} || $REDIS_DEFAULT_PORT;
     my $password = $params{"password"};
-    my $host2    = validate_resolvable($host);
-    my $hostport = $host2 . ( $verbose ? ":$port" : "" );
+    # don't replace $host with IP as it can break load balancer routing with '503 Service Temporarily Unavailable'
+    validate_resolvable($host);
+    my $hostport = $host . ( $verbose ? ":$port" : "" );
     $hostport   .= " ($host)";
     vlog2 "connecting to redis server $hostport";
     my $redis;
     try {
-        $redis = Redis->new(server => "$host2:$port", password => $password) || quit "CRITICAL", "failed to connect to redis server $hostport";
+        $redis = Redis->new(server => "$host:$port", password => $password) || quit "CRITICAL", "failed to connect to redis server $hostport";
     };
     catch_quit "failed to connect to redis server $hostport";
     $redis or quit "CRITICAL", "failed to connect to Redis server $hostport";

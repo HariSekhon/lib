@@ -80,7 +80,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.19.5";
+our $VERSION = "1.19.6";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -1401,7 +1401,7 @@ sub curl ($;$$$$$$) {
     $host =~ s/(?::\d+)?(?:\/.*)?$//;
     isHost($host) or die "invalid host determined from URL '$url' in curl()";
     my $auth = (defined($user) and defined($password));
-    # Don't replace $host with resolved host as this changes the vlog output and also affects proxy exceptions
+    # don't replace $host with resolved host as this changes the vlog output, affects proxy exceptions can break load balancer routing with '503 Service Temporarily Unavailable'
     validate_resolvable($host);
     if($name){
         if($type eq "POST"){
@@ -3617,7 +3617,9 @@ sub validate_hosts($$){
             $hosts[$i] =~ s/:$node_port$//;
         }
         $hosts[$i]  = validate_host($hosts[$i]);
-        $hosts[$i]  = validate_resolvable($hosts[$i]);
+        # don't replace $host with IP as it can break load balancer routing with '503 Service Temporarily Unavailable'
+        #$hosts[$i]  = validate_resolvable($hosts[$i]);
+        #validate_resolvable($hosts[$i]);
         $node_port  = $port unless defined($node_port);
         $hosts[$i] .= ":$node_port";
         vlog_option("port", $node_port);

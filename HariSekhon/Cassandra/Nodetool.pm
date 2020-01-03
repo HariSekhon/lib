@@ -9,7 +9,7 @@
 
 package HariSekhon::Cassandra::Nodetool;
 
-$VERSION = "0.2.11";
+$VERSION = "0.2.12";
 
 use strict;
 use warnings;
@@ -66,7 +66,8 @@ sub nodetool_options(;$$$$){
     my $user            = shift;
     my $password        = shift;
     my $options         = "";
-    $host     = validate_resolvable($host)  if defined($host);
+    # don't replace $host with IP as it can break load balancer routing with '503 Service Temporarily Unavailable'
+    validate_resolvable($host)  if defined($host);
     $options .= "--host '$host' "           if defined($host);
     $options .= "--port '$port' "           if defined($port);
     $options .= "--username '$user' "       if defined($user);
