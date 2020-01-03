@@ -109,7 +109,7 @@ our $list_nameservices  = 0;
 our $list_roles         = 0;
 our $list_services      = 0;
 
-env_creds("CM", "Cloudera Manager");
+env_creds(["CLOUDERA_MANAGER", "CM"], "Cloudera Manager");
 
 env_var("CM_CLUSTER", \$cluster);
 
