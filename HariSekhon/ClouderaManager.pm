@@ -123,7 +123,7 @@ our %cm_options_tls = (
 );
 
 our %cm_option_cluster = (
-    "C|cluster=s"      => [ \$cluster,      "Cluster Name as shown in Cloudera Manager (eg. \"Cluster - CDH4\", \$CLOUDERA_MANAGER_CLUSTER, \$CM_CLUSTER)" ],
+    "C|cluster=s"      => [ \$cluster,      "Cluster Name as shown in Cloudera Manager (eg. \"Cluster - CDH4\", \$CLOUDERA_MANAGER_CLUSTER, \$CLOUDERA_CLUSTER, \$CM_CLUSTER)" ],
 );
 
 our %cm_options = (
