@@ -113,7 +113,7 @@ our $list_services      = 0;
 
 env_creds(["CLOUDERA_MANAGER", "CM"], "Cloudera Manager");
 
-env_var(["CLOUDERA_MANAGER_CLUSTER", "CLOUDERA_CLUSTER", "CM_CLUSTER"], \$cluster);
+env_vars(["CLOUDERA_MANAGER_CLUSTER", "CLOUDERA_CLUSTER", "CM_CLUSTER"], \$cluster);
 env_vars(["CLOUDERA_MANAGER_TLS", "CLOUDERA_MANAGER_SSL"], \$tls);
 
 our %cm_options_tls = (
