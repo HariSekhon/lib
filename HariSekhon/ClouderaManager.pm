@@ -13,7 +13,7 @@
 
 package HariSekhon::ClouderaManager;
 
-$VERSION = "0.5.2";
+$VERSION = "0.5.3";
 
 use strict;
 use warnings;
@@ -172,7 +172,9 @@ sub cm_query(;$) {
             $port = $ssl_port;
         }
     }
-    $host = validate_resolvable($host);
+    # querying this behind and application load balancer will break with a '503 Service Temporarily Unavailable' if using IP rather than hostname, so just validate that we don't get a DNS error and then go via the FQDN to allow the LB to route the request
+    #$host = validate_resolvable($host);
+    validate_resolvable($host);
     $url_prefix = "$protocol://$host:$port";
 
     # Doesn't work
