@@ -13,7 +13,7 @@
 
 package HariSekhon::ClouderaManager;
 
-$VERSION = "0.6.0";
+$VERSION = "0.6.1";
 
 use strict;
 use warnings;
@@ -83,7 +83,7 @@ our @EXPORT_OK = ( @EXPORT );
 our $ua = LWP::UserAgent->new;
 
 our $protocol     = "http";
-# update: originally used v1 but Cloudera has deprecated this for 6.x
+# update: originally used v1 but Cloudera has removed APIs v1 - v5 from Cloudera Manager 6.x
 # https://docs.cloudera.com/documentation/enterprise/6/release-notes/topics/rg_deprecated_items.html
 our $api          = "/api/v6";
 our $default_port = 7180;
@@ -99,7 +99,7 @@ our $nameservice;
 our $role;
 our $service;
 our $ssl_ca_path;
-our $tls = 0;
+our $tls;
 our $tls_noverify;
 our $url;
 our $url_prefix;
@@ -113,16 +113,17 @@ our $list_services      = 0;
 
 env_creds(["CLOUDERA_MANAGER", "CM"], "Cloudera Manager");
 
-env_var("CM_CLUSTER", \$cluster);
+env_var(["CLOUDERA_MANAGER_CLUSTER", "CM_CLUSTER"], \$cluster);
+env_vars(["CLOUDERA_MANAGER_TLS", "CLOUDERA_MANAGER_SSL"], \$tls);
 
 our %cm_options_tls = (
-    "T|tls"            => [ \$tls,          "Use TLS connection to Cloudera Manager (automatically updates port to $ssl_port if still set to $default_port to save one 302 redirect round trip)" ],
+    "T|tls"            => [ \$tls,          "Use TLS connection to Cloudera Manager (\$CLOUDERA_MANAGER_TLS, \$CLOUDERA_MANAGER_SSL) (automatically updates port to $ssl_port if still set to $default_port to save one 302 redirect round trip)" ],
     "ssl-CA-path=s"    => [ \$ssl_ca_path,  "Path to CA certificate directory for validating SSL certificate (automatically enables --tls)" ],
     "tls-noverify"     => [ \$tls_noverify, "Do not verify SSL certificate from Cloudera Manager (automatically enables --tls)" ],
 );
 
 our %cm_option_cluster = (
-    "C|cluster=s"      => [ \$cluster,      "Cluster Name as shown in Cloudera Manager (eg. \"Cluster - CDH4\", \$CM_CLUSTER)" ],
+    "C|cluster=s"      => [ \$cluster,      "Cluster Name as shown in Cloudera Manager (eg. \"Cluster - CDH4\", \$CLOUDERA_MANAGER_CLUSTER, \$CM_CLUSTER)" ],
 );
 
 our %cm_options = (
