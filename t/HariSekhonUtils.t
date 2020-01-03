@@ -1160,7 +1160,7 @@ is(validate_hostport("myHost.myDomain.com:8080"), "myHost.myDomain.com:8080",   
 
 is_deeply([validate_host_port_user_password("myHost.domain.com", 80, "myUser", "myPassword")],   ["myHost.domain.com", 80, "myUser", "myPassword"], 'validate_host_port_user_password()');
 
-is_deeply([validate_hosts("localhost,127.0.0.1:443", 80)],   ["127.0.0.1:80","127.0.0.1:443"], 'validate_hosts()');
+is_deeply([validate_hosts("localhost,127.0.0.1:443", 80)],   ["localhost:80","127.0.0.1:443"], 'validate_hosts()');
 
 is_deeply([validate_node_list("node1, node2 ,node3 , node4,,\t\nnode5")], [qw/node1 node2 node3 node4 node5/],    'validate_node_list($)');
 # The , in node4, inside the qw array should be split out to just node4 and blank, blank shouldn't make it in to the array
