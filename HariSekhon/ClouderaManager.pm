@@ -13,7 +13,7 @@
 
 package HariSekhon::ClouderaManager;
 
-$VERSION = "0.5.3";
+$VERSION = "0.6.0";
 
 use strict;
 use warnings;
@@ -83,7 +83,9 @@ our @EXPORT_OK = ( @EXPORT );
 our $ua = LWP::UserAgent->new;
 
 our $protocol     = "http";
-our $api          = "/api/v1";
+# update: originally used v1 but Cloudera has deprecated this for 6.x
+# https://docs.cloudera.com/documentation/enterprise/6/release-notes/topics/rg_deprecated_items.html
+our $api          = "/api/v6";
 our $default_port = 7180;
 $port             = $default_port;
 our $ssl_port     = 7183;
