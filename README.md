@@ -5,8 +5,8 @@ Hari Sekhon Perl Library
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20OS%20X-blue.svg)](https://github.com/harisekhon/lib#hari-sekhon-perl-library)
 [![DockerHub](https://img.shields.io/badge/docker-available-blue.svg)](https://hub.docker.com/r/harisekhon/centos-github/)
 
-[![CI Ubuntu](https://github.com/HariSekhon/lib/workflows/CI%20Ubuntu/badge.svg)](https://github.com/HariSekhon/lib/workflows/CI%20ubuntu/badge.svg)
-[![CI Mac](https://github.com/HariSekhon/lib/workflows/CI%20Mac/badge.svg)](https://github.com/HariSekhon/lib/workflows/CI%20Mac/badge.svg)
+[![CI Ubuntu](https://github.com/HariSekhon/lib/workflows/CI%20Ubuntu/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22CI+Ubuntu%22)
+[![CI Mac](https://github.com/HariSekhon/lib/workflows/CI%20Mac/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22CI+Mac%22)
 
 My personal Perl library, full of lots of validation code and utility functions.
 
