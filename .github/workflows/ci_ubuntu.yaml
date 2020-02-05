@@ -35,16 +35,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-# ============================================================================
-# https://github.com/actions/cache
-# ============================================================================
-# Perl
-#		- uses: actions/cache@v1
-#			with:
-#				path: ~/.cpanm
-#				key: ${{ runner.os }}-cpanm-${{ hashFiles('**/cpan-requirements.txt') }}
-#				restore-keys: |
-#					${{ runner.os }}-cpanm-
-# ============================================================================
+    - uses: actions/cache@v1
+      with:
+        path: ~/.cpanm
+        key: ${{ runner.os }}-cpanm-${{ hashFiles('**/cpan-requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-cpanm-
     - name: build & test
       run: make build test
