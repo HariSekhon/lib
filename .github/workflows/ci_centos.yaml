@@ -38,7 +38,7 @@ jobs:
         ls -l /.dockerenv
         echo "pwd is $PWD"
         cat /etc/*release
-        cd /lib &&
+        cd /tmp &&
         git clone https://github.com/harisekhon/lib &&
         cd lib &&
         make build test
