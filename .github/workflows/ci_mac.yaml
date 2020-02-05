@@ -31,5 +31,11 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/cache@v1
+      with:
+        path: ~/.cpanm
+        key: ${{ runner.os }}-cpanm-${{ hashFiles('**/cpan-requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-cpanm-
     - name: build & test
       run: make build test
