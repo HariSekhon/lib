@@ -16,6 +16,7 @@
 
 gcc
 perl-CPAN
+perl-App-cpanminus
 
 # needed to build XML::Simple dep XML::Parser
 expat-devel
