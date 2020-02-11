@@ -14,11 +14,12 @@
 #                        Alpine Dev Package Requirements
 # ============================================================================ #
 
-alpine-sdk
-gcc
+# installed by bash-tools submodule now
+#alpine-sdk
+#gcc
+#perl-app-cpanminus
 
 perl-dev  # contains CPAN
-perl-app-cpanminus
 perl-doc
 
 # needed to build GSSAPI for dependencies
