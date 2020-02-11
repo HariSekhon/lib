@@ -14,13 +14,14 @@
 #                          Deb Dev Package Requirements
 # ============================================================================ #
 
-build-essential
+# installed by bash-tools now
+#build-essential
 
 # needed to build XML::Simple dep XML::Parser
 libexpat1-dev
 
 # needed to build Net::SSLeay for IO::Socket::SSL for Net::LDAPS
-libssl-dev
+#libssl-dev  # installed by bash-tools now
 libsasl2-dev
 
 # needed to build GSSAPI for LWP::Authen::Negotiate
