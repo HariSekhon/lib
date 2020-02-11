@@ -14,9 +14,10 @@
 #                          RPM Dev Package Requirements
 # ============================================================================ #
 
-gcc
-perl-CPAN
-perl-App-cpanminus
+# installed by bash-tools submodule now
+#gcc
+#perl-CPAN
+#perl-App-cpanminus
 
 # needed to build XML::Simple dep XML::Parser
 expat-devel
