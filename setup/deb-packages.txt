@@ -14,9 +14,10 @@
 #                            Deb Package Requirements
 # ============================================================================ #
 
-git
-perl  # contains cpan
-cpanminus
-ca-certificates
-procps
-wget
+# installed by bash-tools submodule now
+#git
+#perl  # contains cpan
+#cpanminus
+#ca-certificates
+#procps
+#wget
