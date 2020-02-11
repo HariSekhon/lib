@@ -14,8 +14,9 @@
 #                            RPM Package Requirements
 # ============================================================================ #
 
-git
-perl
-procps
-wget
-which
+# installed by bash-tools submodule now
+#git
+#perl
+#procps
+#wget
+#which
