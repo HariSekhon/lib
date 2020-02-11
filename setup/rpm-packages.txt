@@ -17,6 +17,6 @@
 # installed by bash-tools submodule now
 #git
 #perl
-#procps
+#procps-ng
 #wget
 #which
