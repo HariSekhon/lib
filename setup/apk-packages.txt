@@ -17,13 +17,12 @@
 # installed by bash-tools submodule now
 #bash
 #git
+# grep needed for validate_regex() posix unit test as busybox's in-built grep doesn't validate regex errors
+#grep
 #perl
 #wget
 
 perl-utils  # contains cpan, prove
-
-# grep needed for validate_regex() posix unit test as busybox's in-built grep doesn't validate regex errors
-grep
 
 #openssl-dev
 #libressl-dev
