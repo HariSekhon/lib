@@ -16,6 +16,8 @@
 
 # Install if available in repos, otherwise will be installed by cpanm
 
+perl-modules  # pulls in Sys::Syslog
+
 libcrypt-ssleay-perl
 libdbd-mysql-perl
 libio-all-lwp-perl
