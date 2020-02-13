@@ -12,11 +12,19 @@ Hari Sekhon Perl Library
 [![CI Ubuntu 14.04](https://github.com/HariSekhon/lib/workflows/CI%20Ubuntu%2014.04/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22CI+Ubuntu+14.04%22)
 [![CI Ubuntu 16.04](https://github.com/HariSekhon/lib/workflows/CI%20Ubuntu%2016.04/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22CI+Ubuntu+16.04%22)
 [![CI Ubuntu 18.04](https://github.com/HariSekhon/lib/workflows/CI%20Ubuntu%2018.04/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22CI+Ubuntu+18.04%22)
+[![CI Debian](https://github.com/HariSekhon/lib/workflows/CI%20Debian/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22CI+Debian%22)
+[![CI Debian 6](https://github.com/HariSekhon/lib/workflows/CI%20Debian%206/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22CI+Debian+6%22)
+[![CI Debian 7](https://github.com/HariSekhon/lib/workflows/CI%20Debian%207/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22CI+Debian+7%22)
+[![CI Debian 8](https://github.com/HariSekhon/lib/workflows/CI%20Debian%208/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22CI+Debian+8%22)
+[![CI Debian 9](https://github.com/HariSekhon/lib/workflows/CI%20Debian%209/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22CI+Debian+9%22)
+[![CI Debian 10](https://github.com/HariSekhon/lib/workflows/CI%20Debian%2010/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22CI+Debian+10%22)
 [![CI CentOS](https://github.com/HariSekhon/lib/workflows/CI%20CentOS/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22CI+CentOS%22)
+[![CI CentOS 6](https://github.com/HariSekhon/lib/workflows/CI%20CentOS%206/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22CI+CentOS+6%22)
 [![CI CentOS 7](https://github.com/HariSekhon/lib/workflows/CI%20CentOS%207/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22CI+CentOS+7%22)
 [![CI CentOS 8](https://github.com/HariSekhon/lib/workflows/CI%20CentOS%208/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22CI+CentOS+8%22)
 [![CI Fedora](https://github.com/HariSekhon/lib/workflows/CI%20Fedora/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22CI+Fedora%22)
 [![CI Alpine](https://github.com/HariSekhon/lib/workflows/CI%20Alpine/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22CI+Alpine%22)
+[![CI Alpine 3](https://github.com/HariSekhon/lib/workflows/CI%20Alpine%203/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22CI+Alpine+3%22)
 
 My personal Perl library, full of lots of validation code and utility functions.
 
