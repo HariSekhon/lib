@@ -22,6 +22,9 @@
 perl-dev  # contains CPAN
 perl-doc
 
+# needed to build cpan packages like IO::Pty
+libc-dev
+
 # needed to build GSSAPI for dependencies
 # conflicts with krb5-dev
 #heimdal-dev
