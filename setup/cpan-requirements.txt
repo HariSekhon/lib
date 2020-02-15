@@ -31,7 +31,8 @@ Class::Accessor
 #Term::ANSIColor
 Test::More
 # installs but returns an error code
-Thrift
+# newer Thrift breaks HBase thrift lib
+Thrift@0.9.3
 
 # pinning version to stop it breaking Travis CI Perl 5.10 builds
 #Data::Dumper@2.161
