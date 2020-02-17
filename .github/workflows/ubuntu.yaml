@@ -29,7 +29,6 @@ jobs:
     #name: build
     timeout-minutes: 60
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - uses: actions/cache@v1
@@ -37,13 +36,13 @@ jobs:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-lib  # ${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
-          ${{ runner.os }}-pip-
+          ${{ runner.os }}-pip-lib
     - uses: actions/cache@v1
       with:
         path: ~/.cpanm
-        key: ${{ runner.os }}-cpanm-lib  # ${{ hashFiles('**/cpan-requirements.txt') }}
+        key: ${{ runner.os }}-cpanm-lib-${{ hashFiles('**/cpan-requirements.txt') }}
         restore-keys: |
-          ${{ runner.os }}-cpanm-
+          ${{ runner.os }}-cpanm-lib
     - name: build
       run: make
     - name: test
