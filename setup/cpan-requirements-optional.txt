@@ -16,4 +16,5 @@
 
 # Try to install but don't fail if they do
 
-Thrift::Exception
+# installs but returns an error code
+Thrift
