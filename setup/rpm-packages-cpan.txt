@@ -35,7 +35,7 @@ perl-XML-LibXML
 perl-XML-Simple
 #perl-YAML
 perl-libwww-perl
-perl-thrift
+#perl-thrift  # too old, missing Thrift::Exception, Thrift module needs to be newer built from CPAN
 
 #perl-Readonly-XS
 #perl-Readonly
