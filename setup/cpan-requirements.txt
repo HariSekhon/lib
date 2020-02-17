@@ -40,3 +40,6 @@ Test::More
 #IO::Socket::Timeout
 #Readonly
 #Readonly::XS
+
+# needed by Hbase/Constants.pm
+parent
