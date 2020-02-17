@@ -37,6 +37,14 @@ jobs:
         key: ${{ runner.os }}-pip-lib  # -${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
+    - uses: actions/cache@v1
+      with:
+        path: ~/.cpanm
+        key: ${{ runner.os }}-cpanm-lib  # ${{ hashFiles('**/cpan-requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-cpanm-
+    - name: brew update
+      run: which brew && brew update || :
     - name: build
       run: make
     - name: test
