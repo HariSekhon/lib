@@ -14,6 +14,8 @@
 #                          RPM Dev Package Requirements
 # ============================================================================ #
 
+krb5-devel
+
 # installed by bash-tools submodule now
 #gcc
 #perl-CPAN
