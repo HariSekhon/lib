@@ -37,6 +37,10 @@ REPO := HariSekhon/lib
 
 CODE_FILES := $(shell find . -type f -name '*.pl' -o -type f -name '*.pm' -o -type f -name '*.sh' -o -type f -name '*.t' | grep -v -e bash-tools -e Hbase)
 
+ifndef CPANM
+	CPANM := cpanm
+endif
+
 .PHONY: build
 build:
 	@echo ==============
@@ -44,7 +48,8 @@ build:
 	@echo ==============
 
 	$(MAKE) init
-	if [ -z "$(CPANM)" ]; then make; exit $$?; fi
+	@# doesn't exit Make anyway, only line, and don't wanna use oneshell
+	@#if [ -z "$(CPANM)" ]; then make; exit $$?; fi
 	$(MAKE) system-packages-perl
 	$(MAKE) perl
 
