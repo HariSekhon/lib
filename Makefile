@@ -15,14 +15,18 @@
 # ===================
 # bootstrap commands:
 
+# setup/bootstrap.sh
+#
+# OR
+#
 # Alpine:
 #
 #   apk add --no-cache git make && git clone https://github.com/harisekhon/lib && cd lib && make
-
+#
 # Debian / Ubuntu:
 #
 #   apt-get update && apt-get install -y make git && git clone https://github.com/harisekhon/lib && cd lib && make
-
+#
 # RHEL / CentOS:
 #
 #   yum install -y make git && git clone https://github.com/harisekhon/lib && cd lib && make
