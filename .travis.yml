@@ -72,6 +72,12 @@ install:
   # --installdeps only does dep modules, leaving others to be fully tested and compiled by make's regular cpan, which is slow and doing only "cpan --verbose --notest ." results in calling Makefile.PL and then make, again falling back to the slow original cpan, so now changed core Makefile to get cpanm and then use that for all modules
   - travis_retry make
 
+addons:
+  sonarcloud:
+    organization: "harisekhon"
+    token:
+      secure: "FnwL0C+BAUWUGz5wWZJeW3Wxi2eRAMgTNPghCFQYtmwLrvOa76j4tV3lqMtbXYqa32HkCJYqmo7T0Mj/oGAr+dqbxHD/mj3Qh24Xw1F0QydRM0WWbPen6bcp0jis+4VlNxZSBHJ62fHYrVF2p2v9/rtH+Ifc/kDGs+7ZdYjgbuw="
+
 script:
   #- PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -lrsv t
   - python -V
@@ -79,6 +85,8 @@ script:
   #- which pip || sudo apt-get update && sudo apt-get install -y python-pip
   - pip -V
   - travis_retry make test
+  # sends to sonarcloud using above addon and secure token
+  - sonar-scanner
 
 after_success:
   - echo "After Success:"
