@@ -33,7 +33,7 @@ while read -r repo dir; do
         echo "WARNING: repo dir $dir not found, skipping..."
         continue
     fi
-    for filename in *.yml; do
+    for filename in *.yml .circleci/config.yml; do
         target="../$dir/$filename"
         echo "syncing $filename -> $target"
         sed "s,/lib,/$repo," "$filename" > "$target"
