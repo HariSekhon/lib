@@ -19,7 +19,7 @@ Hari Sekhon Perl Library
 
 [![Travis CI](https://travis-ci.org/HariSekhon/lib.svg?branch=master)](https://travis-ci.org/HariSekhon/lib)
 [![Azure DevOps](https://dev.azure.com/harisekhon/GitHub/_apis/build/status/HariSekhon.lib?branchName=master)](https://dev.azure.com/harisekhon/GitHub/_build/latest?definitionId=3&branchName=master)
-[![AppVeyor](https://ci.appveyor.com/api/projects/status/u6f97cskcgb30sce/branch/master?svg=true)](https://ci.appveyor.com/project/HariSekhon/lib/branch/master)
+[![AppVeyor](https://ci.appveyor.com/api/projects/status/xhq99c042l2hcrab/branch/master?svg=true)](https://ci.appveyor.com/project/HariSekhon/lib/branch/master)
 [![BitBucket Pipeline](https://img.shields.io/bitbucket/pipelines/harisekhon/lib/master)](https://bitbucket.org/harisekhon/lib/addon/pipelines/home#!/)
 [![Codeship Status for HariSekhon/lib](https://app.codeship.com/projects/44957fe0-3c5f-0138-07d2-66210e546d42/status?branch=master)](https://app.codeship.com/projects/387244)
 [![CircleCI](https://circleci.com/gh/HariSekhon/lib.svg?style=svg)](https://circleci.com/gh/HariSekhon/lib)
