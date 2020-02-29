@@ -19,10 +19,11 @@ Hari Sekhon Perl Library
 
 [![Travis CI](https://img.shields.io/travis/harisekhon/lib/master?logo=travis)](https://travis-ci.org/HariSekhon/lib)
 [![AppVeyor](https://img.shields.io/appveyor/build/harisekhon/lib/master?logo=appveyor)](https://ci.appveyor.com/project/HariSekhon/lib/branch/master)
-[![Codeship Status for HariSekhon/lib](https://app.codeship.com/projects/44957fe0-3c5f-0138-07d2-66210e546d42/status?branch=master)](https://app.codeship.com/projects/387244)
+[![Drone](https://img.shields.io/drone/build/HariSekhon/lib/master?logo=drone)](https://cloud.drone.io/HariSekhon/lib)
 [![CircleCI](https://circleci.com/gh/HariSekhon/lib.svg?style=svg)](https://circleci.com/gh/HariSekhon/lib)
-[![Shippable](https://api.shippable.com/projects/5e52c6364c324200063326d5/badge?branch=master)](https://app.shippable.com/github/HariSekhon/lib/dashboard)
-[![Codefresh](https://g.codefresh.io/api/badges/pipeline/harisekhon/GitHub%2Flib?branch=master&key=eyJhbGciOiJIUzI1NiJ9.NWU1MmM5OGNiM2FiOWUzM2Y3ZDZmYjM3.O69674cW7vYom3v5JOGKXDbYgCVIJU9EWhXUMHl3zwA&type=cf-1)](https://g.codefresh.io/pipelines/pylib/builds)
+[![Codeship Status for HariSekhon/lib](https://app.codeship.com/projects/44957fe0-3c5f-0138-07d2-66210e546d42/status?branch=master)](https://app.codeship.com/projects/387244)
+[![Shippable](https://api.shippable.com/projects/5e52c6364c324200063326d5/badge?branch=master)](https://app.shippable.com/github/HariSekhon/lib/dashboard/jobs)
+[![Codefresh](https://g.codefresh.io/api/badges/pipeline/harisekhon/GitHub%2Flib?branch=master&key=eyJhbGciOiJIUzI1NiJ9.NWU1MmM5OGNiM2FiOWUzM2Y3ZDZmYjM3.O69674cW7vYom3v5JOGKXDbYgCVIJU9EWhXUMHl3zwA&type=cf-1)](https://g.codefresh.io/pipelines/lib/builds)
 [![Wercker](https://app.wercker.com/status/7af643f46ecad1311bc1200fd42e509b/s/master "wercker status")](https://app.wercker.com/project/byKey/7af643f46ecad1311bc1200fd42e509b)
 
 [![Azure DevOps](https://dev.azure.com/harisekhon/GitHub/_apis/build/status/HariSekhon.lib?branchName=master)](https://dev.azure.com/harisekhon/GitHub/_build/latest?definitionId=3&branchName=master)
