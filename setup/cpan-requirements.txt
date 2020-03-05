@@ -43,3 +43,6 @@ Test::More
 
 # needed by Hbase/Constants.pm
 parent
+
+# needed to put $PERL5LIB paths back in @INC in Taint mode
+perl5lib
