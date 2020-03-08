@@ -5,10 +5,10 @@ Hari Sekhon - Perl Library
 [![CodeFactor](https://www.codefactor.io/repository/github/harisekhon/lib/badge)](https://www.codefactor.io/repository/github/harisekhon/lib)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_lib&metric=alert_status)](https://sonarcloud.io/dashboard?id=HariSekhon_lib)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_lib&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=HariSekhon_lib)
-[![GitHub stars](https://img.shields.io/github/stars/harisekhon/lib.svg)](https://github.com/harisekhon/lib/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/harisekhon/lib.svg)](https://github.com/harisekhon/lib/network)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_lib&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=HariSekhon_lib)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_lib&metric=security_rating)](https://sonarcloud.io/dashboard?id=HariSekhon_lib)
+[![GitHub stars](https://img.shields.io/github/stars/harisekhon/lib.svg)](https://github.com/harisekhon/lib/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/harisekhon/lib.svg)](https://github.com/harisekhon/lib/network)
 <!-- measure not found
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_lib&metric=ncloc)](https://sonarcloud.io/dashboard?id=HariSekhon_lib)
 -->
@@ -16,7 +16,7 @@ Hari Sekhon - Perl Library
 [![Linux](https://img.shields.io/badge/OS-Linux-blue?logo=linux)](https://github.com/harisekhon/lib#hari-sekhon---perl-library)
 [![Mac](https://img.shields.io/badge/OS-Mac-blue?logo=apple)](https://github.com/harisekhon/lib#hari-sekhon---perl-library)
 [![Docker](https://img.shields.io/badge/container-Docker-blue?logo=docker)](https://hub.docker.com/r/harisekhon/github/)
-[![DockerHub Pulls](https://img.shields.io/docker/pulls/harisekhon/centos-github)](https://hub.docker.com/r/harisekhon/github)
+[![DockerHub Pulls](https://img.shields.io/docker/pulls/harisekhon/centos-github?label=DockerHub%20pulls&logo=docker)](https://hub.docker.com/r/harisekhon/github)
 [![DockerHub Build Automated](https://img.shields.io/docker/automated/harisekhon/centos-github)](https://hub.docker.com/r/harisekhon/centos-github)
 [![Docker Build Status](https://img.shields.io/docker/cloud/build/harisekhon/centos-github)](https://hub.docker.com/r/harisekhon/centos-github/builds)
 [![MicroBadger](https://images.microbadger.com/badges/image/harisekhon/github.svg)](http://microbadger.com/#/images/harisekhon/github)
