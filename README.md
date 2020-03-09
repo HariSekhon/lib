@@ -1,8 +1,8 @@
 Hari Sekhon - Perl Library
 ==========================
 
-[![GitHub stars](https://img.shields.io/github/stars/harisekhon/lib.svg)](https://github.com/harisekhon/lib/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/harisekhon/lib.svg)](https://github.com/harisekhon/lib/network)
+[![GitHub stars](https://img.shields.io/github/stars/harisekhon/lib)](https://github.com/harisekhon/lib/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/harisekhon/lib)](https://github.com/harisekhon/lib/network)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b74a91c19a5845e2961533a5933381db)](https://www.codacy.com/app/harisekhon/lib)
 [![CodeFactor](https://www.codefactor.io/repository/github/harisekhon/lib/badge)](https://www.codefactor.io/repository/github/harisekhon/lib)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_lib&metric=alert_status)](https://sonarcloud.io/dashboard?id=HariSekhon_lib)
