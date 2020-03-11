@@ -35,8 +35,8 @@ Hari Sekhon - Perl Library
 -->
 
 [![Azure DevOps](https://dev.azure.com/harisekhon/GitHub/_apis/build/status/HariSekhon.lib?branchName=master)](https://dev.azure.com/harisekhon/GitHub/_build/latest?definitionId=3&branchName=master)
-[![BitBucket Pipeline](https://img.shields.io/bitbucket/pipelines/harisekhon/lib/master?logo=bitbucket)](https://bitbucket.org/harisekhon/lib/addon/pipelines/home#!/)
-[![GitLab Pipeline](https://img.shields.io/gitlab/pipeline/harisekhon/lib?logo=gitlab)](https://gitlab.com/HariSekhon/lib/pipelines)
+[![BitBucket Pipeline](https://img.shields.io/bitbucket/pipelines/harisekhon/lib/master?logo=bitbucket&label=BitBucket)](https://bitbucket.org/harisekhon/lib/addon/pipelines/home#!/)
+[![GitLab Pipeline](https://img.shields.io/gitlab/pipeline/harisekhon/lib?logo=gitlab&label=GitLab)](https://gitlab.com/HariSekhon/lib/pipelines)
 [![Repo on GitHub](https://img.shields.io/badge/repo-GitHub-blue?logo=github)](https://github.com/HariSekhon/lib)
 [![Repo on GitLab](https://img.shields.io/badge/repo-GitLab-blue?logo=gitlab)](https://gitlab.com/HariSekhon/lib)
 [![Repo on BitBucket](https://img.shields.io/badge/repo-BitBucket-blue?logo=bitbucket)](https://bitbucket.org/HariSekhon/lib)
