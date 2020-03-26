@@ -31,8 +31,9 @@ Hari Sekhon - Perl Library
 [![Shippable](https://img.shields.io/shippable/5e52c6364c324200063326d5/master?label=Shippable)](https://app.shippable.com/github/HariSekhon/lib/dashboard/jobs)
 [![Codefresh](https://g.codefresh.io/api/badges/pipeline/harisekhon/GitHub%2Flib?branch=master&key=eyJhbGciOiJIUzI1NiJ9.NWU1MmM5OGNiM2FiOWUzM2Y3ZDZmYjM3.O69674cW7vYom3v5JOGKXDbYgCVIJU9EWhXUMHl3zwA&type=cf-1)](https://g.codefresh.io/pipelines/lib/builds)
 [![Wercker](https://app.wercker.com/status/7af643f46ecad1311bc1200fd42e509b/s/master "wercker status")](https://app.wercker.com/project/byKey/7af643f46ecad1311bc1200fd42e509b)
-[![Cirrus CI](https://img.shields.io/cirrus/github/HariSekhon/lib/master?logo=Cirrus%20CI&label=Cirrus%20CI)](https://cirrus-ci.com/github/HariSekhon/lib)
 [![BuildKite](https://img.shields.io/buildkite/73d50522a8dd505559b653dc21940c7f071664db776012507f/master?label=BuildKite)](https://buildkite.com/hari-sekhon/lib)
+[![buddy pipeline](https://app.buddy.works/harisekhon/lib/pipelines/pipeline/246982/badge.svg?token=7f63afa3c423a65e6e39a79be0386959e98c4105ea1e20f7f8b05d6d6b587038 "buddy pipeline")](https://app.buddy.works/harisekhon/lib/pipelines/pipeline/246982)
+[![Cirrus CI](https://img.shields.io/cirrus/github/HariSekhon/lib/master?logo=Cirrus%20CI&label=Cirrus%20CI)](https://cirrus-ci.com/github/HariSekhon/lib)
 <!--
 [![Wercker](https://img.shields.io/wercker/ci/5e58eec714b91a0800356b5b/master?label=Wercker)](https://app.wercker.com/project/byKey/7af643f46ecad1311bc1200fd42e509b)
 -->
