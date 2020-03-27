@@ -1,0 +1,8 @@
+\$aws_access_key_regex =[[:space:]]
+\$aws_secret_key_regex =[[:space:]]
+\$aws_access_key = isAws
+\$aws_access_key = shift
+\$aws_access_key =~ /\^
+\$aws_secret_key = isAws
+\$aws_secret_key = shift
+\$aws_secret_key =~ /\^
