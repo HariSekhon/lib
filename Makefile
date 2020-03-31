@@ -50,7 +50,7 @@ build:
 	@echo ==============
 	@echo Perl Lib Build
 	@echo ==============
-	@bash-tools/git_summary_line.sh
+	@$(MAKE) git-summary
 	@echo
 
 	$(MAKE) init
