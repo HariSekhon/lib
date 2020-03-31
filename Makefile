@@ -50,6 +50,8 @@ build:
 	@echo ==============
 	@echo Perl Lib Build
 	@echo ==============
+	@bash-tools/git_summary_line.sh
+	@echo
 
 	$(MAKE) init
 	@# doesn't exit Make anyway, only line, and don't wanna use oneshell
