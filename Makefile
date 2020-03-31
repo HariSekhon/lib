@@ -46,14 +46,13 @@ ifndef CPANM
 endif
 
 .PHONY: build
-build:
+build: init
 	@echo ==============
 	@echo Perl Lib Build
 	@echo ==============
 	@$(MAKE) git-summary
 	@echo
 
-	$(MAKE) init
 	@# doesn't exit Make anyway, only line, and don't wanna use oneshell
 	@#if [ -z "$(CPANM)" ]; then make; exit $$?; fi
 	$(MAKE) system-packages-perl
