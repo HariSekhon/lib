@@ -36,7 +36,7 @@ jobs:
     # untars repo in docker container so git submodule update fails
     #- uses: actions/checkout@v2
     - name: install git & make
-      run: yum install -y git make
+      run: apt-get update && apt-get install -y git make
     - name: git clone
       run: cd /tmp && git clone "https://github.com/harisekhon/$repo"
     - name: init
