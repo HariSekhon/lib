@@ -43,5 +43,7 @@ jobs:
       run: cd "/tmp/$repo" && git submodule update --init --recursive
     - name: build
       run: cd "/tmp/$repo" && make ci
+    - name: fatpacks
+      run: cd "/tmp/$repo" && make fatpacks
     - name: test
       run: cd "/tmp/$repo" && make test
