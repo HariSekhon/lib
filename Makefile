@@ -81,7 +81,8 @@ perl:
 	$(BASH_TOOLS)/perl_cpanm_install_if_absent.sh Test::More
 
 	@echo
-	$(MAKE) cpan-optional
+	# called within cpan target
+	@#$(MAKE) cpan-optional
 	$(MAKE) cpan
 	@echo
 	@# newer versions of the Redis module require Perl >= 5.10, this will install the older compatible version for RHEL5/CentOS5 servers still running Perl 5.8 if the latest module fails
