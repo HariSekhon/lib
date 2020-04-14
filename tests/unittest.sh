@@ -22,7 +22,7 @@ cd "$srcdir/.."
 # shellcheck disable=SC1091
 . bash-tools/lib/utils.sh
 
-section "Running Perl Unit Tests"
+section "Running Perl Lib Unit Tests"
 
 #PERL5LIB=${PERLBREW_ROOT:-} PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -I . -lrsv --timer t
 PERL5LIB=${PERLBREW_ROOT:-} prove -I . -lrsv --timer t
