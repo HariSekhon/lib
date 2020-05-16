@@ -14,7 +14,8 @@
 #                    Mac OS X - Homebrew Package Requirements
 # ============================================================================ #
 
-openssl
+# in bash-tools now
+#openssl
 
 # installed by bash-tools submodule now
 #cpanm
