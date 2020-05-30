@@ -46,3 +46,10 @@ parent
 
 # needed to put $PERL5LIB paths back in @INC in Taint mode
 perl5lib
+
+# needed to fix this error in Semaphore CI
+# ./HariSekhon/Datameer.pm:       Attempt to reload JSON/XS.pm aborted.
+# Compilation failed in require at ./HariSekhon/Datameer.pm line 22.
+# BEGIN failed--compilation aborted at ./HariSekhon/Datameer.pm line 22.
+common::sense
+Types::Serialiser
