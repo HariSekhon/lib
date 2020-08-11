@@ -10,7 +10,7 @@ Hari Sekhon - Perl Library
 [![GitHub stars](https://img.shields.io/github/stars/harisekhon/lib?logo=github)](https://github.com/harisekhon/lib/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/harisekhon/lib?logo=github)](https://github.com/harisekhon/lib/network)
 [![Lines of Code](https://img.shields.io/badge/lines%20of%20code-10k-lightgrey?logo=codecademy)](https://github.com/HariSekhon/lib)
-[![GitHub Last Commit](https://img.shields.io/github/last-commit/HariSekhon/lib)](https://github.com/HariSekhon/lib/commits/master)
+[![GitHub Last Commit](https://img.shields.io/github/last-commit/HariSekhon/lib?logo=github)](https://github.com/HariSekhon/lib/commits/master)
 <!-- measure not found
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_lib&metric=ncloc)](https://sonarcloud.io/dashboard?id=HariSekhon_lib)
 -->
