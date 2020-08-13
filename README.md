@@ -31,7 +31,7 @@ Hari Sekhon - Perl Library
 [![Codeship Status for HariSekhon/lib](https://app.codeship.com/projects/44957fe0-3c5f-0138-07d2-66210e546d42/status?branch=master)](https://app.codeship.com/projects/387244)
 [![Shippable](https://img.shields.io/shippable/5e52c6364c324200063326d5/master?label=Shippable&logo=shippable)](https://app.shippable.com/github/HariSekhon/lib/dashboard/jobs)
 [![Codefresh](https://g.codefresh.io/api/badges/pipeline/harisekhon/GitHub%2Flib?branch=master&key=eyJhbGciOiJIUzI1NiJ9.NWU1MmM5OGNiM2FiOWUzM2Y3ZDZmYjM3.O69674cW7vYom3v5JOGKXDbYgCVIJU9EWhXUMHl3zwA&type=cf-1)](https://g.codefresh.io/pipelines/edit/new/builds?id=5e58e2c43953b7316b4b7903&pipeline=lib&projects=GitHub&projectId=5e52ca8ea284e00f882ea992&context=github&filter=page:1;pageSize:10;timeFrameStart:week)
-[![Wercker](https://app.wercker.com/status/7af643f46ecad1311bc1200fd42e509b/s/master "wercker status")](https://app.wercker.com/harisekhon/lib/runs)
+[![Wercker](https://img.shields.io/wercker/ci/5e58eec714b91a0800356b5b/master?label=Wercker&logo=oracle)](https://app.wercker.com/harisekhon/lib/runs)
 [![BuildKite](https://img.shields.io/buildkite/ee85ef275ba64807fc2efce47336b0e0d92a1cba7fcc94b584/master?label=BuildKite)](https://buildkite.com/hari-sekhon/lib)
 [![Cirrus CI](https://img.shields.io/cirrus/github/HariSekhon/lib/master?logo=Cirrus%20CI&label=Cirrus%20CI)](https://cirrus-ci.com/github/HariSekhon/lib)
 [![Semaphore](https://harisekhon.semaphoreci.com/badges/lib.svg)](https://harisekhon.semaphoreci.com/projects/lib)
