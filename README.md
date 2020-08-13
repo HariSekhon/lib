@@ -22,7 +22,6 @@ Hari Sekhon - Perl Library
 [![DockerHub Build Automated](https://img.shields.io/docker/automated/harisekhon/centos-github?logo=docker)](https://hub.docker.com/r/harisekhon/centos-github)
 [![Docker Build Status](https://img.shields.io/docker/cloud/build/harisekhon/centos-github?logo=docker)](https://hub.docker.com/r/harisekhon/centos-github/builds)
 [![MicroBadger](https://images.microbadger.com/badges/image/harisekhon/github.svg)](http://microbadger.com/#/images/harisekhon/github)
-[![CI Builds Overview](https://img.shields.io/badge/CI%20Builds-Overview%20Page-blue?logo=circleci)](https://bitbucket.org/harisekhon/devops-bash-tools/src/master/STATUS.md)
 
 [![Travis CI](https://img.shields.io/travis/harisekhon/lib/master?logo=travis&label=Travis)](https://travis-ci.org/HariSekhon/lib)
 [![AppVeyor](https://img.shields.io/appveyor/build/harisekhon/lib/master?logo=appveyor&label=AppVeyor)](https://ci.appveyor.com/project/HariSekhon/lib/branch/master)
@@ -40,6 +39,7 @@ Hari Sekhon - Perl Library
 [![Jenkins](https://img.shields.io/badge/Jenkins-ready-blue?logo=jenkins)](https://github.com/HariSekhon/lib/blob/master/Jenkinsfile)
 [![Concourse](https://img.shields.io/badge/Concourse-ready-blue?logo=concourse)](https://github.com/HariSekhon/lib/blob/master/.concourse.yml)
 [![GoCD](https://img.shields.io/badge/GoCD-ready-blue?logo=go)](https://github.com/HariSekhon/lib/blob/master/.gocd.yml)
+[![CI Builds Overview](https://img.shields.io/badge/CI%20Builds-Overview%20Page-blue?logo=circleci)](https://bitbucket.org/harisekhon/devops-bash-tools/src/master/STATUS.md)
 
 [![Azure DevOps](https://dev.azure.com/harisekhon/GitHub/_apis/build/status/HariSekhon.lib?branchName=master)](https://dev.azure.com/harisekhon/GitHub/_build/latest?definitionId=3&branchName=master)
 [![BitBucket Pipeline](https://img.shields.io/bitbucket/pipelines/harisekhon/lib/master?logo=bitbucket&label=BitBucket)](https://bitbucket.org/harisekhon/lib/addon/pipelines/home#!/)
