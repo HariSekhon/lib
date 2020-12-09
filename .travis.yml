@@ -15,8 +15,8 @@
 
 # https://docs.travis-ci.com/user/customizing-the-build/
 
-# sets language to Ruby and breaks build
-#version: ~> 1.0
+# XXX: sets language to Ruby and breaks build
+version: ~> 1.0
 
 # https://docs.travis-ci.com/user/languages/perl/
 language: perl
