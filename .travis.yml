@@ -75,9 +75,11 @@ notifications:
 # https://docs.travis-ci.com/user/caching/
 
 cache:
-  directories:
-    - .cpanm
-    - .cpan
+  - pip
+  - directories:
+    - $HOME/.cache
+    - $HOME/.cpanm
+    - $HOME/.cpan
 
 # ==============================================
 # https://docs.travis-ci.com/user/job-lifecycle/
