@@ -13,11 +13,16 @@
 #  http://www.linkedin.com/in/harisekhon
 #
 
+# ============================================================================ #
+#                               T r a v i s   C I
+# ============================================================================ #
+
 # https://docs.travis-ci.com/user/customizing-the-build/
 
 # XXX: sets language to Ruby and breaks build
 version: ~> 1.0
 
+# ===============================================
 # https://docs.travis-ci.com/user/languages/perl/
 language: perl
 perl:
@@ -31,6 +36,7 @@ perl:
   # there is workaround in build now to install older version if latest fails for RHEL5/CentOS5 servers
   #- "5.8"
 
+# =========================================
 # https://docs.travis-ci.com/user/multi-os/
 os:
   - linux
@@ -40,33 +46,40 @@ os:
 # macOS 10.15.7 - otherwise defaults to Mac macOS 10.13 with xcode9.4 otherwise - and HomeBrew update takes 50 minutes until the build times out :-/
 osx_image: xcode12.2
 
+# =============================================
 # https://docs.travis-ci.com/user/build-matrix/
 # https://docs.travis-ci.com/user/build-stages/matrix-expansion/
 #matrix:
 #  allow_failures:
 #  - os: osx
 
+# ======================================================
 # https://docs.travis-ci.com/user/environment-variables/
 env:
   #- DEBUG=1 PYTHONUNBUFFERED=1
   - PYTHONUNBUFFERED=1
 
+# ==============================================
 # https://docs.travis-ci.com/user/notifications/
 notifications:
   email: false
 
+# =================================================================================
 # https://docs.travis-ci.com/user/customizing-the-build/#building-specific-branches
 # https://docs.travis-ci.com/user/conditional-builds-stages-jobs
 #branches:
 #  only:
 #    - master
 
+# ========================================
 # https://docs.travis-ci.com/user/caching/
+
 cache:
   directories:
     - .cpanm
     - .cpan
 
+# ==============================================
 # https://docs.travis-ci.com/user/job-lifecycle/
 
 # avoid package checksum mismatches when installing packages
@@ -79,13 +92,6 @@ install:
   #- cpanm --installdeps --notest . || echo CPANM FAILED
   # --installdeps only does dep modules, leaving others to be fully tested and compiled by make's regular cpan, which is slow and doing only "cpan --verbose --notest ." results in calling Makefile.PL and then make, again falling back to the slow original cpan, so now changed core Makefile to get cpanm and then use that for all modules
   - travis_retry make
-
-# https://docs.travis-ci.com/user/sonarcloud/
-addons:
-  sonarcloud:
-    organization: "harisekhon"
-    token:
-      secure: "FnwL0C+BAUWUGz5wWZJeW3Wxi2eRAMgTNPghCFQYtmwLrvOa76j4tV3lqMtbXYqa32HkCJYqmo7T0Mj/oGAr+dqbxHD/mj3Qh24Xw1F0QydRM0WWbPen6bcp0jis+4VlNxZSBHJ62fHYrVF2p2v9/rtH+Ifc/kDGs+7ZdYjgbuw="
 
 script:
   #- PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -lrsv t
@@ -105,3 +111,11 @@ after_success:
 after_failure:
   - echo "After Failure"
   #- for x in /home/travis/.cpanm/work/*/build.log; do echo "uploading $x"; curl -sT "$x" transfer.sh || :; curl -sT "$x" chunk.io || :; done
+
+# ===========================================
+# https://docs.travis-ci.com/user/sonarcloud/
+addons:
+  sonarcloud:
+    organization: "harisekhon"
+    token:
+      secure: "FnwL0C+BAUWUGz5wWZJeW3Wxi2eRAMgTNPghCFQYtmwLrvOa76j4tV3lqMtbXYqa32HkCJYqmo7T0Mj/oGAr+dqbxHD/mj3Qh24Xw1F0QydRM0WWbPen6bcp0jis+4VlNxZSBHJ62fHYrVF2p2v9/rtH+Ifc/kDGs+7ZdYjgbuw="
