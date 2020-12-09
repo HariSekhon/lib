@@ -13,9 +13,12 @@
 #  http://www.linkedin.com/in/harisekhon
 #
 
+# https://docs.travis-ci.com/user/customizing-the-build/
+
 # sets language to Ruby and breaks build
 #version: ~> 1.0
 
+# https://docs.travis-ci.com/user/languages/perl/
 language: perl
 perl:
   # this build has thread support
@@ -28,6 +31,7 @@ perl:
   # there is workaround in build now to install older version if latest fails for RHEL5/CentOS5 servers
   #- "5.8"
 
+# https://docs.travis-ci.com/user/multi-os/
 os:
   - linux
   - osx
@@ -36,34 +40,34 @@ os:
 # macOS 10.15.7 - otherwise defaults to Mac macOS 10.13 with xcode9.4 otherwise - and HomeBrew update takes 50 minutes until the build times out :-/
 osx_image: xcode12.2
 
-#dist: trusty
+# https://docs.travis-ci.com/user/build-matrix/
+# https://docs.travis-ci.com/user/build-stages/matrix-expansion/
+#matrix:
+#  allow_failures:
+#  - os: osx
 
-sudo: required
-
-notifications:
-  email: false
-
+# https://docs.travis-ci.com/user/environment-variables/
 env:
   #- DEBUG=1 PYTHONUNBUFFERED=1
   - PYTHONUNBUFFERED=1
 
+# https://docs.travis-ci.com/user/notifications/
+notifications:
+  email: false
+
+# https://docs.travis-ci.com/user/customizing-the-build/#building-specific-branches
+# https://docs.travis-ci.com/user/conditional-builds-stages-jobs
 #branches:
 #  only:
 #    - master
 
+# https://docs.travis-ci.com/user/caching/
 cache:
   directories:
     - .cpanm
     - .cpan
 
-# multi-OS is a beta feature
-#os:
-#  - linux
-#  - osx
-
-#matrix:
-#  allow_failures:
-#  - os: osx
+# https://docs.travis-ci.com/user/job-lifecycle/
 
 # avoid package checksum mismatches when installing packages
 before_install:
@@ -76,6 +80,7 @@ install:
   # --installdeps only does dep modules, leaving others to be fully tested and compiled by make's regular cpan, which is slow and doing only "cpan --verbose --notest ." results in calling Makefile.PL and then make, again falling back to the slow original cpan, so now changed core Makefile to get cpanm and then use that for all modules
   - travis_retry make
 
+# https://docs.travis-ci.com/user/sonarcloud/
 addons:
   sonarcloud:
     organization: "harisekhon"
@@ -94,7 +99,8 @@ script:
 
 after_success:
   - echo "After Success:"
-  - cover -report coveralls || :
+    # -report is parsed as a map and dropped otherwise
+  - "cover -report coveralls || :"
 
 after_failure:
   - echo "After Failure"
