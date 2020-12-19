@@ -47,6 +47,8 @@ Hari Sekhon - Perl Library
 [![Azure DevOps](https://dev.azure.com/harisekhon/GitHub/_apis/build/status/HariSekhon.lib?branchName=master)](https://dev.azure.com/harisekhon/GitHub/_build/latest?definitionId=3&branchName=master)
 [![GitLab Pipeline](https://img.shields.io/gitlab/pipeline/harisekhon/lib?logo=gitlab&label=GitLab%20CI)](https://gitlab.com/HariSekhon/lib/pipelines)
 [![BitBucket Pipeline](https://img.shields.io/bitbucket/pipelines/harisekhon/lib/master?logo=bitbucket&label=BitBucket%20CI)](https://bitbucket.org/harisekhon/lib/addon/pipelines/home#!/)
+[![AWS CodeBuild](https://img.shields.io/badge/AWS%20CodeBuild-ready-blue?logo=amazon%20aws)](https://github.com/HariSekhon/lib/blob/master/buildspec.yml)
+[![GCP Cloud Build](https://img.shields.io/badge/GCP%20Cloud%20Build-ready-blue?logo=google%20cloud)](https://github.com/HariSekhon/lib/blob/master/cloudbuild.yml)
 
 [![Repo on Azure DevOps](https://img.shields.io/badge/repo-Azure%20DevOps-0078D7?logo=azure%20devops)](https://dev.azure.com/harisekhon/GitHub/_git/lib)
 [![Repo on GitHub](https://img.shields.io/badge/repo-GitHub-2088FF?logo=github)](https://github.com/HariSekhon/lib)
