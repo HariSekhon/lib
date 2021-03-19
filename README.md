@@ -43,6 +43,7 @@ Hari Sekhon - Perl Library
 [![Cirrus CI](https://img.shields.io/cirrus/github/HariSekhon/lib/master?logo=Cirrus%20CI&label=Cirrus%20CI)](https://cirrus-ci.com/github/HariSekhon/lib)
 [![Semaphore](https://harisekhon.semaphoreci.com/badges/lib.svg)](https://harisekhon.semaphoreci.com/projects/lib)
 [![Wercker](https://app.wercker.com/status/7af643f46ecad1311bc1200fd42e509b/s/master "wercker status")](https://app.wercker.com/harisekhon/lib/runs)
+[![Buddy](https://img.shields.io/badge/Buddy-ready-1A86FD?logo=buddy)](https://github.com/HariSekhon/lib/blob/master/buddy.yml)
 <!--[![Wercker](https://img.shields.io/wercker/ci/5e58eec714b91a0800356b5b/master?label=Wercker&logo=oracle)](https://app.wercker.com/harisekhon/lib/runs)-->
 
 [![Azure DevOps](https://dev.azure.com/harisekhon/GitHub/_apis/build/status/HariSekhon.lib?branchName=master)](https://dev.azure.com/harisekhon/GitHub/_build/latest?definitionId=3&branchName=master)
