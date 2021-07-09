@@ -32,7 +32,7 @@ Hari Sekhon - Perl Library
 [![GoCD](https://img.shields.io/badge/GoCD-ready-blue?logo=go)](https://github.com/HariSekhon/lib/blob/master/.gocd.yml)
 [![TeamCity](https://img.shields.io/badge/TeamCity-ready-blue?logo=teamcity)](https://github.com/HariSekhon/TeamCity-CI)
 
-[![Travis CI](https://img.shields.io/travis/harisekhon/lib/master?logo=travis&label=Travis%20CI)](https://travis-ci.org/HariSekhon/lib)
+[![Travis CI](https://img.shields.io/badge/TravisCI-legacy-lightgrey?logo=travis&label=Travis%20CI)](https://github.com/HariSekhon/lib/blob/master/.travis.yml)
 [![AppVeyor](https://img.shields.io/appveyor/build/harisekhon/lib/master?logo=appveyor&label=AppVeyor)](https://ci.appveyor.com/project/HariSekhon/lib/branch/master)
 [![Drone](https://img.shields.io/drone/build/HariSekhon/lib/master?logo=drone&label=Drone)](https://cloud.drone.io/HariSekhon/lib)
 [![CircleCI](https://circleci.com/gh/HariSekhon/lib.svg?style=svg)](https://circleci.com/gh/HariSekhon/lib)
