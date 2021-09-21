@@ -1537,11 +1537,11 @@ sub expand_units ($;$$) {
     defined($units) || code_error "no units arg 2 passed to expand_units()";
     isFloat($num)   || code_error "non-float num arg 1 passed to expand_units()";
     if   ($units =~ /^B?$/i) { return $num; }
-    elsif($units =~ /^KB?$/i){ $power = 1; }
-    elsif($units =~ /^MB?$/i){ $power = 2; }
-    elsif($units =~ /^GB?$/i){ $power = 3; }
-    elsif($units =~ /^TB?$/i){ $power = 4; }
-    elsif($units =~ /^PB?$/i){ $power = 5; }
+    elsif($units =~ /^Ki*B?$/i){ $power = 1; }
+    elsif($units =~ /^Mi*B?$/i){ $power = 2; }
+    elsif($units =~ /^Gi*B?$/i){ $power = 3; }
+    elsif($units =~ /^Ti*B?$/i){ $power = 4; }
+    elsif($units =~ /^Pi*B?$/i){ $power = 5; }
     else { code_error "unrecognized units '$units' " . ($name ? "for $name " : "") . "passed to expand_units(). $nagios_plugins_support_msg"; }
     return $num * (1024**$power);
 }
