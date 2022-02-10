@@ -91,6 +91,9 @@ Hari Sekhon - Perl Library
 [![Perl 5.24](https://github.com/HariSekhon/lib/workflows/Perl%205.24/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22Perl+5.24%22)
 [![Perl 5.26](https://github.com/HariSekhon/lib/workflows/Perl%205.26/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22Perl+5.26%22)
 [![Perl 5.28](https://github.com/HariSekhon/lib/workflows/Perl%205.28/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22Perl+5.28%22)
+[![Perl 5.30](https://github.com/HariSekhon/lib/workflows/Perl%205.30/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22Perl+5.30%22)
+[![Perl 5.32](https://github.com/HariSekhon/lib/workflows/Perl%205.32/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22Perl+5.32%22)
+[![Perl 5.34](https://github.com/HariSekhon/lib/workflows/Perl%205.34/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22Perl+5.34%22)
 
 Perl library, full of lots of validation code and utility functions.
 
