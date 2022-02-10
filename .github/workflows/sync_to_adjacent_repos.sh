@@ -19,7 +19,7 @@ srcdir="$(dirname "$0")"
 
 cd "$srcdir"
 
-sed 's/#.*//; s/:/ /' ../../bash-tools/setup/repolist.txt |
+sed 's/#.*//; s/:/ /' ../../bash-tools/setup/repos.txt |
 grep -e nagios-plugins -e perl-tools |
 while read -r repo dir; do
     #if [ -z "$dir" ]; then
@@ -30,23 +30,9 @@ while read -r repo dir; do
         echo "WARNING: repo dir $dir not found, skipping..."
         continue
     fi
-    for filename in *.yaml; do
+    for filename in perl*.yaml; do
         target="../../../$dir/.github/workflows/$filename"
-        if [ -f "$target.disabled" ]; then
-            target="$target.disabled"
-        fi
-        if [ -n "${ALL:-}" ] || grep -Eq '^[[:space:]]*(container|python-version):' "$filename"; then
-            if [ -n "${NEW:-}" ] || [ -f "$target" ]; then
-                echo "syncing $filename -> $target"
-                timeout=60
-                if [[ "$repo" =~ nagios-plugins ]]; then
-                    timeout=240
-                fi
-                sed "s/lib/$repo/;s/timeout-minutes:.*/timeout-minutes: $timeout/" "$filename" > "$target"
-                if [ "$repo" = "nagios-plugins" ]; then
-                    perl -pi -e 's/(^[[:space:]]+make$)/\1 build zookeeper/' "$target"
-                fi
-            fi
-        fi
+        echo "copying $filename to $target"
+        sed "s/\/lib$/\/$repo/" "$filename" > "$target"
     done
 done
