@@ -31,3 +31,5 @@ jobs:
   build:
     name: Perl
     uses: HariSekhon/GitHub-Actions/.github/workflows/perl.yaml@master
+    with:
+      version: latest
