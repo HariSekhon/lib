@@ -12,7 +12,7 @@
 #
 
 ---
-name: Perl
+name: Perl 5.28
 
 on:
   push:
