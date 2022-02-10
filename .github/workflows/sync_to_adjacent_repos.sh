@@ -20,12 +20,11 @@ srcdir="$(dirname "$0")"
 cd "$srcdir"
 
 sed 's/#.*//; s/:/ /' ../../bash-tools/setup/repos.txt |
-grep -e nagios-plugins -e perl-tools |
+grep -i -e nagios-plugins -e perl-tools |
 while read -r repo dir; do
     #if [ -z "$dir" ]; then
     #    dir="$repo"
     #fi
-    repo="$(tr '[:upper:]' '[:lower:]' <<< "$repo")"
     if ! [ -d "../../../$dir" ]; then
         echo "WARNING: repo dir $dir not found, skipping..."
         continue
