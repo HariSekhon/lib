@@ -55,5 +55,5 @@ jobs:
     with:
       container: perl:5.32
       caches: apt cpanm
-      build-target: ci fatpacks
+      build-targets: ci fatpacks
       debug: ${{ github.event.inputs.debug }}
