@@ -1,20 +1,21 @@
 Hari Sekhon - Perl Library
 ==========================
 
+[![GitHub stars](https://img.shields.io/github/stars/harisekhon/lib?logo=github)](https://github.com/harisekhon/lib/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/harisekhon/lib?logo=github)](https://github.com/harisekhon/lib/network)
+[![Lines of Code](https://img.shields.io/badge/lines%20of%20code-10k-lightgrey?logo=codecademy)](https://github.com/HariSekhon/lib)
+[![License](https://img.shields.io/github/license/HariSekhon/lib)](https://github.com/HariSekhon/lib/blob/master/LICENSE)
+[![GitHub Last Commit](https://img.shields.io/github/last-commit/HariSekhon/lib?logo=github)](https://github.com/HariSekhon/lib/commits/master)
+<!-- measure not found
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_lib&metric=ncloc)](https://sonarcloud.io/dashboard?id=HariSekhon_lib)
+-->
+
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b74a91c19a5845e2961533a5933381db)](https://www.codacy.com/app/harisekhon/lib)
 [![CodeFactor](https://www.codefactor.io/repository/github/harisekhon/lib/badge)](https://www.codefactor.io/repository/github/harisekhon/lib)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_lib&metric=alert_status)](https://sonarcloud.io/dashboard?id=HariSekhon_lib)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_lib&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=HariSekhon_lib)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_lib&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=HariSekhon_lib)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_lib&metric=security_rating)](https://sonarcloud.io/dashboard?id=HariSekhon_lib)
-[![GitHub stars](https://img.shields.io/github/stars/harisekhon/lib?logo=github)](https://github.com/harisekhon/lib/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/harisekhon/lib?logo=github)](https://github.com/harisekhon/lib/network)
-[![GitHub Last Commit](https://img.shields.io/github/last-commit/HariSekhon/lib?logo=github)](https://github.com/HariSekhon/lib/commits/master)
-[![Lines of Code](https://img.shields.io/badge/lines%20of%20code-10k-lightgrey?logo=codecademy)](https://github.com/HariSekhon/lib)
-[![License](https://img.shields.io/github/license/HariSekhon/lib)](https://github.com/HariSekhon/lib/blob/master/LICENSE)
-<!-- measure not found
-[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_lib&metric=ncloc)](https://sonarcloud.io/dashboard?id=HariSekhon_lib)
--->
 
 [![Linux](https://img.shields.io/badge/OS-Linux-blue?logo=linux)](https://github.com/harisekhon/lib#hari-sekhon---perl-library)
 [![Mac](https://img.shields.io/badge/OS-Mac-blue?logo=apple)](https://github.com/harisekhon/lib#hari-sekhon---perl-library)
