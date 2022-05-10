@@ -2,7 +2,7 @@
 #  Author: Hari Sekhon
 #  Date: 2011-09-15 11:30:24 +0100 (Thu, 15 Sep 2011)
 #
-#  https://github.com/harisekhon/lib
+#  https://github.com/HariSekhon/lib
 #
 #  License: see accompanying LICENSE file
 #
@@ -582,7 +582,7 @@ our $progname = basename $0;
 $progname =~ /^([\w\.\/_-]+)$/ or quit("UNKNOWN", "Invalid program name - does not adhere to strict regex validation, you should name the program simply and sanely");
 $progname = $1;
 
-our $nagios_plugins_support_msg = "Please try latest version from https://github.com/harisekhon/nagios-plugins, re-run on command line with -vvv and if problem persists paste full output from -vvv mode in to a ticket requesting a fix/update at https://github.com/harisekhon/nagios-plugins/issues/new";
+our $nagios_plugins_support_msg = "Please try latest version from https://github.com/HariSekhon/Nagios-Plugins, re-run on command line with -vvv and if problem persists paste full output from -vvv mode in to a ticket requesting a fix/update at https://github.com/HariSekhon/Nagios-Plugins/issues/new";
 our $nagios_plugins_support_msg_api = "API may have changed. $nagios_plugins_support_msg";
 
 # ============================================================================ #

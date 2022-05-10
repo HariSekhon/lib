@@ -2,7 +2,7 @@
 #  Author: Hari Sekhon
 #  Date: 2014-09-30 21:54:01 +0100 (Tue, 30 Sep 2014)
 #
-#  https://github.com/harisekhon/lib
+#  https://github.com/HariSekhon/lib
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
@@ -138,7 +138,7 @@ sub curl_mapr($$$;$){
     isUrl($url) or code_error "invalid URL '$url' supplied to curl_mapr()";
     my $content = curl $url, "MapR Control System", $user, $password, $err_sub;
     vlog2("parsing output from MapR Control System\n");
-    $json = isJson($content) or quit "CRITICAL", "invalid json returned by MapR Control System, perhaps you tried --no-ssl and SSL was used on that port? Try running with -vvv to debug and file as ticket if neccessary to https://github.com/harisekhon/nagios-plugins/issues";
+    $json = isJson($content) or quit "CRITICAL", "invalid json returned by MapR Control System, perhaps you tried --no-ssl and SSL was used on that port? Try running with -vvv to debug and file as ticket if neccessary to https://github.com/HariSekhon/Nagios-Plugins/issues";
     vlog3 Dumper($json);
     return $json;
 }

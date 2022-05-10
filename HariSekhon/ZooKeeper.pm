@@ -2,7 +2,7 @@
 #  Author: Hari Sekhon
 #  Date: 2013-07-03 01:58:10 +0100 (Wed, 03 Jul 2013)
 #
-#  https://github.com/harisekhon/lib
+#  https://github.com/HariSekhon/lib
 #
 #  License: see accompanying LICENSE file
 #
