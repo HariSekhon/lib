@@ -32,6 +32,6 @@ while read -r repo dir; do
     for filename in perl*.yaml; do
         target="../../../$dir/.github/workflows/$filename"
         echo "copying $filename to $target"
-        sed "s/\/lib$/\/$repo/" "$filename" > "$target"
+        sed "s/\\/lib$/\\/$repo/" "$filename" > "$target"
     done
 done
