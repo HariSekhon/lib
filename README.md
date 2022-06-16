@@ -1,5 +1,4 @@
-Hari Sekhon - Perl Library
-==========================
+# Hari Sekhon - Perl Library
 
 [![GitHub stars](https://img.shields.io/github/stars/harisekhon/lib?logo=github)](https://github.com/HariSekhon/lib/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/harisekhon/lib?logo=github)](https://github.com/HariSekhon/lib/network)
