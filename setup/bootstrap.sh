@@ -81,4 +81,6 @@ else
     fi
 fi
 
-make
+if [ -z "${NO_MAKE:-}" ]; then
+    make
+fi
