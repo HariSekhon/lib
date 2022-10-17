@@ -66,7 +66,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.19.6";
+our $VERSION = "1.19.7";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -3939,7 +3939,7 @@ sub validate_resolvable($;$){
 
 sub validate_ssl_opts(){
     if(defined($ssl_noverify)){
-        $main::ua->ssl_opts( verify_hostname => 0 );
+        $main::ua->ssl_opts( verify_hostname => 0, SSL_verify_mode => 0 );
     }
     if(defined($ssl_ca_path)){
         $ssl_ca_path = validate_directory($ssl_ca_path, "SSL CA directory", undef, "no vlog");
