@@ -13,7 +13,7 @@
 
 package HariSekhon::ClouderaManager;
 
-$VERSION = "0.6.1";
+$VERSION = "0.6.2";
 
 use strict;
 use warnings;
@@ -155,7 +155,7 @@ sub cm_query(;$) {
     my $no_items;
     $tls = 1 if(defined($ssl_ca_path) or defined($tls_noverify));
     if(defined($tls_noverify)){
-        $ua->ssl_opts( verify_hostname => 0 );
+        $ua->ssl_opts( SSL_verify_mode => 0, verify_hostname => 0 );
         $tls = 1;
     }
     if(defined($ssl_ca_path)){
