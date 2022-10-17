@@ -6,20 +6,6 @@
 #
 #  License: see accompanying LICENSE file
 #
-
-#  HARI SEKHON:
-#
-#  Library of personal stuff I use a lot, cobbled together from bits of my own
-#  scripts over the last few years and a Nagios library I started in Python years ago
-#
-#  I welcome feedback on this. Currently this lib isn't designed for purity but rather convenience
-#  and ease of maintenance.  If you have a better way of doing anything in this library that will
-#  not significantly inconvenience me then let me know!
-#
-#  PLEASE DO NOT CHANGE ANYTHING IN HERE!
-#
-#  You may use this library at your own risk. You may not change it.
-#
 # ============================================================================ #
 #  Unit Tests
 #
