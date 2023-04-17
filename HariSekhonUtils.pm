@@ -66,7 +66,7 @@ if( -f dirname(__FILE__) . "/.use_net_ssl" ){
     import Net::SSL;
 }
 
-our $VERSION = "1.19.7";
+our $VERSION = "1.19.8";
 
 #BEGIN {
 # May want to refactor this so reserving ISA, update: 5.8.3 onwards
@@ -678,7 +678,7 @@ our $aws_host_ip_regex  = '\bip-\d+-\d+-\d+-\d+\b';
 our $hostname_regex     = "$hostname_component(?:\.$domain_regex)?";
 our $aws_hostname_regex = "$aws_host_ip_regex(?:\.$domain_regex)?";
 our $dirname_regex      = '[\/\w\s\\.,:*()=%?+-]+';
-our $filename_regex     = $dirname_regex . '[^\/]';
+our $filename_regex     = $dirname_regex . '(?<![\/])';
 our $rwxt_regex         = '[r-][w-][x-][r-][w-][x-][r-][w-][xt-]';
 our $fqdn_regex         = $hostname_component . '\.' . $domain_regex;
 our $aws_fqdn_regex     = $aws_host_ip_regex . '\.' . $domain_regex;
