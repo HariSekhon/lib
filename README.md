@@ -11,6 +11,7 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b74a91c19a5845e2961533a5933381db)](https://www.codacy.com/app/harisekhon/lib)
 [![CodeFactor](https://www.codefactor.io/repository/github/harisekhon/lib/badge)](https://www.codefactor.io/repository/github/harisekhon/lib)
+[![SonarCloud](https://github.com/HariSekhon/lib/actions/workflows/sonarcloud.yaml/badge.svg)](https://github.com/HariSekhon/lib/actions/workflows/sonarcloud.yaml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_lib&metric=alert_status)](https://sonarcloud.io/dashboard?id=HariSekhon_lib)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_lib&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=HariSekhon_lib)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_lib&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=HariSekhon_lib)
