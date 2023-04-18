@@ -41,11 +41,9 @@
 [![Codefresh](https://g.codefresh.io/api/badges/pipeline/harisekhon/GitHub%2Flib?branch=master&key=eyJhbGciOiJIUzI1NiJ9.NWU1MmM5OGNiM2FiOWUzM2Y3ZDZmYjM3.O69674cW7vYom3v5JOGKXDbYgCVIJU9EWhXUMHl3zwA&type=cf-1)](https://g.codefresh.io/pipelines/edit/new/builds?id=5e58e2c43953b7316b4b7903&pipeline=lib&projects=GitHub&projectId=5e52ca8ea284e00f882ea992&context=github&filter=page:1;pageSize:10;timeFrameStart:week)
 [![Cirrus CI](https://img.shields.io/cirrus/github/HariSekhon/lib/master?logo=Cirrus%20CI&label=Cirrus%20CI)](https://cirrus-ci.com/github/HariSekhon/lib)
 [![Semaphore](https://harisekhon.semaphoreci.com/badges/lib.svg)](https://harisekhon.semaphoreci.com/projects/lib)
-[![Wercker](https://app.wercker.com/status/7af643f46ecad1311bc1200fd42e509b/s/master "wercker status")](https://app.wercker.com/harisekhon/lib/runs)
 [![Buddy](https://img.shields.io/badge/Buddy-ready-1A86FD?logo=buddy)](https://github.com/HariSekhon/lib/blob/master/buddy.yml)
 [![Shippable](https://img.shields.io/badge/Shippable-legacy-lightgrey?logo=jfrog&label=Shippable)](https://github.com/HariSekhon/lib/blob/master/shippable.yml)
 [![Travis CI](https://img.shields.io/badge/TravisCI-ready-blue?logo=travis&label=Travis%20CI)](https://github.com/HariSekhon/lib/blob/master/.travis.yml)
-<!--[![Wercker](https://img.shields.io/wercker/ci/5e58eec714b91a0800356b5b/master?label=Wercker&logo=oracle)](https://app.wercker.com/harisekhon/lib/runs)-->
 
 [![Azure DevOps](https://dev.azure.com/harisekhon/GitHub/_apis/build/status/HariSekhon.lib?branchName=master)](https://dev.azure.com/harisekhon/GitHub/_build/latest?definitionId=3&branchName=master)
 [![GitLab Pipeline](https://img.shields.io/gitlab/pipeline/harisekhon/lib?logo=gitlab&label=GitLab%20CI)](https://gitlab.com/HariSekhon/lib/pipelines)
@@ -88,19 +86,6 @@
 
 [![Perl versions](https://img.shields.io/badge/Perl-5.10+-39457E?logo=perl)](https://github.com/HariSekhon/lib)
 [![Perl](https://github.com/HariSekhon/lib/workflows/Perl/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22Perl%22)
-[![Perl 5.10](https://github.com/HariSekhon/lib/workflows/Perl%205.10/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22Perl+5.10%22)
-[![Perl 5.12](https://github.com/HariSekhon/lib/workflows/Perl%205.12/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22Perl+5.12%22)
-[![Perl 5.14](https://github.com/HariSekhon/lib/workflows/Perl%205.14/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22Perl+5.14%22)
-[![Perl 5.16](https://github.com/HariSekhon/lib/workflows/Perl%205.16/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22Perl+5.16%22)
-[![Perl 5.18](https://github.com/HariSekhon/lib/workflows/Perl%205.18/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22Perl+5.18%22)
-[![Perl 5.20](https://github.com/HariSekhon/lib/workflows/Perl%205.20/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22Perl+5.20%22)
-[![Perl 5.22](https://github.com/HariSekhon/lib/workflows/Perl%205.22/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22Perl+5.22%22)
-[![Perl 5.24](https://github.com/HariSekhon/lib/workflows/Perl%205.24/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22Perl+5.24%22)
-[![Perl 5.26](https://github.com/HariSekhon/lib/workflows/Perl%205.26/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22Perl+5.26%22)
-[![Perl 5.28](https://github.com/HariSekhon/lib/workflows/Perl%205.28/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22Perl+5.28%22)
-[![Perl 5.30](https://github.com/HariSekhon/lib/workflows/Perl%205.30/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22Perl+5.30%22)
-[![Perl 5.32](https://github.com/HariSekhon/lib/workflows/Perl%205.32/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22Perl+5.32%22)
-[![Perl 5.34](https://github.com/HariSekhon/lib/workflows/Perl%205.34/badge.svg)](https://github.com/HariSekhon/lib/actions?query=workflow%3A%22Perl+5.34%22)
 
 Perl library, full of lots of validation code and utility functions.
 
