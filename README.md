@@ -16,6 +16,7 @@
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_lib&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=HariSekhon_lib)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_lib&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=HariSekhon_lib)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_lib&metric=security_rating)](https://sonarcloud.io/dashboard?id=HariSekhon_lib)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_lib&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=HariSekhon_lib)
 
 [![Linux](https://img.shields.io/badge/OS-Linux-blue?logo=linux)](https://github.com/HariSekhon/lib#hari-sekhon---perl-library)
 [![Mac](https://img.shields.io/badge/OS-Mac-blue?logo=apple)](https://github.com/HariSekhon/lib#hari-sekhon---perl-library)
