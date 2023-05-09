@@ -31,11 +31,11 @@ perl_lib_start_time="$(start_timer)"
 tests/find_uncovered_subs.sh
 
 # overlaps with bash-tools
-#bash-tools/check_perl_syntax.sh HariSekhonUtils.pm
+#bash-tools/checks/check_perl_syntax.sh HariSekhonUtils.pm
 
 tests/unittest.sh
 
-bash-tools/check_all.sh
+bash-tools/checks/check_all.sh
 
 time_taken "$perl_lib_start_time" "Perl Lib Tests Completed in"
 section2 "Perl Lib Tests Successful"
