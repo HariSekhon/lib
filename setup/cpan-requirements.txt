@@ -15,7 +15,7 @@
 # ============================================================================ #
 
 # moved to bash-tools repo dependencies as script lives there now
-# needed by bash-tools/perl_generate_fatpacks.sh
+# needed by bash-tools/perl/perl_generate_fatpacks.sh
 #App::FatPacker
 
 # needed for other modules to build
