@@ -111,7 +111,7 @@ clean:
 
 .PHONY: deep-clean
 deep-clean: clean
-	# have to remove .cache for Python because we call bash-tools/check_pytools.sh which does a python build
+	# have to remove .cache for Python because we call bash-tools/checks/check_pytools.sh which does a python build
 	$(SUDO) rm -fr /root/.cpan \
 				   /root/.cpanm \
 				   /root/.cache \
