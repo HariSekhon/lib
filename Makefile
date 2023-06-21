@@ -78,7 +78,7 @@ perl:
 	$(CPANM) -V | head -n2
 
 	@echo "Installing Test::More first because some libraries need this to already be present to build"
-	$(BASH_TOOLS)/perl_cpanm_install_if_absent.sh Test::More
+	$(BASH_TOOLS)/perl/perl_cpanm_install_if_absent.sh Test::More
 
 	@echo
 	# called within cpan target
