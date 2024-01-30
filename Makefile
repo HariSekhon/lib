@@ -92,7 +92,7 @@ perl:
 
 .PHONY: reinstall
 reinstall:
-	CPAN_OPTS="--reinstall" $(MAKE) perl
+	PERL_USER_INSTALL=1 CPAN_OPTS="--reinstall" $(MAKE) perl
 
 .PHONY: test
 test:
