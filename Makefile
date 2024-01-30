@@ -90,6 +90,10 @@ perl:
 	@#echo "Installing Redis module or backdated version for older Perl"
 	@#$(SUDO_PERL) $(CPANM) --notest Redis || $(SUDO_PERL) $(CPANM) --notest DAMS/Redis-1.976.tar.gz
 
+.PHONY: reinstall
+reinstall:
+	export CPAN_OPTS="--reinstall" $(MAKE) perl
+
 .PHONY: test
 test:
 	tests/all.sh
