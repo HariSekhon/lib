@@ -36,7 +36,13 @@ Mozilla::CA
 # newer versions of the Redis module require Perl >= 5.10, so may need to install an older version manually to get past this if the packaged version isn't found
 Redis
 Sys::Syslog
-Term::ReadKey
+
+Term::ReadKey  # @2.30 if you hit this infuriating error:
+
+# Can't load 'blib/arch/auto/Term/ReadKey/ReadKey.bundle' for module Term::ReadKey: dlopen(blib/arch/auto/Term/ReadKey/ReadKey.bundle, 0x0001): tried: 'blib/arch/auto/Term/ReadKey/ReadKey.bundle' (relative path not allowed in hardened program), '/System/Volumes/Preboot/Cryptexes/OSblib/arch/auto/Term/ReadKey/ReadKey.bundle' (no such file), '/usr/lib/blib/arch/auto/Term/ReadKey/ReadKey.bundle' (no such file, not in dyld cache) at /System/Library/Perl/5.30/darwin-thread-multi-2level/DynaLoader.pm line 197.
+#  at /System/Library/Perl/5.30/darwin-thread-multi-2level/DynaLoader.pm line 95.
+#          DynaLoader::croak("Can't load 'blib/arch/auto/Term/ReadKey/ReadKey.bundle' for m"...) called at /System/Library/Perl/5.30/darwin-thread-multi-2level/DynaLoader.pm line 197
+
 Time::HiRes
 #XML::SAX
 XML::Simple
