@@ -45,6 +45,15 @@ if($Config{usethreads}){
     require threads;
     import threads;
 }
+# breaks Perl Taint mode programs - for untainted programs, better to let user set $PERL5LIB
+#BEGIN {
+#    if($ENV{"HOME"} =~ /^(\/[\w-]+)$/){
+#        $ENV{"HOME"} = $1;
+#        # use happens too early before $1 is populated or $HOME is changed, even when not in a BEGIN block
+#        # breaks taint mode programs
+#        use lib "$ENV{HOME}/perl5/lib";
+#    }
+#}
 use 5.006_001;
 use Carp;
 use Cwd 'abs_path';
