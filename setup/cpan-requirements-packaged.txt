@@ -23,8 +23,9 @@ JSON::XS
 LWP::Authen::Negotiate
 LWP::Protocol::https
 Math::Round
-MongoDB
-MongoDB::MongoClient
+# now fails to build due to BSON::XS - so moved to cpan-requirements-optional.txt
+#MongoDB
+#MongoDB::MongoClient
 Mozilla::CA
 #Net::LDAP
 #Net::LDAPI
