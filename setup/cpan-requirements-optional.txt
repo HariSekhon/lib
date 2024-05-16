@@ -16,5 +16,9 @@
 
 # Try to install but don't fail if they do
 
+# fails to build due to BSON::XS error and it's EOL
+MongoDB
+MongoDB::MongoClient
+
 # installs but returns an error code
 Thrift
