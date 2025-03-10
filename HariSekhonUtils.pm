@@ -452,6 +452,7 @@ our %EXPORT_TAGS = (
     'web'   =>  [   qw(
                         curl
                         curl_json
+                        curl_redirect
                         wget
                     ) ],
 );
@@ -1483,6 +1484,29 @@ sub curl_json ($;$$$$$$) {
     $json = isJson($content) or quit "CRITICAL", "invalid json returned " . ( $name ? "by $name at $url" : "from $url");
 }
 
+sub curl_redirect ($;$$$$$$) {
+    my $url         = shift;
+    my $name        = shift;
+    my $user        = shift;
+    my $password    = shift;
+    my $err_handler = shift;
+    my $type        = shift() || 'GET';
+    my $body        = shift;
+
+    defined_main_ua();
+    $main::ua->add_handler(response_redirect => sub {
+        my($response, $ua, $h) = @_;
+
+        if ($response->code == 307) {
+            my $active = $response->header("Location");
+            quit("OK", "Standby with active at $active");
+        }
+
+        return undef;
+    });
+
+    return curl $url, $name, $user, $password, $err_handler, $type, $body;
+}
 
 sub debug (@) {
     return unless $debug;
