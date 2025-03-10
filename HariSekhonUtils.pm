@@ -2183,9 +2183,16 @@ sub isInt ($;$) {
 sub isInterface ($) {
     my $interface = shift;
     defined($interface) || return;
+    my $vlan;
+    ($interface, $vlan) = split(/\./, $interface);
+    $interface = isAlNum($interface) or return;
+    if ($vlan) {
+        isInt($vlan) or return;
+        ($vlan > 0 && $vlan < 4095) or return;
+        $interface .= "." . $vlan
+    }
     # TODO: consider checking if the interface actually exists on the system
-    $interface =~ /^((?:em|eth|bond|lo|docker)\d+|lo|veth[A-Fa-f0-9]+)$/ or return;
-    return $1;
+    return $interface;
 }
 
 
@@ -3681,7 +3688,7 @@ sub validate_int ($$;$$) {
 sub validate_interface ($) {
     my $interface = shift;
     defined($interface) || usage "interface not defined";
-    $interface = isInterface($interface) || usage "invalid interface defined: must be either eth<N>, bond<N> or lo<N>";
+    $interface = isInterface($interface) || usage "invalid interface defined: must be either alfanumeric or alfanumber.number";
     vlog_option("interface", $interface);
     return $interface;
 }
