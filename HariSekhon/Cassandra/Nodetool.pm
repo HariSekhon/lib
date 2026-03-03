@@ -33,6 +33,7 @@ our @EXPORT = ( qw (
                         die_nodetool_unrecognized_output
                         nodetool_options
                         skip_nodetool_output
+			            skip_connection_refused
                         validate_nodetool
                         validate_nodetool_options
                 )
@@ -94,10 +95,9 @@ our $nodetool_errors_regex = qr/
                                 You\s+must\s+set |
                                 Cannot\s+resolve |
                                 unknown\s+host   |
-                                connection\s+refused  |
                                 failed\s+to\s+connect |
-                                error |
-                                user  |
+                                error    |
+                                user     |
                                 password |
                                 Exception(?!s\s*:\s*\d+) |
                                 in thread
@@ -106,7 +106,11 @@ our $nodetool_errors_regex = qr/
 sub check_nodetool_errors($){
     @_ or code_error "no input passed to check_nodetool_errors()";
     my $str = join(" ", @_);
-    quit "CRITICAL", $str if $str =~ /$nodetool_errors_regex/;
+    if(skip_connection_refused($str)) {
+         return 1;
+    }else{
+         quit "CRITICAL", $str if $str =~ /$nodetool_errors_regex/;
+    }
 }
 
 sub skip_nodetool_output($){
@@ -117,6 +121,15 @@ sub skip_nodetool_output($){
         return 1;
     }
     return 0;
+}
+
+sub skip_connection_refused($){
+	@_ or code_error "no input passed to skip_nodetool_output()";
+    	my $str = join(" ", @_);
+	if($str =~ /connection\s+refused/i) {
+		return 1;
+	}
+	return 0;
 }
 
 # Cassandra 2.0 DataStax Community Edition (nodetool version gives 'ReleaseVersion: 2.0.2')
