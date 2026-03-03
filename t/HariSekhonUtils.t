@@ -666,11 +666,12 @@ is(validate_integer(6,"six",5,7),    6,  'validate_integer(6,"six",5,7)');
 
 # ============================================================================ #
 is(isInterface("eth0"),     "eth0",     'isInterface("eth0")');
+is(isInterface("eth0.100"), "eth0.100", 'isInterface("eth0.100")');
 is(isInterface("bond3"),    "bond3",    'isInterface("bond3")');
 is(isInterface("lo"),       "lo",       'isInterface("lo")');
 is(isInterface("docker0"),  "docker0",  'isInterface("docker0")');
 is(isInterface("vethfa1b2c3"), "vethfa1b2c3", 'isInterface("vethfa1b2c3")');
-ok(!isInterface("vethfa1b2z3"), 'isInterface("vethfa1b2z3")');
+is(isInterface("vethfa1b2c3.100"), "vethfa1b2c3.100", 'isInterface("vethfa1b2c3.100")');
 ok(!isInterface('b@interface'), '!isInterface(\'b@dinterface\'');
 
 is(validate_interface("eth0"),     "eth0",     'validate_interface("eth0")');
